@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🛍️ CashShilpo - AI Powered Universal POS</title>
+    <!-- External Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700&family=Source+Code+Pro:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+
+    <!-- Link to modular stylesheet -->
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body class="bg-dots">
+    <div class="flex h-screen bg-bg-primary text-text-secondary">
+      <!-- Sidebar Navigation -->
+      <aside
+        id="sidebar"
+        class="w-64 bg-[var(--bg-secondary)] flex flex-col transition-all duration-300 border-r border-border-color shrink-0"
+      >
+        <div class="h-24 flex items-center justify-between px-6 shrink-0">
+          <div class="flex items-center overflow-hidden">
+            <i data-lucide="gem" class="w-10 h-10 text-accent shrink-0"></i>
+            <span
+              id="brand-name"
+              class="ml-4 text-2xl font-bold text-text-primary tracking-tighter"
+              >CashShilpo</span
+            >
+          </div>
+        </div>
+        <nav id="main-nav" class="flex-1 px-4 py-4 space-y-2">
+          <a
+            href="#"
+            data-view="dashboard"
+            class="nav-link flex items-center p-3 rounded-lg hover:bg-bg-tertiary hover:text-white group"
+          >
+            <i
+              data-lucide="layout-dashboard"
+              class="w-6 h-6 shrink-0 text-gray-400 group-hover:text-accent"
+            ></i
+            ><span class="nav-link-text ml-4 font-medium">Dashboard</span>
+          </a>
+          <a
+            href="#"
+            data-view="pos"
+            class="nav-link flex items-center p-3 rounded-lg hover:bg-bg-tertiary hover:text-white group"
+          >
+            <i
+              data-lucide="scan-line"
+              class="w-6 h-6 shrink-0 text-gray-400 group-hover:text-accent"
+            ></i
+            ><span class="nav-link-text ml-4 font-medium">POS Terminal</span>
+          </a>
+          <a
+            href="#"
+            data-view="invoices"
+            class="nav-link flex items-center p-3 rounded-lg hover:bg-bg-tertiary hover:text-white group"
+          >
+            <i
+              data-lucide="file-text"
+              class="w-6 h-6 shrink-0 text-gray-400 group-hover:text-accent"
+            ></i
+            ><span class="nav-link-text ml-4 font-medium">Invoices</span>
+          </a>
+          <a
+            href="#"
+            data-view="inventory"
+            class="nav-link flex items-center p-3 rounded-lg hover:bg-bg-tertiary hover:text-white group"
+          >
+            <i
+              data-lucide="boxes"
+              class="w-6 h-6 shrink-0 text-gray-400 group-hover:text-accent"
+            ></i
+            ><span class="nav-link-text ml-4 font-medium">Inventory</span>
+          </a>
+          <a
+            href="#"
+            data-view="reports"
+            class="nav-link flex items-center p-3 rounded-lg hover:bg-bg-tertiary hover:text-white group"
+          >
+            <i
+              data-lucide="bar-chart-3"
+              class="w-6 h-6 shrink-0 text-gray-400 group-hover:text-accent"
+            ></i
+            ><span class="nav-link-text ml-4 font-medium">Reports</span>
+          </a>
+          <a
+            href="#"
+            data-view="customers"
+            class="nav-link flex items-center p-3 rounded-lg hover:bg-bg-tertiary hover:text-white group"
+          >
+            <i
+              data-lucide="users"
+              class="w-6 h-6 shrink-0 text-gray-400 group-hover:text-accent"
+            ></i
+            ><span class="nav-link-text ml-4 font-medium">Customers</span>
+          </a>
+          <a
+            href="#"
+            data-view="settings"
+            class="nav-link flex items-center p-3 rounded-lg hover:bg-bg-tertiary hover:text-white group"
+          >
+            <i
+              data-lucide="settings"
+              class="w-6 h-6 shrink-0 text-gray-400 group-hover:text-accent"
+            ></i
+            ><span class="nav-link-text ml-4 font-medium">Settings</span>
+          </a>
+        </nav>
+        <div class="p-4 border-t border-border-color shrink-0">
+          <a
+            href="#"
+            class="flex items-center p-3 rounded-lg hover:bg-bg-tertiary"
+          >
+            <img
+              src="https://placehold.co/40x40/007BFF/ffffff?text=A"
+              class="w-10 h-10 rounded-full ring-2 ring-border-color shrink-0"
+              alt="User Avatar"
+            />
+            <div class="user-profile-details ml-4">
+              <p class="font-semibold text-text-primary">Admin User</p>
+              <p class="text-xs text-text-secondary">admin@cashshilpo.com</p>
+            </div>
+          </a>
+        </div>
+      </aside>
+
+      <!-- Sidebar Backdrop for Mobile -->
+      <div
+        id="sidebar-backdrop"
+        class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden"
+      ></div>
+
+      <!-- Main Content Workspace -->
+      <main class="flex-1 flex flex-col bg-bg-primary overflow-hidden">
+        <header
+          class="h-24 flex items-center justify-between px-8 border-b border-border-color shrink-0 bg-[var(--bg-secondary)]/50"
+        >
+          <div class="flex items-center gap-4">
+            <button
+              id="sidebar-toggle"
+              class="text-text-secondary hover:text-text-primary p-2 -ml-2 rounded-md"
+            >
+              <i data-lucide="panel-left-close" class="w-6 h-6"></i>
+            </button>
+            <button
+              data-action="open-search"
+              class="flex items-center gap-2 text-text-secondary hover:text-text-primary bg-bg-tertiary px-4 py-2 rounded-lg border border-border-color"
+            >
+              <i data-lucide="search" class="w-5 h-5"></i>
+              <span class="text-sm hidden md:inline">Search...</span>
+              <kbd
+                class="ml-4 text-xs font-sans border border-border-color-strong rounded px-1.5 py-0.5 hidden md:inline"
+                >⌘K</kbd
+              >
+            </button>
+          </div>
+          <div class="flex items-center gap-2 md:gap-4">
+            <!-- Currency Selector Dropdown -->
+            <div class="relative">
+              <button
+                data-action="toggle-action-menu"
+                class="flex items-center gap-2 text-text-secondary hover:text-text-primary bg-bg-tertiary px-3 py-2 rounded-lg border border-border-color"
+              >
+                <i data-lucide="globe" class="w-5 h-5"></i>
+                <span
+                  id="current-currency-display"
+                  class="text-sm font-semibold"
+                  >USD</span
+                >
+                <i
+                  data-lucide="chevron-down"
+                  class="w-4 h-4 text-text-secondary"
+                ></i>
+              </button>
+              <div id="currency-menu" class="action-menu w-40">
+                <!-- Currency options will be injected here -->
+              </div>
+            </div>
+            <button
+              data-action="show-shortcuts"
+              class="text-text-secondary hover:text-text-primary p-2 rounded-full hover:bg-bg-tertiary"
+            >
+              <i data-lucide="help-circle" class="w-6 h-6"></i>
+            </button>
+            <button
+              data-action="open-notifications"
+              class="text-text-secondary hover:text-text-primary relative p-2"
+            >
+              <i data-lucide="bell" class="w-6 h-6"></i
+              ><span
+                class="absolute top-1 right-1 w-2.5 h-2.5 bg-danger rounded-full border-2 border-bg-secondary"
+              ></span>
+            </button>
+            <button
+              id="ai-assistant-btn"
+              class="bg-accent text-white rounded-full p-2 hover:bg-accent-hover transition-all transform hover:scale-110 shadow-lg shadow-accent-glow"
+            >
+              <i data-lucide="sparkles" class="w-6 h-6"></i>
+            </button>
+          </div>
+        </header>
+        <div
+          id="main-tabs-container"
+          class="flex-shrink-0 flex items-center border-b border-border-color px-4 bg-[var(--bg-secondary)]/50"
+        ></div>
+        <div id="workspace-content" class="flex-1 p-4 md:p-8 overflow-y-auto">
+          <!-- Dynamic content will be loaded here -->
+        </div>
+      </main>
+    </div>
+
+    <!-- Modals Container -->
+    <div id="modals-container"></div>
+
+    <!-- Toasts Container -->
+    <div
+      id="toasts-container"
+      class="fixed bottom-6 right-6 z-[100] space-y-3 w-full max-w-sm md:max-w-md"
+    ></div>
+
+    <!-- Link to modular scripts -->
+    <script src="database.js"></script>
+    <script src="utils.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,18859 @@
+// --- FIREBASE SDK IMPORTS ---
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+  updateProfile,
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  onSnapshot,
+  collection,
+  query,
+  where,
+  writeBatch,
+  runTransaction,
+  getDocs,
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+// --- SESSION START TIME ---
+// We record when the page loads to differentiate between new and historical notifications.
+const sessionStartTime = new Date();
+
+// --- GEMINI API Configuration ---
+const gemini_api_key = "AIzaSyCWKlR6mzcAaLGGUwzAk-4M1-4DoI0QbWY"; // Injected by the environment
+
+// --- FIREBASE CONFIG & INITIALIZATION ---
+const firebaseConfig = {
+  apiKey: "AIzaSyCBhzyl_1KpaROyjDaXX7fyLv-gQRoOTY0",
+  authDomain: "cashshilpo.firebaseapp.com",
+  projectId: "cashshilpo",
+  storageBucket: "cashshilpo.firebasestorage.app",
+  messagingSenderId: "544846655087",
+  appId: "1:544846655087:web:0269ce6564c6b42c62a79a",
+  measurementId: "G-GT06B6K2T6",
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// --- SMART SYSTEM PROFILES (Remains static) ---
+let businessProfiles = {
+  general: {
+    name: "General Store",
+    icon: "store",
+    terminology: {
+      product: "Product",
+      inventory: "Inventory",
+      category: "Category",
+    },
+    features: {
+      serials: true,
+      expiry: true,
+      service: true,
+      hasInventoryTab: true,
+    },
+    customFields: [
+      { name: "brand", label: "Brand", type: "text" },
+      { name: "supplier", label: "Supplier", type: "text" },
+    ],
+  },
+  grocery: {
+    name: "Super Shop",
+    icon: "shopping-cart",
+    terminology: {
+      product: "Item",
+      inventory: "Stock",
+      category: "Department",
+    },
+    features: {
+      serials: false,
+      expiry: true,
+      service: false,
+      hasInventoryTab: true,
+    },
+    customFields: [
+      { name: "brand", label: "Brand", type: "text" },
+      {
+        name: "weight",
+        label: "Net Weight",
+        type: "text",
+        placeholder: "e.g., 500g, 1L",
+      },
+    ],
+  },
+  electronics: {
+    name: "Electronics Store",
+    icon: "smartphone",
+    terminology: {
+      product: "Device",
+      inventory: "Inventory",
+      category: "Brand",
+    },
+    features: {
+      serials: true,
+      expiry: false,
+      service: true,
+      hasInventoryTab: true,
+    },
+    customFields: [
+      { name: "brand", label: "Brand", type: "text" },
+      { name: "model", label: "Model", type: "text" },
+      { name: "specifications", label: "Specifications", type: "textarea" },
+    ],
+  },
+  pharmacy: {
+    name: "Pharmacy",
+    icon: "briefcase-medical",
+    terminology: {
+      product: "Medicine",
+      inventory: "Stock",
+      category: "Category",
+    },
+    features: {
+      serials: false,
+      expiry: true,
+      service: false,
+      hasInventoryTab: true,
+    },
+    customFields: [
+      { name: "manufacturer", label: "Manufacturer", type: "text" },
+      { name: "genericName", label: "Generic Name", type: "text" },
+      {
+        name: "strength",
+        label: "Strength",
+        type: "text",
+        placeholder: "e.g., 500mg",
+      },
+    ],
+  },
+  restaurant: {
+    name: "Restaurant",
+    icon: "utensils-crossed",
+    terminology: {
+      product: "Dish",
+      inventory: "Ingredients",
+      category: "Menu Section",
+    },
+    features: {
+      serials: false,
+      expiry: false,
+      service: true,
+      hasInventoryTab: true,
+    },
+    customFields: [
+      { name: "ingredients", label: "Key Ingredients", type: "textarea" },
+      {
+        name: "spiceLevel",
+        label: "Spice Level",
+        type: "select",
+        options: ["Mild", "Medium", "Hot", "Extra Hot"],
+      },
+      { name: "isVeg", label: "Vegetarian", type: "checkbox" },
+    ],
+  },
+  apparel: {
+    name: "Apparel Boutique",
+    icon: "shirt",
+    terminology: {
+      product: "Apparel",
+      inventory: "Stock",
+      category: "Collection",
+    },
+    features: {
+      serials: false,
+      expiry: false,
+      service: false,
+      hasInventoryTab: true,
+    },
+    customFields: [
+      { name: "color", label: "Color", type: "text" },
+      {
+        name: "size",
+        label: "Size",
+        type: "select",
+        options: ["XS", "S", "M", "L", "XL", "XXL"],
+      },
+      { name: "material", label: "Material", type: "text" },
+    ],
+  },
+  repair: {
+    name: "Repair Services",
+    icon: "wrench",
+    terminology: {
+      product: "Service",
+      inventory: "Parts",
+      category: "Service Type",
+    },
+    features: {
+      serials: true,
+      expiry: false,
+      service: true,
+      hasInventoryTab: true,
+    },
+    customFields: [
+      {
+        name: "deviceDetails",
+        label: "Device/Item Details",
+        type: "text",
+        placeholder: "e.g., iPhone 14 Pro, Honda Civic",
+      },
+      {
+        name: "serviceDuration",
+        label: "Estimated Duration",
+        type: "text",
+        placeholder: "e.g., 2 hours, 3-5 days",
+      },
+      { name: "technician", label: "Assigned Technician", type: "text" },
+    ],
+  },
+  salon: {
+    name: "Salon & Spa",
+    icon: "scissors",
+    terminology: {
+      product: "Service",
+      inventory: "Products",
+      category: "Service Category",
+    },
+    features: {
+      serials: false,
+      expiry: false,
+      service: true,
+      hasInventoryTab: true,
+    },
+    customFields: [
+      { name: "duration", label: "Duration (minutes)", type: "text" },
+      { name: "therapist", label: "Stylist/Therapist", type: "text" },
+      { name: "bookingRequired", label: "Booking Required", type: "checkbox" },
+    ],
+  },
+  consulting: {
+    name: "Consulting Agency",
+    icon: "briefcase",
+    terminology: {
+      product: "Service",
+      inventory: "Resources",
+      category: "Engagement Type",
+    },
+    features: {
+      serials: false,
+      expiry: false,
+      service: true,
+      hasInventoryTab: false,
+    },
+    customFields: [
+      {
+        name: "billingType",
+        label: "Billing Type",
+        type: "select",
+        options: ["Hourly", "Fixed Project", "Retainer"],
+      },
+      { name: "consultant", label: "Lead Consultant", type: "text" },
+      { name: "deliverables", label: "Key Deliverables", type: "textarea" },
+    ],
+  },
+  digital: {
+    name: "Digital Services / SaaS",
+    icon: "cloud-cog",
+    terminology: {
+      product: "Plan / Service",
+      inventory: "Licenses",
+      category: "Service Tier",
+    },
+    features: {
+      serials: false,
+      expiry: false,
+      service: true,
+      hasInventoryTab: false,
+    },
+    customFields: [
+      {
+        name: "billingCycle",
+        label: "Billing Cycle",
+        type: "select",
+        options: ["Monthly", "Annually", "One-time"],
+      },
+      { name: "featuresList", label: "Features Included", type: "textarea" },
+      {
+        name: "supportLevel",
+        label: "Support Level",
+        type: "text",
+        placeholder: "e.g., Basic, Premium, 24/7",
+      },
+    ],
+  },
+};
+// --- NEW: USER ROLES & PERMISSIONS ---
+// Defines the permission structure for different roles in the system.
+const userRoles = {
+  admin: {
+    name: "Administrator",
+    permissions: {
+      canDoEverything: true, // A master key permission
+    },
+  },
+  manager: {
+    name: "Manager",
+    permissions: {
+      canAccessDashboard: {
+        value: true,
+        description: "Can view the main dashboard and analytics.",
+      },
+      canUsePOS: {
+        value: true,
+        description: "Can access and use the Point of Sale terminal.",
+      },
+      canManageInvoices: {
+        value: true,
+        description: "Can view, create, and manage all invoices.",
+      },
+      canManageInventory: {
+        value: false,
+        description: "DEPRECATED: Use granular permissions instead.",
+      }, // MODIFIED
+      canAddProducts: { value: true, description: "Can add new products." }, // NEW
+      canEditProducts: {
+        value: true,
+        description: "Can edit existing products.",
+      }, // NEW
+      canDeactivateProducts: {
+        value: true,
+        description: "Can activate or deactivate products.",
+      }, // NEW
+      canDeleteProducts: {
+        value: false,
+        description: "Cannot permanently delete products.",
+      }, // NEW
+      canViewInventory: {
+        value: true,
+        description: "Can view the inventory list and product details.",
+      }, // NEW
+      canViewProfitAndLoss: {
+        value: false,
+        description:
+          "Can view gross profit, cost prices, and other profit-related metrics.",
+      }, // NEW PERMISSION
+      canAccessReports: {
+        value: true,
+        description: "Can generate and view all business reports.",
+      },
+      canSeeAllReports: {
+        value: true,
+        description: "Can see reports for all staff, not just their own.",
+      }, // NEW
+      canManageCustomers: {
+        value: true,
+        description: "Can add, edit, and delete customer profiles.",
+      },
+      canManageStaff: {
+        value: false,
+        description: "Can invite and manage staff roles and permissions.",
+      },
+      canManageRoles: {
+        value: false,
+        description: "Can view and edit user role permissions.",
+      }, // NEW
+      canInviteCashiers: {
+        value: true,
+        description: "Can invite new cashiers, pending admin approval.",
+      },
+      canViewStaffPerformance: {
+        value: true,
+        description: "Can view performance reports for staff.",
+      },
+      canManageSettings: {
+        value: true,
+        description: "Can change store settings, receipt templates, etc.",
+      },
+      canRequestStaffDeactivation: {
+        value: true,
+        description:
+          "Can request to deactivate a cashier, pending admin approval.",
+      },
+      canEditCashierDetails: {
+        value: true,
+        description: "Can edit basic details of a cashier, like their name.",
+      },
+      canDirectlyVoidInvoice: {
+        value: true,
+        description: "Can directly void an invoice without a prior request.",
+      }, // NEW
+      canManageExpenses: {
+        value: true,
+        description: "Can add and view their own business expenses.",
+      }, // MODIFIED
+      canAddExpenses: {
+        value: true,
+        description: "Can add new business expenses.",
+      }, // NEW
+      canEditExpenses: { value: false, description: "Cannot edit expenses." }, // NEW
+      canDeleteExpenses: {
+        value: false,
+        description: "Cannot delete expenses.",
+      }, // NEW
+    },
+  },
+  cashier: {
+    name: "Cashier",
+    permissions: {
+      canAccessDashboard: {
+        value: true,
+        description: "Can view the main dashboard and analytics.",
+      },
+      canUsePOS: {
+        value: true,
+        description: "Can access and use the Point of Sale terminal.",
+      },
+      canManageInvoices: {
+        value: true,
+        description: "Can view, create, and manage all invoices.",
+      },
+      canManageInventory: {
+        value: false,
+        description: "Can add, edit, and delete products and adjust stock.",
+      },
+      canAddProducts: { value: false, description: "Can add new products." }, // NEW
+      canEditProducts: {
+        value: false,
+        description: "Can edit existing products.",
+      }, // NEW
+      canDeactivateProducts: {
+        value: false,
+        description: "Can activate or deactivate products.",
+      }, // NEW
+      canDeleteProducts: {
+        value: false,
+        description: "Cannot permanently delete products.",
+      }, // NEW
+      canViewInventory: {
+        value: true,
+        description: "Can view the inventory list and product details.",
+      }, // NEW
+      canViewProfitAndLoss: {
+        value: false,
+        description:
+          "Can view gross profit, cost prices, and other profit-related metrics.",
+      }, // NEW PERMISSION
+      canAccessReports: {
+        value: true,
+        description: "Can generate and view all business reports.",
+      }, // MODIFIED
+      canSeeAllReports: {
+        value: false,
+        description: "Can see reports for all staff, not just their own.",
+      }, // NEW
+      canManageCustomers: {
+        value: true,
+        description: "Can add, edit, and delete customer profiles.",
+      },
+      canManageStaff: {
+        value: false,
+        description: "Can invite and manage staff roles and permissions.",
+      },
+      canManageRoles: {
+        value: false,
+        description: "Can view and edit user role permissions.",
+      }, // NEW
+      canViewStaffPerformance: {
+        value: false,
+        description: "Can view performance reports for staff.",
+      },
+      canManageSettings: {
+        value: false,
+        description: "Can change store settings, receipt templates, etc.",
+      },
+      canRequestInvoiceVoid: {
+        value: true,
+        description:
+          "Can request to void an invoice, pending manager approval.",
+      }, // NEW
+      canCancelVoidRequest: {
+        value: true,
+        description: "Can cancel their own pending void requests.",
+      }, // NEW
+      canManageExpenses: {
+        value: false,
+        description: "Cannot manage business expenses.",
+      }, // NEW
+      canAddExpenses: {
+        value: false,
+        description: "Cannot add new business expenses.",
+      }, // NEW
+      canEditExpenses: { value: false, description: "Cannot edit expenses." }, // NEW
+      canDeleteExpenses: {
+        value: false,
+        description: "Cannot delete expenses.",
+      }, // NEW
+    },
+  },
+};
+// --- REAL-TIME DATA STORE ---
+// This object will be populated by Firestore listeners
+let firestoreData = {
+  storeInfo: {},
+  unitsOfMeasurement: [],
+  products: [],
+  customers: [],
+  invoices: [],
+  staff: [], // NEW: To hold all staff members
+  notifications: [], // For now, notifications will remain local
+  auditLog: [], // NEW: To hold audit logs
+  expenses: [], // NEW: To hold expense records
+};
+
+// --- NEW: To manage Firestore listeners ---
+let activeListeners = [];
+
+// --- APPLICATION STATE (UI and Session state) ---
+let appState = {
+  tabs: [],
+  activeTabId: null,
+  isSidebarCollapsed: false,
+  isHeaderCollapsed: false, // NEW: For header state
+  currentCurrency: "USD", // Will be updated from storeInfo
+  settings: {
+    // Will be updated from storeInfo.settings
+    selectedReceiptTemplate: "modern",
+    posLayout: "classic", // To switch between POS layouts
+    businessType: "general",
+    defaultCurrency: "USD",
+    taxRate: 10,
+    defaultUnit: "pcs",
+    voidLockoutDays: 30,
+    automations: {
+      // Default automation settings
+      dynamicPricing: { enabled: false, strategy: "balanced" },
+      fraudDetection: { enabled: true, sensitivity: "high" },
+      inventoryOptimization: { enabled: true, analysisFrequency: "weekly" },
+      endOfDayReports: { enabled: true, deliveryTime: "22:00" },
+    },
+    permissions: {}, // NEW: Will hold customized role permissions
+  },
+  viewStates: {
+    inventory: {
+      currentPage: 1,
+      searchQuery: "",
+      filters: { category: "all", stockStatus: "all" },
+    },
+    customers: { currentPage: 1, searchQuery: "", filters: {} },
+    invoices: { currentPage: 1, searchQuery: "", filters: { status: "all" } },
+    reports: {
+      currentPage: 1,
+      searchQuery: "",
+      reportType: "sales",
+      filters: { cashierId: "all" },
+    },
+    posModern: {
+      collapsedCategories: [],
+      isCategoryPanelCollapsed: false,
+      activeCategory: "top-sellers",
+    }, // For persisting modern POS category collapse state
+    staff: {
+      currentPage: 1,
+      searchQuery: "",
+      filters: { role: "all", status: "all" },
+    }, // NEW: For staff view state
+    expenses: {
+      currentPage: 1,
+      searchQuery: "",
+      filters: { category: "all", period: "last30", paymentMethod: "all" },
+      customRange: { start: "", end: "" },
+    }, // MODIFIED: For expenses view state
+  },
+  itemsPerPage: 15, // Global items per page
+  customProfiles: {},
+  session: {
+    currentUser: null, // NEW: Will hold the logged-in user's full data
+    userRole: null, // NEW: e.g., 'admin', 'manager'
+    userPermissions: {}, // NEW: Will hold the boolean permissions
+    storeId: null, // The currently active storeId
+    availableStores: [], // NEW: To hold all stores for a user [{id, name}]
+  },
+  firebaseReady: false, // Flag to check if initial data load is complete
+  endOfDayReportScheduled: false, // Flag to ensure the report is scheduled only once
+};
+let posState = { sales: [], activeSaleId: null, saleCounter: 1 };
+
+// --- UPDATED: Centralized Chart Styling ---
+const chartStyles = {
+  fontFamily: "'Inter', sans-serif",
+  palettes: {
+    // --- NEW GENTLE & PROFESSIONAL PALETTES ---
+    gentleOcean: ["#38bdf8", "#7dd3fc", "#bae6fd", "#e0f2fe", "#f0f9ff"],
+    softMeadow: ["#4ade80", "#86efac", "#bbf7d0", "#dcfce7", "#f0fdf4"],
+    warmStone: ["#fbbf24", "#fcd34d", "#fde68a", "#fef3c7", "#fffbeb"],
+    mutedSunset: ["#f472b6", "#f9a8d4", "#fbcfe8", "#fce7f3", "#fdf2f8"],
+    coolSlate: ["#94a3b8", "#cbd5e1", "#e2e8f0", "#f1f5f9", "#f8fafc"],
+  },
+  createGradient(ctx, color) {
+    if (!ctx || !ctx.canvas) return color;
+    const gradient = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height);
+    // Softer gradient
+    const a = this.hexToRgba(color, 0.4);
+    const b = this.hexToRgba(color, 0.0);
+    gradient.addColorStop(0, a);
+    gradient.addColorStop(1, b);
+    return gradient;
+  },
+  hexToRgba(hex, alpha = 1) {
+    let c;
+    if (/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) {
+      c = hex.substring(1).split("");
+      if (c.length == 3) {
+        c = [c[0], c[0], c[1], c[1], c[2], c[2]];
+      }
+      c = "0x" + c.join("");
+      return `rgba(${[(c >> 16) & 255, (c >> 8) & 255, c & 255].join(
+        ","
+      )},${alpha})`;
+    }
+    throw new Error("Bad Hex");
+  },
+};
+
+// --- UPDATED: Custom Glow Plugin for Charts (More Subtle) ---
+const chartGlowPlugin = {
+  id: "chartGlow",
+  beforeDatasetsDraw: (chart, args, options) => {
+    const { ctx } = chart;
+    ctx.save();
+    // Subtle shadow instead of a bright glow
+    ctx.shadowColor = options.color || "rgba(0,0,0,0.1)";
+    ctx.shadowBlur = options.blur || 10;
+    ctx.shadowOffsetX = options.offsetX || 0;
+    ctx.shadowOffsetY = options.offsetY || 5;
+  },
+  afterDatasetsDraw: (chart) => {
+    chart.ctx.restore();
+  },
+};
+Chart.register(chartGlowPlugin);
+
+const getCurrentProfile = () => {
+  const profileId = appState.settings.businessType;
+  return (
+    businessProfiles[profileId] ||
+    appState.customProfiles[profileId] ||
+    businessProfiles.general
+  );
+};
+
+// --- AI & API UTILITIES ---
+
+/**
+ * A wrapper for the fetch API that includes exponential backoff for retries.
+ * @param {string} url The API endpoint URL.
+ * @param {object} options The fetch options (method, headers, body).
+ * @param {number} retries Number of retries.
+ * @returns {Promise<Response>} The fetch response.
+ */
+const fetchWithRetry = async (url, options, retries = 3) => {
+  let lastError;
+  for (let i = 0; i < retries; i++) {
+    try {
+      const response = await fetch(url, options);
+      // Retry only on 5xx server errors
+      if (response.status >= 500 && response.status < 600) {
+        throw new Error(`Server Error: ${response.status}`);
+      }
+      return response; // Success
+    } catch (error) {
+      lastError = error;
+      console.warn(
+        `[API] Attempt ${i + 1} failed: ${error.message}. Retrying in ${
+          Math.pow(2, i) * 1000
+        }ms...`
+      );
+      // Don't wait on the last attempt
+      if (i < retries - 1) {
+        await new Promise((res) => setTimeout(res, Math.pow(2, i) * 1000));
+      }
+    }
+  }
+  // After all retries, throw the last captured error
+  throw lastError;
+};
+
+/**
+ * Calls the generative AI model to get structured product data from a natural language prompt.
+ * @param {string} prompt The user's prompt for the AI (e.g., product name and details).
+ * @param {object} profile The current business profile to provide context to the AI.
+ * @returns {Promise<object>} A promise that resolves with the AI response.
+ */
+const callGenerativeAI = async (prompt, profile) => {
+  // NEW: Restrict this powerful AI feature to admins only.
+  if (appState.session.userRole !== "admin") {
+    console.warn(
+      `[AI] Denied access to generative AI for role: ${appState.session.userRole}`
+    );
+    return {
+      success: false,
+      error: "You do not have permission to use this feature.",
+    };
+  }
+
+  console.log(
+    `[AI] Calling Gemini API for product generation with prompt: "${prompt}"`
+  );
+  document.getElementById("ai-thinking-indicator")?.classList.remove("hidden");
+
+  const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${gemini_api_key}`;
+
+  // Dynamically build the system prompt based on the business profile
+  let systemInstruction = `You are an expert data entry assistant for a Point of Sale system. Your task is to extract product information from a user's detailed prompt and return it as a structured JSON object.
+            The business type is: "${profile.name}".
+            Use the following terminology: The product is called a "${
+              profile.terminology.product
+            }", its category is a "${profile.terminology.category}".
+            From the user's prompt, extract the product's name, a suitable category, its selling price, its cost price, its barcode (if available), and its initial stock quantity. Assume the currency is USD unless specified otherwise.
+            Also, determine if the product is 'physical' or 'service', if it's taxable, and if it requires a serial number (${
+              profile.features.serials
+                ? "this business supports serial numbers"
+                : "this business does not typically use serial numbers"
+            }).
+            Fill in the following custom fields based ONLY on the information provided in the prompt: ${profile.customFields
+              .map((f) => `"${f.label}"`)
+              .join(", ")}.
+            Do not search online or invent information not present in the prompt. If a value is not found in the prompt, omit the key. The prices and stock should be numbers, not strings.`;
+
+  const productSchema = {
+    type: "OBJECT",
+    properties: {
+      name: { type: "STRING" },
+      category: { type: "STRING" },
+      price: {
+        type: "NUMBER",
+        description: "Selling price mentioned in the prompt.",
+      },
+      costPrice: {
+        type: "NUMBER",
+        description: "Cost or wholesale price mentioned in the prompt.",
+      },
+      stock: {
+        type: "NUMBER",
+        description: "The initial stock or inventory quantity mentioned.",
+      },
+      barcode: {
+        type: "STRING",
+        description:
+          "The barcode number (UPC, EAN, etc.) mentioned in the prompt.",
+      },
+      productType: { type: "STRING", enum: ["physical", "service"] },
+      taxable: { type: "BOOLEAN" },
+      isSerialized: { type: "BOOLEAN" },
+      customData: {
+        type: "OBJECT",
+        properties: profile.customFields.reduce((acc, field) => {
+          acc[field.label] = { type: "STRING" };
+          return acc;
+        }, {}),
+      },
+    },
+    required: ["name", "category", "price", "productType"],
+  };
+
+  const payload = {
+    contents: [{ parts: [{ text: prompt }] }],
+    systemInstruction: { parts: [{ text: systemInstruction }] },
+    generationConfig: {
+      responseMimeType: "application/json",
+      responseSchema: productSchema,
+    },
+  };
+
+  try {
+    const response = await fetchWithRetry(apiUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    document.getElementById("ai-thinking-indicator")?.classList.add("hidden");
+
+    if (!response.ok) {
+      const errorBody = await response.text();
+      console.error("[AI] API Error:", response.status, errorBody);
+      return {
+        success: false,
+        error: `API request failed with status ${response.status}. Check console for details.`,
+      };
+    }
+
+    const result = await response.json();
+    const candidate = result.candidates?.[0];
+
+    if (candidate && candidate.content?.parts?.[0]?.text) {
+      const productJson = JSON.parse(candidate.content.parts[0].text);
+      console.log("[AI] Received structured product data:", productJson);
+      return { success: true, product: productJson };
+    } else {
+      console.log("[AI] No valid content found in response.", result);
+      let errorMessage =
+        "I couldn't find detailed information for that product. The response was empty.";
+      if (result.promptFeedback?.blockReason) {
+        errorMessage = `Request was blocked: ${result.promptFeedback.blockReason}. Please refine your prompt.`;
+      }
+      return { success: false, error: errorMessage };
+    }
+  } catch (error) {
+    document.getElementById("ai-thinking-indicator")?.classList.add("hidden");
+    console.error("[AI] Network or parsing error:", error);
+    return {
+      success: false,
+      error: "A network error occurred while contacting the AI.",
+    };
+  }
+};
+
+/**
+ * Uses the AI to interpret a user's command and return a structured intent.
+ * @param {string} prompt The user's natural language command.
+ * @returns {Promise<object>} A promise that resolves with the structured intent.
+ */
+const getIntentFromAI = async (prompt, userRole) => {
+  console.log(
+    `[AI] Calling Gemini API for intent recognition: "${prompt}" for role: "${userRole}"`
+  );
+
+  const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${gemini_api_key}`;
+  const term = getCurrentProfile().terminology;
+
+  // --- NEW: Role-based Intent Filtering ---
+  let availableIntents = [
+    // Base intents for everyone
+    "GREETING",
+    "ADD_ITEM_TO_SALE",
+    "CREATE_INVOICE",
+    "VIEW_PRODUCT_DETAILS",
+    "CREATE_CUSTOMER",
+    "CREATE_SALE_WITH_NEW_CUSTOMER",
+    "GET_HELP",
+    "UNKNOWN",
+    "APPLY_DISCOUNT_TO_SALE",
+    "UPDATE_CUSTOMER",
+    "VIEW_PAGE",
+  ];
+
+  if (userRole === "manager" || userRole === "admin") {
+    availableIntents.push(
+      "CREATE_PRODUCT",
+      "UPDATE_PRODUCT",
+      "DELETE_PRODUCT",
+      "DELETE_CUSTOMER",
+      "QUERY_DATA",
+      "ANALYZE_DASHBOARD",
+      "GENERATE_REPORT"
+    );
+  }
+
+  if (userRole === "admin") {
+    availableIntents.push("UPDATE_SETTING", "CREATE_PROFILE");
+  }
+
+  const systemInstruction = `You are a super-powered, fully integrated AI controller for a Point of Sale application. Your primary function is to interpret user commands in English or Bengali (Bangla) and translate them into a structured JSON object representing their intent and any relevant entities. You have complete control over the software's data and navigation. Your reasoning should be a step-by-step thought process on how you interpreted the command and chose the intent and entities.
+
+            Current user's role is: "${userRole}". Only use the intents available to this role.
+
+            Current application context:
+            - The product is called a "${term.product}".
+            - The inventory is called "${term.inventory}".
+            - The category is called "${term.category}".
+
+            Available intents for the "${userRole}" role are:
+            - ${availableIntents.join("\n            - ")}
+
+            Extract entities from the user's prompt. For quantities and prices, extract only the number.
+            Today is ${new Date().toLocaleDateString("en-US", {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}.
+            
+            Key command phrases & complex examples:
+            - "hello", "hi" -> GREETING
+            - "show me", "go to", "open" -> VIEW_PAGE
+            - "add", "put" -> ADD_ITEM_TO_SALE
+            - "create a product called 'Organic Honey'..." -> CREATE_PRODUCT (extract all details like price, cost, category from the prompt)
+            - "create 2 new products: 1. name: 'Mug', price: 15, stock: 50. 2. name: 'Plate', price: 25, stock: 30" -> CREATE_PRODUCT, items: [{productName: 'Mug', price: 15, stock: 50}, {productName: 'Plate', price: 25, stock: 30}]
+            - "what is the profit margin on 'Espresso Coffee Beans'?" -> ANALYZE_DASHBOARD, analysisType: 'profit margin', productName: 'Espresso Coffee Beans'
+            - "compare sales of Coffee vs Produce this month" -> ANALYZE_DASHBOARD, analysisType: 'category comparison'
+            - "generate a sales report for last week" -> GENERATE_REPORT, reportType: 'sales', dateRange: 'last week'
+            - "make a new sale for John Doe with 2 organic apples and 1 coffee" -> CREATE_INVOICE
+            - "apply a 10% discount to the current sale" -> APPLY_DISCOUNT_TO_SALE, discountType: 'percent', discountValue: 10
+            - "list all products with stock less than 50" -> QUERY_DATA, query: 'products with stock < 50'
+            - "who are my top 3 customers this month?" -> QUERY_DATA, query: 'top 3 customers this month'
+            - "create a new customer John Doe, phone 555-9876, address 123 Oak St" -> CREATE_CUSTOMER
+            - "delete customer John Doe" -> DELETE_CUSTOMER, customerName: "John Doe"
+            - "start a sale for a new customer named Jane Smith, phone 555-4444, with 2 Organic Apples" -> CREATE_SALE_WITH_NEW_CUSTOMER
+            
+            Bengali examples:
+            - "Hyperion X1 ফোনের বিস্তারিত দেখান" -> intent: VIEW_PRODUCT_DETAILS, productName: "Hyperion X1"
+            - "আমার সবচেয়ে বেশি বিক্রি হওয়া পণ্য কোনটি?" -> intent: ANALYZE_DASHBOARD, analysisType: "top selling products"
+            - "গত মাসের বিক্রয়ের রিপোর্ট তৈরি করুন" -> intent: GENERATE_REPORT, reportType: 'sales', dateRange: 'last month'
+            - "SKU001 পণ্যটি মুছে ফেলুন" -> intent: DELETE_PRODUCT, productName: "SKU001"
+            - "একটি নতুন কাস্টমার প্রোফাইল তৈরি করুন" -> intent: CREATE_CUSTOMER
+            `;
+
+  const intentSchema = {
+    type: "OBJECT",
+    properties: {
+      intent: { type: "STRING", enum: availableIntents },
+      entities: {
+        type: "OBJECT",
+        properties: {
+          productName: { type: "STRING" },
+          customerName: { type: "STRING" },
+          customerPhone: { type: "STRING" },
+          customerAddress: { type: "STRING" },
+          customerEmail: { type: "STRING" },
+          quantity: { type: "NUMBER" },
+          price: { type: "NUMBER" },
+          settingName: { type: "STRING" },
+          settingValue: { type: "STRING" },
+          page: {
+            type: "STRING",
+            description:
+              "e.g., dashboard, pos, inventory, invoices, reports, customers, settings",
+          },
+          query: {
+            type: "STRING",
+            description: "A concise summary of the user's question about data.",
+          },
+          analysisType: {
+            type: "STRING",
+            description:
+              "e.g., 'top selling products', 'profit margin', 'category comparison'",
+          },
+          reportType: {
+            type: "STRING",
+            enum: ["sales", "inventory", "customer"],
+          },
+          dateRange: {
+            type: "STRING",
+            description:
+              "e.g., 'today', 'last week', 'this month', 'last 30 days'",
+          },
+          discountType: { type: "STRING", enum: ["percent", "fixed"] },
+          discountValue: { type: "NUMBER" },
+          invoiceId: { type: "STRING" },
+          items: {
+            type: "ARRAY",
+            description:
+              "Used for creating invoices OR creating multiple products.",
+            items: {
+              type: "OBJECT",
+              properties: {
+                productName: { type: "STRING" },
+                quantity: { type: "NUMBER" },
+                category: { type: "STRING" },
+                price: { type: "NUMBER" },
+                costPrice: { type: "NUMBER" },
+                stock: { type: "NUMBER" },
+              },
+            },
+          },
+        },
+      },
+      reasoning: {
+        type: "STRING",
+        description:
+          "A step-by-step thought process explaining how the intent and entities were chosen based on the prompt.",
+      },
+    },
+    required: ["intent"],
+  };
+
+  const payload = {
+    contents: [{ parts: [{ text: prompt }] }],
+    systemInstruction: { parts: [{ text: systemInstruction }] },
+    generationConfig: {
+      responseMimeType: "application/json",
+      responseSchema: intentSchema,
+    },
+  };
+
+  try {
+    const response = await fetchWithRetry(apiUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) throw new Error(`API Error: ${response.status}`);
+    const result = await response.json();
+    const candidate = result.candidates?.[0];
+
+    if (candidate && candidate.content?.parts?.[0]?.text) {
+      const intentJson = JSON.parse(candidate.content.parts[0].text);
+      console.log("[AI] Recognized Intent:", intentJson);
+      return { success: true, ...intentJson };
+    }
+    return { success: false, intent: "UNKNOWN" };
+  } catch (error) {
+    console.error("[AI] Intent recognition error:", error);
+    return { success: false, intent: "UNKNOWN" };
+  }
+};
+
+// --- FIREBASE REFERENCES ---
+let storeRef,
+  productsRef,
+  customersRef,
+  invoicesRef,
+  uomRef,
+  notificationsRef,
+  staffRef,
+  usersRef,
+  auditLogRef,
+  expensesRef; // MODIFIED
+
+const setupFirebaseRefs = (storeId) => {
+  if (!storeId) {
+    console.error("Cannot setup Firebase refs without a storeId.");
+    return;
+  }
+  storeRef = doc(db, "stores", storeId);
+  productsRef = collection(storeRef, "products");
+  customersRef = collection(storeRef, "customers");
+  invoicesRef = collection(storeRef, "invoices");
+  uomRef = collection(storeRef, "unitsOfMeasurement");
+  notificationsRef = collection(storeRef, "notifications");
+  staffRef = collection(storeRef, "staff"); // NEW
+  usersRef = collection(db, "users"); // NEW: top-level users collection
+  auditLogRef = collection(storeRef, "auditLog"); // NEW
+  expensesRef = collection(storeRef, "expenses"); // NEW
+};
+
+// --- NEW: Function to detach all active Firestore listeners ---
+const detachAllListeners = () => {
+  console.log(
+    `[Auth] Detaching ${activeListeners.length} active Firestore listeners.`
+  );
+  activeListeners.forEach((unsubscribe) => unsubscribe());
+  activeListeners = [];
+};
+
+// --- REWRITTEN: Store Creation on Signup ---
+const createNewStoreForUser = async (user, businessName) => {
+  console.log(`Creating new store '${businessName}' for user ${user.uid}`);
+
+  // --- STEP 1: Create the core User Profile and Store documents ---
+  // These are created first because the security rules for Step 2 depend on them.
+  const newStoreRef = doc(collection(db, "stores"));
+  const newStoreId = newStoreRef.id;
+  const userProfileRef = doc(collection(db, "users"), user.uid);
+
+  const initialBatch = writeBatch(db);
+
+  // Define the Store Info - Note the `ownerUid` which is critical for security rules
+  const defaultStoreInfo = {
+    name: businessName,
+    ownerUid: user.uid, // CRITICAL: Track who owns the store for security rules
+    createdAt: new Date().toISOString(),
+    logoUrl: "https://placehold.co/100x100/007BFF/FFFFFF?text=CS",
+    address: "123 Commerce St, Business City, 12345",
+    contact: "555-0101",
+    website: "example.com",
+    taxId: "BIN-123456789",
+    socials: "@yourbusiness",
+    baseCurrency: "USD",
+    defaultDisplayCurrency: "USD",
+    currencies: {
+      USD: { name: "US Dollar", symbol: "$", rate: 1 },
+      BDT: { name: "Bangladeshi Taka", symbol: "৳", rate: 117.5 },
+      EUR: { name: "Euro", symbol: "€", rate: 0.92 },
+      GBP: { name: "British Pound", symbol: "£", rate: 0.79 },
+      JPY: { name: "Japanese Yen", symbol: "¥", rate: 157.25 },
+      INR: { name: "Indian Rupee", symbol: "₹", rate: 83.5 },
+    },
+    settings: {
+      selectedReceiptTemplate: "modern",
+      businessType: "general",
+      defaultCurrency: "USD",
+      taxRate: 10,
+      defaultUnit: "pcs",
+      voidLockoutDays: 30, // NEW
+      automations: {
+        dynamicPricing: { enabled: false, strategy: "balanced" },
+        fraudDetection: { enabled: true, sensitivity: "high" },
+        inventoryOptimization: { enabled: true, analysisFrequency: "weekly" },
+        endOfDayReports: { enabled: true, deliveryTime: "22:00" },
+      },
+      permissions: JSON.parse(JSON.stringify(userRoles)),
+    },
+    customProfiles: {},
+  };
+  initialBatch.set(newStoreRef, defaultStoreInfo);
+
+  // Define the User Profile linking the user's UID to their new store ID
+  initialBatch.set(userProfileRef, {
+    stores: [{ id: newStoreId, name: businessName }], // Store as an array
+    currentStoreId: newStoreId, // Set the new store as the current one
+  });
+
+  // Commit the first, most critical batch
+  await initialBatch.commit();
+  console.log(
+    `Step 1 Complete: Created store ${newStoreId} and user profile for ${user.uid}`
+  );
+
+  // --- STEP 2: Create all the subcollection documents ---
+  // Now that the store and user profile exist, the security rules will pass.
+  const subcollectionBatch = writeBatch(db);
+
+  // Create default Units of Measurement
+  const newUomRef = collection(newStoreRef, "unitsOfMeasurement");
+  const defaultUnits = [
+    { id: "pcs", name: "Piece(s)", allowsDecimal: false },
+    { id: "kg", name: "Kilogram", allowsDecimal: true },
+    { id: "g", name: "Gram", allowsDecimal: true },
+    { id: "ltr", name: "Liter", allowsDecimal: true },
+    { id: "ml", name: "Milliliter", allowsDecimal: true },
+    { id: "box", name: "Box", allowsDecimal: false },
+    { id: "pack", name: "Pack", allowsDecimal: false },
+  ];
+  defaultUnits.forEach((unit) =>
+    subcollectionBatch.set(doc(newUomRef, unit.id), unit)
+  );
+
+  // Create a welcome Notification
+  const newNotificationsRef = collection(newStoreRef, "notifications");
+  const welcomeNotification = {
+    date: new Date().toISOString(),
+    message:
+      "Welcome to CashShilpo! Your new POS is set up and ready to go. Start by adding your first product.",
+    type: "info",
+    read: false,
+    targetRoles: ["admin", "manager"],
+  };
+  subcollectionBatch.set(doc(newNotificationsRef), welcomeNotification);
+
+  // Create the user's staff profile *inside* their new store
+  const newStaffRef = doc(collection(newStoreRef, "staff"), user.uid);
+  subcollectionBatch.set(newStaffRef, {
+    name: user.displayName || user.email,
+    email: user.email,
+    role: "admin",
+    status: "active",
+    joinDate: new Date().toISOString(),
+  });
+
+  await subcollectionBatch.commit();
+  console.log(
+    `Step 2 Complete: Successfully created subcollection documents for store ${newStoreId}`
+  );
+
+  return newStoreId; // Return the new store ID
+};
+
+// --- NEW: Function to add a new store to an existing user ---
+const addNewStoreToExistingUser = async (user, businessName) => {
+  console.log(
+    `Adding new store '${businessName}' for existing user ${user.uid}`
+  );
+
+  // --- STEP 1: Create the new Store document ---
+  const newStoreRef = doc(collection(db, "stores"));
+  const newStoreId = newStoreRef.id;
+
+  const newStoreData = {
+    name: businessName,
+    ownerUid: user.uid, // The user creating it is the owner
+    createdAt: new Date().toISOString(),
+    logoUrl: "https://placehold.co/100x100/007BFF/FFFFFF?text=CS",
+    address: "123 Commerce St, Business City, 12345",
+    contact: "555-0101",
+    website: "example.com",
+    taxId: "BIN-123456789",
+    socials: "@yourbusiness",
+    baseCurrency: "USD",
+    defaultDisplayCurrency: "USD",
+    currencies: {
+      USD: { name: "US Dollar", symbol: "$", rate: 1 },
+      BDT: { name: "Bangladeshi Taka", symbol: "৳", rate: 117.5 },
+      EUR: { name: "Euro", symbol: "€", rate: 0.92 },
+      GBP: { name: "British Pound", symbol: "£", rate: 0.79 },
+      JPY: { name: "Japanese Yen", symbol: "¥", rate: 157.25 },
+      INR: { name: "Indian Rupee", symbol: "₹", rate: 83.5 },
+    },
+    settings: {
+      selectedReceiptTemplate: "modern",
+      businessType: "general",
+      defaultCurrency: "USD",
+      taxRate: 10,
+      defaultUnit: "pcs",
+      voidLockoutDays: 30,
+      automations: {
+        dynamicPricing: { enabled: false, strategy: "balanced" },
+        fraudDetection: { enabled: true, sensitivity: "high" },
+        inventoryOptimization: { enabled: true, analysisFrequency: "weekly" },
+        endOfDayReports: { enabled: true, deliveryTime: "22:00" },
+      },
+      permissions: JSON.parse(JSON.stringify(userRoles)),
+    },
+    customProfiles: {},
+  };
+  await setDoc(newStoreRef, newStoreData);
+
+  // --- STEP 2: Create subcollections for the new store ---
+  const subcollectionBatch = writeBatch(db);
+  const newUomRef = collection(newStoreRef, "unitsOfMeasurement");
+  const defaultUnits = [
+    { id: "pcs", name: "Piece(s)", allowsDecimal: false },
+    { id: "kg", name: "Kilogram", allowsDecimal: true },
+    { id: "g", name: "Gram", allowsDecimal: true },
+    { id: "ltr", name: "Liter", allowsDecimal: true },
+    { id: "ml", name: "Milliliter", allowsDecimal: true },
+    { id: "box", name: "Box", allowsDecimal: false },
+    { id: "pack", name: "Pack", allowsDecimal: false },
+  ];
+  defaultUnits.forEach((unit) =>
+    subcollectionBatch.set(doc(newUomRef, unit.id), unit)
+  );
+
+  const newNotificationsRef = collection(newStoreRef, "notifications");
+  const welcomeNotification = {
+    date: new Date().toISOString(),
+    message: `Welcome to your new store, ${businessName}!`,
+    type: "info",
+    read: false,
+    targetRoles: ["admin", "manager"],
+  };
+  subcollectionBatch.set(doc(newNotificationsRef), welcomeNotification);
+
+  // Add the user as the admin for this new store
+  const newStaffRef = doc(collection(newStoreRef, "staff"), user.uid);
+  subcollectionBatch.set(newStaffRef, {
+    name: user.displayName || user.email,
+    email: user.email,
+    role: "admin",
+    status: "active",
+    joinDate: new Date().toISOString(),
+  });
+  await subcollectionBatch.commit();
+
+  // --- STEP 3: Update the user's profile ---
+  // We use a transaction to safely read and update the user's stores array.
+  const userProfileRef = doc(db, "users", user.uid);
+  await runTransaction(db, async (transaction) => {
+    const userDoc = await transaction.get(userProfileRef);
+    if (!userDoc.exists()) {
+      throw "User document does not exist!";
+    }
+    const currentStores = userDoc.data().stores || [];
+    const newStores = [
+      ...currentStores,
+      { id: newStoreId, name: businessName },
+    ];
+    // Atomically update the stores array and set the current store to the new one
+    transaction.update(userProfileRef, {
+      stores: newStores,
+      currentStoreId: newStoreId,
+    });
+  });
+
+  console.log(`Successfully added and switched to new store ${newStoreId}`);
+  return newStoreId;
+};
+
+const syncStoreNameToUserProfiles = async (storeId, newStoreName) => {
+  console.log(
+    `[Sync] Starting store name sync for store ${storeId} to '${newStoreName}'.`
+  );
+  try {
+    const staffSnapshot = await getDocs(staffRef);
+    if (staffSnapshot.empty) {
+      console.warn("[Sync] No staff found for this store. Sync complete.");
+      return;
+    }
+
+    const batch = writeBatch(db);
+
+    const userDocPromises = staffSnapshot.docs.map((staffDoc) =>
+      getDoc(doc(usersRef, staffDoc.id))
+    );
+    const userDocsSnapshots = await Promise.all(userDocPromises);
+
+    userDocsSnapshots.forEach((userDocSnap, index) => {
+      if (userDocSnap.exists()) {
+        const userId = userDocSnap.id;
+        const userProfileRef = doc(usersRef, userId);
+        const userData = userDocSnap.data();
+        const currentStores = userData.stores || [];
+
+        const storeIndex = currentStores.findIndex((s) => s.id === storeId);
+
+        if (
+          storeIndex > -1 &&
+          currentStores[storeIndex].name !== newStoreName
+        ) {
+          const updatedStores = [...currentStores];
+          updatedStores[storeIndex].name = newStoreName;
+          batch.update(userProfileRef, { stores: updatedStores });
+          console.log(`[Sync] Queued name update for user ${userId}.`);
+        }
+      } else {
+        const failedUserId = staffSnapshot.docs[index].id;
+        console.warn(
+          `[Sync] User profile not found for staff ID: ${failedUserId}`
+        );
+      }
+    });
+
+    await batch.commit();
+    console.log("[Sync] Store name sync completed successfully.");
+  } catch (error) {
+    console.error(
+      "[Sync] Failed to sync store name across user profiles:",
+      error
+    );
+  }
+};
+// --- NEW PERMISSION AND UI LOGIC ---
+// This part is new. It checks who can see what.
+const checkPermission = (permission) => {
+  const currentUserRole = appState.session.userRole;
+
+  // --- NEW: Force disable expenses for cashiers ---
+  if (
+    (permission === "canManageExpenses" ||
+      permission === "canAddExpenses" ||
+      permission === "canEditExpenses" ||
+      permission === "canDeleteExpenses") &&
+    currentUserRole === "cashier"
+  ) {
+    return false;
+  }
+  // --- END NEW ---
+
+  // 1. Admin with 'canDoEverything' always has permission. Admin permissions are static and not editable.
+  if (
+    currentUserRole === "admin" &&
+    userRoles.admin.permissions.canDoEverything
+  ) {
+    return true;
+  }
+
+  if (!currentUserRole) return false;
+
+  // 2. Check for customized permissions from Firestore settings first.
+  // These are loaded into appState.settings.permissions on startup.
+  const customPermissionInfo =
+    appState.settings.permissions?.[currentUserRole]?.permissions?.[permission];
+  if (customPermissionInfo !== undefined) {
+    return customPermissionInfo.value;
+  }
+
+  // 3. Fallback to static permissions if no custom one is set (for safety, though they should always be set).
+  const staticPermissionInfo =
+    userRoles[currentUserRole]?.permissions?.[permission];
+  if (staticPermissionInfo !== undefined) {
+    return staticPermissionInfo.value;
+  }
+
+  return false;
+};
+
+const updateUIPermissions = () => {
+  // This part hides and shows the links in your sidebar based on user role
+  document.querySelectorAll("[data-permission]").forEach((el) => {
+    const requiredPermission = el.dataset.permission;
+
+    // SPECIAL CASE FOR INVENTORY: The nav link requires 'canManageInventory' in the HTML,
+    // but we want to show it for any inventory-related permission.
+    if (
+      el.dataset.view === "inventory" &&
+      requiredPermission === "canManageInventory"
+    ) {
+      if (
+        checkPermission("canViewInventory") ||
+        checkPermission("canAddProducts") ||
+        checkPermission("canEditProducts") ||
+        checkPermission("canDeactivateProducts")
+      ) {
+        // MODIFIED
+        el.style.display = "flex";
+      } else {
+        el.style.display = "none";
+      }
+      return; // Move to the next element
+    }
+
+    // Original logic for all other elements
+    if (checkPermission(requiredPermission)) {
+      el.style.display = "flex";
+    } else {
+      el.style.display = "none";
+    }
+  });
+
+  // This part updates your name and role at the bottom of the sidebar
+  const user = appState.session.currentUser;
+  const role = appState.session.userRole;
+  if (user && role) {
+    document.getElementById("user-name").textContent = user.name;
+    document.getElementById("user-role").textContent =
+      userRoles[role]?.name || "Unknown Role";
+    const avatarLetter = user.name ? user.name.charAt(0).toUpperCase() : "?";
+    document.getElementById(
+      "user-avatar"
+    ).src = `https://placehold.co/40x40/1f2937/4b5563?text=${avatarLetter}`;
+
+    // NEW: Populate user menu
+    const userMenuName = document.getElementById("user-menu-name");
+    const userMenuEmail = document.getElementById("user-menu-email");
+    if (userMenuName) userMenuName.textContent = user.name;
+    if (userMenuEmail) userMenuEmail.textContent = user.email;
+  } else {
+    document.getElementById("user-name").textContent = "Not Logged In";
+    document.getElementById("user-role").textContent = "No Role";
+    document.getElementById(
+      "user-avatar"
+    ).src = `https://placehold.co/40x40/1f2937/4b5563?text=?`;
+  }
+};
+
+// --- NEW SECTION: CORE UTILITY FUNCTIONS ---
+// Moved from DOMContentLoaded to be available globally sooner.
+const currencyUtils = {
+  get(currencyCode = appState.currentCurrency) {
+    const currencies = firestoreData.storeInfo.currencies || {};
+    const base = firestoreData.storeInfo.baseCurrency || "USD";
+    return (
+      currencies[currencyCode] ||
+      currencies[base] || { name: "US Dollar", symbol: "$", rate: 1 }
+    );
+  },
+  convert(amountInBase, toCurrencyCode = appState.currentCurrency) {
+    const rate = this.get(toCurrencyCode).rate || 1;
+    return amountInBase * rate;
+  },
+  convertToBase(amountInCurrency, fromCurrencyCode = appState.currentCurrency) {
+    const rate = this.get(fromCurrencyCode).rate || 1;
+    if (rate === 0) return 0;
+    return amountInCurrency / rate;
+  },
+  format(
+    amountInBase,
+    toCurrencyCode = appState.currentCurrency,
+    options = {}
+  ) {
+    if (isNaN(amountInBase)) amountInBase = 0;
+    const currencyInfo = this.get(toCurrencyCode);
+    const convertedAmount = this.convert(amountInBase, toCurrencyCode);
+
+    const formattedWithCode = new Intl.NumberFormat(undefined, {
+      style: "currency",
+      currency: toCurrencyCode,
+      currencyDisplay: "code",
+      ...options,
+    }).format(convertedAmount);
+
+    return formattedWithCode.replace(toCurrencyCode, currencyInfo.symbol);
+  },
+};
+const printElement = (elementId) => {
+  const elementToPrint = document.getElementById(elementId);
+
+  if (!elementToPrint || !window.jspdf || !window.html2canvas) {
+    const missing = !window.jspdf
+      ? "jsPDF"
+      : !window.html2canvas
+      ? "html2canvas"
+      : "element";
+    console.error(`${missing} is not available for printing.`);
+    showToast(
+      "Printing library is not ready yet. Please try again in a moment.",
+      "error"
+    );
+    return;
+  }
+  const { jsPDF } = window.jspdf;
+  // Show a temporary loading toast
+  showToast("Generating your PDF receipt...", "info");
+
+  window
+    .html2canvas(elementToPrint, {
+      scale: 2, // Use a higher scale for better image quality
+      useCORS: true,
+      // Set a fallback background color that matches the dark theme.
+      backgroundColor: "#101827",
+      allowTaint: true,
+    })
+    .then((canvas) => {
+      const imgData = canvas.toDataURL("image/png");
+
+      // --- SIZING LOGIC ---
+      const pdfWidth = 210;
+      const canvasWidth = canvas.width;
+      const canvasHeight = canvas.height;
+      const canvasAspectRatio = canvasHeight / canvasWidth;
+      const pdfHeight = pdfWidth * canvasAspectRatio;
+
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: [pdfWidth, pdfHeight],
+      });
+
+      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+
+      // --- In-Page Printing Logic ---
+      const iframe = document.createElement("iframe");
+      iframe.style.position = "fixed";
+      iframe.style.right = "100%"; // Position it off-screen
+      iframe.style.bottom = "100%";
+      iframe.style.width = "0";
+      iframe.style.height = "0";
+      iframe.style.border = "none";
+      iframe.src = pdf.output("bloburl");
+
+      iframe.onload = function () {
+        try {
+          setTimeout(() => {
+            iframe.contentWindow.focus();
+            iframe.contentWindow.print();
+            setTimeout(() => {
+              if (iframe.parentNode) {
+                iframe.parentNode.removeChild(iframe);
+              }
+            }, 1000);
+          }, 500);
+        } catch (e) {
+          console.error("In-page printing failed:", e);
+          showToast(
+            "Could not open print dialog. Please check browser settings.",
+            "error"
+          );
+          if (iframe.parentNode) {
+            iframe.parentNode.removeChild(iframe);
+          }
+        }
+      };
+      document.body.appendChild(iframe);
+    })
+    .catch((err) => {
+      console.error("PDF generation failed:", err);
+      showToast("Failed to generate PDF for printing.", "error");
+    });
+};
+const playNotificationSound = () => {
+  const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  if (!audioContext) return; // Web Audio API not supported
+
+  const oscillator = audioContext.createOscillator();
+  const gainNode = audioContext.createGain();
+
+  oscillator.connect(gainNode);
+  gainNode.connect(audioContext.destination);
+
+  gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+  gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.01); // Quick fade in
+
+  oscillator.type = "sine";
+  oscillator.frequency.setValueAtTime(880, audioContext.currentTime); // A nice "ping" frequency
+
+  oscillator.start(audioContext.currentTime);
+  gainNode.gain.exponentialRampToValueAtTime(
+    0.00001,
+    audioContext.currentTime + 0.15
+  ); // Quick fade out
+  oscillator.stop(audioContext.currentTime + 0.15);
+};
+
+const showToast = (message, type = "success") => {
+  const toastsContainer = document.getElementById("toasts-container");
+  if (!toastsContainer) {
+    console.error("Toasts container not found in the DOM.");
+    return;
+  }
+  const toastStyles = {
+    success: {
+      bg: "bg-green-500/10 border-green-500/50",
+      icon: "check-circle",
+      iconColor: "text-green-400",
+    },
+    error: {
+      bg: "bg-red-500/10 border-red-500/50",
+      icon: "alert-circle",
+      iconColor: "text-red-400",
+    },
+    info: {
+      bg: "bg-blue-500/10 border-blue-500/50",
+      icon: "info",
+      iconColor: "text-blue-400",
+    },
+    warning: {
+      bg: "bg-yellow-500/10 border-yellow-500/50",
+      icon: "alert-triangle",
+      iconColor: "text-yellow-400",
+    },
+    stock: {
+      bg: "bg-yellow-500/10 border-yellow-500/50",
+      icon: "package-search",
+      iconColor: "text-yellow-400",
+    },
+    sale: {
+      bg: "bg-green-500/10 border-green-500/50",
+      icon: "receipt-text",
+      iconColor: "text-green-400",
+    },
+  };
+  let style = toastStyles[type];
+  if (!style) {
+    console.warn(
+      `[Toast] Unknown toast type: "${type}". Defaulting to 'info'.`
+    );
+    style = toastStyles.info;
+  }
+  const toast = document.createElement("div");
+  toast.className = `toast glass-pane flex items-center gap-4 text-text-primary text-sm font-medium px-4 py-3 rounded-xl shadow-lg ${style.bg}`;
+  toast.innerHTML = `<i data-lucide="${style.icon}" class="w-6 h-6 ${style.iconColor}"></i><p class="flex-1">${message}</p>`;
+  toastsContainer.prepend(toast);
+  lucide.createIcons();
+  setTimeout(() => toast.remove(), 5000);
+};
+
+const showModal = (title, content, footer, options = {}) => {
+  const modalsContainer = document.getElementById("modals-container");
+  if (!modalsContainer) {
+    console.error("Modals container not found in the DOM.");
+    return null; // Return null to prevent further errors
+  }
+  const { size = "max-w-lg", customClasses = "" } = options;
+  const modalId = `modal-${Date.now()}`;
+  const modalHTML = `
+        <div id="${modalId}" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4 opacity-0">
+            <div class="modal-content glass-pane rounded-xl shadow-2xl w-full ${size} ${customClasses} scale-95 transform">
+                <div class="flex justify-between items-center p-5 border-b border-border-color">
+                    <h3 class="text-xl font-semibold text-text-primary">${title}</h3>
+                    <button data-action="close-modal" class="p-1 rounded-full text-text-secondary hover:bg-bg-tertiary hover:text-white">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+                <div class="p-6 text-text-secondary max-h-[78vh] overflow-y-auto">${content}</div>
+                ${
+                  footer
+                    ? `<div class="flex justify-end items-center p-4 bg-[var(--bg-secondary)]/50 rounded-b-xl space-x-3">${footer}</div>`
+                    : ""
+                }
+            </div>
+        </div>`;
+  modalsContainer.insertAdjacentHTML("beforeend", modalHTML);
+  lucide.createIcons();
+  const modalEl = document.getElementById(modalId);
+  setTimeout(() => {
+    modalEl.classList.remove("opacity-0");
+    modalEl.querySelector(".modal-content").classList.remove("scale-95");
+  }, 10);
+  return modalEl;
+};
+
+const closeModal = (modalEl) => {
+  if (!modalEl) return;
+  modalEl.classList.add("opacity-0");
+  modalEl.querySelector(".modal-content").classList.add("scale-95");
+  setTimeout(() => modalEl.remove(), 300);
+};
+
+const formatAndTruncate = (label, valueToFormat, isCurrency = true) => {
+  const fullValue = isCurrency
+    ? currencyUtils.format(valueToFormat, appState.currentCurrency, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })
+    : valueToFormat.toLocaleString();
+
+  // If a formatted number is too long, truncate it and make it clickable to show the full value.
+  if (fullValue.length > 10) {
+    const truncatedValue = fullValue.substring(0, 7) + "...";
+    return `<span class="cursor-pointer hover:underline" data-action="show-full-stat" data-full-value="${fullValue}" data-label="${label}">${truncatedValue}</span>`;
+  }
+  return fullValue;
+};
+
+const commonChartOptions = (isCurrency = true, customOptions = {}) => {
+  // Start with the base options
+  const options = {
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: {
+      duration: 1200,
+      easing: "easeInOutSine",
+      delay: (context) => {
+        let delay = 0;
+        if (context.type === "data" && context.mode === "default") {
+          delay = context.dataIndex * 40 + context.datasetIndex * 80;
+        }
+        return delay;
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        grid: {
+          color: "rgba(255,255,255,0.06)",
+          drawBorder: false,
+          border: { dash: [3, 6] },
+        },
+        ticks: {
+          color: "#9ca3af",
+          font: {
+            fontFamily: chartStyles.fontFamily,
+          },
+          callback: isCurrency
+            ? (value) =>
+                currencyUtils.format(value, appState.currentCurrency, {
+                  notation: "compact",
+                })
+            : (value) => value.toLocaleString(),
+        },
+      },
+      x: {
+        grid: { display: false },
+        ticks: {
+          color: "#9ca3af",
+          font: {
+            fontFamily: chartStyles.fontFamily,
+          },
+        },
+      },
+    },
+    plugins: {
+      chartGlow: { color: "rgba(0,0,0,0.15)", blur: 20, offsetY: 8 },
+      legend: {
+        labels: {
+          color: "#9ca3af",
+          usePointStyle: true,
+          pointStyle: "rectRounded",
+          padding: 20,
+          font: {
+            fontFamily: chartStyles.fontFamily,
+            size: 13,
+          },
+        },
+      },
+      tooltip: {
+        enabled: true,
+        backgroundColor: "rgba(10, 10, 15, 0.8)",
+        backdropFilter: "blur(5px)",
+        titleColor: "#fff",
+        bodyColor: "#cbd5e1",
+        borderColor: "rgba(255, 255, 255, 0.1)",
+        borderWidth: 1,
+        padding: 12,
+        titleFont: { family: chartStyles.fontFamily, weight: "bold", size: 14 },
+        bodyFont: { family: chartStyles.fontFamily, size: 12 },
+        displayColors: true,
+        callbacks: {
+          label: (context) =>
+            isCurrency
+              ? currencyUtils.format(context.raw, appState.currentCurrency, {
+                  notation: "standard",
+                })
+              : context.raw.toLocaleString(),
+        },
+      },
+    },
+  };
+
+  // Manually merge nested objects and spread the rest
+  const { plugins, scales, ...rest } = customOptions;
+  if (plugins) {
+    options.plugins = { ...options.plugins, ...plugins };
+  }
+  if (scales) {
+    options.scales.x = { ...options.scales.x, ...(scales.x || {}) };
+    options.scales.y = { ...options.scales.y, ...(scales.y || {}) };
+  }
+
+  return { ...options, ...rest };
+};
+
+const renderPaginationControls = (
+  container,
+  totalItems,
+  currentPage,
+  itemsPerPage,
+  viewType
+) => {
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  if (totalPages <= 1) {
+    container.innerHTML = "";
+    return;
+  }
+
+  const startItem = (currentPage - 1) * itemsPerPage + 1;
+  const endItem = Math.min(startItem + itemsPerPage - 1, totalItems);
+
+  let paginationHTML = `<div class="flex items-center justify-between text-sm text-text-secondary">`;
+  paginationHTML += `<div>Showing <span class="font-medium text-text-primary">${startItem}</span> to <span class="font-medium text-text-primary">${endItem}</span> of <span class="font-medium text-text-primary">${totalItems}</span> results</div>`;
+  paginationHTML += `<div class="flex items-center gap-2">`;
+  paginationHTML += `<button data-action="paginate" data-view-type="${viewType}" data-page="${
+    currentPage - 1
+  }" class="pagination-arrow-btn" ${
+    currentPage === 1 ? "disabled" : ""
+  }><i data-lucide="chevron-left" class="w-5 h-5 pointer-events-none"></i></button>`;
+
+  // Simplified pagination links (e.g., 1 ... 4 5 6 ... 10)
+  const pagesToShow = [];
+  if (totalPages <= 7) {
+    for (let i = 1; i <= totalPages; i++) pagesToShow.push(i);
+  } else {
+    pagesToShow.push(1);
+    if (currentPage > 3) pagesToShow.push("...");
+    if (currentPage > 2) pagesToShow.push(currentPage - 1);
+    if (currentPage > 1 && currentPage < totalPages)
+      pagesToShow.push(currentPage);
+    if (currentPage < totalPages - 1) pagesToShow.push(currentPage + 1);
+    if (currentPage < totalPages - 2) pagesToShow.push("...");
+    pagesToShow.push(totalPages);
+  }
+
+  const uniquePages = [...new Set(pagesToShow)];
+
+  uniquePages.forEach((p) => {
+    if (p === "...") {
+      paginationHTML += `<span class="pagination-ellipsis">...</span>`;
+    } else {
+      paginationHTML += `<button data-action="paginate" data-view-type="${viewType}" data-page="${p}" class="pagination-page-btn ${
+        p === currentPage ? "active" : ""
+      }">${p}</button>`;
+    }
+  });
+
+  paginationHTML += `<button data-action="paginate" data-view-type="${viewType}" data-page="${
+    currentPage + 1
+  }" class="pagination-arrow-btn" ${
+    currentPage === totalPages ? "disabled" : ""
+  }><i data-lucide="chevron-right" class="w-5 h-5 pointer-events-none"></i></button>`;
+  paginationHTML += `</div></div>`;
+  container.innerHTML = paginationHTML;
+  lucide.createIcons();
+};
+
+document.addEventListener("DOMContentLoaded", () => {
+  // --- NEW: STORE SWITCHER LOGIC ---
+  const renderStoreSwitcher = () => {
+    const store = appState.session.availableStores.find(
+      (s) => s.id === appState.session.storeId
+    );
+    if (!store) return; // Don't render if the active store isn't in the list
+
+    const switcherContainer = document.getElementById(
+      "store-switcher-container"
+    );
+    if (!switcherContainer) {
+      console.error("Store switcher container not found in DOM.");
+      return;
+    }
+
+    switcherContainer.innerHTML = `
+                    <button data-action="toggle-store-menu" class="flex items-center gap-3 px-3 py-2 rounded-lg bg-bg-secondary hover:bg-bg-tertiary transition-colors border border-border-color">
+                        <i data-lucide="store" class="w-5 h-5 text-accent"></i>
+                        <span class="font-semibold text-text-primary">${
+                          store.name
+                        }</span>
+                        <i data-lucide="chevrons-up-down" class="w-4 h-4 text-text-secondary"></i>
+                    </button>
+                    <div id="store-menu" class="action-menu !w-56">
+                        ${appState.session.availableStores
+                          .map(
+                            (s) => `
+                            <div class="action-menu-item" data-action="switch-store" data-id="${
+                              s.id
+                            }">
+                                <i data-lucide="store" class="w-4 h-4"></i>
+                                <span>${s.name}</span>
+                                ${
+                                  s.id === appState.session.storeId
+                                    ? '<i data-lucide="check" class="w-4 h-4 text-accent ml-auto"></i>'
+                                    : ""
+                                }
+                            </div>
+                        `
+                          )
+                          .join("")}
+                        ${
+                          appState.session.userRole === "admin"
+                            ? `
+                        <div class="h-px bg-border-color my-1"></div>
+                        <div class="action-menu-item" data-action="add-new-store">
+                            <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                            <span>Add New Store</span>
+                        </div>
+                        `
+                            : ""
+                        }
+                    </div>
+                `;
+    lucide.createIcons();
+  };
+
+  const switchStore = async (newStoreId) => {
+    if (newStoreId === appState.session.storeId) return;
+
+    showToast(`Switching to new store... Please wait.`, "info");
+
+    try {
+      const userProfileRef = doc(db, "users", auth.currentUser.uid);
+      await updateDoc(userProfileRef, { currentStoreId: newStoreId });
+
+      // Reload the page to re-initialize all data listeners for the new store.
+      // This is the safest way to prevent data leakage between stores.
+      window.location.reload();
+    } catch (error) {
+      console.error("Failed to switch store:", error);
+      showToast("Could not switch store. Please try again.", "error");
+    }
+  };
+
+  // --- NEW: Permission Change Handler ---
+  const viewPermissionMap = {
+    dashboard: "canAccessDashboard",
+    pos: "canUsePOS",
+    inventory: [
+      "canViewInventory",
+      "canAddProducts",
+      "canEditProducts",
+      "canDeactivateProducts",
+    ], // MODIFIED
+    customers: "canManageCustomers",
+    invoices: "canManageInvoices",
+    reports: "canAccessReports",
+    settings: "canManageSettings",
+    staff: [
+      "canManageStaff",
+      "canInviteCashiers",
+      "canViewStaffPerformance",
+      "canEditCashierDetails",
+    ],
+    "user-roles": "canManageRoles", // NEW
+    expenses: "canManageExpenses", // NEW
+  };
+
+  const handlePermissionChange = () => {
+    let activeTabRemoved = false;
+    const originalTabCount = appState.tabs.length;
+
+    appState.tabs = appState.tabs.filter((tab) => {
+      const requiredPermission = viewPermissionMap[tab.viewType];
+      if (!requiredPermission) return true;
+
+      let hasPermission = false;
+      if (Array.isArray(requiredPermission)) {
+        hasPermission = requiredPermission.some((p) => checkPermission(p));
+      } else {
+        hasPermission = checkPermission(requiredPermission);
+      }
+
+      // Special case for cashiers who have a dedicated, limited settings view.
+      if (
+        tab.viewType === "settings" &&
+        appState.session.userRole === "cashier"
+      ) {
+        hasPermission = true;
+      }
+
+      if (!hasPermission) {
+        if (tab.id === appState.activeTabId) {
+          activeTabRemoved = true;
+        }
+        showToast(
+          `Your access to the ${tab.name} tab has been revoked.`,
+          "warning"
+        );
+        return false; // Remove this tab
+      }
+      return true; // Keep this tab
+    });
+
+    // If the active tab was one of the ones removed...
+    if (activeTabRemoved) {
+      // Switch to the first available tab, or the dashboard if possible.
+      if (appState.tabs.length > 0) {
+        appState.activeTabId = appState.tabs[0].id;
+      } else {
+        appState.activeTabId = null;
+        // If no tabs are left, try to open the dashboard.
+        if (checkPermission("canAccessDashboard")) {
+          // Use a timeout to avoid being in the middle of a render cycle
+          setTimeout(() => openOrSwitchTab("dashboard"), 0);
+        }
+      }
+    }
+
+    // Only trigger a re-render if the number of tabs has changed.
+    if (originalTabCount !== appState.tabs.length) {
+      renderApp();
+      return true; // Return true to indicate a render happened
+    }
+    return false; // Return false if no render happened
+  };
+
+  // --- NEW: FULLSCREEN LOGIC ---
+  const toggleFullScreen = () => {
+    const doc = window.document;
+    const docEl = doc.documentElement;
+
+    const requestFullScreen =
+      docEl.requestFullscreen ||
+      docEl.mozRequestFullScreen ||
+      docEl.webkitRequestFullscreen ||
+      docEl.msRequestFullscreen;
+    const cancelFullScreen =
+      doc.exitFullscreen ||
+      doc.mozCancelFullScreen ||
+      doc.webkitExitFullscreen ||
+      doc.msExitFullscreen;
+
+    const isFullscreen =
+      doc.fullscreenElement ||
+      doc.mozFullScreenElement ||
+      doc.webkitFullscreenElement ||
+      doc.msFullscreenElement;
+
+    if (!isFullscreen) {
+      if (requestFullScreen) {
+        requestFullScreen.call(docEl);
+      }
+    } else {
+      if (cancelFullScreen) {
+        cancelFullScreen.call(doc);
+      }
+    }
+  };
+
+  const updateFullscreenIcon = () => {
+    const fullscreenBtn = document.getElementById("fullscreen-btn");
+    if (!fullscreenBtn) return;
+    const isFullscreen =
+      document.fullscreenElement ||
+      document.mozFullScreenElement ||
+      document.webkitFullscreenElement ||
+      document.msFullscreenElement;
+
+    if (isFullscreen) {
+      fullscreenBtn.innerHTML = `<i data-lucide="minimize" class="w-5 h-5"></i>`;
+      fullscreenBtn.setAttribute("title", "Exit Fullscreen");
+    } else {
+      fullscreenBtn.innerHTML = `<i data-lucide="maximize" class="w-5 h-5"></i>`;
+      fullscreenBtn.setAttribute("title", "Enter Fullscreen");
+    }
+    lucide.createIcons();
+  };
+
+  document.addEventListener("fullscreenchange", updateFullscreenIcon);
+  document.addEventListener("webkitfullscreenchange", updateFullscreenIcon);
+  document.addEventListener("mozfullscreenchange", updateFullscreenIcon);
+  document.addEventListener("MSFullscreenChange", updateFullscreenIcon);
+  // --- END FULLSCREEN LOGIC ---
+
+  const jsBarcodeScript = document.createElement("script");
+  jsBarcodeScript.src =
+    "https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js";
+  document.head.appendChild(jsBarcodeScript);
+  const jspdfScript = document.createElement("script");
+  jspdfScript.src =
+    "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+  document.head.appendChild(jspdfScript);
+
+  const html2canvasScript = document.createElement("script");
+  html2canvasScript.src =
+    "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js";
+  document.head.appendChild(html2canvasScript);
+  lucide.createIcons();
+
+  document.head.insertAdjacentHTML(
+    "beforeend",
+    `
+                <style>
+                    .glass-pane-modal .modal-content {
+                        background: rgba(18, 18, 18, 0.8);
+                        backdrop-filter: blur(20px);
+                        -webkit-backdrop-filter: blur(20px);
+                        border: 1px solid rgba(255, 255, 255, 0.1);
+                    }
+                    /* NEW: Notification Bell Animation */
+                    .has-unread-notifications .lucide-bell {
+                        animation: ring-bell 1.5s ease-in-out infinite;
+                        transform-origin: top center;
+                    }
+                    @keyframes ring-bell {
+                        0%, 100% { transform: rotate(0); }
+                        10%, 30%, 50%, 70%, 90% { transform: rotate(-10deg); }
+                        20%, 40%, 60%, 80% { transform: rotate(10deg); }
+                    }
+                    /* NEW STYLES FOR MODERN POS */
+                    .category-group-header {
+                        width: 100%; display: flex; justify-content: space-between; align-items: center;
+                        padding: 8px 4px; font-size: 11px; text-transform: uppercase;
+                        color: var(--text-secondary); font-weight: 600; letter-spacing: 0.05em;
+                        cursor: pointer;
+                    }
+                    .category-group-header:hover { color: var(--text-primary); }
+                    .category-group-icon {
+                        width: 16px; height: 16px; transition: transform 0.2s ease-in-out;
+                    }
+                    .category-group:not(.is-open) .category-group-icon {
+                        transform: rotate(-180deg);
+                    }
+                    .category-group-list {
+                        display: grid;
+                        grid-template-rows: 0fr;
+                        transition: grid-template-rows 0.3s ease-in-out;
+                    }
+                    .category-group.is-open .category-group-list {
+                        grid-template-rows: 1fr;
+                    }
+                    .category-group-list > div {
+                        overflow: hidden;
+                    }
+                    .pos-category-btn {
+                        display: flex; align-items: center; text-align: left;
+                        width: 100%;
+                        padding: 10px 12px;
+                        font-size: 14px; font-weight: 500;
+                        border-radius: 8px;
+                        color: var(--text-secondary);
+                        transition: all 0.2s ease;
+                        border-left: 3px solid transparent;
+                    }
+                    .pos-category-btn:hover {
+                        background-color: var(--bg-tertiary);
+                        color: var(--text-primary);
+                    }
+                    .pos-category-btn.active {
+                        background-color: var(--accent-glow);
+                        color: var(--accent);
+                        font-weight: 600;
+                        border-left-color: var(--accent);
+                    }
+                     .product-grid-item {
+                        background-color: var(--bg-secondary);
+                        border-radius: 12px;
+                        padding: 12px;
+                        text-align: center;
+                        border: 1px solid var(--border-color);
+                        transition: all 0.2s ease-in-out;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: space-between;
+                    }
+                    .product-grid-item:not(:disabled):hover {
+                        transform: translateY(-4px);
+                        box-shadow: 0 8px 20px -5px rgba(0,0,0,0.3);
+                        border-color: var(--border-color-strong);
+                    }
+                     .product-grid-item:disabled {
+                        cursor: not-allowed;
+                    }
+                     /* Styles for collapsible category panel */
+                    #pos-category-panel {
+                        transition: width 0.3s ease-in-out, min-width 0.3s ease-in-out, padding 0.3s ease-in-out, opacity 0.3s ease-in-out, border-width 0.3s ease-in-out;
+                    }
+                    #pos-category-container.category-sidebar-collapsed #pos-category-panel {
+                        width: 0 !important;
+                        min-width: 0 !important;
+                        padding-left: 0;
+                        padding-right: 0;
+                        border-right-width: 0;
+                        opacity: 0;
+                        overflow: hidden;
+                    }
+                    #pos-category-sidebar-toggle {
+                        position: absolute;
+                        top: 50%;
+                        transform: translateY(-50%);
+                        z-index: 20;
+                        background-color: var(--bg-primary);
+                        border: 1px solid var(--border-color);
+                        border-left: none;
+                        width: 20px;
+                        height: 48px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        border-top-right-radius: 999px;
+                        border-bottom-right-radius: 999px;
+                        color: var(--text-secondary);
+                        transition: left 0.3s ease-in-out, background-color 0.2s;
+                    }
+                    #pos-category-sidebar-toggle:hover {
+                        background-color: var(--accent);
+                        color: white;
+                    }
+                    /* END NEW STYLES */
+                    .typing-indicator .dot {
+                        width: 8px;
+                        height: 8px;
+                        background-color: var(--accent);
+                        border-radius: 50%;
+                        animation: typing-bounce 1.2s infinite ease-in-out;
+                    }
+                    .typing-indicator .dot:nth-child(2) { animation-delay: -0.2s; }
+                    .typing-indicator .dot:nth-child(3) { animation-delay: -0.4s; }
+                    @keyframes typing-bounce {
+                        0%, 60%, 100% { transform: translateY(0); }
+                        30% { transform: translateY(-6px); }
+                    }
+                    .ai-modal-pane .modal-content {
+                        background: rgba(10, 10, 15, 0.6); /* Darker, less transparent */
+                        backdrop-filter: blur(30px);
+                        -webkit-backdrop-filter: blur(30px);
+                        border: 1px solid rgba(255, 255, 255, 0.1);
+                        box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+                    }
+                    #ai-chat-history {
+                        background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.05) 1px, transparent 0);
+                        background-size: 20px 20px;
+                    }
+                    .prompt-suggestion {
+                        padding: 6px 14px;
+                        background: rgba(255,255,255,0.05);
+                        border: 1px solid rgba(255,255,255,0.1);
+                        border-radius: 999px;
+                        color: var(--text-secondary);
+                        transition: all 0.2s ease;
+                        cursor: pointer;
+                    }
+                    .prompt-suggestion:hover {
+                        background: var(--accent);
+                        color: white;
+                        border-color: var(--accent);
+                        transform: translateY(-2px);
+                    }
+                    /* Super Advanced Pagination Styles */
+                    .pagination-arrow-btn {
+                        display: flex; align-items: center; justify-content: center;
+                        width: 36px; height: 36px;
+                        border: 1px solid var(--border-color);
+                        border-radius: 8px;
+                        background-color: var(--bg-secondary);
+                        color: var(--text-secondary);
+                        transition: all 0.2s ease-in-out;
+                    }
+                    .pagination-arrow-btn:not(:disabled):hover {
+                        background-color: var(--bg-tertiary);
+                        color: var(--text-primary);
+                        border-color: var(--border-color-strong);
+                    }
+                    .pagination-arrow-btn:disabled {
+                        opacity: 0.4;
+                        cursor: not-allowed;
+                    }
+                    .pagination-page-btn {
+                        display: flex; align-items: center; justify-content: center;
+                        min-width: 36px; height: 36px;
+                        padding: 0 8px;
+                        border-radius: 8px;
+                        font-weight: 500;
+                        transition: all 0.2s ease-in-out;
+                        border: 1px solid transparent;
+                    }
+                    .pagination-page-btn:hover:not(.active) {
+                        background-color: var(--bg-tertiary);
+                        color: var(--text-primary);
+                    }
+                    .pagination-page-btn.active {
+                        background-color: var(--accent);
+                        color: white;
+                        font-weight: 600;
+                        box-shadow: 0 4px 12px -2px var(--accent-glow);
+                        border-color: var(--accent);
+                    }
+                    .pagination-ellipsis {
+                        display: flex; align-items: center; justify-content: center;
+                        width: 36px; height: 36px;
+                        color: var(--text-secondary);
+                        letter-spacing: 2px;
+                    }
+                    /* STYLES FOR HEADER COLLAPSE */
+                    #main-header {
+                        transition: all 0.3s ease-in-out;
+                    }
+                    body.header-collapsed #main-header {
+                        height: 0px !important;
+                        padding-top: 0 !important;
+                        padding-bottom: 0 !important;
+                        overflow: hidden;
+                        border-bottom-width: 0 !important;
+                        opacity: 0;
+                    }
+                    #workspace-content-container {
+                        transition: padding-top 0.3s ease-in-out;
+                    }
+                    body.header-collapsed #workspace-content-container {
+                        padding-top: 1.5rem; 
+                    }
+                    body.header-collapsed #main-tabs-container {
+                        border-top: 1px solid var(--border-color);
+                    }
+                    /* STYLES FOR THE HEADER TOGGLE BUTTON */
+                    #header-toggle-btn {
+                        position: absolute;
+                        left: 50%;
+                        z-index: 40;
+                        transform: translateX(-50%);
+                        transition: top 0.3s ease-in-out, background-color 0.2s, color 0.2s, box-shadow 0.2s, border-color 0.2s;
+                        border-radius: 9999px;
+                        width: 28px;
+                        height: 28px;
+                        padding: 0;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        background-color: var(--bg-secondary);
+                        border: 1px solid var(--border-color);
+                        box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+                        color: var(--text-secondary);
+                    }
+                    #header-toggle-btn:hover {
+                        background-color: var(--accent);
+                        color: white;
+                        border-color: var(--accent);
+                        box-shadow: 0 4px 12px var(--accent-glow);
+                    }
+                    #header-toggle-btn > i {
+                        width: 16px;
+                        height: 16px;
+                    }
+                    body:not(.header-collapsed) #header-toggle-btn {
+                        /* Position it centered on the header's bottom border */
+                        top: 66px; /* header is h-20 (80px), button is 28px high. 80 - (28/2) = 66 */
+                    }
+                    body.header-collapsed #header-toggle-btn {
+                        top: -14px; /* Move up to sit on the new top border, revealing it */
+                    }
+                    /* --- NEW: Sidebar Collapsed User Profile --- */
+                    #sidebar.sidebar-collapsed #user-profile-section .user-profile-details,
+                    #sidebar.sidebar-collapsed #user-profile-section [data-lucide="more-vertical"] {
+                        display: none;
+                    }
+                    #sidebar.sidebar-collapsed #user-profile-section > .flex {
+                        justify-content: center;
+                    }
+                </style>
+            `
+  );
+
+  // --- STATE PERSISTENCE ---
+  const saveState = () => {
+    try {
+      const appStateToPersist = {
+        tabs: appState.tabs,
+        activeTabId: appState.activeTabId,
+        isSidebarCollapsed: appState.isSidebarCollapsed,
+        isHeaderCollapsed: appState.isHeaderCollapsed, // NEW
+        viewStates: appState.viewStates, // Persist UI states like filters and collapsed sections
+      };
+      localStorage.setItem(
+        "cashshilpoAppState",
+        JSON.stringify(appStateToPersist)
+      );
+      localStorage.setItem("cashshilpoPosState", JSON.stringify(posState));
+    } catch (e) {
+      console.error("Could not save state to localStorage", e);
+    }
+  };
+
+  const loadState = () => {
+    try {
+      const persistedAppState = JSON.parse(
+        localStorage.getItem("cashshilpoAppState")
+      );
+      if (persistedAppState) {
+        appState.tabs = persistedAppState.tabs || [];
+        appState.activeTabId = persistedAppState.activeTabId || null;
+        appState.isSidebarCollapsed =
+          persistedAppState.isSidebarCollapsed || false;
+        appState.isHeaderCollapsed =
+          persistedAppState.isHeaderCollapsed || false; // NEW
+        if (persistedAppState.viewStates) {
+          // Deep merge to prevent overwriting new default states with old persisted ones
+          appState.viewStates = {
+            ...appState.viewStates,
+            ...persistedAppState.viewStates,
+            inventory: {
+              ...appState.viewStates.inventory,
+              ...(persistedAppState.viewStates.inventory || {}),
+            },
+            customers: {
+              ...appState.viewStates.customers,
+              ...(persistedAppState.viewStates.customers || {}),
+            },
+            invoices: {
+              ...appState.viewStates.invoices,
+              ...(persistedAppState.viewStates.invoices || {}),
+            },
+            reports: {
+              ...appState.viewStates.reports,
+              ...(persistedAppState.viewStates.reports || {}),
+            },
+            posModern: {
+              ...appState.viewStates.posModern,
+              ...(persistedAppState.viewStates.posModern || {}),
+            },
+            staff: {
+              ...appState.viewStates.staff,
+              ...(persistedAppState.viewStates.staff || {}),
+            },
+          };
+        }
+      }
+      const persistedPosState = JSON.parse(
+        localStorage.getItem("cashshilpoPosState")
+      );
+      if (persistedPosState) {
+        posState.sales = persistedPosState.sales || [];
+        posState.activeSaleId = persistedPosState.activeSaleId || null;
+        posState.saleCounter = persistedPosState.saleCounter || 1;
+        if (posState.sales.length > 0 && !posState.activeSaleId) {
+          posState.activeSaleId =
+            posState.sales.find((s) => s.status === "active")?.id ||
+            posState.sales[0].id;
+        }
+      }
+    } catch (e) {
+      console.error("Could not load persisted state", e);
+      localStorage.removeItem("cashshilpoAppState");
+      localStorage.removeItem("cashshilpoPosState");
+    }
+  };
+
+  loadState(); // Load state as soon as DOM is ready
+
+  // NEW: Function to apply header collapse state and associated setup
+  const applyHeaderCollapseState = () => {
+    // This function assumes a main wrapper with id="app-container" exists.
+    const appContainer =
+      document.getElementById("app-container") || document.body;
+    const headerToggleBtn = document.getElementById("header-toggle-btn");
+    if (!appContainer || !headerToggleBtn) return;
+
+    if (appState.isHeaderCollapsed) {
+      appContainer.classList.add("header-collapsed");
+      headerToggleBtn.setAttribute("title", "Expand Header");
+      headerToggleBtn.innerHTML = `<i data-lucide="chevrons-down-up" class="w-4 h-4"></i>`;
+    } else {
+      appContainer.classList.remove("header-collapsed");
+      headerToggleBtn.setAttribute("title", "Collapse Header");
+      headerToggleBtn.innerHTML = `<i data-lucide="chevrons-up-down" class="w-4 h-4"></i>`;
+    }
+    lucide.createIcons();
+  };
+
+  const setupHeaderToggle = () => {
+    const header = document.querySelector("header");
+    if (!header) {
+      console.warn("Could not find header to attach toggle.");
+      return;
+    }
+
+    header.id = "main-header";
+    const mainColumn = header.parentElement;
+    if (!mainColumn) return;
+
+    // Ensure the parent is a positioning context
+    mainColumn.style.position = "relative";
+
+    // Gives the content container an ID for CSS targeting
+    const contentContainer = document.getElementById("workspace-content")
+      ?.parentElement;
+    if (contentContainer) contentContainer.id = "workspace-content-container";
+
+    // Prevent adding button if it already exists from a re-render
+    let headerToggleBtn = document.getElementById("header-toggle-btn");
+    if (headerToggleBtn) return;
+
+    const toggleButtonHTML = `
+                    <button id="header-toggle-btn" title="Collapse Header">
+                        <i data-lucide="chevrons-up-down" class="w-4 h-4"></i>
+                    </button>
+                `;
+    // Insert the button into the main column, not inside the header
+    mainColumn.insertAdjacentHTML("beforeend", toggleButtonHTML);
+
+    headerToggleBtn = document.getElementById("header-toggle-btn");
+    if (headerToggleBtn) {
+      headerToggleBtn.addEventListener("click", () => {
+        appState.isHeaderCollapsed = !appState.isHeaderCollapsed;
+        applyHeaderCollapseState();
+        saveState();
+      });
+    }
+  };
+  setupHeaderToggle(); // Run setup on initial load
+
+  window.addEventListener("beforeunload", saveState); // Save state on page close/refresh
+
+  const workspaceContent = document.getElementById("workspace-content");
+  const mainTabsContainer = document.getElementById("main-tabs-container");
+  const modalsContainer = document.getElementById("modals-container");
+  const toastsContainer = document.getElementById("toasts-container");
+  const sidebar = document.getElementById("sidebar");
+  const sidebarToggleBtn = document.getElementById("sidebar-toggle");
+  const sidebarBackdrop = document.getElementById("sidebar-backdrop");
+
+  // --- NEW: USER PROFILE MODAL & MENU LOGIC ---
+  function openMyProfileModal() {
+    const user = appState.session.currentUser;
+    if (!user) {
+      showToast("You must be logged in to view your profile.", "error");
+      return;
+    }
+
+    const roleInfo = userRoles[user.role] || { name: "Unknown" };
+
+    const content = `
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="md:col-span-1 text-center">
+                            <img src="https://placehold.co/128x128/1f2937/4b5563?text=${user.name
+                              .charAt(0)
+                              .toUpperCase()}" class="w-32 h-32 rounded-full mx-auto ring-4 ring-bg-secondary shadow-lg">
+                            <h2 class="text-2xl font-bold text-text-primary mt-4">${
+                              user.name
+                            }</h2>
+                            <p class="text-accent font-semibold">${
+                              roleInfo.name
+                            }</p>
+                        </div>
+                        <div class="md:col-span-2 space-y-4">
+                            <h3 class="text-lg font-semibold text-text-primary">Contact Information</h3>
+                            <div class="space-y-3 text-sm">
+                                <div class="flex items-start gap-3"><i data-lucide="mail" class="w-4 h-4 text-text-secondary mt-0.5 shrink-0"></i><div><p class="text-text-secondary -mb-1">Email</p><p class="text-text-primary font-medium break-all">${
+                                  user.email
+                                }</p></div></div>
+                                <div class="flex items-start gap-3"><i data-lucide="phone" class="w-4 h-4 text-text-secondary mt-0.5 shrink-0"></i><div><p class="text-text-secondary -mb-1">Phone</p><p class="text-text-primary font-medium">${
+                                  user.phone || "Not provided"
+                                }</p></div></div>
+                                <div class="flex items-start gap-3"><i data-lucide="map-pin" class="w-4 h-4 text-text-secondary mt-0.5 shrink-0"></i><div><p class="text-text-secondary -mb-1">Address</p><p class="text-text-primary font-medium">${
+                                  user.address || "Not provided"
+                                }</p></div></div>
+                            </div>
+                            <div class="border-t border-border-color pt-4">
+                                <h3 class="text-lg font-semibold text-text-primary">Account Details</h3>
+                                <div class="space-y-3 text-sm mt-3">
+                                    <div class="flex items-start gap-3"><i data-lucide="calendar" class="w-4 h-4 text-text-secondary mt-0.5 shrink-0"></i><div><p class="text-text-secondary -mb-1">Joined On</p><p class="text-text-primary font-medium">${new Date(
+                                      user.joinDate
+                                    ).toLocaleDateString()}</p></div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+    const footer = `<button data-action="close-modal" class="btn btn-secondary">Close</button>${
+      user.role === "admin"
+        ? `<button id="edit-my-profile" class="btn btn-primary">Edit My Profile</button>`
+        : ""
+    }`;
+    const modal = showModal("My Profile", content, footer, {
+      size: "max-w-3xl",
+    });
+    lucide.createIcons();
+
+    const editProfileBtn = modal.querySelector("#edit-my-profile");
+    if (editProfileBtn) {
+      editProfileBtn.addEventListener("click", () => {
+        closeModal(modal);
+        // Only admins will have this button, so just call the admin edit modal.
+        openAdminEditStaffModal(user.uid);
+      });
+    }
+  }
+
+  async function openNotificationsModal() {
+    const notifications = firestoreData.notifications;
+
+    // Use negative horizontal margins to make list dividers edge-to-edge
+    const content = `
+                    <div class="max-h-[60vh] overflow-y-auto -mx-6">
+                        <div class="divide-y divide-border-color">
+                            ${
+                              notifications.length > 0
+                                ? notifications
+                                    .map((n) => {
+                                      const icons = {
+                                        success: "check-circle",
+                                        info: "info",
+                                        warning: "alert-triangle",
+                                        stock: "package-search",
+                                        sale: "receipt-text",
+                                      };
+                                      const colors = {
+                                        success: "green",
+                                        info: "blue",
+                                        warning: "orange",
+                                        stock: "yellow",
+                                        sale: "green",
+                                      };
+                                      const icon = icons[n.type] || "bell";
+                                      const color = colors[n.type] || "gray";
+                                      // Differentiate styling for read (faded) and unread notifications.
+                                      return `
+                                <div class="notification-item flex items-start gap-4 py-4 px-6 ${
+                                  !n.read ? "bg-blue-500/10" : "opacity-60"
+                                } hover:opacity-100 hover:bg-bg-secondary transition-all duration-200">
+                                    <div class="w-8 h-8 rounded-full flex items-center justify-center bg-${color}-500/10 text-${color}-400 shrink-0 mt-1">
+                                        <i data-lucide="${icon}" class="w-5 h-5"></i>
+                                    </div>
+                                    <div class="flex-grow">
+                                        <p class="text-sm text-text-primary">${n.message.replace(
+                                          /<strong>/g,
+                                          '<strong class="font-semibold text-white">'
+                                        )}</p>
+                                        <p class="text-xs text-text-secondary mt-1">${new Date(
+                                          n.date
+                                        ).toLocaleString()}</p>
+                                    </div>
+                                    ${
+                                      !n.read
+                                        ? '<div class="w-2.5 h-2.5 bg-blue-400 rounded-full ml-2 self-center shrink-0"></div>'
+                                        : ""
+                                    }
+                                </div>
+                                `;
+                                    })
+                                    .join("")
+                                : `<p class="text-center text-text-secondary py-8 px-6">You have no notifications.</p>`
+                            }
+                        </div>
+                    </div>
+                `;
+
+    const footer =
+      notifications.length > 0
+        ? `<button id="clear-all-notifications-btn" class="btn btn-danger-secondary">Clear All</button>`
+        : "";
+
+    const modal = showModal("Notifications", content, footer, {
+      size: "max-w-lg",
+    });
+    if (!modal) return;
+
+    lucide.createIcons();
+
+    // Mark as read only when the close button is clicked.
+    const closeBtn = modal.querySelector('button[data-action="close-modal"]');
+    if (closeBtn) {
+      closeBtn.addEventListener("click", async () => {
+        const unreadNotifications = firestoreData.notifications.filter(
+          (n) => !n.read
+        );
+        if (unreadNotifications.length > 0) {
+          try {
+            const batch = writeBatch(db);
+            unreadNotifications.forEach((n) => {
+              const notifRef = doc(notificationsRef, n.id);
+              batch.update(notifRef, { read: true });
+            });
+            await batch.commit();
+          } catch (error) {
+            console.error(
+              "Error marking notifications as read on close:",
+              error
+            );
+          }
+        }
+      });
+    }
+
+    const clearAllBtn = modal.querySelector("#clear-all-notifications-btn");
+    if (clearAllBtn) {
+      clearAllBtn.addEventListener("click", async () => {
+        clearAllBtn.disabled = true;
+        clearAllBtn.textContent = "Clearing...";
+
+        try {
+          const batch = writeBatch(db);
+          firestoreData.notifications.forEach((n) => {
+            const notifRef = doc(notificationsRef, n.id);
+            batch.delete(notifRef);
+          });
+          await batch.commit();
+          showToast("All notifications cleared.", "success");
+          closeModal(modal);
+        } catch (error) {
+          console.error("Error clearing notifications:", error);
+          showToast("Could not clear notifications.", "error");
+          clearAllBtn.disabled = false;
+          clearAllBtn.textContent = "Clear All";
+        }
+      });
+    }
+  }
+
+  function openGlobalSearchModal() {
+    const content = `
+                    <div class="-m-6">
+                        <div class="relative">
+                            <i data-lucide="search" class="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-text-secondary"></i>
+                            <input type="text" id="global-search-input" placeholder="Search products, customers, invoices..." class="w-full text-lg bg-transparent form-input border-0 border-b border-border-color rounded-none pl-14 p-5 focus:ring-0">
+                        </div>
+                        <div id="global-search-results" class="max-h-[60vh] overflow-y-auto p-4">
+                            <div class="text-center text-text-secondary py-12">
+                                <i data-lucide="search" class="w-12 h-12 mx-auto mb-4"></i>
+                                <p>Find anything in your store instantly.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <style>
+                        .search-result-group {
+                            display: flex;
+                            align-items: center;
+                            gap: 1rem;
+                            padding: 0.75rem;
+                            border-radius: 0.5rem;
+                            cursor: pointer;
+                            transition: background-color 0.2s ease;
+                        }
+                        .search-result-group:hover {
+                            background-color: var(--bg-secondary);
+                        }
+                    </style>
+                `;
+    const modal = showModal("Global Search", content, "", {
+      size: "max-w-3xl",
+      customClasses: "p-0",
+    });
+    lucide.createIcons();
+
+    const input = modal.querySelector("#global-search-input");
+    const resultsContainer = modal.querySelector("#global-search-results");
+    input.focus();
+
+    input.addEventListener("input", () => {
+      const query = input.value.toLowerCase().trim();
+      if (query.length < 2) {
+        resultsContainer.innerHTML = ` <div class="text-center text-text-secondary py-12">
+                                <i data-lucide="search" class="w-12 h-12 mx-auto mb-4"></i>
+                                <p>Find anything in your store instantly.</p>
+                            </div>`;
+        lucide.createIcons();
+        return;
+      }
+
+      const term = getCurrentProfile().terminology;
+      const results = {
+        products: [],
+        customers: [],
+        invoices: [],
+      };
+
+      // Search Products
+      firestoreData.products.forEach((p) => {
+        if (
+          p.name.toLowerCase().includes(query) ||
+          p.id.toLowerCase().includes(query) ||
+          p.barcode?.includes(query)
+        ) {
+          results.products.push(p);
+        }
+      });
+
+      // Search Customers
+      firestoreData.customers.forEach((c) => {
+        if (
+          c.name.toLowerCase().includes(query) ||
+          (c.phone || "").includes(query) ||
+          c.email?.toLowerCase().includes(query)
+        ) {
+          results.customers.push(c);
+        }
+      });
+
+      // Search Invoices
+      firestoreData.invoices.forEach((i) => {
+        if (
+          i.id.toLowerCase().includes(query) ||
+          i.customerName.toLowerCase().includes(query)
+        ) {
+          results.invoices.push(i);
+        }
+      });
+
+      let resultsHTML = "";
+      if (results.products.length > 0) {
+        resultsHTML += `<h4 class="text-xs uppercase font-semibold text-text-secondary px-2 mb-2">${term.product}s</h4>`;
+        resultsHTML += results.products
+          .slice(0, 5)
+          .map(
+            (p) => `
+                            <div data-search-action="view-product" data-id="${
+                              p.id
+                            }" class="search-result-group">
+                                <i data-lucide="package" class="w-5 h-5 text-accent"></i>
+                                <div>
+                                    <p class="font-medium text-text-primary">${
+                                      p.name
+                                    }</p>
+                                    <p class="text-xs text-text-secondary font-mono">${
+                                      p.id
+                                    } &bull; Price: ${currencyUtils.format(
+              p.price
+            )} &bull; Stock: ${p.stock}</p>
+                                </div>
+                            </div>
+                        `
+          )
+          .join("");
+      }
+      if (results.customers.length > 0) {
+        resultsHTML += `<h4 class="text-xs uppercase font-semibold text-text-secondary px-2 mt-4 mb-2">Customers</h4>`;
+        resultsHTML += results.customers
+          .slice(0, 5)
+          .map(
+            (c) => `
+                            <div data-search-action="view-customer" data-id="${c.id}" class="search-result-group">
+                                <i data-lucide="user" class="w-5 h-5 text-accent"></i>
+                                <div>
+                                    <p class="font-medium text-text-primary">${c.name}</p>
+                                    <p class="text-xs text-text-secondary">${c.phone} &bull; ${c.email}</p>
+                                </div>
+                            </div>
+                        `
+          )
+          .join("");
+      }
+      if (results.invoices.length > 0) {
+        resultsHTML += `<h4 class="text-xs uppercase font-semibold text-text-secondary px-2 mt-4 mb-2">Invoices</h4>`;
+        resultsHTML += results.invoices
+          .slice(0, 5)
+          .map(
+            (i) => `
+                            <div data-search-action="view-invoice" data-id="${
+                              i.id
+                            }" class="search-result-group">
+                                <i data-lucide="receipt-text" class="w-5 h-5 text-accent"></i>
+                                <div>
+                                    <p class="font-medium text-text-primary">Invoice ${
+                                      i.id
+                                    }</p>
+                                    <p class="text-xs text-text-secondary">${
+                                      i.customerName
+                                    } &bull; Total: ${currencyUtils.format(
+              i.totalInBaseCurrency,
+              i.currency
+            )}</p>
+                                </div>
+                            </div>
+                        `
+          )
+          .join("");
+      }
+
+      if (resultsHTML) {
+        resultsContainer.innerHTML = resultsHTML;
+      } else {
+        resultsContainer.innerHTML = `<p class="text-center py-12 text-text-secondary">No results found for "${query}".</p>`;
+      }
+      lucide.createIcons();
+    });
+
+    resultsContainer.addEventListener("click", (e) => {
+      const target = e.target.closest("[data-search-action]");
+      if (!target) return;
+
+      const { searchAction, id } = target.dataset;
+      closeModal(modal);
+
+      switch (searchAction) {
+        case "view-product":
+          openOrSwitchTab("inventory");
+          setTimeout(() => {
+            const container = document.querySelector(
+              "#inventory-view-container"
+            );
+            if (container) {
+              renderProductDetailView(id, container);
+            }
+          }, 200);
+          break;
+        case "view-customer":
+          openOrSwitchTab("customers");
+          setTimeout(() => {
+            openCustomerModal(id);
+          }, 200);
+          break;
+        case "view-invoice":
+          openOrSwitchTab("invoices");
+          setTimeout(() => {
+            const invoice = firestoreData.invoices.find((i) => i.id === id);
+            if (invoice) {
+              if (invoice.customerId) {
+                invoice.customer = firestoreData.customers.find(
+                  (c) => c.id === invoice.customerId
+                );
+              }
+              showReceipt(invoice);
+            }
+          }, 200);
+          break;
+      }
+    });
+  }
+
+  function openCalculatorModal(type = "simple") {
+    const content = `
+                    <div class="flex flex-col h-[75vh] max-h-[650px]">
+                        <!-- Tabs -->
+                        <div class="border-b border-border-color flex-shrink-0">
+                            <button data-tab="simple" class="form-tab px-4 py-3 text-sm font-medium ${
+                              type === "simple" ? "active" : ""
+                            }">Calculator</button>
+                            <button data-tab="advanced" class="form-tab px-4 py-3 text-sm font-medium ${
+                              type === "advanced" ? "active" : ""
+                            }">Advanced Tools</button>
+                        </div>
+
+                        <!-- Panes -->
+                        <div class="flex-grow overflow-hidden">
+                            <!-- Simple Calculator Pane -->
+                            <div class="form-pane p-4 h-full ${
+                              type === "simple" ? "active" : ""
+                            }" data-pane="simple">
+                                <div class="flex flex-col h-full">
+                                    <input id="calc-display" type="text" readonly class="w-full text-right text-4xl font-mono p-4 mb-4 bg-bg-tertiary rounded-lg border-border-color">
+                                    <div class="grid grid-cols-4 gap-2 flex-grow">
+                                        <button data-calc-action="clear" class="calc-btn bg-red-500/20 text-red-300">AC</button>
+                                        <button data-calc-action="backspace" class="calc-btn bg-gray-500/20 text-gray-300"><i data-lucide="delete" class="w-6 h-6 pointer-events-none"></i></button>
+                                        <button data-calc-action="operator" data-key="%" class="calc-btn bg-gray-500/20 text-gray-300">%</button>
+                                        <button data-calc-action="operator" data-key="/" class="calc-btn operator-btn text-2xl">÷</button>
+                                        
+                                        <button data-calc-action="number" data-key="7" class="calc-btn text-2xl">7</button>
+                                        <button data-calc-action="number" data-key="8" class="calc-btn text-2xl">8</button>
+                                        <button data-calc-action="number" data-key="9" class="calc-btn text-2xl">9</button>
+                                        <button data-calc-action="operator" data-key="*" class="calc-btn operator-btn text-2xl">×</button>
+                                        
+                                        <button data-calc-action="number" data-key="4" class="calc-btn text-2xl">4</button>
+                                        <button data-calc-action="number" data-key="5" class="calc-btn text-2xl">5</button>
+                                        <button data-calc-action="number" data-key="6" class="calc-btn text-2xl">6</button>
+                                        <button data-calc-action="operator" data-key="-" class="calc-btn operator-btn text-2xl">-</button>
+                                        
+                                        <button data-calc-action="number" data-key="1" class="calc-btn text-2xl">1</button>
+                                        <button data-calc-action="number" data-key="2" class="calc-btn text-2xl">2</button>
+                                        <button data-calc-action="number" data-key="3" class="calc-btn text-2xl">3</button>
+                                        <button data-calc-action="operator" data-key="+" class="calc-btn operator-btn text-2xl">+</button>
+                                        
+                                        <button data-calc-action="number" data-key="0" class="calc-btn text-2xl col-span-2">0</button>
+                                        <button data-calc-action="number" data-key="." class="calc-btn text-2xl">.</button>
+                                        <button data-calc-action="equals" class="calc-btn operator-btn text-2xl">=</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Advanced Calculator Pane -->
+                            <div class="form-pane p-6 h-full overflow-y-auto ${
+                              type === "advanced" ? "active" : ""
+                            }" data-pane="advanced">
+                                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                    <!-- Profit Margin Calculator -->
+                                    <div class="tool-card">
+                                        <h4 class="tool-title"><i data-lucide="trending-up" class="w-5 h-5 text-accent"></i>Profit Margin</h4>
+                                        <div id="profit-calc" class="tool-body">
+                                            <div class="grid grid-cols-2 gap-3">
+                                                <div><label class="input-label">Cost Price</label><input type="number" name="costPrice" class="form-input w-full p-2 mt-1"></div>
+                                                <div><label class="input-label">Selling Price</label><input type="number" name="sellingPrice" class="form-input w-full p-2 mt-1"></div>
+                                            </div>
+                                            <div class="grid grid-cols-2 gap-3 result-area">
+                                                <div><p class="result-label">Gross Profit</p><p id="profit-result" class="result-value text-green-400">...</p></div>
+                                                <div><p class="result-label">Profit Margin</p><p id="margin-result" class="result-value text-green-400">...</p></div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Discount Calculator -->
+                                    <div class="tool-card">
+                                         <h4 class="tool-title"><i data-lucide="percent" class="w-5 h-5 text-accent"></i>Discount</h4>
+                                         <div id="discount-calc" class="tool-body">
+                                            <div><label class="input-label">Original Price</label><input type="number" name="originalPrice" class="form-input w-full p-2 mt-1"></div>
+                                            <div class="flex">
+                                                <select name="discountType" class="form-select rounded-r-none w-24 p-2 text-sm">
+                                                    <option value="percent">%</option>
+                                                    <option value="fixed">${
+                                                      currencyUtils.get().symbol
+                                                    }</option>
+                                                </select>
+                                                <input type="number" name="discountValue" placeholder="Discount" class="w-full form-input rounded-l-none p-2">
+                                            </div>
+                                            <div class="result-area">
+                                                <p class="result-label">Final Price</p>
+                                                <p id="discount-result" class="result-value text-blue-400">...</p>
+                                            </div>
+                                         </div>
+                                    </div>
+
+                                    <!-- Tax Calculator -->
+                                    <div class="tool-card">
+                                         <h4 class="tool-title"><i data-lucide="landmark" class="w-5 h-5 text-accent"></i>Tax</h4>
+                                         <div id="tax-calc" class="tool-body">
+                                            <div><label class="input-label">Price (before tax)</label><input type="number" name="preTaxPrice" class="form-input w-full p-2 mt-1"></div>
+                                            <div><label class="input-label">Tax Rate (%)</label><input type="number" name="taxRate" value="${
+                                              appState.settings.taxRate
+                                            }" class="form-input w-full p-2 mt-1"></div>
+                                            <div class="grid grid-cols-2 gap-3 result-area">
+                                                <div><p class="result-label">Tax Amount</p><p id="tax-amount-result" class="result-value text-yellow-400">...</p></div>
+                                                <div><p class="result-label">Total (with tax)</p><p id="tax-total-result" class="result-value text-yellow-400">...</p></div>
+                                            </div>
+                                         </div>
+                                    </div>
+                                    
+                                    <!-- Currency Converter -->
+                                    <div class="tool-card">
+                                        <h4 class="tool-title"><i data-lucide="arrow-right-left" class="w-5 h-5 text-accent"></i>Currency Converter</h4>
+                                        <div id="currency-converter" class="tool-body">
+                                            <div><label class="input-label">Amount</label><input type="number" name="convertAmount" class="form-input w-full p-2 mt-1"></div>
+                                            <div class="grid grid-cols-2 gap-3">
+                                                <div><label class="input-label">From</label><select name="convertFrom" class="form-select w-full mt-1"></select></div>
+                                                <div><label class="input-label">To</label><select name="convertTo" class="form-select w-full mt-1"></select></div>
+                                            </div>
+                                            <div class="result-area">
+                                                <p class="result-label">Converted Amount</p>
+                                                <p id="currency-result" class="result-value text-purple-400">...</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Loan EMI Calculator -->
+                                    <div class="tool-card">
+                                        <h4 class="tool-title"><i data-lucide="banknote" class="w-5 h-5 text-accent"></i>Loan EMI</h4>
+                                        <div id="loan-calc" class="tool-body">
+                                            <div><label class="input-label">Loan Amount</label><input type="number" name="loanAmount" class="form-input w-full p-2 mt-1"></div>
+                                            <div class="grid grid-cols-2 gap-3">
+                                                <div><label class="input-label">Interest Rate (%)</label><input type="number" name="loanRate" class="form-input w-full p-2 mt-1"></div>
+                                                <div><label class="input-label">Tenure (Years)</label><input type="number" name="loanTenure" class="form-input w-full p-2 mt-1"></div>
+                                            </div>
+                                            <div class="result-area">
+                                                <p class="result-label">Monthly EMI</p>
+                                                <p id="emi-result" class="result-value text-teal-400">...</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Compound Interest Calculator -->
+                                    <div class="tool-card">
+                                        <h4 class="tool-title"><i data-lucide="piggy-bank" class="w-5 h-5 text-accent"></i>Compound Interest</h4>
+                                        <div id="interest-calc" class="tool-body">
+                                            <div><label class="input-label">Principal Amount</label><input type="number" name="principal" class="form-input w-full p-2 mt-1"></div>
+                                            <div class="grid grid-cols-2 gap-3">
+                                                <div><label class="input-label">Annual Rate (%)</label><input type="number" name="interestRate" class="form-input w-full p-2 mt-1"></div>
+                                                <div><label class="input-label">Years</label><input type="number" name="interestYears" class="form-input w-full p-2 mt-1"></div>
+                                            </div>
+                                            <div class="result-area">
+                                                <p class="result-label">Future Value</p>
+                                                <p id="future-value-result" class="result-value text-pink-400">...</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Breakeven Point Calculator -->
+                                    <div class="tool-card lg:col-span-2">
+                                        <h4 class="tool-title"><i data-lucide="target" class="w-5 h-5 text-accent"></i>Breakeven Point</h4>
+                                        <div id="breakeven-calc" class="tool-body">
+                                            <div class="grid grid-cols-3 gap-3">
+                                                <div><label class="input-label">Fixed Costs</label><input type="number" name="fixedCosts" class="form-input w-full p-2 mt-1"></div>
+                                                <div><label class="input-label">Price per Unit</label><input type="number" name="unitPrice" class="form-input w-full p-2 mt-1"></div>
+                                                <div><label class="input-label">Cost per Unit</label><input type="number" name="unitCost" class="form-input w-full p-2 mt-1"></div>
+                                            </div>
+                                            <div class="grid grid-cols-2 gap-3 result-area">
+                                                <div><p class="result-label">Breakeven Units</p><p id="breakeven-units-result" class="result-value text-orange-400">...</p></div>
+                                                <div><p class="result-label">Breakeven Revenue</p><p id="breakeven-revenue-result" class="result-value text-orange-400">...</p></div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <style>
+                        .calc-btn { background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 0.75rem; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+                        .calc-btn:hover { background-color: var(--bg-tertiary); transform: scale(1.05); }
+                        .calc-btn:active { transform: scale(0.95); }
+                        .operator-btn { background-color: var(--accent); color: white; }
+                        .tool-card { background-color: var(--bg-secondary); border-radius: 0.75rem; border: 1px solid var(--border-color); }
+                        .tool-title { font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; padding: 1rem 1rem 0; }
+                        .tool-body { padding: 1rem; space-y: 0.75rem; }
+                        .input-label { font-size: 0.75rem; color: var(--text-secondary); }
+                        .result-area { padding-top: 0.75rem; border-top: 1px solid var(--border-color-strong); margin-top: 0.75rem; }
+                        .result-label { font-size: 0.75rem; color: var(--text-secondary); }
+                        .result-value { font-family: monospace; font-size: 1.125rem; font-weight: 600; }
+                    </style>
+                `;
+    const modal = showModal("Calculators", content, "", {
+      size: "max-w-4xl",
+      customClasses: "p-0",
+    });
+    lucide.createIcons();
+
+    // Tab switching logic
+    const tabs = modal.querySelectorAll(".form-tab");
+    const panes = modal.querySelectorAll(".form-pane");
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        tabs.forEach((t) => t.classList.remove("active"));
+        panes.forEach((p) => p.classList.remove("active"));
+        tab.classList.add("active");
+        modal
+          .querySelector(`.form-pane[data-pane="${tab.dataset.tab}"]`)
+          .classList.add("active");
+      });
+    });
+
+    // Simple Calculator Logic
+    const display = modal.querySelector("#calc-display");
+    let expression = "";
+
+    function handleCalcInput(action, key) {
+      if (expression === "Error" || expression === "Infinity") {
+        expression = "";
+      }
+
+      switch (action) {
+        case "number":
+          expression += key;
+          break;
+        case "operator":
+          if (expression === "" && key !== "-") return;
+          const lastChar = expression.slice(-1);
+          if (["+", "-", "*", "/", "%"].includes(lastChar)) {
+            expression = expression.slice(0, -1) + key;
+          } else {
+            expression += key;
+          }
+          break;
+        case "equals":
+          if (
+            expression === "" ||
+            ["+", "-", "*", "/", "%"].includes(expression.slice(-1))
+          )
+            return;
+          try {
+            const result = new Function("return " + expression)();
+            expression = String(result);
+          } catch {
+            expression = "Error";
+          }
+          break;
+        case "clear":
+          expression = "";
+          break;
+        case "backspace":
+          expression = expression.slice(0, -1);
+          break;
+      }
+
+      display.value = expression || "0";
+    }
+
+    modal
+      .querySelector('[data-pane="simple"]')
+      .addEventListener("click", (e) => {
+        const target = e.target.closest("[data-calc-action]");
+        if (!target) return;
+        handleCalcInput(target.dataset.calcAction, target.dataset.key);
+      });
+
+    // --- NEW: Keyboard Support for Calculator ---
+    const handleKeyboardInput = (e) => {
+      // Only handle input if the modal exists and the simple calculator is visible
+      const modalExists = document.body.contains(modal);
+      const simplePane = modal.querySelector('.form-pane[data-pane="simple"]');
+      if (
+        !modalExists ||
+        !simplePane ||
+        !simplePane.classList.contains("active")
+      )
+        return;
+
+      // Don't interfere with inputs in the advanced tab or other modals
+      if (
+        e.target.tagName === "INPUT" ||
+        e.target.tagName === "TEXTAREA" ||
+        e.target.tagName === "SELECT"
+      ) {
+        if (
+          !modal.contains(e.target) ||
+          modal
+            .querySelector('.form-pane[data-pane="advanced"]')
+            .contains(e.target)
+        ) {
+          return;
+        }
+      }
+
+      const key = e.key;
+      let handled = false;
+
+      if ((key >= "0" && key <= "9") || key === ".") {
+        handleCalcInput("number", key);
+        handled = true;
+      } else if (["+", "-", "*", "/", "%"].includes(key)) {
+        handleCalcInput("operator", key);
+        handled = true;
+      } else if (key === "Enter" || key === "=") {
+        handleCalcInput("equals", null);
+        handled = true;
+      } else if (key === "Backspace") {
+        handleCalcInput("backspace", null);
+        handled = true;
+      } else if (key === "Escape" || key.toLowerCase() === "c") {
+        handleCalcInput("clear", null);
+        handled = true;
+      }
+
+      if (handled) {
+        e.preventDefault();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyboardInput);
+
+    // --- Cleanup on close ---
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        mutation.removedNodes.forEach((node) => {
+          if (node === modal) {
+            document.removeEventListener("keydown", handleKeyboardInput);
+            observer.disconnect();
+          }
+        });
+      });
+    });
+    observer.observe(modalsContainer, { childList: true });
+
+    // Advanced Calculator Logic
+    const profitCalc = modal.querySelector("#profit-calc");
+    const discountCalc = modal.querySelector("#discount-calc");
+    const taxCalc = modal.querySelector("#tax-calc");
+    const currencyConverter = modal.querySelector("#currency-converter");
+    const loanCalc = modal.querySelector("#loan-calc");
+    const interestCalc = modal.querySelector("#interest-calc");
+    const breakevenCalc = modal.querySelector("#breakeven-calc");
+
+    profitCalc.addEventListener("input", () => {
+      const costInDisplay =
+        parseFloat(profitCalc.querySelector('[name="costPrice"]').value) || 0;
+      const sellingInDisplay =
+        parseFloat(profitCalc.querySelector('[name="sellingPrice"]').value) ||
+        0;
+
+      const cost = currencyUtils.convertToBase(costInDisplay);
+      const selling = currencyUtils.convertToBase(sellingInDisplay);
+
+      const profit = selling - cost;
+      const margin = selling > 0 ? (profit / selling) * 100 : 0;
+
+      profitCalc.querySelector(
+        "#profit-result"
+      ).textContent = currencyUtils.format(profit);
+      profitCalc.querySelector(
+        "#margin-result"
+      ).textContent = `${margin.toFixed(2)}%`;
+    });
+
+    discountCalc.addEventListener("input", () => {
+      const originalInDisplay =
+        parseFloat(
+          discountCalc.querySelector('[name="originalPrice"]').value
+        ) || 0;
+      const original = currencyUtils.convertToBase(originalInDisplay);
+
+      const type = discountCalc.querySelector('[name="discountType"]').value;
+      const value =
+        parseFloat(
+          discountCalc.querySelector('[name="discountValue"]').value
+        ) || 0;
+
+      let finalPrice = original;
+      if (type === "percent") {
+        finalPrice = original * (1 - value / 100);
+      } else {
+        // 'fixed' amount is in display currency
+        const valueInBase = currencyUtils.convertToBase(value);
+        finalPrice = original - valueInBase;
+      }
+      discountCalc.querySelector(
+        "#discount-result"
+      ).textContent = currencyUtils.format(finalPrice);
+    });
+
+    taxCalc.addEventListener("input", () => {
+      const preTaxInDisplay =
+        parseFloat(taxCalc.querySelector('[name="preTaxPrice"]').value) || 0;
+      const preTax = currencyUtils.convertToBase(preTaxInDisplay);
+
+      const rate =
+        parseFloat(taxCalc.querySelector('[name="taxRate"]').value) || 0;
+
+      const taxAmount = preTax * (rate / 100);
+      const total = preTax + taxAmount;
+
+      taxCalc.querySelector(
+        "#tax-amount-result"
+      ).textContent = currencyUtils.format(taxAmount);
+      taxCalc.querySelector(
+        "#tax-total-result"
+      ).textContent = currencyUtils.format(total);
+    });
+
+    // --- NEW: Currency Converter Logic ---
+    if (currencyConverter) {
+      const fromSelect = currencyConverter.querySelector(
+        '[name="convertFrom"]'
+      );
+      const toSelect = currencyConverter.querySelector('[name="convertTo"]');
+      const currencies = firestoreData.storeInfo.currencies || {};
+      const optionsHTML = Object.keys(currencies)
+        .map((code) => `<option value="${code}">${code}</option>`)
+        .join("");
+      fromSelect.innerHTML = optionsHTML;
+      toSelect.innerHTML = optionsHTML;
+      fromSelect.value = appState.currentCurrency;
+      toSelect.value = firestoreData.storeInfo.baseCurrency || "USD";
+
+      currencyConverter.addEventListener("input", () => {
+        const amount =
+          parseFloat(
+            currencyConverter.querySelector('[name="convertAmount"]').value
+          ) || 0;
+        const from = fromSelect.value;
+        const to = toSelect.value;
+        const baseAmount = currencyUtils.convertToBase(amount, from);
+        const convertedAmount = currencyUtils.convert(baseAmount, to);
+        currencyConverter.querySelector(
+          "#currency-result"
+        ).textContent = currencyUtils.format(baseAmount, to);
+      });
+    }
+
+    // --- NEW: Loan EMI Calculator Logic ---
+    if (loanCalc) {
+      loanCalc.addEventListener("input", () => {
+        const p =
+          parseFloat(loanCalc.querySelector('[name="loanAmount"]').value) || 0;
+        const r =
+          (parseFloat(loanCalc.querySelector('[name="loanRate"]').value) || 0) /
+          12 /
+          100;
+        const n =
+          (parseFloat(loanCalc.querySelector('[name="loanTenure"]').value) ||
+            0) * 12;
+
+        if (p > 0 && r > 0 && n > 0) {
+          const emi = (p * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+          const emiInBase = currencyUtils.convertToBase(emi);
+          loanCalc.querySelector(
+            "#emi-result"
+          ).textContent = currencyUtils.format(emiInBase);
+        } else {
+          loanCalc.querySelector("#emi-result").textContent = "...";
+        }
+      });
+    }
+
+    // --- NEW: Compound Interest Logic ---
+    if (interestCalc) {
+      interestCalc.addEventListener("input", () => {
+        const p =
+          parseFloat(interestCalc.querySelector('[name="principal"]').value) ||
+          0;
+        const r =
+          (parseFloat(
+            interestCalc.querySelector('[name="interestRate"]').value
+          ) || 0) / 100;
+        const t =
+          parseFloat(
+            interestCalc.querySelector('[name="interestYears"]').value
+          ) || 0;
+
+        if (p > 0 && r > 0 && t > 0) {
+          const futureValue = p * Math.pow(1 + r, t);
+          const futureValueInBase = currencyUtils.convertToBase(futureValue);
+          interestCalc.querySelector(
+            "#future-value-result"
+          ).textContent = currencyUtils.format(futureValueInBase);
+        } else {
+          interestCalc.querySelector("#future-value-result").textContent =
+            "...";
+        }
+      });
+    }
+
+    // --- NEW: Breakeven Point Logic ---
+    if (breakevenCalc) {
+      breakevenCalc.addEventListener("input", () => {
+        const fixedCosts =
+          parseFloat(
+            breakevenCalc.querySelector('[name="fixedCosts"]').value
+          ) || 0;
+        const unitPrice =
+          parseFloat(breakevenCalc.querySelector('[name="unitPrice"]').value) ||
+          0;
+        const unitCost =
+          parseFloat(breakevenCalc.querySelector('[name="unitCost"]').value) ||
+          0;
+
+        const contributionMargin = unitPrice - unitCost;
+
+        if (fixedCosts > 0 && contributionMargin > 0) {
+          const breakevenUnits = Math.ceil(fixedCosts / contributionMargin);
+          const breakevenRevenue = breakevenUnits * unitPrice;
+
+          const breakevenUnitsInBase = currencyUtils.convertToBase(
+            breakevenUnits
+          );
+          const breakevenRevenueInBase = currencyUtils.convertToBase(
+            breakevenRevenue
+          );
+
+          breakevenCalc.querySelector(
+            "#breakeven-units-result"
+          ).textContent = `${breakevenUnits.toLocaleString()} units`;
+          breakevenCalc.querySelector(
+            "#breakeven-revenue-result"
+          ).textContent = currencyUtils.format(breakevenRevenueInBase);
+        } else {
+          breakevenCalc.querySelector("#breakeven-units-result").textContent =
+            "...";
+          breakevenCalc.querySelector("#breakeven-revenue-result").textContent =
+            "...";
+        }
+      });
+    }
+  }
+
+  const initUserProfileMenu = () => {
+    const userProfileSection = document.getElementById("user-profile-section");
+    if (!userProfileSection) {
+      console.warn("User profile section not found in DOM.");
+      return;
+    }
+
+    userProfileSection.classList.remove("group");
+    const trigger = userProfileSection.querySelector(".flex.items-center");
+    if (trigger) {
+      trigger.dataset.action = "toggle-user-menu";
+    }
+
+    const oldLogoutButton = userProfileSection.querySelector(
+      'button[data-action="logout"]'
+    );
+    if (oldLogoutButton) {
+      oldLogoutButton.remove();
+    }
+
+    const logoutIcon = userProfileSection.querySelector(
+      '[data-lucide="log-out"]'
+    );
+    if (logoutIcon) {
+      logoutIcon.dataset.lucide = "more-vertical";
+      logoutIcon.classList.remove("opacity-0", "group-hover:opacity-100");
+    }
+
+    const menu = document.createElement("div");
+    menu.id = "user-menu";
+    menu.className = "action-menu !w-60";
+    menu.innerHTML = `
+                    <div class="p-3 border-b border-border-color">
+                        <p class="font-semibold text-text-primary truncate" id="user-menu-name">Loading...</p>
+                        <p class="text-xs text-text-secondary truncate" id="user-menu-email">...</p>
+                    </div>
+                    <div class="p-1">
+                        <a href="#" data-action="view-my-profile" class="action-menu-item">
+                            <i data-lucide="user-circle" class="w-4 h-4"></i>
+                            <span>My Profile</span>
+                        </a>
+                        <a href="#" data-action="show-shortcuts" class="action-menu-item">
+                            <i data-lucide="keyboard" class="w-4 h-4"></i>
+                            <span>Keyboard Shortcuts</span>
+                        </a>
+                        <div class="h-px bg-border-color my-1"></div>
+                        <a href="#" data-action="logout" class="action-menu-item danger">
+                            <i data-lucide="log-out" class="w-4 h-4"></i>
+                            <span>Sign Out</span>
+                        </a>
+                    </div>
+                `;
+    // MODIFIED: Append menu to the body to prevent it from being hidden by the sidebar's overflow when collapsed.
+    document.body.appendChild(menu);
+    lucide.createIcons();
+  };
+  initUserProfileMenu();
+  // --- END NEW ---
+
+  // --- CURRENCY UTILITY ---
+  // MOVED to global scope
+
+  // --- CORE UTILITY FUNCTIONS ---
+  // MOVED to global scope
+
+  // --- AUTOMATION & SIMULATION FUNCTIONS ---
+  const createNotification = async (type, message, options = {}) => {
+    // NEW: Default target is admin and manager. Can be overridden.
+    const { targetRoles = ["admin", "manager"] } = options;
+
+    const notification = {
+      type,
+      message,
+      date: new Date().toISOString(),
+      read: false,
+      targetRoles, // NEW: Store who this notification is for
+    };
+    try {
+      await addDoc(notificationsRef, notification);
+    } catch (error) {
+      console.error("Failed to create notification:", error);
+    }
+  };
+
+  const simulateInventoryOptimization = () => {
+    if (!appState.settings.automations?.inventoryOptimization?.enabled) return;
+    // Admins or managers trigger this, but the notification can be for anyone.
+    if (appState.session.userRole === "cashier") return;
+
+    const realProducts = firestoreData.products.filter(
+      (p) => !p.name.toLowerCase().includes("cashshilpo")
+    );
+
+    const topSeller = realProducts
+      .filter((p) => p.sales > 0)
+      .sort((a, b) => b.sales - a.sales)[0];
+
+    if (topSeller) {
+      const messageFragment = `Sales of <strong>${topSeller.name}</strong> are high`;
+      // Check if a similar notification already exists to avoid spamming, regardless of read status.
+      const existing = firestoreData.notifications.some((n) =>
+        n.message.includes(messageFragment)
+      );
+      if (!existing) {
+        // Default targetRoles (admin/manager) is appropriate here.
+        createNotification(
+          "info",
+          `${messageFragment}. Consider a featured promotion or increasing stock.`
+        );
+      }
+    }
+
+    const lowStockItem = realProducts
+      .filter(
+        (p) => p.productType === "physical" && p.stock > 0 && p.stock < 10
+      )
+      .sort((a, b) => a.stock - b.stock)[0];
+
+    if (lowStockItem) {
+      const messageFragment = `You are low on <strong>${lowStockItem.name}</strong>`;
+      // Check if a similar notification already exists, regardless of read status.
+      const existing = firestoreData.notifications.some((n) =>
+        n.message.includes(messageFragment)
+      );
+      if (!existing) {
+        // NEW: Low stock alerts go to everyone.
+        createNotification(
+          "stock",
+          `<strong>Inventory Alert:</strong> ${messageFragment} (${lowStockItem.stock} remaining). Create a purchase order to avoid stockout.`,
+          { targetRoles: ["admin", "manager", "cashier"] }
+        );
+      }
+    }
+  };
+
+  const simulateDynamicPricing = () => {
+    if (!appState.settings.automations?.dynamicPricing?.enabled) return;
+    if (appState.session.userRole === "cashier") return; // Cashiers don't run this simulation
+
+    const realProducts = firestoreData.products.filter(
+      (p) => !p.name.toLowerCase().includes("cashshilpo")
+    );
+    const productToAdjust = realProducts.find(
+      (p) => p.sales > 20 && p.price < 50
+    );
+
+    if (productToAdjust) {
+      const messageFragment = `consider increasing the price of <strong>${productToAdjust.name}</strong>`;
+      // Check if a similar notification already exists, regardless of read status.
+      const existing = firestoreData.notifications.some((n) =>
+        n.message.includes(messageFragment)
+      );
+      if (!existing) {
+        const suggestedPrice = (productToAdjust.price * 1.05).toFixed(2);
+        // Default targetRoles (admin/manager) is appropriate here.
+        createNotification(
+          "info",
+          `<strong>Pricing Suggestion:</strong> Based on demand, ${messageFragment} to ${currencyUtils.format(
+            suggestedPrice
+          )}.`
+        );
+      }
+    }
+  };
+
+  const scheduleEndOfDayReport = () => {
+    if (
+      appState.endOfDayReportScheduled ||
+      !appState.settings.automations?.endOfDayReports?.enabled
+    ) {
+      return;
+    }
+    if (appState.session.userRole === "cashier") return; // Cashiers don't trigger this report
+    appState.endOfDayReportScheduled = true;
+    console.log("[Automation] Scheduling End of Day report...");
+
+    const runAndReschedule = () => {
+      console.log("[Automation] Running scheduled End of Day report.");
+
+      // The actual report generation logic
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+      const todaysInvoices = firestoreData.invoices.filter((inv) => {
+        const invDate = new Date(inv.date);
+        return invDate >= todayStart && invDate <= new Date(); // Check invoices from today
+      });
+      if (todaysInvoices.length > 0) {
+        const totalRevenue = todaysInvoices.reduce(
+          (sum, inv) => sum + inv.totalInBaseCurrency,
+          0
+        );
+        // Default targetRoles (admin/manager) is appropriate here.
+        createNotification(
+          "sale",
+          `<strong>End of Day Summary:</strong> You made <strong>${
+            todaysInvoices.length
+          }</strong> sales today for a total of <strong>${currencyUtils.format(
+            totalRevenue
+          )}</strong>.`
+        );
+      } else {
+        console.log(
+          "[Automation] No sales today, skipping End of Day report notification."
+        );
+      }
+
+      // Reschedule for the next day
+      setTimeout(runAndReschedule, 24 * 60 * 60 * 1000); // 24 hours
+    };
+
+    const deliveryTime =
+      appState.settings.automations.endOfDayReports.deliveryTime || "22:00";
+    const [hours, minutes] = deliveryTime.split(":").map(Number);
+
+    const now = new Date();
+    const nextReportTime = new Date();
+    nextReportTime.setHours(hours, minutes, 0, 0);
+
+    if (now > nextReportTime) {
+      // If the time has already passed for today, schedule it for tomorrow
+      nextReportTime.setDate(nextReportTime.getDate() + 1);
+    }
+
+    const delay = nextReportTime.getTime() - now.getTime();
+    console.log(
+      `[Automation] Next report in ${Math.round(delay / 1000 / 60)} minutes.`
+    );
+    setTimeout(runAndReschedule, delay);
+  };
+
+  const simulateFraudDetection = (transactionValue, cashier) => {
+    // NEW: Pass cashier info
+    if (!appState.settings.automations?.fraudDetection?.enabled) return;
+    const sensitivity =
+      appState.settings.automations.fraudDetection.sensitivity || "high";
+    let riskScore = 0;
+    if (transactionValue > 1000) riskScore += 50;
+    if (transactionValue > 500) riskScore += 25;
+
+    let threshold = 50;
+    if (sensitivity === "low") threshold = 80;
+    if (sensitivity === "medium") threshold = 60;
+
+    if (
+      riskScore > 0 &&
+      Math.random() * 100 < riskScore &&
+      riskScore > threshold
+    ) {
+      // NEW: Formatted message includes the cashier's name.
+      const cashierName = cashier
+        ? `by cashier <strong>${cashier.name}</strong>`
+        : "";
+      const message = `<strong>Fraud Alert:</strong> A high-value transaction of ${currencyUtils.format(
+        transactionValue
+      )} was just processed ${cashierName} and may require review.`;
+      // NEW: This notification is only for admins and managers.
+      createNotification("warning", message, {
+        targetRoles: ["admin", "manager"],
+      });
+    }
+  };
+
+  const runAutomations = () => {
+    // These functions simulate background tasks that would run on a server.
+    // We run them once on startup for demonstration.
+    simulateInventoryOptimization();
+    simulateDynamicPricing();
+  };
+
+  // --- VIEW CONTENT & INITIALIZERS ---
+  // NOTE: All init... functions are defined later in the script
+  const viewInitializers = {
+    dashboard: initDashboard,
+    pos: initPOS,
+    inventory: (pane) =>
+      initInventory(pane.querySelector("#inventory-view-container")),
+    customers: initCustomers,
+    invoices: initInvoices,
+    reports: initReports,
+    settings: initSettings,
+    staff: (pane) => initStaff(pane.querySelector("#staff-view-container")), // UPDATED
+    "user-roles": initUserRoles, // NEW
+    expenses: initExpenses, // NEW
+  };
+
+  function getViewContent(viewType) {
+    // --- NEW: Top-level permission check ---
+    const requiredPermission = viewPermissionMap[viewType];
+    let hasPermission = true;
+
+    if (requiredPermission) {
+      if (Array.isArray(requiredPermission)) {
+        hasPermission = requiredPermission.some((p) => checkPermission(p));
+      } else {
+        hasPermission = checkPermission(requiredPermission);
+      }
+    }
+
+    // Special case for settings for cashiers, as they have a custom view.
+    if (viewType === "settings" && appState.session.userRole === "cashier") {
+      hasPermission = true;
+    }
+
+    if (!hasPermission) {
+      return `<div class="text-center p-20 flex flex-col items-center">
+                            <i data-lucide="shield-off" class="w-20 h-20 text-red-500/50 mb-6"></i>
+                            <h2 class="text-2xl font-semibold">Access Denied</h2>
+                            <p class="text-text-secondary mt-2">You do not have permission to view this page. Please contact an administrator.</p>
+                        </div>`;
+    }
+    // --- END NEW ---
+    const profile = getCurrentProfile();
+    const term = profile.terminology;
+    const taxRate = appState.settings.taxRate ?? 0;
+    switch (viewType) {
+      case "dashboard":
+        return `
+                        <div class="space-y-8">
+                            <!-- Dashboard Header -->
+                            <div class="flex flex-col md:flex-row justify-between md:items-center gap-4">
+                                <div>
+                                    <h1 class="text-3xl font-bold text-text-primary">Welcome Back, Admin</h1>
+                                    <p class="text-text-secondary" id="dashboard-date">Your business at a glance.</p>
+                                </div>
+                                 <div class="flex flex-col items-stretch md:items-end">
+                                    <!-- Desktop: Button Group -->
+                                    <div class="hidden lg:block relative max-w-full sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl">
+                                        <button id="dashboard-scroll-left" class="dashboard-scroll-btn left hidden absolute -left-2 top-0 bottom-0 z-10 flex items-center bg-gradient-to-r from-bg-primary to-transparent pl-2 pr-8 text-text-secondary hover:text-text-primary transition-opacity">
+                                            <i data-lucide="chevron-left" class="w-6 h-6 pointer-events-none"></i>
+                                        </button>
+                                        <div id="dashboard-period-tabs" class="flex items-center overflow-x-auto scrollbar-hide bg-bg-secondary p-1 rounded-lg border border-border-color">
+                                            <button data-action="set-dashboard-period" data-period="today" data-label="Today" class="dashboard-period-btn active whitespace-nowrap">Today</button>
+                                            <button data-action="set-dashboard-period" data-period="yesterday" data-label="Yesterday" class="dashboard-period-btn whitespace-nowrap">Yesterday</button>
+                                            <button data-action="set-dashboard-period" data-period="week" data-label="This Week" class="dashboard-period-btn whitespace-nowrap">This Week</button>
+                                            <button data-action="set-dashboard-period" data-period="last7" data-label="Last 7 Days" class="dashboard-period-btn whitespace-nowrap">Last 7 Days</button>
+                                            <button data-action="set-dashboard-period" data-period="month" data-label="This Month" class="dashboard-period-btn whitespace-nowrap">This Month</button>
+                                            <button data-action="set-dashboard-period" data-period="last30" data-label="Last 30 Days" class="dashboard-period-btn whitespace-nowrap">Last 30 Days</button>
+                                            <button data-action="set-dashboard-period" data-period="year" data-label="This Year" class="dashboard-period-btn whitespace-nowrap">This Year</button>
+                                            <button data-action="set-dashboard-period" data-period="custom" data-label="Custom" class="dashboard-period-btn flex items-center gap-1.5 whitespace-nowrap"><i data-lucide="calendar" class="w-4 h-4"></i>Custom</button>
+                                        </div>
+                                        <button id="dashboard-scroll-right" class="dashboard-scroll-btn right hidden absolute -right-2 top-0 bottom-0 z-10 flex items-center bg-gradient-to-l from-bg-primary to-transparent pr-2 pl-8 text-text-secondary hover:text-text-primary transition-opacity">
+                                            <i data-lucide="chevron-right" class="w-6 h-6 pointer-events-none"></i>
+                                        </button>
+                                    </div>
+
+                                   <!-- Mobile & Medium Screens: Dropdown -->
+                                    <div class="lg:hidden relative" id="dashboard-period-dropdown-container">
+                                        <button id="dashboard-period-dropdown-btn" class="btn btn-secondary w-full flex justify-between items-center text-sm p-2.5">
+                                            <span id="selected-period-label">Today</span>
+                                            <i data-lucide="chevron-down" class="w-4 h-4 transition-transform"></i>
+                                        </button>
+                                        <div id="dashboard-period-dropdown-menu" class="absolute top-full right-0 mt-2 w-full bg-bg-secondary border border-border-color rounded-lg shadow-lg z-20 hidden p-1">
+                                            <a href="#" class="dashboard-period-item" data-action="set-dashboard-period" data-period="today" data-label="Today">Today</a>
+                                            <a href="#" class="dashboard-period-item" data-action="set-dashboard-period" data-period="yesterday" data-label="Yesterday">Yesterday</a>
+                                            <a href="#" class="dashboard-period-item" data-action="set-dashboard-period" data-period="week" data-label="This Week">This Week</a>
+                                            <a href="#" class="dashboard-period-item" data-action="set-dashboard-period" data-period="last7" data-label="Last 7 Days">Last 7 Days</a>
+                                            <a href="#" class="dashboard-period-item" data-action="set-dashboard-period" data-period="month" data-label="This Month">This Month</a>
+                                            <a href="#" class="dashboard-period-item" data-action="set-dashboard-period" data-period="last30" data-label="Last 30 Days">Last 30 Days</a>
+                                            <a href="#" class="dashboard-period-item" data-action="set-dashboard-period" data-period="year" data-label="This Year">This Year</a>
+                                            <div class="h-px bg-border-color my-1"></div>
+                                            <a href="#" class="dashboard-period-item flex items-center justify-between" data-action="set-dashboard-period" data-period="custom" data-label="Custom">
+                                                <span>Custom Range</span>
+                                                <i data-lucide="calendar" class="w-4 h-4"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    
+                                    <div id="dashboard-custom-range" class="hidden flex items-center gap-2 mt-2">
+                                        <input type="date" id="dashboard-start-date" class="form-input text-sm p-2 h-auto bg-bg-tertiary">
+                                        <span class="text-text-secondary">to</span>
+                                        <input type="date" id="dashboard-end-date" class="form-input text-sm p-2 h-auto bg-bg-tertiary">
+                                        <button id="dashboard-apply-range" class="btn btn-primary text-sm py-2">Apply</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Main KPI Cards -->
+                            <div id="dashboard-stats-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                <!-- KPI Cards will be rendered here -->
+                            </div>
+
+                            <!-- Main Charts & Performance -->
+                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                <div class="lg:col-span-2 glass-pane p-6 rounded-xl flex flex-col">
+                                    <h2 class="text-xl font-semibold mb-4 text-text-primary">Revenue Overview</h2>
+                                    <div class="relative flex-grow min-h-[300px]">
+                                        <canvas id="sales-chart"></canvas>
+                                    </div>
+                                </div>
+                                <div class="glass-pane p-6 rounded-xl flex flex-col">
+                                     <h2 class="text-xl font-semibold mb-4 text-text-primary">Performance Snapshot</h2>
+                                     <div class="space-y-4 flex-grow">
+                                        <div>
+                                            <h3 class="text-sm font-semibold text-text-secondary mb-2">Top Selling ${term.product}s</h3>
+                                            <ul id="top-products-list" class="space-y-2"></ul>
+                                        </div>
+                                        <div class="pt-4 border-t border-border-color">
+                                            <h3 class="text-sm font-semibold text-text-secondary mb-2">Sales by ${term.category}</h3>
+                                            <div class="relative h-40"><canvas id="category-sales-chart"></canvas></div>
+                                        </div>
+                                     </div>
+                                </div>
+                            </div>
+                            
+                            <!-- NEW: Hourly Sales & Payment Methods -->
+                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                <div class="lg:col-span-2 glass-pane p-6 rounded-xl flex flex-col">
+                                    <h2 class="text-xl font-semibold mb-4 text-text-primary">Hourly Sales Breakdown</h2>
+                                    <div class="relative flex-grow min-h-[300px]">
+                                        <canvas id="hourly-sales-chart"></canvas>
+                                    </div>
+                                </div>
+                                <div class="glass-pane p-6 rounded-xl flex flex-col">
+                                     <h2 class="text-xl font-semibold mb-4 text-text-primary">Payment Methods</h2>
+                                     <div class="relative flex-grow min-h-[300px] flex items-center justify-center">
+                                        <canvas id="payment-methods-chart"></canvas>
+                                     </div>
+                                </div>
+                            </div>
+
+                            <!-- MODIFIED: Quick Info Grid -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                <div class="glass-pane p-6 rounded-xl flex flex-col">
+                                    <div class="flex-grow">
+                                        <h2 class="text-xl font-semibold mb-4 text-text-primary flex items-center gap-2"><i data-lucide="sparkles" class="text-accent"></i>AI Insights & Quick Actions</h2>
+                                        <div id="ai-insights-container" class="space-y-3 text-sm min-h-[6rem]">
+                                            <!-- AI Insights will be rendered here -->
+                                        </div>
+                                    </div>
+                                    <div class="mt-auto pt-4 border-t border-border-color grid grid-cols-2 gap-3">
+                                        <button data-action="add-product" class="btn btn-secondary text-sm flex items-center justify-center py-2.5">
+                                            <i data-lucide="plus" class="w-4 h-4 mr-2"></i>New ${term.product}
+                                        </button>
+                                        <button data-action="receive-stock" class="btn btn-secondary text-sm flex items-center justify-center py-2.5">
+                                            <i data-lucide="package-plus" class="w-4 h-4 mr-2"></i>Receive Stock
+                                        </button>
+                                    </div>
+                                </div>
+                                <div id="dashboard-middle-pane" class="glass-pane p-6 rounded-xl max-h-[50vh]">
+                                     <!-- This will be dynamically filled with Recent Activity or Cashier Performance -->
+                                </div>
+                                <div class="glass-pane p-6 rounded-xl space-y-4 max-h-[50vh]">
+                                    <div>
+                                        <h2 class="text-xl font-semibold mb-2 text-text-primary">Top Customers</h2>
+                                        <ul id="top-customers-list" class="space-y-2"></ul>
+                                    </div>
+                                    <div class="pt-4 border-t border-border-color">
+                                        <h2 class="text-xl font-semibold mb-2 text-text-primary">Low Stock Alert</h2>
+                                        <ul id="low-stock-list" class="space-y-2 max-h-40 overflow-y-auto"></ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <style> 
+                            .dashboard-period-btn { padding: 6px 12px; font-size: 14px; font-weight: 500; border-radius: 6px; transition: all 0.2s ease; }
+                            .dashboard-period-btn.active { background-color: var(--accent); color: white; } 
+                            .dashboard-period-btn:not(.active):hover { background-color: var(--bg-tertiary); }
+                            .dashboard-period-item { display: block; padding: 8px 12px; font-size: 14px; border-radius: 6px; }
+                            .dashboard-period-item:hover { background-color: var(--bg-tertiary); }
+                            .scrollbar-hide::-webkit-scrollbar { display: none; }
+                            .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+                        </style>
+                    `;
+      case "pos": {
+        if (appState.settings.posLayout === "modern") {
+          // NEW MODERN LAYOUT HTML
+          return `<div class="flex flex-col h-[90.7vh] -mx-4 md:-mx-8 -my-4 md:-my-8 bg-bg-secondary">
+                                <!-- POS Tabs -->
+                                <div class="relative flex-shrink-0 border-b border-border-color bg-bg-primary">
+                                    <button id="pos-scroll-left" class="pos-scroll-btn-left hidden absolute left-0 top-0 bottom-0 z-10 flex items-center pl-4 pr-8 bg-gradient-to-r from-bg-primary to-transparent text-text-secondary hover:text-text-primary transition-opacity"><i data-lucide="chevron-left" class="w-6 h-6 pointer-events-none"></i></button>
+                                    <div id="pos-tabs-container" class="flex items-center"></div>
+                                    <button id="pos-scroll-right" class="pos-scroll-btn-right hidden absolute right-0 top-0 bottom-0 z-10 flex items-center pr-4 pl-8 bg-gradient-to-l from-bg-primary to-transparent text-text-secondary hover:text-text-primary transition-opacity"><i data-lucide="chevron-right" class="w-6 h-6 pointer-events-none"></i></button>
+                                </div>
+                                
+                                <div class="flex flex-row flex-grow overflow-hidden">
+                                    <!-- Middle: Products & Categories -->
+                                    <div id="pos-product-panel" class="w-7/12 flex flex-col overflow-hidden border-r border-border-color bg-bg-primary">
+                                        <div class="p-4 md:p-6 border-b border-border-color shrink-0">
+                                            <div class="relative w-full">
+                                                <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-secondary"></i>
+                                                <input type="text" id="pos-modern-search" placeholder="Scan or search ${term.product}s by name, SKU, or barcode..." class="w-full form-input pl-12 p-3 bg-bg-secondary focus:ring-accent" autocomplete="off">
+                                                <div id="pos-search-results" class="absolute top-full left-0 right-0 mt-1 border border-border-color rounded-lg shadow-lg z-20 hidden max-h-60 overflow-y-auto bg-bg-secondary"></div>
+                                            </div>
+                                        </div>
+                                        <div class="flex-grow flex overflow-hidden relative" id="pos-category-container">
+                                            <!-- CATEGORY PANEL TOGGLE -->
+                                            <button data-action="toggle-pos-category-sidebar" id="pos-category-sidebar-toggle" title="Toggle Category Panel">
+                                                <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                                            </button>
+                                            <!-- Left: Categories -->
+                                            <div id="pos-category-panel" class="w-56 border-r border-border-color flex flex-col overflow-y-auto shrink-0">
+                                                <nav id="pos-modern-categories" class="flex-grow p-3 space-y-2"></nav>
+                                            </div>
+                                            <!-- Middle: Products -->
+                                            <div id="pos-modern-products-container" class="flex-grow overflow-y-auto p-4 md:p-6">
+                                                <h3 id="pos-modern-product-title" class="text-xl font-semibold text-text-primary mb-4"></h3>
+                                                <div id="pos-modern-products-grid" class="grid grid-cols-2 md:grid-cols-3 gap-5"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Right: Cart -->
+                                    <div class="flex-grow bg-bg-secondary flex flex-col overflow-hidden">
+                                        <div class="p-4 md:p-6 border-b border-border-color flex justify-between items-center shrink-0">
+                                            <h2 class="text-xl font-bold text-text-primary">Current Sale</h2>
+                                            <div id="pos-customer-area">
+                                                <!-- Customer button or display will go here -->
+                                            </div>
+                                        </div>
+                                        <div id="pos-modern-cart-body" class="flex-grow overflow-y-auto p-4 md:p-6 space-y-3"></div>
+                                        <div class="p-4 md:p-6 border-t border-border-color bg-bg-primary space-y-4 shrink-0">
+                                            <div class="space-y-2 text-sm">
+                                                <div class="flex justify-between"><p class="text-text-secondary">Subtotal:</p><p id="pos-subtotal" class="font-mono text-text-primary">$0.00</p></div>
+                                                <div id="pos-discount-row" class="flex justify-between hidden"><p class="text-text-secondary">Discount:</p><p id="pos-discount" class="font-mono text-red-400">-$0.00</p></div>
+                                                <div class="flex justify-between"><p class="text-text-secondary">Tax (${taxRate}%):</p><p id="pos-tax" class="font-mono text-text-primary">$0.00</p></div>
+                                                <div class="flex justify-between border-t border-border-color pt-2 mt-2 font-bold text-2xl"><p class="text-text-primary">Total:</p><p id="pos-total" class="font-mono text-accent">$0.00</p></div>
+                                            </div>
+                                            <div class="grid grid-cols-3 gap-3">
+                                                <button data-action="apply-total-discount" class="btn btn-secondary h-12 text-base">Discount</button>
+                                                <button data-action="hold-sale" class="btn btn-secondary h-12 text-base">Hold</button>
+                                                <button data-action="cancel-sale" class="btn btn-danger h-12 text-base">Cancel</button>
+                                            </div>
+                                            <button data-action="process-payment" class="col-span-2 btn btn-primary text-lg tracking-wider w-full h-16">PAY</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>`;
+        } else {
+          // CLASSIC LAYOUT HTML (existing code)
+          return `<div class="flex flex-col -mx-4 md:-mx-8 -my-4 md:-my-8"><div class="relative flex-shrink-0 border-b border-border-color"><button id="pos-scroll-left" class="pos-scroll-btn-left hidden absolute left-0 top-0 bottom-0 z-10 flex items-center pl-4 pr-8 text-text-secondary hover:text-text-primary transition-opacity"><i data-lucide="chevron-left" class="w-6 h-6 pointer-events-none"></i></button><div id="pos-tabs-container" class="flex items-center"></div><button id="pos-scroll-right" class="pos-scroll-btn-right hidden absolute right-0 top-0 bottom-0 z-10 flex items-center pr-4 pl-8 text-text-secondary hover:text-text-primary transition-opacity"><i data-lucide="chevron-right" class="w-6 h-6 pointer-events-none"></i></button></div><div class="grid grid-cols-12 gap-6 flex-grow p-4 md:p-6 lg:p-8"><div class="h-[78vh] col-span-12 md:col-span-7 glass-pane p-4 rounded-xl flex flex-col"><div class="flex items-center border-b border-border-color pb-4 mb-4"><div class="relative w-full"><i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-secondary"></i><input type="text" id="pos-search" placeholder="Scan or search ${term.product}s..." class="w-full form-input pl-12 p-3 focus:ring-0" autocomplete="off"><div id="pos-search-results" class="absolute top-full left-0 right-0 mt-1 border border-border-color rounded-lg shadow-lg z-20 hidden max-h-60 overflow-y-auto"></div></div><button data-action="add-customer-to-sale" class="ml-3 bg-green-600 text-white p-3 rounded-lg hover:bg-green-700 shrink-0"><i data-lucide="user-plus" class="w-6 h-6"></i></button></div><div class="flex-grow overflow-y-auto pr-2"><table class="w-full text-sm text-left text-text-secondary"><thead class="text-xs text-text-secondary uppercase"><tr><th class="px-6 py-3">${term.product}</th><th class="px-6 py-3 w-32 text-center">Qty</th><th class="px-6 py-3">Price</th><th class="px-6 py-3">Total</th><th class="px-6 py-3 text-right">Actions</th></tr></thead><tbody id="pos-cart-body"></tbody></table></div></div><div class="col-span-12 md:col-span-5 glass-pane p-6 rounded-xl flex flex-col justify-between"><div><h2 class="text-2xl font-bold text-text-primary mb-6">Order Summary</h2><div id="pos-customer-display" class="hidden mb-4"></div><div class="space-y-3 text-lg"><div class="flex justify-between"><p>Subtotal:</p><p id="pos-subtotal" class="font-mono text-text-primary">$0.00</p></div><div id="pos-discount-row" class="flex justify-between hidden"><p>Discount:</p><p id="pos-discount" class="font-mono text-red-400">-$0.00</p></div><div class="flex justify-between"><p>Tax (${taxRate}%):</p><p id="pos-tax" class="font-mono text-text-primary">$0.00</p></div><div class="flex justify-between border-t border-border-color pt-4 mt-2 font-bold text-2xl"><p class="text-text-primary">Total:</p><p id="pos-total" class="font-mono text-accent">$0.00</p></div></div></div><div class="grid grid-cols-2 gap-3 mt-6"><button data-action="apply-total-discount" class="btn btn-secondary text-lg col-span-2">Apply Discount</button><button data-action="hold-sale" class="btn btn-secondary text-lg">Hold</button><button data-action="cancel-sale" class="btn btn-danger text-lg">Cancel</button><button data-action="process-payment" class="col-span-2 btn btn-primary text-xl tracking-wider py-4">PAY</button></div></div></div></div>`;
+        }
+      }
+      case "inventory":
+        return `<div id="inventory-view-container"></div>`;
+      case "customers":
+        return `<div><div class="flex justify-between items-center mb-6"><h1 class="text-3xl font-bold text-text-primary">Customer Database</h1>${
+          checkPermission("canManageCustomers")
+            ? `<button data-action="add-customer" class="btn btn-primary"><i data-lucide="user-plus" class="w-5 h-5 mr-2"></i> Add Customer</button>`
+            : ""
+        }</div><div class="bg-bg-secondary/50 rounded-xl"><table class="table-pro"><thead><tr><th>Customer</th><th>Contact</th><th>Due Balance</th><th>Loyalty ID</th><th>Actions</th></tr></thead><tbody id="customers-table-body"></tbody></table></div></div>`;
+      case "invoices":
+        return `<div><div class="flex justify-between items-center mb-6"><h1 class="text-3xl font-bold text-text-primary">Invoice History</h1></div><div class="bg-bg-secondary/50 rounded-xl"><table class="table-pro"><thead><tr><th>Invoice ID</th><th>Customer</th><th>Date</th><th>Total</th><th>Status</th><th>Actions</th></tr></thead><tbody id="invoices-table-body"></tbody></table></div></div>`;
+      case "expenses":
+        return `<div id="expenses-view-container"></div>`; // NEW
+      case "reports": {
+        const canSeeAllReports = checkPermission("canSeeAllReports"); // MODIFIED
+        const headerTitle = canSeeAllReports
+          ? "Business Reports"
+          : "My Sales Report";
+        const headerSubtitle = canSeeAllReports
+          ? "Analyze trends and performance metrics."
+          : "A summary of your sales performance.";
+        return `
+                        <div class="space-y-6">
+                            <!-- Reports Header -->
+                            <div id="reports-header" class="flex flex-col md:flex-row justify-between md:items-center gap-4">
+                                <div>
+                                    <h1 class="text-3xl font-bold text-text-primary">${headerTitle}</h1>
+                                    <p class="text-text-secondary">${headerSubtitle}</p>
+                                </div>
+                                <div class="flex items-center gap-4">
+                                    ${
+                                      canSeeAllReports
+                                        ? `
+                                    <div class="flex items-center gap-1 bg-bg-secondary p-1 rounded-lg border border-border-color">
+                                        <button data-action="set-report-type" data-type="sales" class="report-type-btn active px-3 py-1.5 text-sm font-semibold rounded-md flex items-center gap-2"><i data-lucide="trending-up" class="w-4 h-4"></i>Sales</button>
+                                        <button data-action="set-report-type" data-type="inventory" class="report-type-btn px-3 py-1.5 text-sm font-semibold rounded-md flex items-center gap-2"><i data-lucide="boxes" class="w-4 h-4"></i>${term.inventory}</button>
+                                        <button data-action="set-report-type" data-type="customer" class="report-type-btn px-3 py-1.5 text-sm font-semibold rounded-md flex items-center gap-2"><i data-lucide="users" class="w-4 h-4"></i>Customer</button>
+                                        <button data-action="set-report-type" data-type="activity" class="report-type-btn px-3 py-1.5 text-sm font-semibold rounded-md flex items-center gap-2"><i data-lucide="history" class="w-4 h-4"></i>Activity</button>
+                                    </div>
+                                    `
+                                        : ""
+                                    }
+                                    <div class="relative" id="report-period-dropdown-container">
+                                        <button id="report-period-dropdown-btn" class="btn btn-secondary w-full flex justify-between items-center text-sm p-2.5">
+                                            <span id="selected-report-period-label">Last 30 Days</span>
+                                            <i data-lucide="chevron-down" class="w-4 h-4 transition-transform"></i>
+                                        </button>
+                                        <div id="report-period-dropdown-menu" class="absolute top-full right-0 mt-2 w-56 bg-bg-secondary border border-border-color rounded-lg shadow-lg z-20 hidden p-1">
+                                            <a href="#" class="report-period-item" data-action="set-report-period" data-period="today" data-label="Today">Today</a>
+                                            <a href="#" class="report-period-item" data-action="set-report-period" data-period="yesterday" data-label="Yesterday">Yesterday</a>
+                                            <a href="#" class="report-period-item" data-action="set-report-period" data-period="week" data-label="This Week">This Week</a>
+                                            <a href="#" class="report-period-item" data-action="set-report-period" data-period="last7" data-label="Last 7 Days">Last 7 Days</a>
+                                            <a href="#" class="report-period-item" data-action="set-report-period" data-period="month" data-label="This Month">This Month</a>
+                                            <a href="#" class="report-period-item active" data-action="set-report-period" data-period="last30" data-label="Last 30 Days">Last 30 Days</a>
+                                            <a href="#" class="report-period-item" data-action="set-report-period" data-period="year" data-label="This Year">This Year</a>
+                                            <div class="h-px bg-border-color my-1"></div>
+                                            <a href="#" class="report-period-item flex items-center justify-between" data-action="set-report-period" data-period="custom" data-label="Custom">
+                                                <span>Custom Range</span>
+                                                <i data-lucide="calendar" class="w-4 h-4"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                     ${
+                                       canSeeAllReports
+                                         ? `
+                                    <div class="relative" id="report-cashier-filter-container">
+                                        <select id="report-cashier-filter" class="form-select bg-bg-secondary border-border-color text-sm p-2.5 h-full appearance-none">
+                                            <option value="all">All Staff</option>
+                                        </select>
+                                    </div>
+                                    `
+                                         : ""
+                                     }
+                                </div>
+                            </div>
+                             <!-- Custom Date Picker -->
+                            <div id="report-custom-range" class="hidden flex items-center justify-end gap-2 bg-bg-secondary p-3 rounded-lg border border-border-color">
+                                <label for="report-start-date" class="text-sm">From:</label>
+                                <input type="date" id="report-start-date" class="form-input text-sm p-2 h-auto bg-bg-tertiary">
+                                <label for="report-end-date" class="text-sm">To:</label>
+                                <input type="date" id="report-end-date" class="form-input text-sm p-2 h-auto bg-bg-tertiary">
+                                <button id="report-apply-range" class="btn btn-primary text-sm py-2">Apply</button>
+                            </div>
+                            <!-- Reports Content Area -->
+                            <div id="reports-container" class="space-y-6">
+                                <!-- Dynamic report content will be injected here -->
+                            </div>
+                        </div>
+                        <style> 
+                            .report-type-btn.active { background-color: var(--accent); color: white; }
+                            .report-period-item { display: block; padding: 8px 12px; font-size: 14px; border-radius: 6px; }
+                            .report-period-item:hover { background-color: var(--bg-tertiary); }
+                                .kpi-card { transition: all 0.3s ease; }
+                                .kpi-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px -5px rgba(0,0,0,0.2), 0 0 15px var(--accent-glow); }
+                            </style>
+                        `;
+      }
+      // [INSTRUCTION]: ADD this new case for 'staff'.
+      case "staff":
+        return `<div id="staff-view-container"></div>`;
+      case "user-roles":
+        return `<div id="user-roles-view-container"></div>`; // NEW
+      case "settings": {
+        const isCashier = appState.session.userRole === "cashier";
+
+        // Cashier-specific settings view
+        if (isCashier) {
+          // Cashiers ONLY see POS Layout options, and can save them.
+          return `<div id="settings-form">
+                                <h1 class="text-3xl font-bold text-text-primary mb-6">Settings</h1>
+                                <div class="space-y-8 max-w-4xl">
+                                    <div class="glass-pane p-6 rounded-lg">
+                                        <h2 class="text-xl font-semibold text-text-primary border-b border-border-color pb-4 mb-4 flex items-center gap-2">
+                                            <i data-lucide="layout-template" class="text-accent"></i> POS Layout
+                                        </h2>
+                                        <p class="text-sm text-text-secondary mb-4">Choose the layout for your Point of Sale terminal.</p>
+                                        <div id="pos-layout-selector"></div>
+                                    </div>
+                                    <div class="flex justify-end">
+                                        <button data-action="save-settings" class="btn btn-primary">Save Changes</button>
+                                    </div>
+                                </div>
+                            </div>`;
+        }
+
+        // Full settings view for Admin/Manager
+        const automationsConfig = {
+          inventoryOptimization: {
+            icon: "brain-circuit",
+            color: "indigo",
+            title: "Inventory Optimization AI",
+            desc:
+              "Get AI suggestions on what to stock, promote, or discontinue.",
+          },
+          dynamicPricing: {
+            icon: "trending-up",
+            color: "blue",
+            title: "Dynamic Pricing Suggestions",
+            desc:
+              "Get AI-powered price suggestions based on sales data and trends.",
+          },
+          endOfDayReports: {
+            icon: "file-clock",
+            color: "teal",
+            title: "Automated End-of-Day Reports",
+            desc:
+              "Receive an automated sales summary via notification each day.",
+          },
+          fraudDetection: {
+            icon: "shield-alert",
+            color: "red",
+            title: "AI-Powered Fraud Detection",
+            desc: "Monitor transactions for suspicious activity in real-time.",
+          },
+        };
+        const automationSettings = appState.settings.automations || {};
+        const automationsHTML = Object.entries(automationsConfig)
+          .map(([id, config]) => {
+            const setting = automationSettings[id] || { enabled: false };
+            return `
+                                <div class="flex items-center justify-between p-4 bg-bg-secondary rounded-lg border border-border-color/50">
+                                    <div class="flex items-center mr-4 overflow-hidden">
+                                        <i data-lucide="${
+                                          config.icon
+                                        }" class="w-6 h-6 text-${
+              config.color
+            }-400 mr-4 shrink-0"></i>
+                                        <div>
+                                            <h4 class="font-medium text-text-primary">${
+                                              config.title
+                                            }</h4>
+                                            <p class="text-xs text-text-secondary truncate pr-2">${
+                                              config.desc
+                                            }</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center shrink-0">
+                                        <button data-action="open-automation-settings" data-automation-id="${id}" class="p-2 text-text-secondary hover:bg-bg-tertiary hover:text-accent transition-colors rounded-md" title="Configure ${
+              config.title
+            }">
+                                            <i data-lucide="settings-2" class="w-5 h-5 pointer-events-none"></i>
+                                        </button>
+                                        <div class="w-px h-6 bg-border-color mx-2"></div>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" data-action="toggle-automation" data-automation-id="${id}" class="sr-only peer" ${
+              setting.enabled ? "checked" : ""
+            }>
+                                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-accent/50 dark:peer-focus:ring-accent rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-accent"></div>
+                                        </label>
+                                    </div>
+                                </div>
+                            `;
+          })
+          .join("");
+
+        let permissionsHTML = "";
+        // MODIFIED: This check should be for admin only, not a configurable permission.
+        if (appState.session.userRole === "admin") {
+          permissionsHTML += `<div id="permissions-container" class="glass-pane p-6 rounded-lg">
+                                <h2 class="text-xl font-semibold text-text-primary border-b border-border-color pb-4 mb-4">Role Permissions</h2>
+                                <p class="text-sm text-text-secondary mb-6">Define what different roles can see and do. Note: Administrator permissions are fixed and cannot be changed.</p>
+                                <div class="space-y-8">`;
+
+          const rolesToDisplay = {
+            manager: userRoles.manager,
+            cashier: userRoles.cashier,
+          };
+
+          Object.entries(rolesToDisplay).forEach(([roleId, role]) => {
+            permissionsHTML += `<div>
+                                    <h3 class="text-lg font-semibold text-text-primary capitalize mb-3">${roleId}</h3>
+                                    <div class="bg-bg-secondary rounded-lg border border-border-color divide-y divide-border-color">
+                                    ${Object.entries(role.permissions)
+                                      .map(([permissionId, perm]) => {
+                                        if (
+                                          typeof perm !== "object" ||
+                                          perm === null
+                                        )
+                                          return ""; // Skip non-object permissions like canDoEverything
+                                        const isChecked =
+                                          appState.settings.permissions?.[
+                                            roleId
+                                          ]?.permissions?.[permissionId]
+                                            ?.value ?? perm.value;
+                                        return `<div class="flex items-center justify-between p-4">
+                                                    <div>
+                                                        <label for="perm-${roleId}-${permissionId}" class="font-medium text-sm text-text-primary cursor-pointer">${permissionId
+                                          .replace(/([A-Z])/g, " $1")
+                                          .replace(/^./, (str) =>
+                                            str.toUpperCase()
+                                          )}</label>
+                                                        <p class="text-xs text-text-secondary">${
+                                                          perm.description
+                                                        }</p>
+                                                    </div>
+                                                    <input type="checkbox" id="perm-${roleId}-${permissionId}" data-action="toggle-permission" data-role-id="${roleId}" data-permission-id="${permissionId}" ${
+                                          isChecked ? "checked" : ""
+                                        } class="form-checkbox h-5 w-5 rounded bg-bg-tertiary border-border-color-strong text-accent focus:ring-accent focus:ring-offset-bg-secondary cursor-pointer shrink-0">
+                                                 </div>`;
+                                      })
+                                      .join("")}
+                                    </div>
+                                </div>`;
+          });
+          permissionsHTML += `</div></div>`;
+        }
+
+        const canManageSettings = checkPermission("canManageSettings");
+        const isAdmin = appState.session.userRole === "admin";
+
+        return `<div id="settings-form"><h1 class="text-3xl font-bold text-text-primary mb-6">Settings</h1><div class="space-y-8 max-w-4xl">
+                        
+                        ${
+                          canManageSettings
+                            ? `
+                            <div class="glass-pane p-6 rounded-lg"><h2 class="text-xl font-semibold text-text-primary border-b border-border-color pb-4 mb-4">Business Profile</h2><div id="business-type-selector"></div></div>
+                        `
+                            : ""
+                        }
+
+                        ${
+                          isAdmin
+                            ? `
+                            <div class="glass-pane p-6 rounded-lg"> <h2 class="text-xl font-semibold text-text-primary border-b border-border-color pb-4 mb-4">Store Information</h2><div class="space-y-4"><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div><label class="block text-sm font-medium mb-1">Store Name</label><input type="text" name="name" value="${
+                              firestoreData.storeInfo.name || ""
+                            }" class="form-input w-full"></div><div><label class="block text-sm font-medium mb-1">Contact Email</label><input type="email" value="contact@cashshilpo.com" class="form-input w-full"></div></div><div><label class="block text-sm font-medium mb-1">Store Address</label><input type="text" name="address" value="${
+                                firestoreData.storeInfo.address || ""
+                              }" class="form-input w-full"></div></div></div>
+                        `
+                            : ""
+                        }
+                        
+                        ${
+                          canManageSettings
+                            ? `
+                            <div class="glass-pane p-6 rounded-lg"> <h2 class="text-xl font-semibold text-text-primary border-b border-border-color pb-4 mb-4">Currency Settings</h2><div class="space-y-4"><div><label class="block text-sm font-medium mb-1">Default Display Currency</label><select id="default-currency-selector" name="defaultCurrency" class="form-select w-full max-w-xs"></select><p class="text-xs text-text-secondary mt-1">This is the currency the POS will default to on launch.</p></div></div></div>
+                        `
+                            : ""
+                        }
+
+                        ${
+                          isAdmin
+                            ? `
+                            <div class="glass-pane p-6 rounded-lg"> <h2 class="text-xl font-semibold text-text-primary border-b border-border-color pb-4 mb-4">Tax Settings</h2><div class="space-y-4"><div><label class="block text-sm font-medium mb-1">Default Tax Rate (%)</label><input type="number" name="taxRate" value="${
+                              appState.settings.taxRate ?? 0
+                            }" class="form-input w-full max-w-xs"></div></div></div>
+                        `
+                            : ""
+                        }
+
+                        ${
+                          canManageSettings
+                            ? `
+                            <div class="glass-pane p-6 rounded-lg"><h2 class="text-xl font-semibold text-text-primary border-b border-border-color pb-4 mb-4">Unit Settings</h2><div class="space-y-4"><div><label class="block text-sm font-medium mb-1">Default Unit of Measurement</label><select id="default-unit-selector" name="defaultUnit" class="form-select w-full max-w-xs"></select><p class="text-xs text-text-secondary mt-1">This will be the pre-selected unit when creating a new product.</p></div></div></div>
+                        `
+                            : ""
+                        }
+                        
+                        ${
+                          isAdmin
+                            ? `
+                            <div class="glass-pane p-6 rounded-lg"><h2 class="text-xl font-semibold text-text-primary border-b border-border-color pb-4 mb-4 flex items-center gap-2"><i data-lucide="sparkles" class="text-accent"></i> Smart Actions & Automation</h2><p class="text-sm text-text-secondary mb-6">Let AI handle the routine tasks. Enable smart automations to boost efficiency and drive sales.</p><div id="automations-container" class="space-y-4">${automationsHTML}</div></div>
+                        `
+                            : ""
+                        }
+                        
+                        
+                        <div class="glass-pane p-6 rounded-lg"><h2 class="text-xl font-semibold text-text-primary border-b border-border-color pb-4 mb-4 flex items-center gap-2"><i data-lucide="layout-template" class="text-accent"></i> POS Layout</h2><p class="text-sm text-text-secondary mb-4">Choose the layout for your Point of Sale terminal.</p><div id="pos-layout-selector"></div></div>
+                        
+                        ${
+                          canManageSettings
+                            ? `
+                            <div class="glass-pane p-6 rounded-lg"> <h2 class="text-xl font-semibold text-text-primary border-b border-border-color pb-4 mb-4">Receipt & Invoice Customization</h2><div id="receipt-template-selector"></div></div>
+                            <div class="flex justify-end"><button data-action="save-settings" class="btn btn-primary">Save Changes</button></div>
+                        `
+                            : ""
+                        }
+
+                        </div></div>`;
+      }
+      default:
+        return `<div class="text-center p-20 flex flex-col items-center"><div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mb-4"></div><h2 class="text-2xl font-semibold">Loading ${viewType}...</h2><p class="text-text-secondary mt-2">Connecting to the cloud.</p></div><style>.loader{border-top-color:var(--accent);animation:spin 1s linear infinite;}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}</style>`;
+    }
+  }
+
+  // --- NAVIGATION & TABBING SYSTEM ---
+  const renderApp = () => {
+    if (!appState.firebaseReady) return; // Don't render until Firebase is ready
+
+    const profile = getCurrentProfile();
+    const inventoryNavLink = document.querySelector(
+      '[data-view="inventory"] .nav-link-text'
+    );
+    if (inventoryNavLink) {
+      inventoryNavLink.textContent = profile.terminology.inventory;
+    }
+
+    // Render Notification Badge
+    const notificationBtn = document.querySelector(
+      '[data-action="open-notifications"]'
+    );
+    if (notificationBtn) {
+      const unreadCount = firestoreData.notifications.filter((n) => !n.read)
+        .length;
+      notificationBtn.classList.toggle(
+        "has-unread-notifications",
+        unreadCount > 0
+      );
+      let badge = notificationBtn.querySelector(".notification-badge");
+      if (unreadCount > 0) {
+        if (!badge) {
+          badge = document.createElement("span");
+          badge.className =
+            "notification-badge absolute top-0 right-0 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white";
+          notificationBtn.appendChild(badge);
+        }
+        badge.textContent = unreadCount;
+      } else if (badge) {
+        badge.remove();
+      }
+    }
+
+    // Render Currency Switcher
+    const currencyMenu = document.getElementById("currency-menu");
+    const currencyDisplay = document.getElementById("current-currency-display");
+    if (currencyDisplay) {
+      currencyDisplay.textContent = appState.currentCurrency;
+    }
+    if (currencyMenu && firestoreData.storeInfo.currencies) {
+      currencyMenu.innerHTML = Object.entries(
+        firestoreData.storeInfo.currencies
+      )
+        .map(
+          ([code, currency]) => `
+                        <div class="action-menu-item" data-action="set-currency" data-currency-code="${code}">
+                            <span class="font-bold text-lg ${
+                              code === appState.currentCurrency
+                                ? "text-accent"
+                                : ""
+                            }">${currency.symbol}</span>
+                            <span>${code} - ${currency.name}</span>
+                        </div>
+                    `
+        )
+        .join("");
+    }
+
+    const activeTab = appState.tabs.find((t) => t.id === appState.activeTabId);
+
+    mainTabsContainer.innerHTML = appState.tabs
+      .map(
+        (tab) => `
+                    <button data-action="switch-tab" data-id="${
+                      tab.id
+                    }" class="main-tab flex items-center gap-2 px-4 py-3 text-sm font-medium hover:bg-bg-tertiary ${
+          tab.id === appState.activeTabId ? "active" : ""
+        }">
+                        ${
+                          tab.viewType === "inventory"
+                            ? profile.terminology.inventory
+                            : tab.name
+                        }
+                        <i data-lucide="x" data-action="close-tab" data-id="${
+                          tab.id
+                        }" class="w-4 h-4 rounded-full hover:bg-bg-tertiary ml-2"></i>
+                    </button>
+                `
+      )
+      .join("");
+
+    if (activeTab) {
+      workspaceContent.innerHTML = `<div class="view-pane">${getViewContent(
+        activeTab.viewType
+      )}</div>`;
+      viewInitializers[activeTab.viewType]?.(
+        workspaceContent.firstElementChild
+      );
+    } else {
+      workspaceContent.innerHTML = `<div class="text-center p-20 flex flex-col items-center"><i data-lucide="layout-template" class="w-20 h-20 text-border-color-strong mb-6"></i><h2 class="text-2xl font-semibold">Workspace is empty</h2><p class="text-text-secondary mt-2">Select an item from the sidebar to open a new tab.</p></div>`;
+    }
+
+    document.querySelectorAll(".nav-link").forEach((link) => {
+      link.classList.toggle(
+        "active-view",
+        activeTab && link.dataset.view === activeTab.viewType
+      );
+    });
+
+    lucide.createIcons();
+    saveState(); // Save state on every render
+  };
+
+  const openOrSwitchTab = (viewType) => {
+    if (!appState.firebaseReady) {
+      showToast("System is still loading...", "info");
+      return;
+    }
+
+    // --- NEW: Permission Gate ---
+    const requiredPermission = viewPermissionMap[viewType];
+    let hasPermission = true;
+
+    if (requiredPermission) {
+      if (Array.isArray(requiredPermission)) {
+        hasPermission = requiredPermission.some((p) => checkPermission(p));
+      } else {
+        hasPermission = checkPermission(requiredPermission);
+      }
+    }
+
+    // Special case for settings for cashiers, who have a custom view.
+    if (viewType === "settings" && appState.session.userRole === "cashier") {
+      hasPermission = true;
+    }
+
+    if (!hasPermission) {
+      showToast("You do not have permission to access this page.", "error");
+      return; // Abort if no permission
+    }
+    // --- END NEW ---
+
+    const existingTab = appState.tabs.find((t) => t.viewType === viewType);
+    if (existingTab) {
+      appState.activeTabId = existingTab.id;
+    } else {
+      const newTabId = `tab_${Date.now()}`;
+      let name = viewType.charAt(0).toUpperCase() + viewType.slice(1);
+      if (viewType === "inventory") {
+        name = getCurrentProfile().terminology.inventory;
+      }
+      appState.tabs.push({ id: newTabId, name: name, viewType: viewType });
+      appState.activeTabId = newTabId;
+    }
+    renderApp();
+  };
+
+  // --- FIREBASE DATA LISTENERS ---
+  const initFirebaseListeners = () => {
+    // StoreInfo, UoM, and Notifications are needed by everyone for basic app function
+    const unsubStore = onSnapshot(storeRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        const oldStoreName = firestoreData.storeInfo.name; // Capture old name
+        firestoreData.storeInfo = data;
+
+        // NEW: If store name changed, update session data and re-render switcher for instant UI update.
+        if (
+          appState.firebaseReady &&
+          oldStoreName &&
+          oldStoreName !== data.name
+        ) {
+          const storeInSession = appState.session.availableStores.find(
+            (s) => s.id === appState.session.storeId
+          );
+          if (storeInSession) {
+            storeInSession.name = data.name;
+          }
+          renderStoreSwitcher();
+        }
+
+        const firestoreSettings = data.settings || {};
+
+        const basePermissions = JSON.parse(JSON.stringify(userRoles));
+        const storedPermissions = firestoreSettings.permissions || {};
+
+        for (const roleId in basePermissions) {
+          if (storedPermissions[roleId]) {
+            for (const permId in basePermissions[roleId].permissions) {
+              const basePerm = basePermissions[roleId].permissions[permId];
+              const storedPerm =
+                storedPermissions[roleId].permissions?.[permId];
+
+              if (
+                typeof basePerm === "object" &&
+                basePerm !== null &&
+                typeof storedPerm === "object" &&
+                storedPerm !== null &&
+                storedPerm.value !== undefined
+              ) {
+                basePerm.value = storedPerm.value;
+              }
+            }
+          }
+        }
+
+        appState.settings = {
+          ...appState.settings,
+          ...firestoreSettings,
+          automations: {
+            ...(appState.settings.automations || {}),
+            ...(firestoreSettings.automations || {}),
+          },
+          permissions: basePermissions,
+        };
+        appState.customProfiles = data.customProfiles || {};
+        appState.currentCurrency =
+          appState.settings.defaultCurrency ||
+          data.defaultDisplayCurrency ||
+          data.baseCurrency;
+
+        if (appState.firebaseReady) {
+          // MODIFIED: handlePermissionChange now returns true if it re-rendered the app
+          const didRender = handlePermissionChange();
+          updateUIPermissions(); // NEW: Refresh sidebar links visibility after permissions change
+          // We still call renderApp if it didn't, to catch other settings changes (like currency)
+          if (!didRender) {
+            renderApp();
+          }
+        }
+      } // This brace closes the 'if(docSnap.exists())' block
+    });
+    activeListeners.push(unsubStore);
+
+    const unsubUOM = onSnapshot(uomRef, (snapshot) => {
+      firestoreData.unitsOfMeasurement = snapshot.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      }));
+      if (appState.firebaseReady && appState.activeTabId) {
+        const activeTab = appState.tabs.find(
+          (t) => t.id === appState.activeTabId
+        );
+        if (
+          activeTab?.viewType === "settings" ||
+          activeTab?.viewType === "inventory"
+        ) {
+          renderApp();
+        }
+      }
+    });
+    activeListeners.push(unsubUOM);
+
+    const unsubNotifications = onSnapshot(
+      query(notificationsRef),
+      (snapshot) => {
+        let needsRender = false;
+        const currentUserRole = appState.session.userRole; // Get current user's role
+
+        snapshot.docChanges().forEach((change) => {
+          const notification = { ...change.doc.data(), id: change.doc.id };
+
+          // NEW: Role-based filtering. Only process notifications meant for the current user.
+          const targetRoles = notification.targetRoles || ["admin", "manager"]; // Default to admin/manager if not specified
+          if (!currentUserRole || !targetRoles.includes(currentUserRole)) {
+            return; // Skip this notification if the user's role is not in the target list
+          }
+
+          if (change.type === "added") {
+            if (
+              !firestoreData.notifications.some((n) => n.id === notification.id)
+            ) {
+              firestoreData.notifications.push(notification);
+              needsRender = true;
+              const notificationDate = new Date(notification.date);
+              if (notificationDate > sessionStartTime) {
+                showToast(
+                  notification.message
+                    .replace(/<strong>/g, "")
+                    .replace(/<\/strong>/g, ""),
+                  notification.type
+                );
+                playNotificationSound();
+              }
+            }
+          }
+          if (change.type === "modified") {
+            const index = firestoreData.notifications.findIndex(
+              (n) => n.id === notification.id
+            );
+            if (index > -1) {
+              firestoreData.notifications[index] = notification;
+              needsRender = true;
+            }
+          }
+          if (change.type === "removed") {
+            const initialLength = firestoreData.notifications.length;
+            firestoreData.notifications = firestoreData.notifications.filter(
+              (n) => n.id !== notification.id
+            );
+            if (firestoreData.notifications.length !== initialLength) {
+              needsRender = true;
+            }
+          }
+        });
+        if (needsRender) {
+          firestoreData.notifications.sort(
+            (a, b) => new Date(b.date) - new Date(a.date)
+          );
+          if (appState.firebaseReady) {
+            renderApp();
+          }
+        }
+      }
+    );
+    activeListeners.push(unsubNotifications);
+
+    // --- Permission Gated Listeners ---
+    // Products are needed for POS, Inventory management, and Dashboard reports
+    if (
+      checkPermission("canUsePOS") ||
+      checkPermission("canManageInventory") ||
+      checkPermission("canAccessDashboard")
+    ) {
+      const unsubProducts = onSnapshot(productsRef, (snapshot) => {
+        firestoreData.products = snapshot.docs.map((doc) => ({
+          ...doc.data(),
+          id: doc.id,
+        }));
+        if (appState.firebaseReady && appState.activeTabId) renderApp();
+      });
+      activeListeners.push(unsubProducts);
+    }
+
+    // Customers are needed for POS and Customer management
+    if (checkPermission("canManageCustomers") || checkPermission("canUsePOS")) {
+      const unsubCustomers = onSnapshot(customersRef, (snapshot) => {
+        firestoreData.customers = snapshot.docs.map((doc) => ({
+          ...doc.data(),
+          id: doc.id,
+        }));
+        if (appState.firebaseReady && appState.activeTabId) renderApp();
+      });
+      activeListeners.push(unsubCustomers);
+    }
+
+    // --- MODIFIED INVOICE LISTENER ---
+    // If a user can see all reports (i.e., Admin/Manager), fetch all invoices.
+    // Otherwise (i.e., a Cashier), fetch only the invoices where their UID is the cashierId.
+    // This is the core fix for the data segregation issue.
+    if (checkPermission("canSeeAllReports")) {
+      const unsubInvoices = onSnapshot(invoicesRef, (snapshot) => {
+        firestoreData.invoices = snapshot.docs.map((doc) => ({
+          ...doc.data(),
+          id: doc.id,
+        }));
+        if (appState.firebaseReady && appState.activeTabId) renderApp();
+      });
+      activeListeners.push(unsubInvoices);
+    } else {
+      // This block will now correctly execute for cashiers.
+      const currentUserId = appState.session.currentUser?.uid;
+      if (currentUserId) {
+        const invoicesQuery = query(
+          invoicesRef,
+          where("cashierId", "==", currentUserId)
+        );
+        const unsubInvoices = onSnapshot(invoicesQuery, (snapshot) => {
+          firestoreData.invoices = snapshot.docs.map((doc) => ({
+            ...doc.data(),
+            id: doc.id,
+          }));
+          if (appState.firebaseReady && appState.activeTabId) renderApp();
+        });
+        activeListeners.push(unsubInvoices);
+      } else {
+        // If for some reason we don't have a user ID, ensure no invoices are loaded.
+        firestoreData.invoices = [];
+        if (appState.firebaseReady && appState.activeTabId) renderApp();
+      }
+    }
+
+    // Staff list is needed for staff management AND for filtering reports.
+    if (
+      checkPermission("canManageStaff") ||
+      checkPermission("canAccessReports") ||
+      checkPermission("canEditCashierDetails")
+    ) {
+      const unsubStaff = onSnapshot(staffRef, (snapshot) => {
+        // NEW: Real-time check for current user's status change
+        const currentUser = appState.session.currentUser;
+        if (currentUser) {
+          snapshot.docChanges().forEach((change) => {
+            // Handle if the current user's record is modified (e.g., deactivated)
+            if (
+              change.type === "modified" &&
+              change.doc.id === currentUser.uid
+            ) {
+              const newStatus = change.doc.data().status;
+              // If user is made inactive in the CURRENT store, force a reload.
+              // The onAuthStateChanged logic will then find another active store or log them out.
+              if (newStatus === "inactive" && appState.session.userRole) {
+                // Check role to avoid logout loop
+                showToast(
+                  "Your account has been deactivated in this store. Finding an active session...",
+                  "warning"
+                );
+                setTimeout(() => window.location.reload(), 2500);
+              }
+            }
+            // NEW: Handle if the current user is removed from the current store.
+            if (
+              change.type === "removed" &&
+              change.doc.id === currentUser.uid
+            ) {
+              showToast(
+                "Your access to this store has been revoked. Finding an active session...",
+                "warning"
+              );
+              // Force a reload. onAuthStateChanged will handle redirection or logout.
+              setTimeout(() => window.location.reload(), 2500);
+            }
+          });
+        }
+
+        firestoreData.staff = snapshot.docs.map((doc) => ({
+          ...doc.data(),
+          id: doc.id,
+        }));
+        if (appState.firebaseReady) {
+          const activeTab = appState.tabs.find(
+            (t) => t.id === appState.activeTabId
+          );
+          // Only re-render if the user is on the staff or reports page
+          if (
+            activeTab?.viewType === "staff" ||
+            activeTab?.viewType === "reports"
+          ) {
+            renderApp();
+          }
+        }
+      });
+      activeListeners.push(unsubStaff);
+    }
+
+    // NEW: Expenses listener, only for users who can manage them.
+    if (checkPermission("canManageExpenses")) {
+      const unsubExpenses = onSnapshot(query(expensesRef), (snapshot) => {
+        firestoreData.expenses = snapshot.docs.map((doc) => ({
+          ...doc.data(),
+          id: doc.id,
+        }));
+        if (appState.firebaseReady) {
+          const activeTab = appState.tabs.find(
+            (t) => t.id === appState.activeTabId
+          );
+          if (activeTab?.viewType === "expenses") {
+            renderApp();
+          }
+        }
+      });
+      activeListeners.push(unsubExpenses);
+    }
+
+    // NEW: Audit Log listener, only for users who can see reports
+    if (checkPermission("canAccessReports")) {
+      const unsubAudit = onSnapshot(query(auditLogRef), (snapshot) => {
+        firestoreData.auditLog = snapshot.docs.map((doc) => ({
+          ...doc.data(),
+          id: doc.id,
+        }));
+        if (appState.firebaseReady) {
+          const activeTab = appState.tabs.find(
+            (t) => t.id === appState.activeTabId
+          );
+          // Only re-render if the user is on the reports page and looking at the activity tab
+          if (
+            activeTab?.viewType === "reports" &&
+            appState.viewStates.reports.reportType === "activity"
+          ) {
+            renderApp();
+          }
+        }
+      });
+      activeListeners.push(unsubAudit);
+    }
+  };
+
+  // NEW helper function to centralize settings processing from a Firestore doc snapshot
+  const processStoreSettings = (docSnap) => {
+    if (!docSnap.exists()) {
+      console.error("Store document does not exist after attempt to load.");
+      return;
+    }
+    console.log("Processing store settings and permissions...");
+    const data = docSnap.data();
+    firestoreData.storeInfo = data;
+    const firestoreSettings = data.settings || {};
+
+    const basePermissions = JSON.parse(JSON.stringify(userRoles));
+    const storedPermissions = firestoreSettings.permissions || {};
+
+    // Deep merge permissions from Firestore into our base template
+    for (const roleId in basePermissions) {
+      if (storedPermissions[roleId]) {
+        for (const permId in basePermissions[roleId].permissions) {
+          const basePerm = basePermissions[roleId].permissions[permId];
+          const storedPerm = storedPermissions[roleId].permissions?.[permId];
+
+          if (
+            typeof basePerm === "object" &&
+            basePerm !== null &&
+            typeof storedPerm === "object" &&
+            storedPerm !== null &&
+            storedPerm.value !== undefined
+          ) {
+            basePerm.value = storedPerm.value;
+          }
+        }
+      }
+    }
+
+    // Update appState with all settings
+    appState.settings = {
+      ...appState.settings,
+      ...firestoreSettings,
+      automations: {
+        ...(appState.settings.automations || {}),
+        ...(firestoreSettings.automations || {}),
+      },
+      permissions: basePermissions,
+    };
+    appState.customProfiles = data.customProfiles || {};
+    appState.currentCurrency =
+      appState.settings.defaultCurrency ||
+      data.defaultDisplayCurrency ||
+      data.baseCurrency;
+
+    // Also populate the session permissions for the current user
+    const currentUserRole = appState.session.userRole;
+    if (currentUserRole && basePermissions[currentUserRole]) {
+      appState.session.userPermissions =
+        basePermissions[currentUserRole].permissions || {};
+    }
+    console.log(
+      "Permissions successfully processed for role:",
+      currentUserRole
+    );
+
+    // NEW: Check if any open tabs need to be closed due to permission changes
+    handlePermissionChange();
+  };
+
+  // --- REWRITTEN: LOGIN & SIGNUP SCREEN ---
+  const renderLoginScreen = async () => {
+    const loginContainer = document.getElementById("login-container");
+    if (!loginContainer) return;
+
+    loginContainer.innerHTML = `
+                    <div class="w-full max-w-md">
+                        <div class="text-center mb-8">
+                             <i data-lucide="gem" class="w-12 h-12 text-accent mx-auto mb-2"></i>
+                             <h1 class="text-3xl font-bold text-text-primary">CashShilpo</h1>
+                             <p class="text-text-secondary">The smart point of sale for modern businesses.</p>
+                        </div>
+
+                        <div id="auth-form-container" class="p-8 space-y-6 rounded-xl login-card">
+                            <!-- This will be filled with either login or signup form -->
+                        </div>
+                    </div>
+                `;
+
+    const formContainer = loginContainer.querySelector("#auth-form-container");
+
+    const showLoginForm = () => {
+      formContainer.innerHTML = `
+                        <div class="text-center">
+                            <h1 class="text-2xl font-bold text-text-primary">Welcome Back</h1>
+                            <p class="text-text-secondary">Sign in to manage your store.</p>
+                        </div>
+                        <form id="login-form" class="space-y-4">
+                            <div>
+                                <label for="email" class="block text-sm font-medium text-text-secondary">Email address</label>
+                                <input id="email" name="email" type="email" autocomplete="email" required class="form-input w-full mt-1">
+                            </div>
+                            <div>
+                                <label for="password" class="block text-sm font-medium text-text-secondary">Password</label>
+                                <input id="password" name="password" type="password" autocomplete="current-password" required class="form-input w-full mt-1">
+                            </div>
+                            <p id="auth-error" class="text-red-400 text-sm hidden"></p>
+                            <div>
+                                <button type="submit" class="btn btn-primary w-full text-base py-3">Sign In</button>
+                            </div>
+                        </form>
+                        <div class="text-center text-sm text-text-secondary">
+                            Don't have an account? <a href="#" id="show-signup-form" class="font-medium text-accent hover:underline">Sign up</a>
+                        </div>
+                    `;
+      const form = formContainer.querySelector("#login-form");
+      const errorEl = formContainer.querySelector("#auth-error");
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        errorEl.classList.add("hidden");
+        try {
+          await signInWithEmailAndPassword(
+            auth,
+            form.email.value,
+            form.password.value
+          );
+          // onAuthStateChanged will handle the rest.
+        } catch (error) {
+          console.error("Login error:", error);
+          errorEl.textContent = error.message.replace("Firebase: ", "");
+          errorEl.classList.remove("hidden");
+        }
+      });
+      formContainer
+        .querySelector("#show-signup-form")
+        .addEventListener("click", (e) => {
+          e.preventDefault();
+          showSignupForm();
+        });
+    };
+
+    const showSignupForm = () => {
+      formContainer.innerHTML = `
+                        <div class="text-center">
+                            <h1 class="text-2xl font-bold text-text-primary">Create Your Account</h1>
+                            <p class="text-text-secondary">Get started with your new business POS.</p>
+                        </div>
+                        <form id="signup-form" class="space-y-4">
+                            <div>
+                                <label for="businessName" class="block text-sm font-medium text-text-secondary">Business Name</label>
+                                <input id="businessName" name="businessName" type="text" required class="form-input w-full mt-1">
+                            </div>
+                            <div>
+                                <label for="name" class="block text-sm font-medium text-text-secondary">Your Full Name</label>
+                                <input id="name" name="name" type="text" required class="form-input w-full mt-1">
+                            </div>
+                            <div>
+                                <label for="email" class="block text-sm font-medium text-text-secondary">Email address</label>
+                                <input id="email" name="email" type="email" autocomplete="email" required class="form-input w-full mt-1">
+                            </div>
+                            <div>
+                                <label for="password" class="block text-sm font-medium text-text-secondary">Password</label>
+                                <input id="password" name="password" type="password" autocomplete="new-password" required class="form-input w-full mt-1">
+                            </div>
+                            <p id="auth-error" class="text-red-400 text-sm hidden"></p>
+                            <div>
+                                <button type="submit" class="btn btn-primary w-full text-base py-3">Create Account</button>
+                            </div>
+                        </form>
+                         <div class="text-center text-sm text-text-secondary">
+                            Already have an account? <a href="#" id="show-login-form" class="font-medium text-accent hover:underline">Log in</a>
+                        </div>
+                    `;
+      const form = formContainer.querySelector("#signup-form");
+      const errorEl = formContainer.querySelector("#auth-error");
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        errorEl.classList.add("hidden");
+        const businessName = form.businessName.value;
+        const fullName = form.name.value;
+        const email = form.email.value;
+        const password = form.password.value;
+
+        try {
+          // 1. Create user in Auth
+          const userCredential = await createUserWithEmailAndPassword(
+            auth,
+            email,
+            password
+          );
+          const user = userCredential.user;
+
+          // It's good practice to set the display name in Auth as well
+          await updateProfile(user, { displayName: fullName });
+
+          // 2. Create the store and all associated data
+          await createNewStoreForUser(user, businessName);
+
+          // Signup is complete. onAuthStateChanged will now pick up the logged-in user and proceed.
+          showToast("Account created successfully! Welcome.", "success");
+        } catch (error) {
+          console.error("Signup error:", error);
+          errorEl.textContent = error.message.replace("Firebase: ", "");
+          errorEl.classList.remove("hidden");
+        }
+      });
+
+      formContainer
+        .querySelector("#show-login-form")
+        .addEventListener("click", (e) => {
+          e.preventDefault();
+          showLoginForm();
+        });
+    };
+
+    showLoginForm(); // Start with the login form
+    lucide.createIcons();
+  };
+
+  // --- REWRITTEN: AUTHENTICATION & APP START ---
+  // This is the new "main gate" that handles multi-tenancy.
+  onAuthStateChanged(auth, async (user) => {
+    const mainAppContainer = document.getElementById("app-container");
+    const loginContainer = document.getElementById("login-container");
+    const loadingOverlay = document.getElementById("loading-overlay");
+
+    if (user) {
+      console.log("User is signed in:", user.uid);
+
+      // --- KEY FIX: Detach any potential lingering listeners from a previous session ---
+      detachAllListeners();
+
+      // 1. Find which store this user belongs to.
+      const userProfileRef = doc(db, "users", user.uid);
+      const userProfileSnap = await getDoc(userProfileRef);
+
+      if (!userProfileSnap.exists()) {
+        // This can happen if signup failed midway. It's safer to sign them out.
+        console.error(
+          `User ${user.uid} is authenticated but has no user profile document. Forcing sign out.`
+        );
+        await signOut(auth);
+        return; // onAuthStateChanged will be re-triggered with user=null
+      }
+
+      const userProfileData = userProfileSnap.data();
+      const potentialStores = userProfileData.stores || [];
+      let storeId = userProfileData.currentStoreId;
+
+      if (!storeId || potentialStores.length === 0) {
+        console.error(
+          `User profile for ${user.uid} is missing a storeId or has no stores. Forcing sign out.`
+        );
+        await signOut(auth);
+        return;
+      }
+
+      // Filter for stores where the user is actually active
+      console.log(
+        `[Auth] Verifying user status in ${potentialStores.length} potential store(s).`
+      );
+      const staffStatusPromises = potentialStores.map((store) =>
+        getDoc(doc(db, "stores", store.id, "staff", user.uid))
+      );
+      const staffStatusSnapshots = await Promise.all(staffStatusPromises);
+
+      const activeStores = potentialStores.filter((store, index) => {
+        const staffDoc = staffStatusSnapshots[index];
+        return (
+          staffDoc.exists() && (staffDoc.data().status || "active") === "active"
+        );
+      });
+
+      if (activeStores.length === 0) {
+        console.log(
+          `[Auth] No active stores found for user. Proceeding with logout.`
+        );
+        showToast(
+          "Your account is inactive in all available stores. Please contact an administrator.",
+          "error"
+        );
+        await signOut(auth);
+        return;
+      }
+
+      // The user has at least one active store. Set the available stores in the session.
+      appState.session.availableStores = activeStores;
+      console.log(`[Auth] User is active in ${activeStores.length} store(s).`);
+
+      // Check if the user's last-used store is still in their active list.
+      const isCurrentStoreActive = activeStores.some((s) => s.id === storeId);
+      if (!isCurrentStoreActive) {
+        storeId = activeStores[0].id; // Default to the first active store
+        console.log(
+          `[Auth] User's current store is inactive. Switching to active store ${storeId}.`
+        );
+        await updateDoc(userProfileRef, { currentStoreId: storeId });
+      }
+
+      appState.session.storeId = storeId;
+      console.log(
+        `User has ${activeStores.length} stores. Active store: ${storeId}`
+      );
+
+      // 2. Now that we have the storeId, setup all Firebase references.
+      setupFirebaseRefs(storeId);
+
+      // 3. Fetch the user's staff profile from *within their store*.
+      const userStaffDocRef = doc(staffRef, user.uid);
+      const userStaffDocSnap = await getDoc(userStaffDocRef);
+
+      if (!userStaffDocSnap.exists()) {
+        console.error(
+          `User ${user.uid} has a profile but no staff record in store ${storeId}. Forcing sign out.`
+        );
+        await signOut(auth);
+        return;
+      }
+
+      const staffData = userStaffDocSnap.data();
+
+      // 4. Check if the user's staff account is pending. The 'inactive' case is already handled.
+      const userStatus = staffData.status || "active";
+
+      if (userStatus === "pending") {
+        showToast(
+          "Your account is pending approval from an administrator.",
+          "warning"
+        );
+        await signOut(auth);
+        return;
+      }
+
+      // 5. All checks passed! Populate session and load the app.
+      appState.session.currentUser = {
+        uid: user.uid,
+        email: user.email,
+        ...staffData,
+      };
+      appState.session.userRole = staffData.role;
+
+      console.log(
+        `User role identified as: ${staffData.role}. Fetching store settings.`
+      );
+
+      // First, fetch the store settings to get permissions
+      const storeDoc = await getDoc(storeRef);
+      if (!storeDoc.exists()) {
+        // This should ideally not happen if the user profile exists, indicates data inconsistency.
+        console.error(
+          `Store document ${storeId} not found for user ${user.uid}. Forcing sign out.`
+        );
+        await signOut(auth);
+        return;
+      }
+      processStoreSettings(storeDoc);
+
+      // Second, with permissions now loaded, initialize all real-time data listeners.
+      initFirebaseListeners();
+
+      // Third, show the app UI.
+      setTimeout(() => {
+        appState.firebaseReady = true;
+        if (loadingOverlay) loadingOverlay.style.display = "none";
+        if (loginContainer) loginContainer.style.display = "none";
+        if (mainAppContainer) mainAppContainer.style.display = "flex";
+
+        // --- NEW: ADD STORE SWITCHER ---
+        if (!document.getElementById("store-switcher-container")) {
+          const notificationBtn = document.querySelector(
+            '[data-action="open-notifications"]'
+          );
+          if (notificationBtn) {
+            // Find the container for header action buttons
+            const headerActionsContainer = notificationBtn.parentElement;
+            if (headerActionsContainer) {
+              const storeSwitcherHTML = `<div id="store-switcher-container" class="relative"></div>`;
+              headerActionsContainer.insertAdjacentHTML(
+                "afterbegin",
+                storeSwitcherHTML
+              );
+            }
+          }
+        }
+        renderStoreSwitcher();
+
+        // --- NEW: ADD FULLSCREEN BUTTON ---
+        if (!document.getElementById("fullscreen-btn")) {
+          const notificationBtn = document.querySelector(
+            '[data-action="open-notifications"]'
+          );
+          if (notificationBtn) {
+            const fullscreenButtonHTML = `
+                                <button data-action="toggle-fullscreen" id="fullscreen-btn" title="Enter Fullscreen" class="w-10 h-10 flex items-center justify-center rounded-lg text-text-secondary hover:bg-bg-tertiary hover:text-text-primary transition-colors">
+                                    <i data-lucide="maximize" class="w-5 h-5"></i>
+                                </button>
+                                `;
+            notificationBtn.insertAdjacentHTML(
+              "beforebegin",
+              fullscreenButtonHTML
+            );
+          }
+        }
+
+        // --- NEW: ADD CALCULATOR BUTTON ---
+        if (!document.getElementById("calculator-container")) {
+          const notificationBtn = document.querySelector(
+            '[data-action="open-notifications"]'
+          );
+          if (notificationBtn) {
+            const calculatorButtonHTML = `
+                                <div id="calculator-container" class="relative">
+                                    <button data-action="toggle-calculator-menu" title="Calculators" class="w-10 h-10 flex items-center justify-center rounded-lg text-text-secondary hover:bg-bg-tertiary hover:text-text-primary transition-colors">
+                                        <i data-lucide="calculator" class="w-5 h-5"></i>
+                                    </button>
+                                    <div id="calculator-menu" class="action-menu !w-48">
+                                        <div class="action-menu-item" data-action="open-calculator" data-type="simple">
+                                            <i data-lucide="calculator" class="w-4 h-4"></i>
+                                            <span>Calculator</span>
+                                        </div>
+                                        <div class="action-menu-item" data-action="open-calculator" data-type="advanced">
+                                            <i data-lucide="function-square" class="w-4 h-4"></i>
+                                            <span>Advanced Tools</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                `;
+            notificationBtn.insertAdjacentHTML(
+              "beforebegin",
+              calculatorButtonHTML
+            );
+          }
+        }
+
+        updateUIPermissions();
+        setupHeaderToggle();
+        applyHeaderCollapseState();
+        runAutomations();
+        scheduleEndOfDayReport();
+        if (appState.activeTabId && appState.tabs.length > 0) {
+          renderApp();
+        } else {
+          openOrSwitchTab("dashboard");
+        }
+      }, 500);
+    } else {
+      // No user is signed in. Show the login/signup screen.
+      console.log(
+        "No user signed in. Detaching listeners and rendering login screen."
+      );
+
+      // --- KEY FIX: DETACH LISTENERS ON SIGN OUT ---
+      detachAllListeners();
+
+      // Reset session state for a clean slate
+      appState.session.storeId = null;
+      appState.session.currentUser = null;
+      appState.session.userRole = null;
+
+      await renderLoginScreen(); // This populates the container
+
+      if (loadingOverlay) loadingOverlay.style.display = "none";
+      if (mainAppContainer) mainAppContainer.style.display = "none";
+      if (loginContainer) {
+        // Make login-container a full-screen, dedicated page
+        loginContainer.style.display = "flex";
+        loginContainer.style.position = "fixed";
+        loginContainer.style.top = "0";
+        loginContainer.style.left = "0";
+        loginContainer.style.right = "0";
+        loginContainer.style.bottom = "0";
+        loginContainer.style.zIndex = "100";
+        loginContainer.style.backgroundColor = "var(--bg-primary, #101827)";
+        loginContainer.style.alignItems = "center";
+        loginContainer.style.justifyContent = "center";
+      }
+    }
+  });
+
+  const renderCashierDashboard = (pane) => {
+    pane.innerHTML = `<div class="text-center p-4">Loading cashier data...</div>`;
+    const term = getCurrentProfile().terminology;
+    const currencyInfo = currencyUtils.get(appState.currentCurrency);
+
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+
+    const todaysInvoices = firestoreData.invoices.filter(
+      (inv) => new Date(inv.date) >= todayStart && inv.status !== "Void"
+    );
+
+    const totalSales = todaysInvoices.reduce(
+      (sum, inv) => sum + inv.totalInBaseCurrency,
+      0
+    );
+    const transactionCount = todaysInvoices.length;
+
+    // --- Performance Snapshot Logic ---
+    const totalItemsSold = todaysInvoices
+      .flatMap((inv) => inv.items)
+      .reduce((sum, item) => sum + (item.qty || 1), 0);
+    const avgItemsPerTx =
+      transactionCount > 0 ? (totalItemsSold / transactionCount).toFixed(1) : 0;
+    const avgSaleValue =
+      transactionCount > 0 ? totalSales / transactionCount : 0;
+
+    const dashboardHTML = `
+                    <div class="space-y-8">
+                        <!-- Dashboard Header -->
+                        <div class="flex flex-col md:flex-row justify-between md:items-center gap-4">
+                            <div>
+                                <h1 class="text-3xl font-bold text-text-primary">Your Shift Summary</h1>
+                                <p class="text-text-secondary">Here's your real-time performance, ${
+                                  appState.session.currentUser.name.split(
+                                    " "
+                                  )[0]
+                                }.</p>
+                            </div>
+                        </div>
+                        <!-- KPI Cards for Cashier -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            <div class="glass-pane p-5 rounded-xl flex items-start justify-between gap-4">
+                                <div class="overflow-hidden">
+                                    <p class="text-sm font-medium text-text-secondary">Your Sales Today</p>
+                                    <p class="text-3xl font-bold text-text-primary">${formatAndTruncate(
+                                      "Your Sales Today",
+                                      totalSales
+                                    )}</p>
+                                </div>
+                                <div class="w-12 h-12 rounded-full flex items-center justify-center bg-green-500/10 shrink-0"><i data-lucide="trending-up" class="w-6 h-6 text-green-400"></i></div>
+                            </div>
+                            <div class="glass-pane p-5 rounded-xl flex items-start justify-between gap-4">
+                                <div class="overflow-hidden">
+                                    <p class="text-sm font-medium text-text-secondary">Transactions</p>
+                                    <p class="text-3xl font-bold text-text-primary">${transactionCount}</p>
+                                </div>
+                                <div class="w-12 h-12 rounded-full flex items-center justify-center bg-blue-500/10 shrink-0"><i data-lucide="receipt-text" class="w-6 h-6 text-blue-400"></i></div>
+                            </div>
+                            <div class="glass-pane p-5 rounded-xl flex items-start justify-between gap-4">
+                                <div class="overflow-hidden">
+                                    <p class="text-sm font-medium text-text-secondary">Avg. Sale Value</p>
+                                    <p class="text-3xl font-bold text-text-primary">${formatAndTruncate(
+                                      "Avg. Sale Value",
+                                      avgSaleValue
+                                    )}</p>
+                                </div>
+                                <div class="w-12 h-12 rounded-full flex items-center justify-center bg-yellow-500/10 shrink-0"><i data-lucide="scale" class="w-6 h-6 text-yellow-400"></i></div>
+                            </div>
+                            <div class="glass-pane p-5 rounded-xl flex items-start justify-between gap-4">
+                                <div class="overflow-hidden">
+                                    <p class="text-sm font-medium text-text-secondary">Avg. Items / Sale</p>
+                                    <p class="text-3xl font-bold text-text-primary">${avgItemsPerTx}</p>
+                                </div>
+                                <div class="w-12 h-12 rounded-full flex items-center justify-center bg-indigo-500/10 shrink-0"><i data-lucide="shopping-basket" class="w-6 h-6 text-indigo-400"></i></div>
+                            </div>
+                        </div>
+
+                        <!-- Main Content Grid -->
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            <!-- Left Column: New Chart -->
+                            <div class="glass-pane p-6 rounded-xl flex flex-col lg:col-span-2 h-96">
+                                <h2 class="text-xl font-semibold mb-4 text-text-primary">Sales Breakdown by Transaction Size</h2>
+                                <div class="flex-grow relative"><canvas id="cashier-sales-breakdown-chart"></canvas></div>
+                            </div>
+
+                            <!-- Right Column: Info Lists -->
+                             <div class="glass-pane p-6 rounded-xl flex flex-col h-96">
+                                <div class="flex flex-col flex-1 min-h-0">
+                                    <h2 class="text-xl font-semibold mb-2 text-text-primary flex-shrink-0">Recent Transactions</h2>
+                                    <ul id="cashier-recent-activity-feed" class="space-y-2 overflow-y-auto pr-2 flex-grow"></ul>
+                                </div>
+                                <div class="border-t border-border-color my-4 flex-shrink-0"></div>
+                                <div class="flex flex-col flex-1 min-h-0">
+                                    <h2 class="text-xl font-semibold mb-2 text-text-primary flex-shrink-0">Low Stock Alert</h2>
+                                    <ul id="cashier-low-stock-list" class="space-y-2 overflow-y-auto pr-2 flex-grow"></ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Bottom Row: Lookup Tool -->
+                        <div class="glass-pane p-6 rounded-xl flex flex-col">
+                            <h2 class="text-xl font-semibold mb-4 text-text-primary">Quick ${
+                              term.product
+                            } Lookup</h2>
+                            <div class="relative">
+                                <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary"></i>
+                                <input type="text" id="cashier-product-lookup" placeholder="Search by name or SKU..." class="form-input w-full pl-9 text-sm">
+                            </div>
+                            <div id="cashier-lookup-results" class="mt-2 space-y-2 max-h-40 overflow-y-auto">
+                                <p class="text-xs text-text-secondary text-center py-4">Start typing to find a ${
+                                  term.product
+                                }.</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+    pane.innerHTML = dashboardHTML;
+    lucide.createIcons();
+
+    // --- Logic for Chart, Lists & Lookup ---
+
+    // Sales Breakdown Chart
+    const baseBuckets = {
+      "0-25": 0,
+      "25-50": 0,
+      "50-100": 0,
+      "100-250": 0,
+      "250+": 0,
+    };
+
+    // Convert base currency thresholds to the current display currency for chart labels
+    const baseThresholds = [25, 50, 100, 250];
+    const displayThresholds = baseThresholds.map((t) =>
+      Math.round(currencyUtils.convert(t))
+    );
+    const bucketLabels = [
+      `${currencyInfo.symbol}0 - ${currencyInfo.symbol}${displayThresholds[0]}`,
+      `${currencyInfo.symbol}${displayThresholds[0]} - ${currencyInfo.symbol}${displayThresholds[1]}`,
+      `${currencyInfo.symbol}${displayThresholds[1]} - ${currencyInfo.symbol}${displayThresholds[2]}`,
+      `${currencyInfo.symbol}${displayThresholds[2]} - ${currencyInfo.symbol}${displayThresholds[3]}`,
+      `${currencyInfo.symbol}${displayThresholds[3]}+`,
+    ];
+
+    todaysInvoices.forEach((inv) => {
+      const total = inv.totalInBaseCurrency;
+      if (total <= 25) baseBuckets["0-25"]++;
+      else if (total <= 50) baseBuckets["25-50"]++;
+      else if (total <= 100) baseBuckets["50-100"]++;
+      else if (total <= 250) baseBuckets["100-250"]++;
+      else baseBuckets["250+"]++;
+    });
+
+    const breakdownData = Object.values(baseBuckets);
+    const breakdownCtx = pane
+      .querySelector("#cashier-sales-breakdown-chart")
+      ?.getContext("2d");
+    if (breakdownCtx) {
+      new Chart(breakdownCtx, {
+        type: "bar",
+        data: {
+          labels: bucketLabels,
+          datasets: [
+            {
+              label: "Number of Sales",
+              data: breakdownData,
+              backgroundColor: chartStyles.createGradient(
+                breakdownCtx,
+                chartStyles.palettes.gentleOcean[0]
+              ),
+              borderColor: chartStyles.palettes.gentleOcean[0],
+              borderWidth: 2,
+              borderRadius: 4,
+            },
+          ],
+        },
+        options: commonChartOptions(false, {
+          plugins: {
+            legend: { display: false },
+            chartGlow: {
+              color: chartStyles.hexToRgba(
+                chartStyles.palettes.gentleOcean[0],
+                0.2
+              ),
+              blur: 15,
+            },
+            tooltip: { callbacks: { label: (c) => `${c.raw} sales` } },
+          },
+          scales: {
+            y: {
+              title: {
+                display: true,
+                text: "Number of Transactions",
+                color: "#9ca3af",
+              },
+            },
+            x: {
+              grid: { display: false },
+              title: {
+                display: true,
+                text: `Transaction Total (in ${appState.currentCurrency})`,
+                color: "#9ca3af",
+              },
+            },
+          },
+        }),
+      });
+    }
+
+    // Recent Activity
+    const recentActivityContainer = pane.querySelector(
+      "#cashier-recent-activity-feed"
+    );
+    const recentInvoices = todaysInvoices
+      .sort((a, b) => new Date(b.date) - new Date(a.date))
+      .slice(0, 5);
+    if (recentActivityContainer) {
+      recentActivityContainer.innerHTML = recentInvoices.length
+        ? recentInvoices
+            .map(
+              (inv) => `
+                        <li class="flex items-center justify-between text-sm hover:bg-bg-secondary/50 p-1.5 rounded-md">
+                            <div>
+                                <p class="font-medium text-text-primary truncate">${
+                                  inv.customerName
+                                }</p>
+                                <p class="text-xs text-text-secondary">${new Date(
+                                  inv.date
+                                ).toLocaleTimeString([], {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })}</p>
+                            </div>
+                            <span class="font-mono text-text-primary font-semibold">${currencyUtils.format(
+                              inv.totalInBaseCurrency,
+                              inv.currency
+                            )}</span>
+                        </li>
+                    `
+            )
+            .join("")
+        : `<li><p class="text-xs text-text-secondary text-center p-2">No sales recorded yet today.</p></li>`;
+    }
+
+    // Low Stock List for Cashier
+    const lowStockList = pane.querySelector("#cashier-low-stock-list");
+    const lowStockProducts = firestoreData.products
+      .filter(
+        (p) => p.productType === "physical" && p.stock > 0 && p.stock < 10
+      )
+      .sort((a, b) => a.stock - b.stock)
+      .slice(0, 5);
+
+    if (lowStockList) {
+      lowStockList.innerHTML = lowStockProducts.length
+        ? lowStockProducts
+            .map(
+              (p) => `
+                        <li class="flex items-center justify-between text-sm hover:bg-bg-secondary/50 p-1.5 rounded-md">
+                            <span class="font-medium text-text-primary truncate pr-4">${p.name}</span>
+                            <span class="font-mono text-red-400 font-semibold">${p.stock} left</span>
+                        </li>
+                    `
+            )
+            .join("")
+        : `<li><p class="text-xs text-text-secondary text-center p-2">All products are well-stocked.</p></li>`;
+    }
+
+    // Product Lookup
+    const lookupInput = pane.querySelector("#cashier-product-lookup");
+    const lookupResults = pane.querySelector("#cashier-lookup-results");
+    if (lookupInput && lookupResults) {
+      lookupInput.addEventListener("input", (e) => {
+        const query = e.target.value.toLowerCase();
+        if (query.length < 2) {
+          lookupResults.innerHTML = `<p class="text-xs text-text-secondary text-center py-4">Start typing to find a ${term.product}.</p>`;
+          return;
+        }
+        const results = firestoreData.products
+          .filter(
+            (p) =>
+              (p.status || "active") === "active" &&
+              (p.name.toLowerCase().includes(query) ||
+                p.id.toLowerCase().includes(query))
+          ) // MODIFIED
+          .slice(0, 5);
+
+        if (results.length) {
+          lookupResults.innerHTML = results
+            .map(
+              (p) => `
+                                <div class="p-2 rounded-md bg-bg-secondary text-sm">
+                                    <p class="font-medium text-text-primary">${
+                                      p.name
+                                    }</p>
+                                    <div class="flex justify-between text-xs mt-1">
+                                        <span class="text-text-secondary font-mono">${
+                                          p.id
+                                        }</span>
+                                        <div>
+                                            <span class="text-text-secondary">Price: <span class="font-mono text-accent">${currencyUtils.format(
+                                              p.price
+                                            )}</span></span>
+                                            <span class="text-text-secondary ml-2">Stock: <span class="font-mono ${
+                                              p.stock <= 0
+                                                ? "text-red-400"
+                                                : "text-green-400"
+                                            }">${
+                p.productType === "physical" ? p.stock : "N/A"
+              }</span></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            `
+            )
+            .join("");
+        } else {
+          lookupResults.innerHTML = `<p class="text-xs text-text-secondary text-center py-4">No ${term.product}s found for "${query}".</p>`;
+        }
+      });
+    }
+  };
+
+  function initDashboard(pane) {
+    if (appState.session.userRole === "cashier") {
+      renderCashierDashboard(pane);
+      return;
+    }
+
+    const term = getCurrentProfile().terminology;
+    let salesChart, categoryChart, hourlySalesChart, paymentMethodsChart; // Hold chart instances
+
+    const updateDashboardData = (period = "today", customRange = null) => {
+      const now = new Date();
+      let startDate, endDate, prevStartDate, prevEndDate, periodLabel;
+
+      // Set time to end of day for comparisons
+      const todayEnd = new Date(now);
+      todayEnd.setHours(23, 59, 59, 999);
+
+      switch (period) {
+        case "year":
+          startDate = new Date(now.getFullYear(), 0, 1);
+          endDate = todayEnd;
+          prevStartDate = new Date(now.getFullYear() - 1, 0, 1);
+          prevEndDate = new Date(now.getFullYear() - 1, 11, 31);
+          prevEndDate.setHours(23, 59, 59, 999);
+          periodLabel = "vs. last year";
+          break;
+        case "month":
+          startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+          endDate = todayEnd;
+          prevStartDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+          prevEndDate = new Date(now.getFullYear(), now.getMonth(), 0);
+          prevEndDate.setHours(23, 59, 59, 999);
+          periodLabel = "vs. last month";
+          break;
+        case "last30":
+          startDate = new Date(now);
+          startDate.setDate(now.getDate() - 29);
+          startDate.setHours(0, 0, 0, 0);
+          endDate = todayEnd;
+
+          prevEndDate = new Date(startDate);
+          prevEndDate.setDate(prevEndDate.getDate() - 1);
+          prevEndDate.setHours(23, 59, 59, 999);
+          prevStartDate = new Date(prevEndDate);
+          prevStartDate.setDate(prevEndDate.getDate() - 29);
+          prevStartDate.setHours(0, 0, 0, 0);
+
+          periodLabel = "vs. previous 30 days";
+          break;
+        case "week":
+          startDate = new Date(now);
+          startDate.setDate(now.getDate() - now.getDay());
+          startDate.setHours(0, 0, 0, 0);
+          endDate = todayEnd;
+
+          prevStartDate = new Date(startDate);
+          prevStartDate.setDate(startDate.getDate() - 7);
+          prevEndDate = new Date(startDate);
+          prevEndDate.setDate(prevEndDate.getDate() - 1);
+          prevEndDate.setHours(23, 59, 59, 999);
+          periodLabel = "vs. last week";
+          break;
+        case "last7":
+          startDate = new Date(now);
+          startDate.setDate(now.getDate() - 6);
+          startDate.setHours(0, 0, 0, 0);
+          endDate = todayEnd;
+
+          prevEndDate = new Date(startDate);
+          prevEndDate.setDate(prevEndDate.getDate() - 1);
+          prevEndDate.setHours(23, 59, 59, 999);
+          prevStartDate = new Date(prevEndDate);
+          prevStartDate.setDate(prevEndDate.getDate() - 6);
+          prevStartDate.setHours(0, 0, 0, 0);
+
+          periodLabel = "vs. previous 7 days";
+          break;
+        case "yesterday":
+          startDate = new Date(now);
+          startDate.setDate(now.getDate() - 1);
+          startDate.setHours(0, 0, 0, 0);
+          endDate = new Date(startDate);
+          endDate.setHours(23, 59, 59, 999);
+
+          prevStartDate = new Date(startDate);
+          prevStartDate.setDate(startDate.getDate() - 1);
+          prevStartDate.setHours(0, 0, 0, 0);
+          prevEndDate = new Date(prevStartDate);
+          prevEndDate.setHours(23, 59, 59, 999);
+
+          periodLabel = "vs. day before";
+          break;
+        case "custom":
+          startDate = new Date(customRange.start);
+          startDate.setHours(0, 0, 0, 0);
+          endDate = new Date(customRange.end);
+          endDate.setHours(23, 59, 59, 999);
+
+          const diff = endDate.getTime() - startDate.getTime();
+          prevEndDate = new Date(startDate.getTime() - 86400000); // 1 day in ms
+          prevEndDate.setHours(23, 59, 59, 999);
+          prevStartDate = new Date(prevEndDate.getTime() - diff);
+          prevStartDate.setHours(0, 0, 0, 0);
+
+          periodLabel = "vs. previous period";
+          break;
+        case "today":
+        default:
+          startDate = new Date(now);
+          startDate.setHours(0, 0, 0, 0);
+          endDate = todayEnd;
+
+          prevStartDate = new Date(startDate);
+          prevStartDate.setDate(startDate.getDate() - 1);
+          prevStartDate.setHours(0, 0, 0, 0);
+          prevEndDate = new Date(prevStartDate);
+          prevEndDate.setHours(23, 59, 59, 999);
+
+          periodLabel = "vs. yesterday";
+          break;
+      }
+
+      document.getElementById(
+        "dashboard-date"
+      ).textContent = `Showing data for: ${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`;
+
+      const getMetricsForPeriod = (start, end) => {
+        const relevantInvoices = firestoreData.invoices.filter((inv) => {
+          const invDate = new Date(inv.date);
+          return invDate >= start && invDate <= end && inv.status !== "Void";
+        });
+
+        const totalRevenue = relevantInvoices.reduce(
+          (sum, inv) => sum + inv.totalInBaseCurrency,
+          0
+        );
+        const totalSales = relevantInvoices.length;
+        const grossProfit = relevantInvoices.reduce((profit, inv) => {
+          const invoiceProfit = inv.items.reduce((itemProfit, item) => {
+            const product = firestoreData.products.find(
+              (p) => p.id === item.id
+            );
+            const cost = product ? product.costPrice : item.price;
+            return itemProfit + (item.price - cost) * (item.qty || 1);
+          }, 0);
+          return profit + invoiceProfit;
+        }, 0);
+        const avgTransactionValue =
+          totalSales > 0 ? totalRevenue / totalSales : 0;
+        return {
+          totalRevenue,
+          totalSales,
+          grossProfit,
+          avgTransactionValue,
+          relevantInvoices,
+        };
+      };
+
+      const currentMetrics = getMetricsForPeriod(startDate, endDate);
+      const previousMetrics = getMetricsForPeriod(prevStartDate, prevEndDate);
+
+      // New metric calculation for receivables
+      const totalReceivables = firestoreData.customers.reduce(
+        (sum, c) => sum + (c.currentDue || 0),
+        0
+      );
+
+      const calculateChange = (current, previous) => {
+        if (previous === 0) return current > 0 ? 100 : 0;
+        return ((current - previous) / previous) * 100;
+      };
+
+      const formatChange = (change) => {
+        if (change === 0 || !isFinite(change))
+          return `<span class="text-text-secondary">–</span>`;
+        const color = change > 0 ? "text-green-400" : "text-red-400";
+        const icon = change > 0 ? "arrow-up-right" : "arrow-down-right";
+        return `<span class="flex items-center text-xs font-semibold ${color}"><i data-lucide="${icon}" class="w-3 h-3 mr-1"></i>${Math.abs(
+          change
+        ).toFixed(1)}%</span>`;
+      };
+
+      const colorClasses = {
+        blue: { bg: "bg-blue-500/10", text: "text-blue-400" },
+        green: { bg: "bg-green-500/10", text: "text-green-400" },
+        yellow: { bg: "bg-yellow-500/10", text: "text-yellow-400" },
+        indigo: { bg: "bg-indigo-500/10", text: "text-indigo-400" },
+        red: { bg: "bg-red-500/10", text: "text-red-400" },
+      };
+
+      let stats = [
+        {
+          icon: "trending-up",
+          color: "blue",
+          label: "Total Revenue",
+          value: formatAndTruncate(
+            "Total Revenue",
+            currentMetrics.totalRevenue
+          ),
+          change: calculateChange(
+            currentMetrics.totalRevenue,
+            previousMetrics.totalRevenue
+          ),
+        },
+        {
+          icon: "wallet",
+          color: "green",
+          label: "Gross Profit",
+          value: formatAndTruncate("Gross Profit", currentMetrics.grossProfit),
+          change: calculateChange(
+            currentMetrics.grossProfit,
+            previousMetrics.grossProfit
+          ),
+        },
+        {
+          icon: "shopping-cart",
+          color: "yellow",
+          label: "Total Sales",
+          value: formatAndTruncate(
+            "Total Sales",
+            currentMetrics.totalSales,
+            false
+          ),
+          change: calculateChange(
+            currentMetrics.totalSales,
+            previousMetrics.totalSales
+          ),
+        },
+        {
+          icon: "hand-coins",
+          color: "red",
+          label: "Total Receivables",
+          value: formatAndTruncate("Total Receivables", totalReceivables),
+          change: null,
+        },
+      ];
+
+      if (!checkPermission("canViewProfitAndLoss")) {
+        // MODIFIED
+        stats = stats.filter((s) => s.label !== "Gross Profit");
+      }
+
+      pane.querySelector("#dashboard-stats-container").innerHTML = stats
+        .map(
+          (s) => `
+                        <div class="glass-pane p-5 rounded-xl flex items-start justify-between gap-4">
+                            <div class="overflow-hidden">
+                                <p class="text-sm font-medium text-text-secondary">${
+                                  s.label
+                                }</p>
+                                <p class="text-3xl font-bold text-text-primary">${
+                                  s.value
+                                }</p>
+                                <div class="flex items-center text-xs mt-1">
+                                    ${
+                                      s.change !== null
+                                        ? formatChange(s.change)
+                                        : ""
+                                    }
+                                    <span class="text-text-secondary/70 ml-2">${
+                                      s.change !== null
+                                        ? periodLabel
+                                        : "Current outstanding balance"
+                                    }</span>
+                                </div>
+                            </div>
+                            <div class="w-12 h-12 rounded-full flex items-center justify-center ${
+                              colorClasses[s.color].bg
+                            } shrink-0">
+                                <i data-lucide="${s.icon}" class="w-6 h-6 ${
+            colorClasses[s.color].text
+          }"></i>
+                            </div>
+                        </div>
+                    `
+        )
+        .join("");
+
+      // Render AI Insights from notifications - NEW: Only for Admin and Manager
+      const insightsContainer = pane.querySelector("#ai-insights-container");
+      if (
+        insightsContainer &&
+        (appState.session.userRole === "admin" ||
+          appState.session.userRole === "manager")
+      ) {
+        const insightNotifications = firestoreData.notifications
+          .filter((n) => ["stock", "info", "warning"].includes(n.type))
+          .slice(0, 2); // Get the latest 2 insights
+
+        const insightIcons = {
+          stock: "package-search",
+          info: "trending-up",
+          warning: "shield-alert",
+        };
+        const insightColors = {
+          stock: "yellow",
+          info: "green",
+          warning: "red",
+        };
+
+        if (insightNotifications.length > 0) {
+          insightsContainer.innerHTML = insightNotifications
+            .map(
+              (n) => `
+                                <div class="flex items-start gap-3 p-3 bg-bg-secondary rounded-lg">
+                                    <i data-lucide="${
+                                      insightIcons[n.type]
+                                    }" class="w-5 h-5 text-${
+                insightColors[n.type]
+              }-400 mt-1 shrink-0"></i>
+                                    <p>${n.message.replace(
+                                      /<strong>(.*?)<\/strong>/g,
+                                      '<span class="font-medium text-blue-400">$1</span>'
+                                    )}</p>
+                                </div>
+                            `
+            )
+            .join("");
+        } else {
+          insightsContainer.innerHTML = `<p class="text-sm text-text-secondary p-3">No new insights at the moment.</p>`;
+        }
+      } else if (insightsContainer) {
+        // If the user is a cashier, hide the parent container of the insights.
+        insightsContainer.closest(".glass-pane").style.display = "none";
+      }
+
+      const salesByProduct = firestoreData.invoices
+        .filter(
+          (inv) => new Date(inv.date) >= startDate && inv.status !== "Void"
+        )
+        .flatMap((inv) => inv.items)
+        .reduce((acc, item) => {
+          acc[item.id] = (acc[item.id] || 0) + item.price * (item.qty || 1);
+          return acc;
+        }, {});
+
+      const topProducts = Object.entries(salesByProduct)
+        .sort(([, a], [, b]) => b - a)
+        .slice(0, 3)
+        .map(([id, revenue]) => ({
+          product: firestoreData.products.find((p) => p.id === id),
+          revenue,
+        }));
+
+      pane.querySelector("#top-products-list").innerHTML = topProducts.length
+        ? topProducts
+            .map(
+              (item) => `
+                        <li class="flex items-center justify-between text-sm hover:bg-bg-secondary/50 p-1.5 rounded-md">
+                            <span class="font-medium text-text-primary truncate pr-4">${
+                              item.product?.name || "Unknown Product"
+                            }</span>
+                            <span class="font-mono text-text-secondary">${currencyUtils.format(
+                              item.revenue
+                            )}</span>
+                        </li>
+                    `
+            )
+            .join("")
+        : `<li><p class="text-xs text-text-secondary text-center p-2">No sales in this period.</p></li>`;
+
+      // --- NEW: Top Customers List ---
+      const customerSpending = currentMetrics.relevantInvoices.reduce(
+        (acc, inv) => {
+          if (inv.customerId) {
+            acc[inv.customerId] =
+              (acc[inv.customerId] || 0) + inv.totalInBaseCurrency;
+          }
+          return acc;
+        },
+        {}
+      );
+
+      const topCustomers = Object.entries(customerSpending)
+        .sort(([, a], [, b]) => b - a)
+        .slice(0, 3)
+        .map(([id, total]) => ({
+          customer: firestoreData.customers.find((c) => c.id === id),
+          total,
+        }));
+
+      pane.querySelector("#top-customers-list").innerHTML = topCustomers.length
+        ? topCustomers
+            .map(
+              (item) => `
+                         <li class="flex items-center justify-between text-sm hover:bg-bg-secondary/50 p-1.5 rounded-md">
+                            <span class="font-medium text-text-primary truncate pr-4">${
+                              item.customer?.name || "Unknown Customer"
+                            }</span>
+                            <span class="font-mono text-text-secondary">${currencyUtils.format(
+                              item.total
+                            )}</span>
+                        </li>
+                    `
+            )
+            .join("")
+        : `<li><p class="text-xs text-text-secondary text-center p-2">No customer sales.</p></li>`;
+
+      // --- NEW: Low Stock List (Live Data) ---
+      const lowStockProducts = firestoreData.products
+        .filter(
+          (p) => p.productType === "physical" && p.stock > 0 && p.stock < 10
+        )
+        .sort((a, b) => a.stock - b.stock);
+
+      pane.querySelector("#low-stock-list").innerHTML = lowStockProducts.length
+        ? lowStockProducts
+            .map(
+              (p) => `
+                        <li class="flex items-center justify-between text-sm hover:bg-bg-secondary/50 p-1.5 rounded-md">
+                            <span class="font-medium text-text-primary truncate pr-4">${p.name}</span>
+                            <span class="font-mono text-red-400 font-semibold">${p.stock} left</span>
+                        </li>
+                    `
+            )
+            .join("")
+        : `<li><p class="text-xs text-text-secondary text-center p-2">All products are well-stocked.</p></li>`;
+
+      const middlePane = pane.querySelector("#dashboard-middle-pane");
+
+      // Admins and Managers see cashier performance AND recent activity
+      if (
+        appState.session.userRole === "admin" ||
+        appState.session.userRole === "manager"
+      ) {
+        // --- Cashier Performance Logic ---
+        const salesByCashier = currentMetrics.relevantInvoices.reduce(
+          (acc, inv) => {
+            if (inv.cashierId && inv.cashierName) {
+              if (!acc[inv.cashierId]) {
+                acc[inv.cashierId] = {
+                  name: inv.cashierName,
+                  total: 0,
+                  count: 0,
+                };
+              }
+              acc[inv.cashierId].total += inv.totalInBaseCurrency;
+              acc[inv.cashierId].count++;
+            }
+            return acc;
+          },
+          {}
+        );
+        const performanceList = Object.values(salesByCashier).sort(
+          (a, b) => b.total - a.total
+        );
+
+        // --- Recent Activity Logic ---
+        const recentInvoices = [...currentMetrics.relevantInvoices]
+          .sort((a, b) => new Date(b.date) - new Date(a.date))
+          .slice(0, 5);
+
+        // --- Combined HTML for the middle pane ---
+        middlePane.innerHTML = `
+                            <div class="h-full flex flex-col">
+                                <!-- Cashier Performance Section -->
+                                <div class="flex-shrink-0">
+                                    <h2 class="text-xl font-semibold mb-2 text-text-primary">Cashier Performance</h2>
+                                    <ul class="space-y-2 overflow-y-auto pr-2" style="max-height: 15vh;">
+                                    ${
+                                      performanceList.length
+                                        ? performanceList
+                                            .map(
+                                              (cashier) => `
+                                        <li class="flex items-center justify-between text-sm hover:bg-bg-secondary/50 p-1.5 rounded-md">
+                                            <span class="font-medium text-text-primary truncate pr-4">${
+                                              cashier.name
+                                            }</span>
+                                            <div class="text-right">
+                                                <span class="font-mono text-text-secondary">${currencyUtils.format(
+                                                  cashier.total
+                                                )}</span>
+                                                <span class="text-xs text-text-secondary/70 block">${
+                                                  cashier.count
+                                                } sales</span>
+                                            </div>
+                                        </li>
+                                    `
+                                            )
+                                            .join("")
+                                        : `<li><p class="text-xs text-text-secondary text-center p-2">No cashier sales in this period.</p></li>`
+                                    }
+                                    </ul>
+                                </div>
+                                <!-- Separator and Recent Activity Section -->
+                                <div class="mt-4 pt-4 border-t border-border-color flex-grow flex flex-col min-h-0">
+                                    <h2 class="text-xl font-semibold mb-2 text-text-primary">Recent Activity</h2>
+                                    <div class="space-y-0 overflow-y-auto flex-grow pr-2">
+                                        ${
+                                          recentInvoices.length
+                                            ? recentInvoices
+                                                .map(
+                                                  (inv) => `
+                                            <div class="flex items-center justify-between py-2 border-b border-border-color/50 last:border-b-0">
+                                                <div>
+                                                    <p class="font-medium text-text-primary text-sm">${
+                                                      inv.customerName
+                                                    }</p>
+                                                    <p class="text-xs text-text-secondary font-mono">${
+                                                      inv.id
+                                                    }</p>
+                                                </div>
+                                                <div class="text-right">
+                                                    <p class="font-semibold font-mono text-text-primary text-sm">${currencyUtils.format(
+                                                      inv.totalInBaseCurrency,
+                                                      inv.currency
+                                                    )}</p>
+                                                    <p class="text-xs text-text-secondary">${new Date(
+                                                      inv.date
+                                                    ).toLocaleTimeString([], {
+                                                      hour: "2-digit",
+                                                      minute: "2-digit",
+                                                    })}</p>
+                                                </div>
+                                            </div>
+                                        `
+                                                )
+                                                .join("")
+                                            : `<p class="text-xs text-text-secondary text-center p-4">No recent activity.</p>`
+                                        }
+                                    </div>
+                                </div>
+                            </div>`;
+      } else {
+        // This case is a fallback, but cashiers have their own dashboard view
+        middlePane.innerHTML = `
+                            <h2 class="text-xl font-semibold mb-4 text-text-primary">Recent Activity</h2>
+                            <div id="recent-activity-feed" class="space-y-0 max-h-[35vh] overflow-y-auto"></div>`;
+
+        const recentInvoices = [...firestoreData.invoices]
+          .filter((inv) => new Date(inv.date) >= startDate)
+          .sort((a, b) => new Date(b.date) - new Date(a.date))
+          .slice(0, 5);
+        middlePane.querySelector(
+          "#recent-activity-feed"
+        ).innerHTML = recentInvoices.length
+          ? recentInvoices
+              .map(
+                (inv) => `
+                            <div class="flex items-center justify-between py-3 border-b border-border-color/50 last:border-b-0">
+                                <div>
+                                    <p class="font-medium text-text-primary">${
+                                      inv.customerName
+                                    }</p>
+                                    <p class="text-xs text-text-secondary font-mono">${
+                                      inv.id
+                                    }</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="font-semibold font-mono text-text-primary">${currencyUtils.format(
+                                      inv.totalInBaseCurrency,
+                                      inv.currency
+                                    )}</p>
+                                    <p class="text-xs text-text-secondary">${new Date(
+                                      inv.date
+                                    ).toLocaleTimeString([], {
+                                      hour: "2-digit",
+                                      minute: "2-digit",
+                                    })}</p>
+                                </div>
+                            </div>
+                        `
+              )
+              .join("")
+          : `<p class="text-xs text-text-secondary text-center p-4">No recent activity.</p>`;
+      }
+
+      const chartInvoices = firestoreData.invoices.filter((inv) => {
+        const invDate = new Date(inv.date);
+        return (
+          invDate >= startDate && invDate <= endDate && inv.status !== "Void"
+        );
+      });
+      let salesLabels, salesData;
+
+      if (period === "today" || period === "yesterday") {
+        salesLabels = Array.from({ length: 24 }, (_, i) => {
+          const h = i % 12 === 0 ? 12 : i % 12;
+          const ampm = i < 12 ? "AM" : "PM";
+          return `${h} ${ampm}`;
+        });
+        salesData = Array(24).fill(0);
+        chartInvoices.forEach((inv) => {
+          const hour = new Date(inv.date).getHours();
+          salesData[hour] += inv.totalInBaseCurrency;
+        });
+      } else {
+        const salesByDay = chartInvoices.reduce((acc, inv) => {
+          const day = new Date(inv.date).toLocaleDateString([], {
+            month: "short",
+            day: "numeric",
+          });
+          acc[day] = (acc[day] || 0) + inv.totalInBaseCurrency;
+          return acc;
+        }, {});
+        salesLabels = Object.keys(salesByDay);
+        salesData = Object.values(salesByDay);
+      }
+
+      if (salesChart) {
+        salesChart.destroy();
+      }
+      const ctx = pane.querySelector("#sales-chart")?.getContext("2d");
+      if (!ctx) return;
+
+      const gradient = chartStyles.createGradient(
+        ctx,
+        chartStyles.palettes.gentleOcean[0]
+      );
+
+      salesChart = new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: salesLabels,
+          datasets: [
+            {
+              label: "Sales",
+              data: salesData,
+              borderColor: chartStyles.palettes.gentleOcean[0],
+              backgroundColor: gradient,
+              tension: 0.4,
+              fill: true,
+              pointBackgroundColor: chartStyles.palettes.gentleOcean[0],
+              pointBorderColor: "#fff",
+              pointHoverBackgroundColor: "#fff",
+              pointHoverBorderColor: chartStyles.palettes.gentleOcean[0],
+              pointRadius: 4,
+              pointHoverRadius: 6,
+              borderWidth: 2.5,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: { color: "rgba(255,255,255,0.05)" },
+              ticks: {
+                color: "#9ca3af",
+                font: { family: chartStyles.fontFamily },
+                callback: (value) =>
+                  currencyUtils.format(value, appState.currentCurrency, {
+                    notation: "compact",
+                  }),
+              },
+            },
+            x: {
+              grid: { display: false },
+              ticks: {
+                color: "#9ca3af",
+                font: { family: chartStyles.fontFamily },
+              },
+            },
+          },
+          plugins: {
+            chartGlow: {
+              color: chartStyles.hexToRgba(
+                chartStyles.palettes.gentleOcean[0],
+                0.25
+              ),
+              blur: 15,
+              offsetY: 7,
+            },
+            legend: { display: false },
+            tooltip: {
+              enabled: true,
+              backgroundColor: "rgba(10, 10, 15, 0.8)",
+              backdropFilter: "blur(5px)",
+              titleColor: "#fff",
+              bodyColor: "#cbd5e1",
+              borderColor: "rgba(59, 130, 246, 0.5)",
+              borderWidth: 1,
+              padding: 12,
+              titleFont: { family: chartStyles.fontFamily, weight: "bold" },
+              bodyFont: { family: chartStyles.fontFamily },
+              callbacks: {
+                label: (context) =>
+                  currencyUtils.format(context.raw, appState.currentCurrency),
+              },
+            },
+          },
+          interaction: {
+            intersect: false,
+            mode: "index",
+          },
+        },
+      });
+
+      const categorySales = chartInvoices
+        .flatMap((inv) => inv.items)
+        .reduce((acc, item) => {
+          const product = firestoreData.products.find((p) => p.id === item.id);
+          if (product) {
+            acc[product.category] =
+              (acc[product.category] || 0) + item.price * (item.qty || 1);
+          }
+          return acc;
+        }, {});
+
+      if (categoryChart) {
+        categoryChart.destroy();
+      }
+      const catCtx = pane
+        .querySelector("#category-sales-chart")
+        ?.getContext("2d");
+      if (!catCtx) return;
+      categoryChart = new Chart(catCtx, {
+        type: "doughnut",
+        data: {
+          labels: Object.keys(categorySales),
+          datasets: [
+            {
+              label: "Sales",
+              data: Object.values(categorySales),
+              backgroundColor: chartStyles.palettes.softMeadow,
+              borderColor: "var(--bg-primary)",
+              borderWidth: 3,
+              hoverOffset: 4, // More gentle hover effect
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: {
+            animateRotate: true,
+            animateScale: true,
+            duration: 1200,
+          },
+          layout: {
+            padding: 10,
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              enabled: true,
+              backgroundColor: "rgba(10, 10, 15, 0.8)",
+              backdropFilter: "blur(5px)",
+              titleColor: "#fff",
+              bodyColor: "#cbd5e1",
+              borderColor: "rgba(255, 255, 255, 0.1)",
+              borderWidth: 1,
+              padding: 10,
+              titleFont: { family: chartStyles.fontFamily, weight: "bold" },
+              bodyFont: { family: chartStyles.fontFamily },
+              callbacks: {
+                label: (context) =>
+                  `${context.label}: ${currencyUtils.format(context.raw)}`,
+              },
+            },
+          },
+        },
+      });
+
+      // --- NEW: Hourly Sales Chart ---
+      const hourlySalesData = Array(24).fill(0);
+      currentMetrics.relevantInvoices.forEach((inv) => {
+        const hour = new Date(inv.date).getHours();
+        hourlySalesData[hour] += inv.totalInBaseCurrency;
+      });
+
+      if (hourlySalesChart) hourlySalesChart.destroy();
+      const hourlyCtx = pane
+        .querySelector("#hourly-sales-chart")
+        ?.getContext("2d");
+      if (hourlyCtx) {
+        hourlySalesChart = new Chart(hourlyCtx, {
+          type: "bar",
+          data: {
+            labels: Array.from({ length: 24 }, (_, i) => {
+              const h = i % 12 === 0 ? 12 : i % 12;
+              const ampm = i < 12 ? "AM" : "PM";
+              return `${h} ${ampm}`;
+            }),
+            datasets: [
+              {
+                label: "Sales",
+                data: hourlySalesData,
+                backgroundColor: chartStyles.createGradient(
+                  hourlyCtx,
+                  chartStyles.palettes.warmStone[0]
+                ),
+                borderColor: chartStyles.palettes.warmStone[0],
+                borderWidth: 2,
+                borderRadius: 4,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: { label: (c) => currencyUtils.format(c.raw) },
+              },
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                grid: { color: "rgba(255,255,255,0.05)" },
+                ticks: {
+                  color: "#9ca3af",
+                  callback: (v) =>
+                    currencyUtils.format(v, appState.currentCurrency, {
+                      notation: "compact",
+                    }),
+                },
+              },
+              x: { grid: { display: false }, ticks: { color: "#9ca3af" } },
+            },
+          },
+        });
+      }
+
+      // --- NEW: Payment Methods Chart ---
+      const paymentMethodsData = currentMetrics.relevantInvoices
+        .flatMap((inv) =>
+          (inv.paymentDetails || []).map((p) => ({
+            ...p,
+            currency: inv.currency,
+          }))
+        )
+        .reduce((acc, payment) => {
+          acc[payment.method] =
+            (acc[payment.method] || 0) +
+            currencyUtils.convertToBase(payment.amount, payment.currency);
+          return acc;
+        }, {});
+
+      if (paymentMethodsChart) paymentMethodsChart.destroy();
+      const paymentCtx = pane
+        .querySelector("#payment-methods-chart")
+        ?.getContext("2d");
+      if (paymentCtx && Object.keys(paymentMethodsData).length > 0) {
+        paymentMethodsChart = new Chart(paymentCtx, {
+          type: "pie",
+          data: {
+            labels: Object.keys(paymentMethodsData),
+            datasets: [
+              {
+                data: Object.values(paymentMethodsData),
+                backgroundColor: chartStyles.palettes.mutedSunset,
+                borderColor: "var(--bg-primary)",
+                borderWidth: 3,
+                hoverOffset: 8,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: "bottom",
+                labels: {
+                  color: "#9ca3af",
+                  usePointStyle: true,
+                  pointStyle: "rectRounded",
+                },
+              },
+              tooltip: {
+                callbacks: {
+                  label: (c) => `${c.label}: ${currencyUtils.format(c.raw)}`,
+                },
+              },
+            },
+          },
+        });
+      } else if (paymentCtx) {
+        paymentCtx.clearRect(
+          0,
+          0,
+          paymentCtx.canvas.width,
+          paymentCtx.canvas.height
+        );
+        paymentCtx.fillStyle = "#6b7280";
+        paymentCtx.textAlign = "center";
+        paymentCtx.font = "14px " + chartStyles.fontFamily;
+        paymentCtx.fillText(
+          "No payment data for this period.",
+          paymentCtx.canvas.width / 2,
+          paymentCtx.canvas.height / 2
+        );
+      }
+
+      lucide.createIcons();
+    };
+
+    // Dashboard period scroller logic
+    const periodTabs = pane.querySelector("#dashboard-period-tabs");
+    const scrollLeftBtn = pane.querySelector("#dashboard-scroll-left");
+    const scrollRightBtn = pane.querySelector("#dashboard-scroll-right");
+
+    const handleDashboardOverflow = () => {
+      if (!periodTabs) return;
+      const isOverflowing = periodTabs.scrollWidth > periodTabs.clientWidth;
+      const isAtStart = periodTabs.scrollLeft < 5;
+      const isAtEnd =
+        periodTabs.scrollLeft + periodTabs.clientWidth >=
+        periodTabs.scrollWidth - 5;
+      scrollLeftBtn?.classList.toggle("hidden", !isOverflowing || isAtStart);
+      scrollRightBtn?.classList.toggle("hidden", !isOverflowing || isAtEnd);
+    };
+
+    if (periodTabs && scrollLeftBtn && scrollRightBtn) {
+      scrollLeftBtn.addEventListener("click", () =>
+        periodTabs.scrollBy({ left: -200, behavior: "smooth" })
+      );
+      scrollRightBtn.addEventListener("click", () =>
+        periodTabs.scrollBy({ left: 200, behavior: "smooth" })
+      );
+      periodTabs.addEventListener("scroll", handleDashboardOverflow);
+      if ("ResizeObserver" in window) {
+        new ResizeObserver(handleDashboardOverflow).observe(periodTabs);
+      }
+      setTimeout(handleDashboardOverflow, 50); // Initial check
+    }
+
+    // Mobile dropdown toggle logic
+    const dropdownBtn = pane.querySelector("#dashboard-period-dropdown-btn");
+    const dropdownMenu = pane.querySelector("#dashboard-period-dropdown-menu");
+    const dropdownContainer = pane.querySelector(
+      "#dashboard-period-dropdown-container"
+    );
+    const dropdownIcon = dropdownBtn?.querySelector(
+      'i[data-lucide="chevron-down"]'
+    );
+
+    if (dropdownBtn && dropdownMenu) {
+      dropdownBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const isHidden = dropdownMenu.classList.toggle("hidden");
+        dropdownIcon?.classList.toggle("rotate-180", !isHidden);
+      });
+    }
+
+    // Listener for all period selectors
+    pane
+      .querySelectorAll('[data-action="set-dashboard-period"]')
+      .forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          e.preventDefault();
+          const target = e.currentTarget;
+          const period = target.dataset.period;
+          const label = target.dataset.label;
+
+          // Update desktop UI
+          pane
+            .querySelectorAll(".dashboard-period-btn")
+            .forEach((b) => b.classList.remove("active"));
+          const desktopBtn = pane.querySelector(
+            `.dashboard-period-btn[data-period="${period}"]`
+          );
+          if (desktopBtn) desktopBtn.classList.add("active");
+
+          // Update mobile UI
+          const selectedLabel = pane.querySelector("#selected-period-label");
+          if (selectedLabel) selectedLabel.textContent = label;
+
+          if (dropdownMenu) {
+            dropdownMenu.classList.add("hidden");
+            dropdownIcon?.classList.remove("rotate-180");
+          }
+
+          // Handle data and custom range UI
+          const customRangeContainer = pane.querySelector(
+            "#dashboard-custom-range"
+          );
+          if (period === "custom") {
+            customRangeContainer.classList.remove("hidden");
+          } else {
+            customRangeContainer.classList.add("hidden");
+            updateDashboardData(period);
+          }
+        });
+      });
+
+    pane
+      .querySelector("#dashboard-apply-range")
+      ?.addEventListener("click", () => {
+        const startInput = pane.querySelector("#dashboard-start-date");
+        const endInput = pane.querySelector("#dashboard-end-date");
+        const start = startInput.value;
+        const end = endInput.value;
+        if (start && end) {
+          if (new Date(start) > new Date(end)) {
+            showToast("Start date cannot be after the end date.", "error");
+            return;
+          }
+          updateDashboardData("custom", { start, end });
+        } else {
+          showToast("Please select both a start and end date.", "error");
+        }
+      });
+
+    updateDashboardData("today");
+  }
+
+  const posFullRender = (pane) => {
+    if (!pane) return;
+    if (appState.settings.posLayout === "modern") {
+      posModernLayoutRender(pane);
+    } else {
+      posClassicLayoutRender(pane);
+    }
+  };
+
+  const posModernLayoutRender = (pane) => {
+    if (!pane) return;
+    const tabsContainer = pane.querySelector("#pos-tabs-container");
+    const cartBody = pane.querySelector("#pos-modern-cart-body");
+    const subtotalEl = pane.querySelector("#pos-subtotal");
+    const taxEl = pane.querySelector("#pos-tax");
+    const totalEl = pane.querySelector("#pos-total");
+    const customerArea = pane.querySelector("#pos-customer-area");
+    const activeSale = posState.sales.find(
+      (s) => s.id === posState.activeSaleId
+    );
+    const scrollLeftBtn = pane.querySelector("#pos-scroll-left");
+    const scrollRightBtn = pane.querySelector("#pos-scroll-right");
+
+    tabsContainer.innerHTML =
+      posState.sales
+        .map((s) => {
+          let statusClass = s.id === posState.activeSaleId ? "active" : "";
+          if (s.status === "held") statusClass += " held";
+          return `
+                    <button data-action="switch-sale" data-id="${
+                      s.id
+                    }" class="pos-tab flex items-center gap-2 px-4 py-3 text-sm font-medium shrink-0 ${statusClass}">
+                        ${
+                          s.status === "held"
+                            ? '<i data-lucide="pause-circle" class="w-4 h-4 text-yellow-400"></i>'
+                            : ""
+                        }
+                        ${s.name}
+                        <i data-lucide="x" data-action="close-sale" data-id="${
+                          s.id
+                        }" class="w-4 h-4 rounded-full hover:bg-bg-tertiary"></i>
+                    </button>
+                    `;
+        })
+        .join("") +
+      `<button data-action="new-sale" class="px-4 py-3 text-accent hover:text-white shrink-0"><i data-lucide="plus" class="w-5 h-5"></i></button>`;
+
+    const handleOverflow = () => {
+      if (!tabsContainer) return;
+      const isOverflowing =
+        tabsContainer.scrollWidth > tabsContainer.clientWidth;
+      const isAtStart = tabsContainer.scrollLeft < 5;
+      const isAtEnd =
+        tabsContainer.scrollLeft + tabsContainer.clientWidth >=
+        tabsContainer.scrollWidth - 5;
+      scrollLeftBtn?.classList.toggle("hidden", !isOverflowing || isAtStart);
+      scrollRightBtn?.classList.toggle("hidden", !isOverflowing || isAtEnd);
+    };
+
+    handleOverflow();
+    tabsContainer.removeEventListener("scroll", handleOverflow);
+    tabsContainer.addEventListener("scroll", handleOverflow);
+    if ("ResizeObserver" in window) {
+      new ResizeObserver(handleOverflow).observe(tabsContainer);
+    }
+
+    if (scrollLeftBtn && scrollRightBtn && tabsContainer) {
+      scrollLeftBtn.addEventListener("click", () =>
+        tabsContainer.scrollBy({ left: -250, behavior: "smooth" })
+      );
+      scrollRightBtn.addEventListener("click", () =>
+        tabsContainer.scrollBy({ left: 250, behavior: "smooth" })
+      );
+    }
+
+    if (!activeSale) {
+      cartBody.innerHTML =
+        '<div class="text-center p-10 flex flex-col items-center justify-center h-full"><i data-lucide="shopping-cart" class="w-12 h-12 text-border-color-strong mx-auto mb-4"></i><p>No active sale.</p><p class="text-xs text-text-secondary">Create one with the + button above!</p></div>';
+      subtotalEl.textContent = currencyUtils.format(0);
+      taxEl.textContent = currencyUtils.format(0);
+      totalEl.textContent = currencyUtils.format(0);
+      customerArea.innerHTML = `<button data-action="add-customer-to-sale" class="btn btn-secondary text-sm p-2"><i data-lucide="user-plus" class="w-4 h-4 mr-2"></i>Customer</button>`;
+      lucide.createIcons();
+      saveState();
+      return;
+    }
+
+    if (activeSale.customer) {
+      customerArea.innerHTML = `
+                        <div class="flex items-center gap-2 p-2 pr-1 bg-blue-900/50 rounded-lg text-blue-200 border border-blue-700">
+                            <i data-lucide="user-check" class="inline w-4 h-4 ml-1"></i> 
+                            <span class="font-medium text-sm">${activeSale.customer.name}</span>
+                            <button data-action="remove-customer-from-sale" class="ml-2 text-blue-300 hover:text-white hover:bg-red-500/50 p-1 rounded-full"><i data-lucide="x" class="w-4 h-4 pointer-events-none"></i></button>
+                        </div>`;
+    } else {
+      customerArea.innerHTML = `<button data-action="add-customer-to-sale" class="btn btn-secondary text-sm p-2"><i data-lucide="user-plus" class="w-4 h-4 mr-2"></i>Customer</button>`;
+    }
+
+    cartBody.innerHTML = activeSale.cart.length
+      ? activeSale.cart
+          .map((item) => {
+            const effectivePriceBase = item.price;
+            const hasDiscount = item.discount && item.discount.value > 0;
+            return `
+                    <div class="bg-bg-primary p-3 rounded-lg flex items-center gap-4 border border-border-color shadow-sm">
+                        <img src="https://placehold.co/64x64/18181b/444444?text=${encodeURIComponent(
+                          item.name
+                        )}" class="w-12 h-12 object-cover rounded-md shrink-0">
+                        <div class="flex-grow overflow-hidden">
+                            <p class="font-medium text-text-primary text-sm truncate">${
+                              item.name
+                            }</p>
+                            <p class="font-mono text-xs text-text-secondary">${currencyUtils.format(
+                              effectivePriceBase
+                            )}</p>
+                        </div>
+                        <div class="flex items-center border border-border-color-strong rounded-md bg-bg-secondary shrink-0">
+                             <button ${
+                               item.isSerialized ? "disabled" : ""
+                             } data-action="decrement-qty" data-id="${
+              item.id
+            }" data-serial="${
+              item.serialNumber || ""
+            }" class="px-2 py-1 text-text-secondary hover:bg-border-color rounded-l-md disabled:opacity-50 disabled:cursor-not-allowed"><i data-lucide="minus" class="w-4 h-4 pointer-events-none"></i></button>
+                            <span class="px-3 py-0.5 text-center font-medium text-text-primary text-sm">${
+                              item.qty
+                            }</span>
+                            <button ${
+                              item.isSerialized ? "disabled" : ""
+                            } data-action="increment-qty" data-id="${
+              item.id
+            }" data-serial="${
+              item.serialNumber || ""
+            }" class="px-2 py-1 text-text-secondary hover:bg-border-color rounded-r-md disabled:opacity-50 disabled:cursor-not-allowed"><i data-lucide="plus" class="w-4 h-4 pointer-events-none"></i></button>
+                        </div>
+                         <p class="font-mono text-text-primary w-24 text-right shrink-0">${currencyUtils.format(
+                           effectivePriceBase * item.qty
+                         )}</p>
+                         <button data-action="edit-cart-item" data-id="${
+                           item.id
+                         }" data-serial="${
+              item.serialNumber || ""
+            }" class="text-text-secondary hover:text-accent p-1 rounded-md shrink-0"><i data-lucide="edit" class="w-4 h-4 pointer-events-none"></i></button>
+                         <button data-action="remove-from-cart" data-id="${
+                           item.id
+                         }" data-serial="${
+              item.serialNumber || ""
+            }" class="text-danger/70 hover:text-danger p-1 rounded-md shrink-0"><i data-lucide="trash-2" class="w-4 h-4 pointer-events-none"></i></button>
+                    </div>`;
+          })
+          .join("")
+      : '<div class="text-center p-10 flex flex-col items-center justify-center h-full"><i data-lucide="scan-line" class="w-12 h-12 text-border-color-strong mx-auto mb-4"></i><p class="text-text-primary">Cart is empty</p><p class="text-xs text-text-secondary mt-1">Add products from the list to get started</p></div>';
+
+    const taxRate = (appState.settings.taxRate ?? 0) / 100;
+    const subtotalBase = activeSale.cart.reduce(
+      (acc, item) => acc + item.price * item.qty,
+      0
+    );
+
+    let discountAmountBase = 0;
+    if (activeSale.discount && activeSale.discount.value > 0) {
+      if (activeSale.discount.type === "percent") {
+        discountAmountBase = subtotalBase * (activeSale.discount.value / 100);
+      } else {
+        // fixed
+        discountAmountBase = activeSale.discount.value;
+      }
+    }
+
+    const subtotalAfterDiscount = subtotalBase - discountAmountBase;
+    const taxableSubtotal = activeSale.cart
+      .filter((i) => i.taxable)
+      .reduce((acc, item) => acc + item.price * item.qty, 0);
+
+    // Apply discount proportionally to the taxable amount
+    const proportionOfTaxable =
+      subtotalBase > 0 ? taxableSubtotal / subtotalBase : 0;
+    const discountOnTaxable = discountAmountBase * proportionOfTaxable;
+    const taxableAmount = taxableSubtotal - discountOnTaxable;
+
+    const taxBase = taxableAmount * taxRate;
+    const totalBase = subtotalAfterDiscount + taxBase;
+
+    const discountRow = pane.querySelector("#pos-discount-row");
+    const discountEl = pane.querySelector("#pos-discount");
+    if (discountAmountBase > 0) {
+      discountRow.classList.remove("hidden");
+      discountEl.textContent = `-${currencyUtils.format(discountAmountBase)}`;
+    } else {
+      discountRow.classList.add("hidden");
+    }
+
+    subtotalEl.textContent = currencyUtils.format(subtotalBase);
+    taxEl.textContent = currencyUtils.format(taxBase);
+    totalEl.textContent = currencyUtils.format(totalBase);
+
+    // Scroll to the bottom of the cart to show the latest item
+    cartBody.scrollTop = cartBody.scrollHeight;
+
+    lucide.createIcons();
+    saveState();
+  };
+
+  const posClassicLayoutRender = (pane) => {
+    if (!pane) return;
+    const tabsContainer = pane.querySelector("#pos-tabs-container");
+    const cartBody = pane.querySelector("#pos-cart-body");
+    const subtotalEl = pane.querySelector("#pos-subtotal");
+    const taxEl = pane.querySelector("#pos-tax");
+    const totalEl = pane.querySelector("#pos-total");
+    const customerDisplay = pane.querySelector("#pos-customer-display");
+    const activeSale = posState.sales.find(
+      (s) => s.id === posState.activeSaleId
+    );
+    const scrollLeftBtn = pane.querySelector("#pos-scroll-left");
+    const scrollRightBtn = pane.querySelector("#pos-scroll-right");
+
+    tabsContainer.innerHTML =
+      posState.sales
+        .map((s) => {
+          let statusClass = s.id === posState.activeSaleId ? "active" : "";
+          if (s.status === "held") statusClass += " held";
+          return `
+                    <button data-action="switch-sale" data-id="${
+                      s.id
+                    }" class="pos-tab flex items-center gap-2 px-4 py-3 text-sm font-medium shrink-0 ${statusClass}">
+                        ${
+                          s.status === "held"
+                            ? '<i data-lucide="pause-circle" class="w-4 h-4 text-yellow-400"></i>'
+                            : ""
+                        }
+                        ${s.name}
+                        <i data-lucide="x" data-action="close-sale" data-id="${
+                          s.id
+                        }" class="w-4 h-4 rounded-full hover:bg-bg-tertiary"></i>
+                    </button>
+                    `;
+        })
+        .join("") +
+      `<button data-action="new-sale" class="px-4 py-3 text-accent hover:text-white shrink-0"><i data-lucide="plus" class="w-5 h-5"></i></button>`;
+
+    const handleOverflow = () => {
+      if (!tabsContainer) return;
+      const isOverflowing =
+        tabsContainer.scrollWidth > tabsContainer.clientWidth;
+      const isAtStart = tabsContainer.scrollLeft < 5;
+      const isAtEnd =
+        tabsContainer.scrollLeft + tabsContainer.clientWidth >=
+        tabsContainer.scrollWidth - 5;
+      scrollLeftBtn?.classList.toggle("hidden", !isOverflowing || isAtStart);
+      scrollRightBtn?.classList.toggle("hidden", !isOverflowing || isAtEnd);
+    };
+
+    handleOverflow();
+    tabsContainer.removeEventListener("scroll", handleOverflow);
+    tabsContainer.addEventListener("scroll", handleOverflow);
+    if ("ResizeObserver" in window) {
+      new ResizeObserver(handleOverflow).observe(tabsContainer);
+    }
+
+    if (scrollLeftBtn && scrollRightBtn) {
+      scrollLeftBtn.addEventListener("click", () =>
+        tabsContainer.scrollBy({ left: -250, behavior: "smooth" })
+      );
+      scrollRightBtn.addEventListener("click", () =>
+        tabsContainer.scrollBy({ left: 250, behavior: "smooth" })
+      );
+    }
+
+    // --- RENDER CART & TOTALS ---
+    if (!activeSale) {
+      cartBody.innerHTML =
+        '<div class="text-center p-10 flex flex-col items-center justify-center h-full"><i data-lucide="shopping-cart" class="w-12 h-12 text-border-color-strong mx-auto mb-4"></i><p>No active sale.</p><p class="text-xs text-text-secondary">Create one with the + button above!</p></div>';
+      subtotalEl.textContent = currencyUtils.format(0);
+      taxEl.textContent = currencyUtils.format(0);
+      totalEl.textContent = currencyUtils.format(0);
+      customerDisplay.classList.add("hidden");
+      customerDisplay.innerHTML = "";
+      lucide.createIcons();
+      saveState();
+      return;
+    }
+
+    if (activeSale.customer) {
+      customerDisplay.classList.remove("hidden");
+      customerDisplay.innerHTML = `
+                        <div class="bg-bg-secondary border border-border-color rounded-xl p-4 flex items-center gap-4 transition-all duration-300">
+                            <div class="w-11 h-11 rounded-full bg-gradient-to-br from-blue-500 to-accent flex items-center justify-center shrink-0 ring-4 ring-bg-secondary">
+                                <i data-lucide="user" class="w-6 h-6 text-white"></i>
+                            </div>
+                            <div class="flex-grow overflow-hidden">
+                                <p class="text-sm text-text-secondary -mb-1">Customer Added</p>
+                                <p class="font-bold text-text-primary text-lg leading-tight truncate" title="${activeSale.customer.name}">${activeSale.customer.name}</p>
+                            </div>
+                            <button data-action="remove-customer-from-sale" class="text-text-secondary hover:text-danger hover:bg-danger/10 p-2 rounded-full transition-colors ml-auto">
+                                <i data-lucide="x" class="w-5 h-5 pointer-events-none"></i>
+                            </button>
+                        </div>
+                        `;
+    } else {
+      customerDisplay.classList.add("hidden");
+      customerDisplay.innerHTML = "";
+    }
+
+    cartBody.innerHTML = activeSale.cart.length
+      ? activeSale.cart
+          .map((item) => {
+            const effectivePriceBase = item.price;
+            const itemTotal = effectivePriceBase * (item.qty || 1);
+            return `
+                    <tr class="border-b border-border-color last:border-b-0 hover:bg-bg-secondary/50">
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-4">
+                                <img src="https://placehold.co/64x64/18181b/444444?text=${encodeURIComponent(
+                                  item.name
+                                )}" class="w-10 h-10 object-cover rounded-md shrink-0">
+                                <div class="flex-grow overflow-hidden">
+                                    <p class="font-medium text-text-primary text-sm truncate">${
+                                      item.name
+                                    }</p>
+                                    <p class="font-mono text-xs text-text-secondary">${
+                                      item.isSerialized
+                                        ? item.serialNumber
+                                        : item.id
+                                    }</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center justify-center border border-border-color-strong rounded-md bg-bg-secondary shrink-0 max-w-[120px] mx-auto">
+                                <button ${
+                                  item.isSerialized ? "disabled" : ""
+                                } data-action="decrement-qty" data-id="${
+              item.id
+            }" data-serial="${
+              item.serialNumber || ""
+            }" class="px-2 py-1 text-text-secondary hover:bg-border-color rounded-l-md disabled:opacity-50 disabled:cursor-not-allowed"><i data-lucide="minus" class="w-4 h-4 pointer-events-none"></i></button>
+                                <span class="px-3 py-0.5 text-center font-medium text-text-primary text-sm w-12">${
+                                  item.qty
+                                }</span>
+                                <button ${
+                                  item.isSerialized ? "disabled" : ""
+                                } data-action="increment-qty" data-id="${
+              item.id
+            }" data-serial="${
+              item.serialNumber || ""
+            }" class="px-2 py-1 text-text-secondary hover:bg-border-color rounded-r-md disabled:opacity-50 disabled:cursor-not-allowed"><i data-lucide="plus" class="w-4 h-4 pointer-events-none"></i></button>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 font-mono">${currencyUtils.format(
+                          effectivePriceBase
+                        )}</td>
+                        <td class="px-6 py-4 font-mono text-text-primary font-semibold">${currencyUtils.format(
+                          itemTotal
+                        )}</td>
+                        <td class="px-6 py-4 text-right">
+                             <div class="flex items-center justify-end gap-2">
+                                <button data-action="edit-cart-item" data-id="${
+                                  item.id
+                                }" data-serial="${
+              item.serialNumber || ""
+            }" class="text-text-secondary hover:text-accent p-1 rounded-md"><i data-lucide="edit" class="w-4 h-4 pointer-events-none"></i></button>
+                                <button data-action="remove-from-cart" data-id="${
+                                  item.id
+                                }" data-serial="${
+              item.serialNumber || ""
+            }" class="text-danger/70 hover:text-danger p-1 rounded-md"><i data-lucide="trash-2" class="w-4 h-4 pointer-events-none"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                    `;
+          })
+          .join("")
+      : `<tr><td colspan="5" class="text-center p-10"><i data-lucide="scan-line" class="w-12 h-12 text-border-color-strong mx-auto mb-4"></i><p class="text-text-primary">Cart is empty</p><p class="text-xs text-text-secondary mt-1">Add products from the list to get started</p></td></tr>`;
+
+    const taxRate = (appState.settings.taxRate ?? 0) / 100;
+    const subtotalBase = activeSale.cart.reduce(
+      (acc, item) => acc + item.price * item.qty,
+      0
+    );
+
+    let discountAmountBase = 0;
+    if (activeSale.discount && activeSale.discount.value > 0) {
+      if (activeSale.discount.type === "percent") {
+        discountAmountBase = subtotalBase * (activeSale.discount.value / 100);
+      } else {
+        // fixed
+        discountAmountBase = activeSale.discount.value;
+      }
+    }
+
+    const subtotalAfterDiscount = subtotalBase - discountAmountBase;
+    const taxableSubtotal = activeSale.cart
+      .filter((i) => i.taxable)
+      .reduce((acc, item) => acc + item.price * item.qty, 0);
+
+    // Apply discount proportionally to the taxable amount
+    const proportionOfTaxable =
+      subtotalBase > 0 ? taxableSubtotal / subtotalBase : 0;
+    const discountOnTaxable = discountAmountBase * proportionOfTaxable;
+    const taxableAmount = taxableSubtotal - discountOnTaxable;
+
+    const taxBase = taxableAmount * taxRate;
+    const totalBase = subtotalAfterDiscount + taxBase;
+
+    const discountRow = pane.querySelector("#pos-discount-row");
+    const discountEl = pane.querySelector("#pos-discount");
+    if (discountAmountBase > 0) {
+      discountRow.classList.remove("hidden");
+      discountEl.textContent = `-${currencyUtils.format(discountAmountBase)}`;
+    } else {
+      discountRow.classList.add("hidden");
+    }
+
+    subtotalEl.textContent = currencyUtils.format(subtotalBase);
+    taxEl.textContent = currencyUtils.format(taxBase);
+    totalEl.textContent = currencyUtils.format(totalBase);
+
+    // Scroll to the bottom of the cart to show the latest item
+    const scrollContainer = cartBody.closest(".overflow-y-auto");
+    if (scrollContainer) {
+      scrollContainer.scrollTop = scrollContainer.scrollHeight;
+    }
+
+    lucide.createIcons();
+    saveState();
+  };
+
+  const addProductToActiveCart = (product) => {
+    const activeSale = posState.sales.find(
+      (s) => s.id === posState.activeSaleId
+    );
+    if (!activeSale) {
+      showToast("No active sale selected.", "error");
+      return;
+    }
+    if (product.stock <= 0 && product.productType === "physical") {
+      showToast(`${product.name} is out of stock.`, "error");
+      return;
+    }
+
+    if (product.isSerialized) {
+      const availableSerials = product.serials || [];
+      if (availableSerials.length === 0) {
+        showToast(`${product.name} has no serial numbers in stock.`, "error");
+        return;
+      }
+
+      const content = `
+                        <p class="mb-4">Select a serial number for <strong>${
+                          product.name
+                        }</strong>.</p>
+                        <select id="serial-selector" class="form-select w-full">
+                            ${availableSerials
+                              .map(
+                                (sn) => `<option value="${sn}">${sn}</option>`
+                              )
+                              .join("")}
+                        </select>
+                    `;
+      const footer = `<button data-action="close-modal" class="btn btn-secondary">Cancel</button><button id="confirm-serial" class="btn btn-primary">Add to Cart</button>`;
+      const modal = showModal("Select Serial Number", content, footer);
+
+      modal.querySelector("#confirm-serial").addEventListener("click", () => {
+        const selectedSerial = modal.querySelector("#serial-selector").value;
+        if (
+          activeSale.cart.some((item) => item.serialNumber === selectedSerial)
+        ) {
+          showToast(
+            `Serial number ${selectedSerial} is already in the cart.`,
+            "error"
+          );
+          return;
+        }
+        activeSale.cart.push({
+          ...product,
+          qty: 1,
+          serialNumber: selectedSerial,
+        });
+        posFullRender(workspaceContent.querySelector(".view-pane"));
+        closeModal(modal);
+      });
+      return;
+    }
+
+    const existingItem = activeSale.cart.find((item) => item.id === product.id);
+    if (existingItem) {
+      if (existingItem.qty < product.stock) {
+        existingItem.qty++;
+      } else {
+        showToast(`No more stock available for ${product.name}.`, "warning");
+        return;
+      }
+    } else {
+      activeSale.cart.push({ ...product, qty: 1 });
+    }
+    posFullRender(workspaceContent.querySelector(".view-pane"));
+  };
+
+  const initClassicPOS = (pane) => {
+    posClassicLayoutRender(pane);
+
+    const searchInput = pane.querySelector("#pos-search");
+    const resultsContainer = pane.querySelector("#pos-search-results");
+    let activeSearchIndex = -1;
+
+    const handleSelection = (product) => {
+      if (!product) return;
+      addProductToActiveCart(product);
+      searchInput.value = "";
+      resultsContainer.innerHTML = "";
+      resultsContainer.classList.add("hidden");
+      searchInput.focus();
+    };
+
+    searchInput.addEventListener("input", (e) => {
+      const query = e.target.value.toLowerCase();
+      if (query.length < 1) {
+        resultsContainer.classList.add("hidden");
+        return;
+      }
+      const filtered = firestoreData.products
+        .filter(
+          (p) =>
+            (p.status || "active") === "active" &&
+            !p.hasVariants &&
+            (p.name.toLowerCase().includes(query) ||
+              p.id.toLowerCase().includes(query))
+        )
+        .slice(0, 7); // MODIFIED
+
+      if (filtered.length > 0) {
+        resultsContainer.innerHTML = filtered
+          .map(
+            (p) => `
+                            <div class="search-result-item p-3 cursor-pointer" data-id="${p.id}">
+                                <p class="font-medium text-text-primary pointer-events-none">${p.name}</p>
+                                <p class="text-xs text-text-secondary font-mono pointer-events-none">ID: ${p.id} / Stock: ${p.stock}</p>
+                            </div>
+                        `
+          )
+          .join("");
+        resultsContainer.classList.remove("hidden");
+      } else {
+        resultsContainer.innerHTML = `<p class="p-3 text-center text-text-secondary">No products found</p>`;
+        resultsContainer.classList.remove("hidden");
+      }
+      activeSearchIndex = -1;
+    });
+
+    resultsContainer.addEventListener("mousedown", (e) => {
+      const target = e.target.closest(".search-result-item");
+      if (target) {
+        const product = firestoreData.products.find(
+          (p) => p.id === target.dataset.id
+        );
+        handleSelection(product);
+      }
+    });
+
+    searchInput.addEventListener("keydown", (e) => {
+      const items = resultsContainer.querySelectorAll(".search-result-item");
+
+      if (e.key === "Enter") {
+        e.preventDefault();
+        const query = searchInput.value.trim();
+        if (!query) return;
+
+        // 1. Prioritize barcode scan
+        const productByBarcode = firestoreData.products.find(
+          (p) => p.barcode && p.barcode === query
+        );
+        if (productByBarcode) {
+          handleSelection(productByBarcode);
+          return;
+        }
+
+        // 2. Check for active selection in dropdown
+        const activeItem = resultsContainer.querySelector(
+          ".search-result-item.active"
+        );
+        if (activeItem) {
+          const product = firestoreData.products.find(
+            (p) => p.id === activeItem.dataset.id
+          );
+          handleSelection(product);
+          return;
+        }
+
+        // 3. Fallback to SKU search
+        const productBySku = firestoreData.products.find(
+          (p) => p.id.toLowerCase() === query.toLowerCase()
+        );
+        if (productBySku) {
+          handleSelection(productBySku);
+          return;
+        }
+
+        // 4. If nothing is found
+        showToast(`Product with barcode or SKU "${query}" not found.`, "error");
+        return;
+      }
+
+      if (resultsContainer.classList.contains("hidden") || items.length === 0)
+        return;
+
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        activeSearchIndex = (activeSearchIndex + 1) % items.length;
+        items.forEach((item, i) =>
+          item.classList.toggle("active", i === activeSearchIndex)
+        );
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        activeSearchIndex =
+          (activeSearchIndex - 1 + items.length) % items.length;
+        items.forEach((item, i) =>
+          item.classList.toggle("active", i === activeSearchIndex)
+        );
+      } else if (e.key === "Escape") {
+        resultsContainer.classList.add("hidden");
+      }
+    });
+
+    searchInput.addEventListener("blur", () =>
+      setTimeout(() => resultsContainer.classList.add("hidden"), 150)
+    );
+
+    const scrollLeftBtn = pane.querySelector("#pos-scroll-left");
+    const scrollRightBtn = pane.querySelector("#pos-scroll-right");
+    const tabsContainer = pane.querySelector("#pos-tabs-container");
+
+    if (scrollLeftBtn && scrollRightBtn && tabsContainer) {
+      scrollLeftBtn.addEventListener("click", () =>
+        tabsContainer.scrollBy({ left: -250, behavior: "smooth" })
+      );
+      scrollRightBtn.addEventListener("click", () =>
+        tabsContainer.scrollBy({ left: 250, behavior: "smooth" })
+      );
+    }
+  };
+
+  const applyPosCategoryPanelState = (pane) => {
+    const categoryContainer = pane.querySelector("#pos-category-container");
+    if (!categoryContainer) return;
+
+    const isCollapsed =
+      appState.viewStates.posModern?.isCategoryPanelCollapsed || false;
+    categoryContainer.classList.toggle(
+      "category-sidebar-collapsed",
+      isCollapsed
+    );
+
+    const productsGrid = categoryContainer.querySelector(
+      "#pos-modern-products-grid"
+    );
+    if (productsGrid) {
+      if (isCollapsed) {
+        productsGrid.classList.remove("md:grid-cols-3");
+        productsGrid.classList.add("md:grid-cols-4");
+      } else {
+        productsGrid.classList.remove("md:grid-cols-4");
+        productsGrid.classList.add("md:grid-cols-3");
+      }
+    }
+  };
+
+  const initModernPOS = (pane) => {
+    posModernLayoutRender(pane);
+    applyPosCategoryPanelState(pane);
+
+    const categoriesContainer = pane.querySelector("#pos-modern-categories");
+    const productsGrid = pane.querySelector("#pos-modern-products-grid");
+    const productTitle = pane.querySelector("#pos-modern-product-title");
+
+    let activeCategory =
+      appState.viewStates.posModern.activeCategory || "top-sellers";
+
+    const renderCategories = () => {
+      const categories = [
+        ...new Set(
+          firestoreData.products
+            .filter((p) => p.category)
+            .map((p) => p.category)
+        ),
+      ];
+      const collapsedCategories =
+        appState.viewStates.posModern?.collapsedCategories || [];
+      categoriesContainer.innerHTML = `
+                        <div class="category-group ${
+                          collapsedCategories.includes("Main") ? "" : "is-open"
+                        }" data-group-id="Main">
+                            <button data-action="toggle-category-collapse" class="category-group-header">
+                                <span>Main</span>
+                                <i data-lucide="chevron-up" class="category-group-icon"></i>
+                            </button>
+                            <div class="category-group-list">
+                                <div class="space-y-1 py-1">
+                                    <a href="#" data-category-id="top-sellers" class="pos-category-btn ${
+                                      activeCategory === "top-sellers"
+                                        ? "active"
+                                        : ""
+                                    }"><i data-lucide="star" class="w-4 h-4 mr-3"></i> Top Sellers</a>
+                                    <a href="#" data-category-id="all" class="pos-category-btn ${
+                                      activeCategory === "all" ? "active" : ""
+                                    }"><i data-lucide="layout-grid" class="w-4 h-4 mr-3"></i> All Products</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="category-group ${
+                          collapsedCategories.includes("Categories")
+                            ? ""
+                            : "is-open"
+                        }" data-group-id="Categories">
+                             <button data-action="toggle-category-collapse" class="category-group-header">
+                                <span>${
+                                  getCurrentProfile().terminology.category
+                                }s</span>
+                                <i data-lucide="chevron-up" class="category-group-icon"></i>
+                            </button>
+                            <div class="category-group-list">
+                                <div class="space-y-1 py-1">
+                                    ${categories
+                                      .map(
+                                        (c) =>
+                                          `<a href="#" data-category-id="${c}" class="pos-category-btn ${
+                                            activeCategory === c ? "active" : ""
+                                          }"><i data-lucide="tag" class="w-4 h-4 mr-3"></i> ${c}</a>`
+                                      )
+                                      .join("")}
+                                </div>
+                            </div>
+                        </div>
+                     `;
+      lucide.createIcons();
+    };
+
+    const renderProducts = (categoryId) => {
+      let productsToShow = [];
+      // NEW: Filter out inactive products from all POS views
+      const activeProducts = firestoreData.products.filter(
+        (p) => (p.status || "active") === "active"
+      );
+
+      if (categoryId === "top-sellers") {
+        productTitle.textContent = "Top Sellers";
+        productsToShow = [...activeProducts]
+          .sort((a, b) => (b.sales || 0) - (a.sales || 0))
+          .slice(0, 12);
+      } else if (categoryId === "all") {
+        productTitle.textContent = "All Products";
+        productsToShow = activeProducts.filter((p) => !p.parentSKU);
+      } else {
+        productTitle.textContent = categoryId;
+        productsToShow = activeProducts.filter(
+          (p) => p.category === categoryId && !p.parentSKU
+        );
+      }
+
+      productsGrid.innerHTML = productsToShow.length
+        ? productsToShow
+            .map((p) => {
+              const isOutOfStock = p.productType === "physical" && p.stock <= 0;
+              const isLowStock =
+                p.productType === "physical" && p.stock > 0 && p.stock < 10;
+              const sizeInfo = p.customData?.Size
+                ? `<p class="text-xs text-text-secondary mt-1">Size: ${p.customData.Size}</p>`
+                : "";
+
+              let stockBadgeHTML = "";
+              if (isOutOfStock) {
+                stockBadgeHTML =
+                  '<div class="absolute inset-0 flex items-center justify-center bg-black/50 rounded-lg"><span class="text-white font-bold text-sm bg-red-600/80 px-2 py-1 rounded">OUT OF STOCK</span></div>';
+              } else if (isLowStock) {
+                stockBadgeHTML = `<div class="absolute top-2 right-2"><span class="text-yellow-900 font-bold text-xs bg-yellow-400 px-2 py-1 rounded-full shadow-lg">${p.stock} LEFT</span></div>`;
+              }
+
+              return `
+                        <button data-action="add-product-from-grid" data-id="${
+                          p.id
+                        }" class="product-grid-item" ${
+                isOutOfStock ? "disabled" : ""
+              }>
+                            <div class="flex-grow flex flex-col">
+                                <div class="relative">
+                                    <img src="https://placehold.co/200x200/18181b/444444?text=${encodeURIComponent(
+                                      p.name
+                                    )}" class="w-full h-auto aspect-square object-cover rounded-lg ${
+                isOutOfStock ? "opacity-40" : ""
+              }">
+                                    ${stockBadgeHTML}
+                                </div>
+                                <div class="mt-3 flex-grow flex flex-col justify-center min-h-[3rem]">
+                                    <p class="font-semibold text-base text-text-primary leading-tight truncate" title="${
+                                      p.name
+                                    }">${p.name}</p>
+                                    ${sizeInfo}
+                                </div>
+                            </div>
+                            <p class="font-mono text-base text-accent mt-2">${currencyUtils.format(
+                              p.price
+                            )}</p>
+                        </button>
+                        `;
+            })
+            .join("")
+        : `<div class="col-span-full text-center p-8 text-text-secondary">No ${
+            getCurrentProfile().terminology.product
+          }s in this category.</div>`;
+    };
+
+    renderCategories();
+    renderProducts(activeCategory);
+
+    categoriesContainer.addEventListener("click", (e) => {
+      const categoryBtn = e.target.closest(".pos-category-btn");
+      if (categoryBtn) {
+        e.preventDefault();
+        activeCategory = categoryBtn.dataset.categoryId;
+        appState.viewStates.posModern.activeCategory = activeCategory;
+        saveState();
+        categoriesContainer
+          .querySelectorAll(".pos-category-btn")
+          .forEach((btn) => btn.classList.remove("active"));
+        categoryBtn.classList.add("active");
+        renderProducts(activeCategory);
+      }
+
+      const collapseBtn = e.target.closest(
+        '[data-action="toggle-category-collapse"]'
+      );
+      if (collapseBtn) {
+        e.preventDefault();
+        const group = collapseBtn.parentElement;
+        const groupId = group.dataset.groupId;
+        const isClosing = group.classList.contains("is-open");
+
+        group.classList.toggle("is-open");
+
+        const collapsedList =
+          appState.viewStates.posModern.collapsedCategories || [];
+        const index = collapsedList.indexOf(groupId);
+
+        if (isClosing) {
+          // Add to list if it's not already there
+          if (index === -1) collapsedList.push(groupId);
+        } else {
+          // Remove from list if it exists
+          if (index > -1) collapsedList.splice(index, 1);
+        }
+        appState.viewStates.posModern.collapsedCategories = collapsedList;
+        saveState(); // Persist the change immediately
+      }
+    });
+
+    productsGrid.addEventListener("click", (e) => {
+      const target = e.target.closest('[data-action="add-product-from-grid"]');
+      if (target) {
+        const product = firestoreData.products.find(
+          (p) => p.id === target.dataset.id
+        );
+        if (product) addProductToActiveCart(product);
+      }
+    });
+
+    const searchInput = pane.querySelector("#pos-modern-search");
+    const resultsContainer = pane.querySelector("#pos-search-results");
+
+    const handleSelection = (product) => {
+      if (!product) return;
+      addProductToActiveCart(product);
+      searchInput.value = "";
+      resultsContainer.innerHTML = "";
+      resultsContainer.classList.add("hidden");
+      searchInput.focus();
+    };
+
+    searchInput.addEventListener("input", (e) => {
+      const query = e.target.value.toLowerCase();
+      if (query.length < 1) {
+        resultsContainer.classList.add("hidden");
+        return;
+      }
+      const filtered = firestoreData.products
+        .filter(
+          (p) =>
+            (p.status || "active") === "active" &&
+            !p.hasVariants &&
+            (p.name.toLowerCase().includes(query) ||
+              p.id.toLowerCase().includes(query) ||
+              p.barcode?.includes(query))
+        )
+        .slice(0, 7); // MODIFIED
+      if (filtered.length > 0) {
+        resultsContainer.innerHTML = filtered
+          .map(
+            (p) =>
+              `<div class="search-result-item p-3 cursor-pointer" data-id="${p.id}"><p class="font-medium text-text-primary pointer-events-none">${p.name}</p><p class="text-xs text-text-secondary font-mono pointer-events-none">ID: ${p.id} / Stock: ${p.stock}</p></div>`
+          )
+          .join("");
+        resultsContainer.classList.remove("hidden");
+      } else {
+        resultsContainer.classList.add("hidden");
+      }
+    });
+    resultsContainer.addEventListener("mousedown", (e) => {
+      const target = e.target.closest(".search-result-item");
+      if (target) {
+        const product = firestoreData.products.find(
+          (p) => p.id === target.dataset.id
+        );
+        handleSelection(product);
+      }
+    });
+
+    searchInput.addEventListener("keydown", (e) => {
+      const items = resultsContainer.querySelectorAll(".search-result-item");
+      let activeSearchIndex = Array.from(items).findIndex((item) =>
+        item.classList.contains("active")
+      );
+
+      if (e.key === "Enter") {
+        e.preventDefault();
+        const query = searchInput.value.trim();
+        if (!query) return;
+
+        // 1. Prioritize barcode scan
+        const productByBarcode = firestoreData.products.find(
+          (p) => p.barcode && p.barcode === query
+        );
+        if (productByBarcode) {
+          handleSelection(productByBarcode);
+          return;
+        }
+
+        // 2. Check for active selection in dropdown
+        const activeItem = resultsContainer.querySelector(
+          ".search-result-item.active"
+        );
+        if (activeItem) {
+          const product = firestoreData.products.find(
+            (p) => p.id === activeItem.dataset.id
+          );
+          handleSelection(product);
+          return;
+        }
+
+        // 3. Fallback to SKU search
+        const productBySku = firestoreData.products.find(
+          (p) => p.id.toLowerCase() === query.toLowerCase()
+        );
+        if (productBySku) {
+          handleSelection(productBySku);
+          return;
+        }
+
+        // 4. If nothing is found and there are results, select the first one
+        if (items.length > 0) {
+          const product = firestoreData.products.find(
+            (p) => p.id === items[0].dataset.id
+          );
+          handleSelection(product);
+          return;
+        }
+
+        showToast(`Product with barcode or SKU "${query}" not found.`, "error");
+        return;
+      }
+
+      if (resultsContainer.classList.contains("hidden") || items.length === 0)
+        return;
+
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        activeSearchIndex = (activeSearchIndex + 1) % items.length;
+        items.forEach((item, i) =>
+          item.classList.toggle("active", i === activeSearchIndex)
+        );
+        if (items[activeSearchIndex])
+          items[activeSearchIndex].scrollIntoView({ block: "nearest" });
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        activeSearchIndex =
+          (activeSearchIndex - 1 + items.length) % items.length;
+        items.forEach((item, i) =>
+          item.classList.toggle("active", i === activeSearchIndex)
+        );
+        if (items[activeSearchIndex])
+          items[activeSearchIndex].scrollIntoView({ block: "nearest" });
+      } else if (e.key === "Escape") {
+        resultsContainer.classList.add("hidden");
+      }
+    });
+
+    searchInput.addEventListener("blur", () =>
+      setTimeout(() => resultsContainer.classList.add("hidden"), 150)
+    );
+
+    // Collapsible sidebar logic
+    const categoryContainer = pane.querySelector("#pos-category-container");
+    const categoryPanel = pane.querySelector("#pos-category-panel");
+    const toggleBtn = pane.querySelector("#pos-category-sidebar-toggle");
+    const toggleIcon = toggleBtn?.querySelector("i");
+
+    if (toggleBtn && categoryPanel && categoryContainer && toggleIcon) {
+      // This single function now handles all state and position updates for the toggle.
+      const syncSidebar = () => {
+        const isCollapsed = categoryContainer.classList.contains(
+          "category-sidebar-collapsed"
+        );
+
+        // Update the icon based on the state
+        toggleIcon.setAttribute(
+          "data-lucide",
+          isCollapsed ? "chevron-right" : "chevron-left"
+        );
+        lucide.createIcons();
+
+        // Update the button's position
+        if (isCollapsed) {
+          toggleBtn.style.left = "0px";
+        } else {
+          // Position at the edge of the visible panel
+          toggleBtn.style.left = `${categoryPanel.offsetWidth - 1}px`;
+        }
+      };
+
+      // Use ResizeObserver to detect any change in the panel's size.
+      // This is the most robust way to handle repositioning after animations or other layout shifts.
+      if ("ResizeObserver" in window) {
+        new ResizeObserver(() => {
+          // We wrap this in a requestAnimationFrame to ensure the repositioning happens
+          // smoothly after the browser has finished its rendering work for the resize.
+          requestAnimationFrame(syncSidebar);
+        }).observe(categoryPanel);
+      } else {
+        // Fallback for very old browsers: sync on transition end and initial load.
+        categoryPanel.addEventListener("transitionend", syncSidebar);
+        syncSidebar();
+      }
+
+      // Run once on initialization to set the correct initial state.
+      syncSidebar();
+    }
+  };
+
+  function initPOS(pane) {
+    if (posState.sales.length === 0) {
+      const newSaleId = `sale_${Date.now()}`;
+      posState.sales.push({
+        id: newSaleId,
+        name: `Sale ${posState.saleCounter++}`,
+        cart: [],
+        customer: null,
+        status: "active",
+        discount: { type: "percent", value: 0 },
+      });
+      posState.activeSaleId = newSaleId;
+    }
+
+    if (appState.settings.posLayout === "modern") {
+      initModernPOS(pane);
+    } else {
+      initClassicPOS(pane);
+    }
+  }
+
+  function initInventory(container) {
+    if (!container) return;
+    const term = getCurrentProfile().terminology;
+    const viewState = appState.viewStates.inventory;
+    // MODIFIED: Use new granular permissions
+    const canAdd = checkPermission("canAddProducts");
+    const canEdit = checkPermission("canEditProducts");
+    const canDeactivate = checkPermission("canDeactivateProducts");
+    const canDelete = checkPermission("canDeleteProducts");
+
+    const allProducts = firestoreData.products.filter((p) => !p.parentSKU);
+    const categories = [...new Set(allProducts.map((p) => p.category))];
+
+    // --- Render static structure ONCE ---
+    container.innerHTML = `
+                    <div>
+                        <div class="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-6">
+                            <h1 class="text-3xl font-bold text-text-primary">${
+                              term.inventory
+                            } Management</h1>
+                            <div class="flex items-center gap-2">
+                                ${
+                                  canAdd
+                                    ? `<button data-action="add-product" class="btn btn-primary flex-1 md:flex-none"><i data-lucide="plus" class="w-5 h-5 mr-2"></i> Add ${term.product}</button>`
+                                    : ""
+                                }
+                            </div>
+                        </div>
+                        
+                        <!-- Search and Filters -->
+                        <div class="flex flex-col md:flex-row gap-4 mb-4">
+                            <div class="relative flex-grow">
+                                <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-text-secondary"></i>
+                                <input type="text" id="inventory-search" placeholder="Search by name, SKU, category..." class="form-input w-full pl-10" value="${
+                                  viewState.searchQuery
+                                }">
+                            </div>
+                            <select id="inventory-category-filter" class="form-select md:w-48">
+                                <option value="all">All ${
+                                  term.category
+                                }s</option>
+                                ${categories
+                                  .map(
+                                    (c) =>
+                                      `<option value="${c}" ${
+                                        viewState.filters.category === c
+                                          ? "selected"
+                                          : ""
+                                      }>${c}</option>`
+                                  )
+                                  .join("")}
+                            </select>
+                            <select id="inventory-stock-filter" class="form-select md:w-48">
+                                <option value="all">All Stock Status</option>
+                                <option value="low" ${
+                                  viewState.filters.stockStatus === "low"
+                                    ? "selected"
+                                    : ""
+                                }>Low Stock</option>
+                                <option value="out" ${
+                                  viewState.filters.stockStatus === "out"
+                                    ? "selected"
+                                    : ""
+                                }>Out of Stock</option>
+                            </select>
+                        </div>
+
+                        <div class="bg-bg-secondary/50 rounded-xl">
+                            <table class="table-pro">
+                                <thead>
+                                    <tr>
+                                        <th>SKU</th>
+                                        <th>${term.product}</th>
+                                        <th>Status</th>
+                                        <th>${term.category}</th>
+                                        <th>Barcode</th>
+                                        <th>Price</th>
+                                        <th>Stock</th>
+                                        ${
+                                          canEdit || canDeactivate || canDelete
+                                            ? "<th>Actions</th>"
+                                            : ""
+                                        }
+                                    </tr>
+                                </thead>
+                                <tbody id="inventory-table-body"></tbody>
+                            </table>
+                        </div>
+                        <div id="inventory-pagination" class="mt-4"></div>
+                    </div>`;
+
+    const renderInventoryTable = () => {
+      // Apply Filters
+      let filteredProducts = allProducts;
+      if (viewState.searchQuery) {
+        const query = viewState.searchQuery.toLowerCase();
+        filteredProducts = filteredProducts.filter(
+          (p) =>
+            p.name.toLowerCase().includes(query) ||
+            p.id.toLowerCase().includes(query) ||
+            p.barcode?.includes(query) ||
+            p.category.toLowerCase().includes(query)
+        );
+      }
+      if (viewState.filters.category !== "all") {
+        filteredProducts = filteredProducts.filter(
+          (p) => p.category === viewState.filters.category
+        );
+      }
+      if (viewState.filters.stockStatus !== "all") {
+        if (viewState.filters.stockStatus === "low") {
+          filteredProducts = filteredProducts.filter(
+            (p) => p.stock > 0 && p.stock < 20
+          );
+        } else if (viewState.filters.stockStatus === "out") {
+          filteredProducts = filteredProducts.filter((p) => p.stock === 0);
+        }
+      }
+
+      // Apply Pagination
+      const totalItems = filteredProducts.length;
+      const startIndex = (viewState.currentPage - 1) * appState.itemsPerPage;
+      const endIndex = startIndex + appState.itemsPerPage;
+      const paginatedProducts = filteredProducts.slice(startIndex, endIndex);
+      const colspan = canEdit || canDeactivate || canDelete ? 8 : 7;
+
+      const tableBody = container.querySelector("#inventory-table-body");
+      if (tableBody) {
+        tableBody.innerHTML = paginatedProducts.length
+          ? paginatedProducts
+              .map((p) => {
+                const status = p.status || "active"; // Default to active
+                const isInactive = status === "inactive";
+
+                // Build action menu items dynamically
+                let actionMenuItems = "";
+                if (canEdit) {
+                  actionMenuItems += `<div class="action-menu-item" data-action="edit-product" data-id="${p.id}"><i data-lucide="edit" class="w-4 h-4"></i><span>Edit</span></div>`;
+                  actionMenuItems += `<div class="action-menu-item" data-action="adjust-stock" data-id="${p.id}"><i data-lucide="sliders-horizontal" class="w-4 h-4"></i><span>Adjust Stock</span></div>`;
+                  actionMenuItems += `<div class="action-menu-item" data-action="receive-stock" data-id="${p.id}"><i data-lucide="package-plus" class="w-4 h-4"></i><span>Receive Stock</span></div>`;
+                }
+                if (canDeactivate) {
+                  actionMenuItems += `<div class="h-px bg-border-color my-1"></div>`;
+                  if (isInactive) {
+                    actionMenuItems += `<div class="action-menu-item" data-action="toggle-product-status" data-id="${p.id}"><i data-lucide="check-circle" class="w-4 h-4 text-green-400"></i><span class="text-green-400">Activate ${term.product}</span></div>`;
+                  } else {
+                    actionMenuItems += `<div class="action-menu-item danger" data-action="toggle-product-status" data-id="${p.id}"><i data-lucide="eye-off" class="w-4 h-4"></i><span>Deactivate ${term.product}</span></div>`;
+                  }
+                }
+                if (canDelete) {
+                  actionMenuItems += `<div class="h-px bg-border-color my-1"></div>`;
+                  actionMenuItems += `<div class="action-menu-item danger" data-action="delete-product" data-id="${p.id}"><i data-lucide="trash-2" class="w-4 h-4"></i><span>Delete ${term.product}</span></div>`;
+                }
+
+                return `
+                            <tr class="table-row ${
+                              isInactive ? "opacity-50" : ""
+                            }" data-action="view-product-details" data-id="${
+                  p.id
+                }">
+                                <td class="font-mono text-xs">${p.id}</td>
+                                <td class="font-medium text-text-primary">${
+                                  p.name
+                                }</td>
+                                <td><span class="px-2 py-1 text-xs font-semibold rounded-full ${
+                                  isInactive
+                                    ? "bg-gray-700 text-gray-300"
+                                    : "bg-green-500/20 text-green-300"
+                                } capitalize">${status}</span></td>
+                                <td>${p.category}</td>
+                                <td class="font-mono text-xs text-text-secondary">${
+                                  p.barcode || "N/A"
+                                }</td>
+                                <td class="font-mono text-left">${currencyUtils.format(
+                                  p.price
+                                )}</td>
+                                <td class="text-left"><span class="font-medium ${
+                                  p.stock <= 0
+                                    ? "text-red-500 bg-red-500/10 px-2 py-1 rounded-md"
+                                    : p.stock < 20
+                                    ? "text-red-400"
+                                    : p.stock < 50
+                                    ? "text-yellow-400"
+                                    : "text-green-400"
+                                }">${
+                  p.productType !== "physical"
+                    ? "N/A"
+                    : p.stock > 0
+                    ? `${p.stock} ${p.uomId}`
+                    : "Out of Stock"
+                }</span></td>
+                                ${
+                                  actionMenuItems
+                                    ? `
+                                <td class="text-right">
+                                    <div class="relative inline-block text-left">
+                                        <button data-action="toggle-action-menu" data-id="${p.id}" class="p-2 rounded-md hover:bg-bg-tertiary focus:outline-none focus:ring-2 focus:ring-accent">
+                                            <i data-lucide="more-vertical" class="w-5 h-5 pointer-events-none"></i>
+                                        </button>
+                                        <div class="action-menu">
+                                            ${actionMenuItems}
+                                        </div>
+                                    </div>
+                                </td>
+                                `
+                                    : ""
+                                }
+                            </tr>`;
+              })
+              .join("")
+          : `<tr><td colspan="${colspan}" class="text-center p-8 text-text-secondary" style="grid-column: 1 / -1;">No ${term.product}s found matching your criteria.</td></tr>`;
+      }
+
+      renderPaginationControls(
+        container.querySelector("#inventory-pagination"),
+        totalItems,
+        viewState.currentPage,
+        appState.itemsPerPage,
+        "inventory"
+      );
+      lucide.createIcons();
+    };
+
+    // Add event listeners once
+    container
+      .querySelector("#inventory-search")
+      .addEventListener("input", (e) => {
+        viewState.searchQuery = e.target.value;
+        viewState.currentPage = 1;
+        renderInventoryTable();
+      });
+    container
+      .querySelector("#inventory-category-filter")
+      .addEventListener("change", (e) => {
+        viewState.filters.category = e.target.value;
+        viewState.currentPage = 1;
+        renderInventoryTable();
+      });
+    container
+      .querySelector("#inventory-stock-filter")
+      .addEventListener("change", (e) => {
+        viewState.filters.stockStatus = e.target.value;
+        viewState.currentPage = 1;
+        renderInventoryTable();
+      });
+
+    renderInventoryTable(); // Initial table render
+    lucide.createIcons(); // Initial full icon render
+  }
+
+  function initCustomers(pane) {
+    const tableBody = pane.querySelector("#customers-table-body");
+    const viewState = appState.viewStates.customers;
+    const renderTable = () => {
+      // Apply search
+      let filteredCustomers = firestoreData.customers;
+      if (viewState.searchQuery) {
+        const query = viewState.searchQuery.toLowerCase();
+        filteredCustomers = filteredCustomers.filter(
+          (c) =>
+            c.name.toLowerCase().includes(query) ||
+            c.phone.includes(query) ||
+            c.email.toLowerCase().includes(query) ||
+            (c.loyaltyId || "").toLowerCase().includes(query)
+        );
+      }
+
+      // Apply pagination
+      const totalItems = filteredCustomers.length;
+      const startIndex = (viewState.currentPage - 1) * appState.itemsPerPage;
+      const endIndex = startIndex + appState.itemsPerPage;
+      const paginatedCustomers = filteredCustomers.slice(startIndex, endIndex);
+      const canEditDelete = checkPermission("canManageStaff"); // Admins/Managers can edit/delete
+
+      // Inject search bar if not present
+      if (!pane.querySelector("#customer-search-container")) {
+        const header = pane.querySelector(
+          ".flex.justify-between.items-center.mb-6"
+        );
+        header.insertAdjacentHTML(
+          "afterend",
+          `
+                            <div id="customer-search-container" class="flex gap-4 mb-4">
+                                <div class="relative flex-grow">
+                                    <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-text-secondary"></i>
+                                    <input type="text" id="customer-search" placeholder="Search by name, phone, email, loyalty ID..." class="form-input w-full pl-10" value="${viewState.searchQuery}">
+                                </div>
+                            </div>
+                        `
+        );
+        lucide.createIcons();
+        pane
+          .querySelector("#customer-search")
+          .addEventListener("input", (e) => {
+            viewState.searchQuery = e.target.value;
+            viewState.currentPage = 1;
+            renderTable();
+          });
+      }
+
+      tableBody.innerHTML = paginatedCustomers.length
+        ? paginatedCustomers
+            .map(
+              (c) => `
+                        <tr class="table-row">
+                            <td class="font-medium text-text-primary">${
+                              c.name
+                            }</td>
+                            <td><div>${c.email}</div><div class="text-xs">${
+                c.phone
+              }</div></td>
+                            <td class="text-left">
+                                ${
+                                  (c.currentDue || 0) > 0
+                                    ? `<span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-500/20 text-red-300 inline-block font-mono">${currencyUtils.format(
+                                        c.currentDue
+                                      )}</span>`
+                                    : `<span class="font-mono text-text-secondary">${currencyUtils.format(
+                                        0
+                                      )}</span>`
+                                }
+                            </td>
+                            <td class="font-mono text-xs">${
+                              c.loyaltyId || "N/A"
+                            }</td>
+                            <td class="text-right">
+                                <div class="relative inline-block text-left">
+                                    <button data-action="toggle-action-menu" data-id="${
+                                      c.id
+                                    }" class="p-2 rounded-md hover:bg-bg-tertiary focus:outline-none focus:ring-2 focus:ring-accent">
+                                        <i data-lucide="more-vertical" class="w-5 h-5 pointer-events-none"></i>
+                                    </button>
+                                    <div class="action-menu">
+                                        <div class="action-menu-item" data-action="receive-payment" data-id="${
+                                          c.id
+                                        }"><i data-lucide="hand-coins" class="w-4 h-4"></i><span>Receive Payment</span></div>
+                                        <div class="h-px bg-border-color my-1"></div>
+                                        ${
+                                          canEditDelete
+                                            ? `<div class="action-menu-item" data-action="edit-customer" data-id="${c.id}"><i data-lucide="edit" class="w-4 h-4"></i><span>Edit</span></div>`
+                                            : ""
+                                        }
+                                        <div class="action-menu-item" data-action="view-customer-invoices" data-id="${
+                                          c.id
+                                        }"><i data-lucide="file-text" class="w-4 h-4"></i><span>View Invoices</span></div>
+                                        ${
+                                          canEditDelete
+                                            ? `<div class="h-px bg-border-color my-1"></div><div class="action-menu-item danger" data-action="delete-customer" data-id="${c.id}"><i data-lucide="trash-2" class="w-4 h-4"></i><span>Delete Customer</span></div>`
+                                            : ""
+                                        }
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>`
+            )
+            .join("")
+        : `<tr><td colspan="5" class="text-center p-8 text-text-secondary" style="grid-column: 1 / -1;">No customers found.</td></tr>`;
+
+      // Inject pagination container if not present
+      if (!pane.querySelector("#customers-pagination")) {
+        tableBody.parentElement.parentElement.insertAdjacentHTML(
+          "afterend",
+          '<div id="customers-pagination" class="mt-4"></div>'
+        );
+      }
+      renderPaginationControls(
+        pane.querySelector("#customers-pagination"),
+        totalItems,
+        viewState.currentPage,
+        appState.itemsPerPage,
+        "customers"
+      );
+      lucide.createIcons();
+    };
+    renderTable();
+  }
+  function initStaff(container) {
+    // UPDATED FUNCTION
+    if (!container) return;
+
+    const canInvite =
+      checkPermission("canManageStaff") || checkPermission("canInviteCashiers");
+    const viewState = appState.viewStates.staff; // NEW: Get view state
+
+    // Render the main structure with filters
+    container.innerHTML = `
+                    <div>
+                        <div class="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-6">
+                            <h1 class="text-3xl font-bold text-text-primary">Staff Management</h1>
+                            ${
+                              canInvite
+                                ? `
+                            <button data-action="invite-staff" class="btn btn-primary">
+                                <i data-lucide="user-plus" class="w-5 h-5 mr-2"></i> Invite Staff
+                            </button>
+                            `
+                                : ""
+                            }
+                        </div>
+                        
+                        <!-- NEW: Search and Filters -->
+                        <div class="flex flex-col md:flex-row gap-4 mb-4">
+                            <div class="relative flex-grow">
+                                <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-text-secondary"></i>
+                                <input type="text" id="staff-search" placeholder="Search by name or email..." class="form-input w-full pl-10" value="${
+                                  viewState.searchQuery
+                                }">
+                            </div>
+                            <select id="staff-role-filter" class="form-select md:w-48">
+                                <option value="all" ${
+                                  viewState.filters.role === "all"
+                                    ? "selected"
+                                    : ""
+                                }>All Roles</option>
+                                <option value="admin" ${
+                                  viewState.filters.role === "admin"
+                                    ? "selected"
+                                    : ""
+                                }>Administrator</option>
+                                <option value="manager" ${
+                                  viewState.filters.role === "manager"
+                                    ? "selected"
+                                    : ""
+                                }>Manager</option>
+                                <option value="cashier" ${
+                                  viewState.filters.role === "cashier"
+                                    ? "selected"
+                                    : ""
+                                }>Cashier</option>
+                            </select>
+                            <select id="staff-status-filter" class="form-select md:w-48">
+                                <option value="all" ${
+                                  viewState.filters.status === "all"
+                                    ? "selected"
+                                    : ""
+                                }>All Statuses</option>
+                                <option value="active" ${
+                                  viewState.filters.status === "active"
+                                    ? "selected"
+                                    : ""
+                                }>Active</option>
+                                <option value="inactive" ${
+                                  viewState.filters.status === "inactive"
+                                    ? "selected"
+                                    : ""
+                                }>Inactive</option>
+                                <option value="pending" ${
+                                  viewState.filters.status === "pending"
+                                    ? "selected"
+                                    : ""
+                                }>Pending</option>
+                                <option value="deactivation_pending" ${
+                                  viewState.filters.status ===
+                                  "deactivation_pending"
+                                    ? "selected"
+                                    : ""
+                                }>Deactivation Pending</option>
+                            </select>
+                        </div>
+                        
+                        <div class="bg-bg-secondary/50 rounded-xl">
+                            <table class="table-pro">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Role</th>
+                                        <th>Status</th>
+                                        <th>Joined On</th>
+                                        <th>Total Sales (30d)</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="staff-table-body"></tbody>
+                            </table>
+                        </div>
+                        <div id="staff-pagination" class="mt-4"></div>
+                    </div>
+                `;
+
+    const tableBody = container.querySelector("#staff-table-body");
+
+    const getStatusBadge = (status) => {
+      const base =
+        "px-2 py-0.5 text-xs font-semibold rounded-full inline-block";
+      if (status === "active") return `${base} bg-green-500/20 text-green-300`;
+      if (status === "inactive") return `${base} bg-gray-500/20 text-gray-300`;
+      if (status === "pending")
+        return `${base} bg-yellow-500/20 text-yellow-300`;
+      if (status === "deactivation_pending")
+        return `${base} bg-orange-500/20 text-orange-300`;
+      return `${base} bg-gray-500/20 text-gray-300`;
+    };
+
+    const renderStaffTable = () => {
+      let staffList = firestoreData.staff;
+      const loggedInUser = appState.session.currentUser;
+      const loggedInRole = appState.session.userRole;
+
+      if (loggedInRole === "manager") {
+        staffList = staffList.filter((member) => member.role !== "admin");
+      }
+
+      // --- NEW: Apply Filters ---
+      if (viewState.searchQuery) {
+        const query = viewState.searchQuery.toLowerCase();
+        staffList = staffList.filter(
+          (m) =>
+            m.name.toLowerCase().includes(query) ||
+            m.email.toLowerCase().includes(query)
+        );
+      }
+      if (viewState.filters.role !== "all") {
+        staffList = staffList.filter((m) => m.role === viewState.filters.role);
+      }
+      if (viewState.filters.status !== "all") {
+        staffList = staffList.filter(
+          (m) => (m.status || "active") === viewState.filters.status
+        );
+      }
+      // --- END NEW ---
+
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+      // Pre-calculate sales for performance
+      const salesByCashier = firestoreData.invoices
+        .filter(
+          (inv) => new Date(inv.date) >= thirtyDaysAgo && inv.status !== "Void"
+        )
+        .reduce((acc, inv) => {
+          if (inv.cashierId) {
+            acc[inv.cashierId] =
+              (acc[inv.cashierId] || 0) + inv.totalInBaseCurrency;
+          }
+          return acc;
+        }, {});
+
+      // --- NEW: Apply Pagination to filtered list ---
+      const totalItems = staffList.length;
+      const startIndex = (viewState.currentPage - 1) * appState.itemsPerPage;
+      const endIndex = startIndex + appState.itemsPerPage;
+      const paginatedStaff = staffList.slice(startIndex, endIndex);
+
+      tableBody.innerHTML = paginatedStaff.length
+        ? paginatedStaff
+            .map((member) => {
+              const totalSales = salesByCashier[member.id] || 0;
+              const canViewPerformance = checkPermission(
+                "canViewStaffPerformance"
+              );
+              const loggedInRole = appState.session.userRole; // Get role explicitly
+              const canRequestDeactivation = checkPermission(
+                "canRequestStaffDeactivation"
+              );
+              const canEditCashier = checkPermission("canEditCashierDetails");
+
+              // Define action menu items based on permissions and logic
+              let actionMenuItems = [];
+
+              // --- Invitation & Deactivation Approval (Admin Only) ---
+              if (loggedInRole === "admin") {
+                if (member.status === "pending") {
+                  actionMenuItems.push(
+                    `<div class="action-menu-item" data-action="approve-staff" data-id="${member.id}"><i data-lucide="user-check" class="w-4 h-4 text-green-400"></i><span class="text-green-400">Approve Invitation</span></div>`
+                  );
+                  actionMenuItems.push(
+                    `<div class="action-menu-item danger" data-action="reject-staff" data-id="${member.id}"><i data-lucide="user-x" class="w-4 h-4"></i><span>Reject Invitation</span></div>`
+                  );
+                } else if (member.status === "deactivation_pending") {
+                  actionMenuItems.push(
+                    `<div class="action-menu-item" data-action="approve-deactivation" data-id="${member.id}"><i data-lucide="user-x" class="w-4 h-4 text-red-400"></i><span class="text-red-400">Approve Deactivation</span></div>`
+                  );
+                  actionMenuItems.push(
+                    `<div class="action-menu-item" data-action="reject-deactivation" data-id="${member.id}"><i data-lucide="rotate-ccw" class="w-4 h-4"></i><span>Reject Deactivation</span></div>`
+                  );
+                }
+              }
+
+              // --- Standard Actions (Apply to non-pending states) ---
+              const isPending =
+                member.status === "pending" ||
+                member.status === "deactivation_pending";
+              if (!isPending) {
+                if (canViewPerformance) {
+                  actionMenuItems.push(
+                    `<div class="action-menu-item" data-action="view-staff-performance" data-id="${member.id}"><i data-lucide="bar-chart-2" class="w-4 h-4"></i><span>View Performance</span></div>`
+                  );
+                }
+
+                // Admin-specific direct management actions
+                if (
+                  loggedInRole === "admin" &&
+                  loggedInUser.uid !== member.id &&
+                  member.role !== "admin"
+                ) {
+                  actionMenuItems.push(
+                    '<div class="h-px bg-border-color my-1"></div>'
+                  );
+                  actionMenuItems.push(
+                    `<div class="action-menu-item" data-action="edit-staff" data-id="${member.id}"><i data-lucide="edit" class="w-4 h-4"></i><span>Edit Role/Status</span></div>`
+                  );
+
+                  const currentStatus = member.status || "active";
+                  const newStatus =
+                    currentStatus === "active" ? "inactive" : "active";
+                  const toggleActionText =
+                    newStatus === "inactive" ? "Deactivate" : "Activate";
+                  const toggleActionIcon =
+                    newStatus === "inactive" ? "user-x" : "user-check";
+                  actionMenuItems.push(
+                    `<div class="action-menu-item" data-action="toggle-staff-status" data-id="${member.id}" data-new-status="${newStatus}"><i data-lucide="${toggleActionIcon}" class="w-4 h-4"></i><span>${toggleActionText} Account</span></div>`
+                  );
+
+                  actionMenuItems.push(
+                    '<div class="h-px bg-border-color my-1"></div>'
+                  );
+                  actionMenuItems.push(
+                    `<div class="action-menu-item danger" data-action="delete-staff" data-id="${member.id}"><i data-lucide="trash-2" class="w-4 h-4"></i><span>Delete Staff</span></div>`
+                  );
+                }
+
+                // Manager-specific request actions for cashiers
+                if (loggedInRole === "manager" && member.role === "cashier") {
+                  if (canEditCashier) {
+                    actionMenuItems.push(
+                      `<div class="action-menu-item" data-action="edit-staff" data-id="${member.id}"><i data-lucide="edit" class="w-4 h-4"></i><span>Edit Name</span></div>`
+                    );
+                  }
+                  if (
+                    canRequestDeactivation &&
+                    (member.status || "active") === "active"
+                  ) {
+                    actionMenuItems.push(
+                      `<div class="action-menu-item danger" data-action="request-deactivation" data-id="${member.id}"><i data-lucide="user-x" class="w-4 h-4"></i><span>Request Deactivation</span></div>`
+                    );
+                  }
+                }
+              }
+
+              return `
+                        <tr class="table-row" data-action="view-staff-details" data-id="${
+                          member.id
+                        }">
+                            <td>
+                                <div class="flex items-center gap-3">
+                                    <img src="https://placehold.co/40x40/1f2937/4b5563?text=${member.name
+                                      .charAt(0)
+                                      .toUpperCase()}" class="w-10 h-10 rounded-full" alt="${
+                member.name
+              }">
+                                    <div>
+                                        <p class="font-medium text-text-primary">${
+                                          member.name
+                                        }</p>
+                                        <p class="text-xs text-text-secondary">${
+                                          member.email
+                                        }</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span class="font-medium capitalize">${
+                              member.role
+                            }</span></td>
+                            <td><span class="${getStatusBadge(
+                              member.status || "active"
+                            )} capitalize">${(
+                member.status || "active"
+              ).replace("_", " ")}</span></td>
+                            <td>${
+                              member.joinDate
+                                ? new Date(member.joinDate).toLocaleDateString()
+                                : "N/A"
+                            }</td>
+                            <td class="font-mono">${currencyUtils.format(
+                              totalSales
+                            )}</td>
+                            <td class="text-right">
+                                ${
+                                  actionMenuItems.length > 0
+                                    ? `
+                                <div class="relative inline-block text-left">
+                                    <button data-action="toggle-action-menu" data-id="${
+                                      member.id
+                                    }" class="p-2 rounded-md hover:bg-bg-tertiary focus:outline-none focus:ring-2 focus:ring-accent">
+                                        <i data-lucide="more-vertical" class="w-5 h-5 pointer-events-none"></i>
+                                    </button>
+                                    <div class="action-menu">
+                                        ${actionMenuItems.join("")}
+                                    </div>
+                                </div>
+                                `
+                                    : '<span class="text-xs text-text-secondary">No actions</span>'
+                                }
+                            </td>
+                        </tr>
+                    `;
+            })
+            .join("")
+        : `<tr><td colspan="6" class="text-center p-8 text-text-secondary" style="grid-column: 1 / -1;">No staff members found matching your criteria.</td></tr>`;
+
+      renderPaginationControls(
+        container.querySelector("#staff-pagination"),
+        totalItems,
+        viewState.currentPage,
+        appState.itemsPerPage,
+        "staff"
+      ); // NEW
+      lucide.createIcons();
+    };
+
+    // --- NEW: Add event listeners ---
+    container.querySelector("#staff-search").addEventListener("input", (e) => {
+      viewState.searchQuery = e.target.value;
+      viewState.currentPage = 1;
+      renderStaffTable();
+    });
+    container
+      .querySelector("#staff-role-filter")
+      .addEventListener("change", (e) => {
+        viewState.filters.role = e.target.value;
+        viewState.currentPage = 1;
+        renderStaffTable();
+      });
+    container
+      .querySelector("#staff-status-filter")
+      .addEventListener("change", (e) => {
+        viewState.filters.status = e.target.value;
+        viewState.currentPage = 1;
+        renderStaffTable();
+      });
+    // --- END NEW ---
+
+    renderStaffTable();
+  }
+
+  // NEW FUNCTION for Staff Details View
+  function renderStaffDetailView(staffId, container) {
+    const member = firestoreData.staff.find((m) => m.id === staffId);
+    if (!member) {
+      container.innerHTML = `<p>Staff member not found.</p>`;
+      return;
+    }
+
+    // --- Performance Calculation ---
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const relevantInvoices = firestoreData.invoices.filter(
+      (inv) =>
+        inv.cashierId === staffId &&
+        new Date(inv.date) >= thirtyDaysAgo &&
+        inv.status !== "Void"
+    );
+
+    const totalSales = relevantInvoices.reduce(
+      (sum, inv) => sum + inv.totalInBaseCurrency,
+      0
+    );
+    const transactionCount = relevantInvoices.length;
+    const avgSaleValue =
+      transactionCount > 0 ? totalSales / transactionCount : 0;
+    const itemsSold = relevantInvoices
+      .flatMap((inv) => inv.items)
+      .reduce((sum, item) => sum + (item.qty || 1), 0);
+
+    const salesByDay = relevantInvoices.reduce((acc, inv) => {
+      const day = new Date(inv.date).toLocaleDateString([], {
+        month: "short",
+        day: "numeric",
+      });
+      acc[day] = (acc[day] || 0) + inv.totalInBaseCurrency;
+      return acc;
+    }, {});
+    const recentTransactions = relevantInvoices
+      .sort((a, b) => new Date(b.date) - new Date(a.date))
+      .slice(0, 5);
+
+    const getStatusInfo = (status) => {
+      const s = status || "active";
+      const statuses = {
+        active: { text: "Active", icon: "check-circle", color: "green" },
+        inactive: { text: "Inactive", icon: "x-circle", color: "gray" },
+        pending: { text: "Pending Approval", icon: "clock", color: "yellow" },
+        deactivation_pending: {
+          text: "Deactivation Pending",
+          icon: "alert-circle",
+          color: "orange",
+        },
+      };
+      return statuses[s] || statuses.inactive;
+    };
+    const statusInfo = getStatusInfo(member.status);
+
+    const canEdit =
+      (checkPermission("canManageStaff") && member.role !== "admin") ||
+      (checkPermission("canEditCashierDetails") && member.role === "cashier");
+
+    container.innerHTML = `
+                <div class="view-pane">
+                    <!-- Header -->
+                    <div class="flex justify-between items-center mb-6">
+                         <button data-action="back-to-staff-list" class="btn btn-secondary"><i data-lucide="arrow-left" class="w-5 h-5 mr-2"></i> Back to Staff List</button>
+                         ${
+                           canEdit
+                             ? `<button data-action="edit-staff" data-id="${staffId}" class="btn btn-primary"><i data-lucide="edit" class="w-4 h-4 mr-2"></i>Edit Profile</button>`
+                             : ""
+                         }
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Left Column: Profile -->
+                        <div class="lg:col-span-1 space-y-6">
+                            <div class="glass-pane p-6 rounded-xl text-center">
+                                <img src="https://placehold.co/128x128/1f2937/4b5563?text=${member.name
+                                  .charAt(0)
+                                  .toUpperCase()}" class="w-32 h-32 rounded-full mx-auto ring-4 ring-bg-secondary shadow-lg">
+                                <h2 class="text-2xl font-bold text-text-primary mt-4">${
+                                  member.name
+                                }</h2>
+                                <p class="text-accent font-semibold capitalize">${
+                                  member.role
+                                }</p>
+                                <div class="mt-2 inline-flex items-center gap-2 px-3 py-1 text-xs font-medium rounded-full bg-${
+                                  statusInfo.color
+                                }-500/10 text-${statusInfo.color}-400">
+                                    <i data-lucide="${
+                                      statusInfo.icon
+                                    }" class="w-3 h-3"></i>
+                                    <span>${statusInfo.text}</span>
+                                </div>
+                            </div>
+                            <div class="glass-pane p-6 rounded-xl">
+                                <h3 class="text-lg font-semibold text-text-primary mb-3">Contact Information</h3>
+                                <div class="space-y-3 text-sm">
+                                    <div class="flex items-start gap-3"><i data-lucide="mail" class="w-4 h-4 text-text-secondary mt-0.5 shrink-0"></i><div><p class="text-text-secondary -mb-1">Email</p><p class="text-text-primary font-medium break-all">${
+                                      member.email
+                                    }</p></div></div>
+                                    <div class="flex items-start gap-3"><i data-lucide="phone" class="w-4 h-4 text-text-secondary mt-0.5 shrink-0"></i><div><p class="text-text-secondary -mb-1">Phone</p><p class="text-text-primary font-medium">${
+                                      member.phone || "Not provided"
+                                    }</p></div></div>
+                                    <div class="flex items-start gap-3"><i data-lucide="map-pin" class="w-4 h-4 text-text-secondary mt-0.5 shrink-0"></i><div><p class="text-text-secondary -mb-1">Address</p><p class="text-text-primary font-medium">${
+                                      member.address || "Not provided"
+                                    }</p></div></div>
+                                </div>
+                            </div>
+                             <div class="glass-pane p-6 rounded-xl">
+                                <h3 class="text-lg font-semibold text-text-primary mb-3">Personal Information</h3>
+                                <div class="space-y-3 text-sm">
+                                    <div class="flex items-start gap-3"><i data-lucide="calendar" class="w-4 h-4 text-text-secondary mt-0.5 shrink-0"></i><div><p class="text-text-secondary -mb-1">Joined On</p><p class="text-text-primary font-medium">${new Date(
+                                      member.joinDate
+                                    ).toLocaleDateString()}</p></div></div>
+                                    <div class="flex items-start gap-3"><i data-lucide="cake" class="w-4 h-4 text-text-secondary mt-0.5 shrink-0"></i><div><p class="text-text-secondary -mb-1">Date of Birth</p><p class="text-text-primary font-medium">${
+                                      member.dob
+                                        ? new Date(
+                                            member.dob
+                                          ).toLocaleDateString()
+                                        : "Not provided"
+                                    }</p></div></div>
+                                    <div class="flex items-start gap-3"><i data-lucide="shield" class="w-4 h-4 text-text-secondary mt-0.5 shrink-0"></i><div><p class="text-text-secondary -mb-1">Emergency Contact</p><p class="text-text-primary font-medium">${
+                                      member.emergencyContactName || "Not set"
+                                    }</p><p class="text-xs text-text-secondary">${
+      member.emergencyContactPhone || ""
+    }</p></div></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Column: Performance -->
+                        <div class="lg:col-span-2 space-y-6">
+                            <div class="glass-pane p-6 rounded-xl">
+                                <h3 class="text-lg font-semibold text-text-primary mb-3">Performance (Last 30 Days)</h3>
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                                    <div class="bg-bg-tertiary p-4 rounded-lg"><p class="text-xs text-text-secondary uppercase">Total Sales</p><p class="text-xl font-bold font-mono">${currencyUtils.format(
+                                      totalSales
+                                    )}</p></div>
+                                    <div class="bg-bg-tertiary p-4 rounded-lg"><p class="text-xs text-text-secondary uppercase">Transactions</p><p class="text-xl font-bold font-mono">${transactionCount}</p></div>
+                                    <div class="bg-bg-tertiary p-4 rounded-lg"><p class="text-xs text-text-secondary uppercase">Avg. Sale</p><p class="text-xl font-bold font-mono">${currencyUtils.format(
+                                      avgSaleValue
+                                    )}</p></div>
+                                    <div class="bg-bg-tertiary p-4 rounded-lg"><p class="text-xs text-text-secondary uppercase">Items Sold</p><p class="text-xl font-bold font-mono">${itemsSold}</p></div>
+                                </div>
+                            </div>
+                            <div class="glass-pane p-6 rounded-xl h-72 flex flex-col">
+                                <h3 class="text-lg font-semibold text-text-primary mb-3">Sales Trend (Last 30 Days)</h3>
+                                <div class="flex-grow"><canvas id="staff-sales-chart"></canvas></div>
+                            </div>
+                             <div class="glass-pane p-6 rounded-xl">
+                                <h3 class="text-lg font-semibold text-text-primary mb-3">Recent Transactions</h3>
+                                <div class="space-y-2">
+                                    ${
+                                      recentTransactions.length
+                                        ? recentTransactions
+                                            .map(
+                                              (inv) => `
+                                    <div class="flex justify-between items-center p-2 bg-bg-tertiary rounded">
+                                        <div>
+                                            <p class="font-medium text-text-primary text-sm">${
+                                              inv.customerName
+                                            }</p>
+                                            <p class="text-xs text-text-secondary font-mono">${
+                                              inv.id
+                                            }</p>
+                                        </div>
+                                        <div class="text-right">
+                                            <p class="font-semibold font-mono text-text-primary text-sm">${currencyUtils.format(
+                                              inv.totalInBaseCurrency,
+                                              inv.currency
+                                            )}</p>
+                                            <p class="text-xs text-text-secondary">${new Date(
+                                              inv.date
+                                            ).toLocaleTimeString([], {
+                                              hour: "2-digit",
+                                              minute: "2-digit",
+                                            })}</p>
+                                        </div>
+                                    </div>
+                                    `
+                                            )
+                                            .join("")
+                                        : `<p class="text-sm text-text-secondary text-center p-4">No transactions in the last 30 days.</p>`
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                `;
+
+    lucide.createIcons();
+
+    const ctx = container.querySelector("#staff-sales-chart")?.getContext("2d");
+    if (ctx) {
+      new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: Object.keys(salesByDay),
+          datasets: [
+            {
+              label: "Sales",
+              data: Object.values(salesByDay),
+              borderColor: chartStyles.palettes.gentleOcean[0],
+              backgroundColor: chartStyles.createGradient(
+                ctx,
+                chartStyles.palettes.gentleOcean[0]
+              ),
+              tension: 0.3,
+              fill: true,
+              pointRadius: 2,
+              pointHoverRadius: 5,
+              borderWidth: 2,
+            },
+          ],
+        },
+        options: commonChartOptions(true, {
+          scales: { x: { ticks: { maxRotation: 0, minRotation: 0 } } },
+        }),
+      });
+    }
+  }
+
+  // NEW FUNCTION: Initialize Expenses View
+  function initExpenses(pane) {
+    const container = pane.querySelector("#expenses-view-container");
+    if (!container) return;
+
+    const viewState = appState.viewStates.expenses;
+    const canManage = checkPermission("canManageExpenses");
+    const allExpenses = firestoreData.expenses;
+    const categories = [
+      "All Categories",
+      ...new Set(allExpenses.map((e) => e.category)),
+    ];
+
+    container.innerHTML = `
+                    <div>
+                        <div class="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-6">
+                            <h1 class="text-3xl font-bold text-text-primary">Expense Tracker</h1>
+                            <div class="flex items-center gap-2">
+                                ${
+                                  canManage
+                                    ? `<button data-action="add-expense" class="btn btn-primary flex-1 md:flex-none"><i data-lucide="plus" class="w-5 h-5 mr-2"></i> Log New Expense</button>`
+                                    : ""
+                                }
+                            </div>
+                        </div>
+                        
+                        <div class="flex flex-col md:flex-row gap-4 mb-4">
+                            <div class="relative flex-grow">
+                                <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-text-secondary"></i>
+                                <input type="text" id="expense-search" placeholder="Search by note, category..." class="form-input w-full pl-10" value="${
+                                  viewState.searchQuery
+                                }">
+                            </div>
+                            <select id="expense-category-filter" class="form-select md:w-48">
+                                ${categories
+                                  .map(
+                                    (c) =>
+                                      `<option value="${c}" ${
+                                        viewState.filters.category === c
+                                          ? "selected"
+                                          : ""
+                                      }>${c}</option>`
+                                  )
+                                  .join("")}
+                            </select>
+                        </div>
+
+                        <div class="bg-bg-secondary/50 rounded-xl">
+                            <table class="table-pro">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Category</th>
+                                        <th>Amount</th>
+                                        <th>Notes</th>
+                                        ${canManage ? "<th>Actions</th>" : ""}
+                                    </tr>
+                                </thead>
+                                <tbody id="expenses-table-body"></tbody>
+                            </table>
+                        </div>
+                        <div id="expenses-pagination" class="mt-4"></div>
+                    </div>`;
+
+    const renderExpensesTable = () => {
+      let filteredExpenses = allExpenses;
+      if (viewState.searchQuery) {
+        const query = viewState.searchQuery.toLowerCase();
+        filteredExpenses = filteredExpenses.filter(
+          (e) =>
+            (e.notes || "").toLowerCase().includes(query) ||
+            e.category.toLowerCase().includes(query)
+        );
+      }
+      if (
+        viewState.filters.category !== "all" &&
+        viewState.filters.category !== "All Categories"
+      ) {
+        filteredExpenses = filteredExpenses.filter(
+          (e) => e.category === viewState.filters.category
+        );
+      }
+
+      filteredExpenses.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+      const totalItems = filteredExpenses.length;
+      const startIndex = (viewState.currentPage - 1) * appState.itemsPerPage;
+      const endIndex = startIndex + appState.itemsPerPage;
+      const paginatedExpenses = filteredExpenses.slice(startIndex, endIndex);
+
+      const tableBody = container.querySelector("#expenses-table-body");
+      if (tableBody) {
+        tableBody.innerHTML = paginatedExpenses.length
+          ? paginatedExpenses
+              .map(
+                (e) => `
+                            <tr class="table-row">
+                                <td>${new Date(
+                                  e.date
+                                ).toLocaleDateString()}</td>
+                                <td><span class="px-2 py-1 text-xs font-semibold rounded-full bg-indigo-500/20 text-indigo-300">${
+                                  e.category
+                                }</span></td>
+                                <td class="font-mono text-left">${currencyUtils.format(
+                                  e.amountInBase
+                                )}</td>
+                                <td class="text-sm text-text-secondary truncate" title="${
+                                  e.notes || ""
+                                }">${e.notes || "N/A"}</td>
+                                ${
+                                  canManage
+                                    ? `
+                                <td class="text-right">
+                                    <div class="relative inline-block text-left">
+                                        <button data-action="toggle-action-menu" data-id="${e.id}" class="p-2 rounded-md hover:bg-bg-tertiary">
+                                            <i data-lucide="more-vertical" class="w-5 h-5 pointer-events-none"></i>
+                                        </button>
+                                        <div class="action-menu">
+                                            <div class="action-menu-item" data-action="edit-expense" data-id="${e.id}"><i data-lucide="edit" class="w-4 h-4"></i><span>Edit</span></div>
+                                            <div class="action-menu-item danger" data-action="delete-expense" data-id="${e.id}"><i data-lucide="trash-2" class="w-4 h-4"></i><span>Delete</span></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                `
+                                    : ""
+                                }
+                            </tr>
+                        `
+              )
+              .join("")
+          : `<tr><td colspan="${
+              canManage ? 5 : 4
+            }" class="text-center p-8 text-text-secondary">No expenses found for this period.</td></tr>`;
+      }
+
+      renderPaginationControls(
+        container.querySelector("#expenses-pagination"),
+        totalItems,
+        viewState.currentPage,
+        appState.itemsPerPage,
+        "expenses"
+      );
+      lucide.createIcons();
+    };
+
+    container
+      .querySelector("#expense-search")
+      .addEventListener("input", (e) => {
+        viewState.searchQuery = e.target.value;
+        viewState.currentPage = 1;
+        renderExpensesTable();
+      });
+    container
+      .querySelector("#expense-category-filter")
+      .addEventListener("change", (e) => {
+        viewState.filters.category = e.target.value;
+        viewState.currentPage = 1;
+        renderExpensesTable();
+      });
+
+    renderExpensesTable();
+    lucide.createIcons();
+  }
+
+  function initInvoices(pane) {
+    const tableBody = pane.querySelector("#invoices-table-body");
+    const viewState = appState.viewStates.invoices;
+    const getStatusBadge = (status) => {
+      const base = "px-3 py-1 text-xs font-semibold rounded-full inline-block";
+      if (status === "Paid") return `${base} bg-green-500/20 text-green-300`;
+      if (status === "Due") return `${base} bg-red-500/20 text-red-300`;
+      if (status === "Partial")
+        return `${base} bg-yellow-500/20 text-yellow-300`;
+      if (status === "Pending")
+        return `${base} bg-yellow-500/20 text-yellow-300`;
+      if (status === "Cancelled") return `${base} bg-gray-500/20 text-gray-300`;
+      if (status === "Void Requested")
+        return `${base} bg-orange-500/20 text-orange-300`;
+      if (status === "Void")
+        return `${base} bg-red-900/40 text-red-400 border border-red-500/50`;
+      return `${base} bg-gray-500/20 text-gray-300`;
+    };
+    const renderTable = () => {
+      // Apply filters
+      let filteredInvoices = [...firestoreData.invoices].sort(
+        (a, b) => new Date(b.date) - new Date(a.date)
+      );
+      if (viewState.searchQuery) {
+        const query = viewState.searchQuery.toLowerCase();
+        filteredInvoices = filteredInvoices.filter(
+          (i) =>
+            i.id.toLowerCase().includes(query) ||
+            i.customerName.toLowerCase().includes(query)
+        );
+      }
+      if (viewState.filters.status !== "all") {
+        filteredInvoices = filteredInvoices.filter(
+          (i) => i.status === viewState.filters.status
+        );
+      }
+
+      // Apply pagination
+      const totalItems = filteredInvoices.length;
+      const startIndex = (viewState.currentPage - 1) * appState.itemsPerPage;
+      const endIndex = startIndex + appState.itemsPerPage;
+      const paginatedInvoices = filteredInvoices.slice(startIndex, endIndex);
+
+      // Inject controls if not present
+      if (!pane.querySelector("#invoice-controls-container")) {
+        const header = pane.querySelector(
+          ".flex.justify-between.items-center.mb-6"
+        );
+        header.insertAdjacentHTML(
+          "afterend",
+          `
+                            <div id="invoice-controls-container" class="flex flex-col md:flex-row gap-4 mb-4">
+                                <div class="relative flex-grow">
+                                    <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-text-secondary"></i>
+                                    <input type="text" id="invoice-search" placeholder="Search by Invoice ID or Customer Name..." class="form-input w-full pl-10" value="${
+                                      viewState.searchQuery
+                                    }">
+                                </div>
+                                <select id="invoice-status-filter" class="form-select md:w-48">
+                                    <option value="all">All Statuses</option>
+                                    <option value="Paid" ${
+                                      viewState.filters.status === "Paid"
+                                        ? "selected"
+                                        : ""
+                                    }>Paid</option>
+                                    <option value="Partial" ${
+                                      viewState.filters.status === "Partial"
+                                        ? "selected"
+                                        : ""
+                                    }>Partial</option>
+                                    <option value="Due" ${
+                                      viewState.filters.status === "Due"
+                                        ? "selected"
+                                        : ""
+                                    }>Due</option>
+                                    <option value="Pending" ${
+                                      viewState.filters.status === "Pending"
+                                        ? "selected"
+                                        : ""
+                                    }>Pending</option>
+                                    <option value="Void Requested" ${
+                                      viewState.filters.status ===
+                                      "Void Requested"
+                                        ? "selected"
+                                        : ""
+                                    }>Void Requested</option>
+                                    <option value="Void" ${
+                                      viewState.filters.status === "Void"
+                                        ? "selected"
+                                        : ""
+                                    }>Void</option> 
+                                    <option value="Cancelled" ${
+                                      viewState.filters.status === "Cancelled"
+                                        ? "selected"
+                                        : ""
+                                    }>Cancelled</option>
+                                </select>
+                            </div>
+                        `
+        );
+        lucide.createIcons();
+        pane.querySelector("#invoice-search").addEventListener("input", (e) => {
+          viewState.searchQuery = e.target.value;
+          viewState.currentPage = 1;
+          renderTable();
+        });
+        pane
+          .querySelector("#invoice-status-filter")
+          .addEventListener("change", (e) => {
+            viewState.filters.status = e.target.value;
+            viewState.currentPage = 1;
+            renderTable();
+          });
+      }
+
+      tableBody.innerHTML = paginatedInvoices.length
+        ? paginatedInvoices
+            .map((i) => {
+              // --- REFACTORED: VOID ACTION LOGIC ---
+              const canRequest = checkPermission("canRequestInvoiceVoid");
+              const canApprove = checkPermission("canApproveInvoiceVoid");
+              const canCancelRequest = checkPermission("canCancelVoidRequest");
+              const canManagerVoid = checkPermission("canDirectlyVoidInvoice");
+              const canAdminVoid = checkPermission("canDoEverything"); // Admin's master key
+              const isVoidableStatus = ["Paid", "Partial", "Due"].includes(
+                i.status
+              );
+              const isTooOld =
+                new Date(i.date) <
+                new Date(
+                  Date.now() -
+                    (appState.settings.voidLockoutDays || 30) * 86400000
+                );
+              const currentUserId = appState.session.currentUser.uid;
+
+              let voidActionItems = [];
+
+              if (!isTooOld) {
+                // 1. Direct Void action (Admin & Manager)
+                if ((canAdminVoid || canManagerVoid) && isVoidableStatus) {
+                  voidActionItems.push(
+                    `<div class="action-menu-item danger" data-action="void-invoice" data-id="${i.id}"><i data-lucide="shield-x" class="w-4 h-4"></i><span>Void Invoice</span></div>`
+                  );
+                }
+
+                // 2. Review Request action (Admin & Manager)
+                if (canApprove && i.status === "Void Requested") {
+                  voidActionItems.push(
+                    `<div class="action-menu-item text-orange-400" data-action="review-void-request" data-id="${i.id}"><i data-lucide="gavel" class="w-4 h-4"></i><span>Review Void Request</span></div>`
+                  );
+                }
+
+                // 3. Request Void action (Cashier)
+                if (
+                  canRequest &&
+                  isVoidableStatus &&
+                  !canAdminVoid &&
+                  !canManagerVoid
+                ) {
+                  voidActionItems.push(
+                    `<div class="action-menu-item danger" data-action="request-void" data-id="${i.id}"><i data-lucide="shield-x" class="w-4 h-4"></i><span>Request Void</span></div>`
+                  );
+                }
+
+                // 4. Cancel Void Request action (Cashier who made the request)
+                if (
+                  canCancelRequest &&
+                  i.status === "Void Requested" &&
+                  i.voidDetails?.requestedBy === currentUserId
+                ) {
+                  voidActionItems.push(
+                    `<div class="action-menu-item" data-action="cancel-void-request" data-id="${i.id}"><i data-lucide="rotate-ccw" class="w-4 h-4"></i><span>Cancel Void Request</span></div>`
+                  );
+                }
+              }
+              const voidActionItem = voidActionItems.join("");
+              // --- END REFACTORED ---
+
+              return `
+                         <tr class="table-row">
+                            <td class="font-mono text-xs">${i.id}</td>
+                            <td class="font-medium text-text-primary">${
+                              i.customerName
+                            }</td>
+                            <td>${new Date(i.date).toLocaleDateString()}</td>
+                            <td class="font-mono">${currencyUtils.format(
+                              i.totalInBaseCurrency,
+                              i.currency
+                            )}</td>
+                            <td><span class="${getStatusBadge(i.status)}">${
+                i.status
+              }</span></td>
+                            <td class="text-right">
+                                <div class="relative inline-block text-left">
+                                    <button data-action="toggle-action-menu" data-id="${
+                                      i.id
+                                    }" class="p-2 rounded-md hover:bg-bg-tertiary focus:outline-none focus:ring-2 focus:ring-accent">
+                                        <i data-lucide="more-vertical" class="w-5 h-5 pointer-events-none"></i>
+                                    </button>
+                                    <div class="action-menu">
+                                        <div class="action-menu-item" data-action="view-invoice" data-id="${
+                                          i.id
+                                        }"><i data-lucide="eye" class="w-4 h-4"></i><span>View Details</span></div>
+                                        <div class="action-menu-item" data-action="print-invoice" data-id="${
+                                          i.id
+                                        }"><i data-lucide="printer" class="w-4 h-4"></i><span>Print</span></div>
+                                        <div class="action-menu-item" data-action="email-invoice" data-id="${
+                                          i.id
+                                        }"><i data-lucide="send" class="w-4 h-4"></i><span>Send via Email</span></div>
+                                        ${
+                                          voidActionItem
+                                            ? `<div class="h-px bg-border-color my-1"></div>${voidActionItem}`
+                                            : ""
+                                        }
+                                        ${
+                                          appState.session.userRole === "admin"
+                                            ? `
+                                        <div class="h-px bg-border-color my-1"></div>
+                                        <div class="action-menu-item danger" data-action="delete-invoice" data-id="${i.id}"><i data-lucide="trash-2" class="w-4 h-4"></i><span>Delete Invoice</span></div>
+                                        `
+                                            : ""
+                                        }
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>`;
+            })
+            .join("")
+        : `<tr><td colspan="6" class="text-center p-8 text-text-secondary" style="grid-column: 1 / -1;">No invoices found.</td></tr>`;
+
+      if (!pane.querySelector("#invoices-pagination")) {
+        tableBody.parentElement.parentElement.insertAdjacentHTML(
+          "afterend",
+          '<div id="invoices-pagination" class="mt-4"></div>'
+        );
+      }
+      renderPaginationControls(
+        pane.querySelector("#invoices-pagination"),
+        totalItems,
+        viewState.currentPage,
+        appState.itemsPerPage,
+        "invoices"
+      );
+      lucide.createIcons();
+    };
+    renderTable();
+  }
+
+  function initReports(pane) {
+    // --- NEW: Force cashier report type to 'sales' ---
+    if (appState.session.userRole === "cashier") {
+      appState.viewStates.reports.reportType = "sales";
+    }
+    // --- END NEW ---
+
+    const term = getCurrentProfile().terminology;
+    const reportsContainer = pane.querySelector("#reports-container");
+    let chartInstances = {};
+    const viewState = appState.viewStates.reports;
+    if (!viewState.period) viewState.period = "last30"; // Initialize if not present
+    if (!viewState.filters) viewState.filters = {}; // Initialize filters if not present
+    if (!viewState.reportType) viewState.reportType = "sales";
+
+    const colorClasses = {
+      blue: { bg: "bg-blue-500/10", text: "text-blue-400" },
+      green: { bg: "bg-green-500/10", text: "text-green-400" },
+      yellow: { bg: "bg-yellow-500/10", text: "text-yellow-400" },
+      indigo: { bg: "bg-indigo-500/10", text: "text-indigo-400" },
+      red: { bg: "bg-red-500/10", text: "text-red-400" },
+    };
+
+    const calculateChange = (current, previous) => {
+      if (previous === 0) return current > 0 ? 100 : 0;
+      return ((current - previous) / previous) * 100;
+    };
+
+    const formatChange = (change) => {
+      if (change === 0 || !isFinite(change)) return ``;
+      const color = change > 0 ? "text-green-400" : "text-red-400";
+      const icon = change > 0 ? "trending-up" : "trending-down";
+      return `<span class="flex items-center text-xs font-semibold ${color}"><i data-lucide="${icon}" class="w-4 h-4 mr-1"></i>${Math.abs(
+        change
+      ).toFixed(1)}%</span>`;
+    };
+
+    const formatAndTruncate = (label, valueToFormat, isCurrency = true) => {
+      const fullValue = isCurrency
+        ? currencyUtils.format(valueToFormat, appState.currentCurrency, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })
+        : valueToFormat.toLocaleString();
+
+      if (fullValue.length > 10) {
+        const truncatedValue = fullValue.substring(0, 7) + "...";
+        return `<span class="cursor-pointer hover:underline" data-action="show-full-stat" data-full-value="${fullValue}" data-label="${label}">${truncatedValue}</span>`;
+      }
+      return fullValue;
+    };
+
+    const destroyCharts = () => {
+      Object.values(chartInstances).forEach((chart) => chart.destroy());
+      chartInstances = {};
+    };
+
+    // --- NEW/REFACTORED SECTION START ---
+
+    // NEW: This function renders the content for the "Audit Log" sub-tab
+    const renderAuditLogSubReport = (
+      startDate,
+      endDate,
+      contentContainer,
+      paginationContainer
+    ) => {
+      // Find and clear the summary container for this view
+      const summaryContainer = document.getElementById(
+        "activity-summary-container"
+      );
+      if (summaryContainer) {
+        summaryContainer.innerHTML = "";
+        summaryContainer.classList.add("hidden");
+      }
+
+      let auditLogs = firestoreData.auditLog.filter((log) => {
+        if (!log.timestamp) return false;
+        const logDate = new Date(log.timestamp);
+        return logDate >= startDate && logDate <= endDate;
+      });
+
+      // NEW: Filter logs for managers to show only their own logs and cashier logs.
+      const currentUserRole = appState.session.userRole;
+      const currentUserId = appState.session.currentUser.uid;
+      if (currentUserRole === "manager") {
+        const cashierIds = firestoreData.staff
+          .filter((s) => s.role === "cashier")
+          .map((s) => s.id);
+        auditLogs = auditLogs.filter((log) => {
+          // A manager can see their own logs or logs generated by any cashier.
+          return (
+            log.user?.id === currentUserId || cashierIds.includes(log.user?.id)
+          );
+        });
+      }
+
+      // If the user can see all reports, apply the dropdown filter.
+      // Otherwise (for a cashier), the data is already pre-filtered by the Firestore listener.
+      if (checkPermission("canSeeAllReports")) {
+        const selectedCashierId = viewState.filters.cashierId;
+        if (selectedCashierId && selectedCashierId !== "all") {
+          auditLogs = auditLogs.filter(
+            (log) => log.user?.id === selectedCashierId
+          );
+        }
+      }
+
+      // Paginate the table
+      const totalItems = auditLogs.length;
+      const startIndex = (viewState.currentPage - 1) * appState.itemsPerPage;
+      const endIndex = startIndex + appState.itemsPerPage;
+      const paginatedLogs = auditLogs
+        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+        .slice(startIndex, endIndex);
+
+      contentContainer.innerHTML = `
+                        <div class="overflow-x-auto">
+                            <table class="table-pro">
+                                <thead>
+                                    <tr>
+                                        <th>Timestamp</th>
+                                        <th>User</th>
+                                        <th>Action Type</th>
+                                        <th>Details</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                ${
+                                  paginatedLogs.length
+                                    ? paginatedLogs
+                                        .map(
+                                          (log) => `
+                                    <tr class="table-row">
+                                        <td class="text-xs">
+                                            <div>${new Date(
+                                              log.timestamp
+                                            ).toLocaleDateString([], {
+                                              year: "numeric",
+                                              month: "2-digit",
+                                              day: "2-digit",
+                                            })}</div>
+                                            <div class="text-text-secondary/80">${new Date(
+                                              log.timestamp
+                                            ).toLocaleTimeString([], {
+                                              hour: "2-digit",
+                                              minute: "2-digit",
+                                              second: "2-digit",
+                                              hour12: true,
+                                            })}</div>
+                                        </td>
+                                        <td class="text-text-primary font-medium">${
+                                          log.user?.name || "System"
+                                        }</td>
+                                        <td><span class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-500/20 text-blue-300 capitalize">${log.type.replace(
+                                          /_/g,
+                                          " "
+                                        )}</span></td>
+                                        <td class="text-sm">${log.details}</td>
+                                    </tr>
+                                `
+                                        )
+                                        .join("")
+                                    : `<tr><td colspan="4" class="text-center p-8 text-text-secondary">No audit logs in this period.</td></tr>`
+                                }
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+
+      renderPaginationControls(
+        paginationContainer,
+        totalItems,
+        viewState.currentPage,
+        appState.itemsPerPage,
+        "reports"
+      );
+    };
+
+    // REFACTORED: This was the old renderVoidedReport function, now adapted to be a sub-report
+    const renderVoidedInvoicesSubReport = (
+      startDate,
+      endDate,
+      contentContainer,
+      paginationContainer
+    ) => {
+      let voidedInvoices = firestoreData.invoices.filter((inv) => {
+        const voidDate =
+          inv.voidDetails?.approvedAt || inv.voidDetails?.requestedAt;
+        const filterDate = voidDate ? new Date(voidDate) : new Date(inv.date);
+        return (
+          inv.status === "Void" &&
+          filterDate >= startDate &&
+          filterDate <= endDate
+        );
+      });
+
+      // NEW: Calculate summary metrics
+      const totalVoidedCount = voidedInvoices.length;
+      const totalVoidedAmountBase = voidedInvoices.reduce(
+        (sum, inv) => sum + inv.totalInBaseCurrency,
+        0
+      );
+
+      // Find and populate the summary container
+      const summaryContainer = document.getElementById(
+        "activity-summary-container"
+      );
+      if (summaryContainer) {
+        summaryContainer.innerHTML = `
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                <div class="summary-card bg-bg-secondary p-4 rounded-lg border border-border-color flex items-center gap-4">
+                                    <div class="w-10 h-10 rounded-lg flex items-center justify-center bg-red-500/10 shrink-0">
+                                        <i data-lucide="shield-x" class="w-5 h-5 text-red-400"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs text-text-secondary uppercase font-semibold">Total Voided Invoices</p>
+                                        <p class="text-2xl font-bold text-text-primary">${totalVoidedCount}</p>
+                                    </div>
+                                </div>
+                                <div class="summary-card bg-bg-secondary p-4 rounded-lg border border-border-color flex items-center gap-4">
+                                    <div class="w-10 h-10 rounded-lg flex items-center justify-center bg-red-500/10 shrink-0">
+                                        <i data-lucide="wallet-cards" class="w-5 h-5 text-red-400"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs text-text-secondary uppercase font-semibold">Total Voided Amount</p>
+                                        <p class="text-2xl font-bold text-text-primary font-mono">${currencyUtils.format(
+                                          totalVoidedAmountBase
+                                        )}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+        summaryContainer.classList.remove("hidden");
+        lucide.createIcons();
+      }
+
+      // If the user can see all reports, apply the dropdown filter.
+      // Otherwise (for a cashier), the data is already pre-filtered by the Firestore listener.
+      if (checkPermission("canSeeAllReports")) {
+        const selectedCashierId = viewState.filters.cashierId;
+        if (selectedCashierId && selectedCashierId !== "all") {
+          voidedInvoices = voidedInvoices.filter(
+            (inv) => inv.cashierId === selectedCashierId
+          );
+        }
+      }
+
+      // Paginate the table
+      const totalItems = voidedInvoices.length;
+      const startIndex = (viewState.currentPage - 1) * appState.itemsPerPage;
+      const endIndex = startIndex + appState.itemsPerPage;
+      const paginatedInvoices = voidedInvoices
+        .sort(
+          (a, b) =>
+            new Date(b.voidDetails?.approvedAt || b.date) -
+            new Date(a.voidDetails?.approvedAt || a.date)
+        )
+        .slice(startIndex, endIndex);
+
+      contentContainer.innerHTML = `
+                        <div class="overflow-x-auto">
+                            <table class="table-pro">
+                                <thead>
+                                    <tr>
+                                        <th>Invoice ID</th>
+                                        <th>Customer</th>
+                                        <th>Original Date</th>
+                                        <th>Voided On</th>
+                                        <th>Voided By</th>
+                                        <th>Reason</th>
+                                        <th class="text-right">Original Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                ${
+                                  paginatedInvoices.length
+                                    ? paginatedInvoices
+                                        .map((inv) => {
+                                          const voidDetails =
+                                            inv.voidDetails || {};
+                                          const voidedBy =
+                                            voidDetails.approvedByName ||
+                                            voidDetails.requestedByName ||
+                                            "N/A";
+                                          const voidedOn = voidDetails.approvedAt
+                                            ? new Date(
+                                                voidDetails.approvedAt
+                                              ).toLocaleDateString()
+                                            : "N/A";
+                                          const reason =
+                                            voidDetails.reason ||
+                                            voidDetails.requestReason ||
+                                            "No reason provided";
+
+                                          return `
+                                    <tr class="table-row">
+                                        <td class="font-mono text-xs">${
+                                          inv.id
+                                        }</td>
+                                        <td class="text-text-primary font-medium">${
+                                          inv.customerName
+                                        }</td>
+                                        <td>${new Date(
+                                          inv.date
+                                        ).toLocaleDateString()}</td>
+                                        <td>${voidedOn}</td>
+                                        <td>${voidedBy}</td>
+                                        <td class="text-sm">${reason}</td>
+                                        <td class="font-mono text-right text-red-400">${currencyUtils.format(
+                                          inv.totalInBaseCurrency
+                                        )}</td>
+                                    </tr>`;
+                                        })
+                                        .join("")
+                                    : `<tr><td colspan="7" class="text-center p-8 text-text-secondary">No voided invoices in this period.</td></tr>`
+                                }
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+
+      renderPaginationControls(
+        paginationContainer,
+        totalItems,
+        viewState.currentPage,
+        appState.itemsPerPage,
+        "reports"
+      );
+    };
+
+    // NEW: This function renders the main container for the Activity report type
+    const renderActivityReport = (startDate, endDate) => {
+      destroyCharts();
+      if (!viewState.filters.activitySubType) {
+        viewState.filters.activitySubType = "voided_invoices";
+      }
+      const activitySubType = viewState.filters.activitySubType;
+
+      reportsContainer.innerHTML = `
+                        <div class="glass-pane p-6 rounded-xl">
+                            <div class="flex flex-col md:flex-row justify-between md:items-center gap-2 mb-6">
+                                <h3 class="text-xl font-semibold text-text-primary">Activity Log</h3>
+                                <div class="activity-tabs flex items-center gap-1 bg-bg-secondary p-1 rounded-lg border border-border-color">
+                                    <button data-action="set-activity-report-type" data-type="voided_invoices" class="activity-tab-btn ${
+                                      activitySubType === "voided_invoices"
+                                        ? "active"
+                                        : ""
+                                    }">
+                                        <i data-lucide="shield-x" class="w-4 h-4 mr-2"></i>Voided Invoices
+                                    </button>
+                                    <button data-action="set-activity-report-type" data-type="audit_log" class="activity-tab-btn ${
+                                      activitySubType === "audit_log"
+                                        ? "active"
+                                        : ""
+                                    }">
+                                        <i data-lucide="file-text" class="w-4 h-4 mr-2"></i>Audit Log
+                                    </button>
+                                    <!-- More buttons can be added here -->
+                                </div>
+                            </div>
+
+                            <!-- NEW: Summary KPIs Container -->
+                            <div id="activity-summary-container"></div>
+                            
+                            <div id="activity-report-content"></div>
+                        </div>
+                        <div id="reports-pagination" class="mt-4"></div>
+                        <style>
+                            .activity-tab-btn { 
+                                display: flex; align-items: center; justify-content: center;
+                                padding: 6px 14px; 
+                                border-radius: 6px; 
+                                color: var(--text-secondary); 
+                                font-weight: 500;
+                                font-size: 14px;
+                                transition: all 0.2s ease; 
+                                border: 1px solid transparent;
+                            }
+                            .activity-tab-btn:hover:not(.active) { 
+                                background-color: var(--bg-tertiary);
+                                color: var(--text-primary); 
+                            }
+                            .activity-tab-btn.active { 
+                                color: var(--accent); 
+                                background-color: var(--accent-glow);
+                                border-color: var(--accent);
+                                box-shadow: 0 2px 8px -1px var(--accent-glow);
+                            }
+                        </style>
+                    `;
+
+      const contentContainer = reportsContainer.querySelector(
+        "#activity-report-content"
+      );
+      const paginationContainer = reportsContainer.querySelector(
+        "#reports-pagination"
+      );
+
+      if (activitySubType === "voided_invoices") {
+        renderVoidedInvoicesSubReport(
+          startDate,
+          endDate,
+          contentContainer,
+          paginationContainer
+        );
+      } else if (activitySubType === "audit_log") {
+        renderAuditLogSubReport(
+          startDate,
+          endDate,
+          contentContainer,
+          paginationContainer
+        );
+      }
+      lucide.createIcons();
+    };
+
+    // --- END NEW/REFACTORED SECTION ---
+
+    const renderSalesReport = (
+      startDate,
+      endDate,
+      prevStartDate,
+      prevEndDate
+    ) => {
+      destroyCharts();
+
+      const getSalesMetrics = (start, end) => {
+        let invoices = firestoreData.invoices.filter((inv) => {
+          const invDate = new Date(inv.date);
+          return invDate >= start && invDate <= end && inv.status !== "Void";
+        });
+
+        // If the user can see all reports, apply the dropdown filter.
+        // Otherwise (for a cashier), the data is already pre-filtered by the Firestore listener.
+        if (checkPermission("canSeeAllReports")) {
+          const selectedCashierId = viewState.filters.cashierId;
+          if (selectedCashierId && selectedCashierId !== "all") {
+            invoices = invoices.filter(
+              (inv) => inv.cashierId === selectedCashierId
+            );
+          }
+        }
+
+        const grossRevenue = invoices.reduce(
+          (sum, inv) => sum + inv.totalInBaseCurrency,
+          0
+        );
+        const grossProfit = invoices.reduce((profit, inv) => {
+          const invoiceProfit = inv.items.reduce((itemProfit, item) => {
+            const product = firestoreData.products.find(
+              (p) => p.id === item.id
+            );
+            const cost = product ? product.costPrice || 0 : item.price;
+            return itemProfit + (item.price - cost) * (item.qty || 1);
+          }, 0);
+          return profit + invoiceProfit;
+        }, 0);
+        const avgSaleValue =
+          invoices.length > 0 ? grossRevenue / invoices.length : 0;
+        const newCustomers = firestoreData.customers.filter((c) => {
+          const joinDate = new Date(c.joinDate);
+          return joinDate >= start && joinDate <= end;
+        }).length;
+        return {
+          invoices,
+          grossRevenue,
+          grossProfit,
+          avgSaleValue,
+          newCustomers,
+        };
+      };
+
+      const currentMetrics = getSalesMetrics(startDate, endDate);
+      const previousMetrics = getSalesMetrics(prevStartDate, prevEndDate);
+
+      let kpis = [
+        {
+          icon: "trending-up",
+          label: "Gross Revenue",
+          value: currentMetrics.grossRevenue,
+          isCurrency: true,
+          color: "blue",
+          change: calculateChange(
+            currentMetrics.grossRevenue,
+            previousMetrics.grossRevenue
+          ),
+        },
+        {
+          icon: "wallet",
+          label: "Gross Profit",
+          value: currentMetrics.grossProfit,
+          isCurrency: true,
+          color: "green",
+          change: calculateChange(
+            currentMetrics.grossProfit,
+            previousMetrics.grossProfit
+          ),
+        },
+        {
+          icon: "receipt",
+          label: "Avg. Sale Value",
+          value: currentMetrics.avgSaleValue,
+          isCurrency: true,
+          color: "yellow",
+          change: calculateChange(
+            currentMetrics.avgSaleValue,
+            previousMetrics.avgSaleValue
+          ),
+        },
+        {
+          icon: "users",
+          label: "New Customers",
+          value: currentMetrics.newCustomers,
+          isCurrency: false,
+          color: "indigo",
+          change: calculateChange(
+            currentMetrics.newCustomers,
+            previousMetrics.newCustomers
+          ),
+        },
+      ];
+
+      // NEW: Conditional replacement for admin
+      if (appState.session.userRole === "admin") {
+        const getExpenseMetrics = (start, end) => {
+          const relevantExpenses = firestoreData.expenses.filter((e) => {
+            if (!e.date) return false;
+            const expenseDate = new Date(e.date);
+            return expenseDate >= start && expenseDate <= end;
+          });
+          const totalExpenses = relevantExpenses.reduce(
+            (sum, e) => sum + e.amountInBase,
+            0
+          );
+          return { totalExpenses };
+        };
+        const currentExpenseMetrics = getExpenseMetrics(startDate, endDate);
+        const previousExpenseMetrics = getExpenseMetrics(
+          prevStartDate,
+          prevEndDate
+        );
+        const currentNetProfit =
+          currentMetrics.grossProfit - currentExpenseMetrics.totalExpenses;
+        const previousNetProfit =
+          previousMetrics.grossProfit - previousExpenseMetrics.totalExpenses;
+
+        // Find 'New Customers' and replace it with 'Net Profit'
+        const customerKpiIndex = kpis.findIndex(
+          (kpi) => kpi.label === "New Customers"
+        );
+        if (customerKpiIndex > -1) {
+          kpis[customerKpiIndex] = {
+            icon: "shield-check",
+            label: "Net Profit",
+            value: currentNetProfit,
+            isCurrency: true,
+            color: "indigo",
+            change: calculateChange(currentNetProfit, previousNetProfit),
+          };
+        }
+      }
+
+      if (!checkPermission("canViewProfitAndLoss")) {
+        // MODIFIED
+        kpis = kpis.filter(
+          (kpi) => kpi.label !== "Gross Profit" && kpi.label !== "Net Profit"
+        );
+      }
+
+      reportsContainer.innerHTML = `
+                        <!-- KPIs -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            ${kpis
+                              .map(
+                                (kpi) => `
+                                <div class="kpi-card glass-pane p-5 rounded-xl flex items-center gap-4">
+                                    <div class="w-12 h-12 rounded-full flex items-center justify-center ${
+                                      colorClasses[kpi.color].bg
+                                    } shrink-0">
+                                        <i data-lucide="${
+                                          kpi.icon
+                                        }" class="w-6 h-6 ${
+                                  colorClasses[kpi.color].text
+                                }"></i>
+                                    </div>
+                                    <div class="overflow-hidden">
+                                        <p class="text-sm font-medium text-text-secondary">${
+                                          kpi.label
+                                        }</p>
+                                        <div class="flex items-baseline gap-2">
+                                            <p class="text-2xl font-bold text-text-primary">${formatAndTruncate(
+                                              kpi.label,
+                                              kpi.value,
+                                              kpi.isCurrency
+                                            )}</p>
+                                            ${formatChange(kpi.change)}
+                                        </div>
+                                    </div>
+                                </div>
+                            `
+                              )
+                              .join("")}
+                        </div>
+                        <!-- Charts -->
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            ${
+                              checkPermission("canViewProfitAndLoss")
+                                ? `<div class="glass-pane p-6 rounded-xl h-96 flex flex-col"><h3 class="text-xl font-semibold text-text-primary mb-4">Profit & Loss</h3><div class="flex-grow"><canvas id="sales-trend-chart"></canvas></div></div>`
+                                : ""
+                            }
+                            <div class="glass-pane p-6 rounded-xl h-96 flex flex-col"><h3 class="text-xl font-semibold text-text-primary mb-4">Top 5 Selling ${
+                              term.product
+                            }s</h3><div class="flex-grow"><canvas id="top-products-chart"></canvas></div></div>
+                            <div class="glass-pane p-6 rounded-xl h-96 flex flex-col"><h3 class="text-xl font-semibold text-text-primary mb-4">Revenue by ${
+                              term.category
+                            }</h3><div class="flex-grow"><canvas id="category-revenue-chart"></canvas></div></div>
+                            <div class="glass-pane p-6 rounded-xl h-96 flex flex-col"><h3 class="text-xl font-semibold text-text-primary mb-4">Sales by Hour of Day</h3><div class="flex-grow"><canvas id="sales-hour-chart"></canvas></div></div>
+                        </div>
+                        <!-- Data Table -->
+                        <div class="glass-pane p-6 rounded-xl">
+                            <h3 class="text-xl font-semibold text-text-primary mb-4">All Sales in Period</h3>
+                             <div class="overflow-x-auto">
+                                <table class="table-pro">
+                                    <thead><tr><th>Invoice ID</th><th>Customer</th><th>Date</th><th>Items</th><th>Total</th>${
+                                      checkPermission("canViewProfitAndLoss")
+                                        ? "<th>Profit</th>"
+                                        : ""
+                                    }<th>Status</th></tr></thead>
+                                    <tbody>
+                                    ${firestoreData.invoices
+                                      .filter((inv) => inv.status !== "Void")
+                                      .slice(0, 5)
+                                      .map((inv) => {
+                                        const profit = inv.items.reduce(
+                                          (itemProfit, item) => {
+                                            const product = firestoreData.products.find(
+                                              (p) => p.id === item.id
+                                            );
+                                            const cost = product
+                                              ? product.costPrice || 0
+                                              : item.price;
+                                            return (
+                                              itemProfit +
+                                              (item.price - cost) *
+                                                (item.qty || 1)
+                                            );
+                                          },
+                                          0
+                                        );
+                                        return `
+                                        <tr class="table-row">
+                                            <td class="font-mono text-xs">${
+                                              inv.id
+                                            }</td>
+                                            <td class="text-text-primary font-medium">${
+                                              inv.customerName
+                                            }</td>
+                                            <td>${new Date(
+                                              inv.date
+                                            ).toLocaleDateString()}</td>
+                                            <td class="text-center">${inv.items.reduce(
+                                              (sum, i) => sum + (i.qty || 1),
+                                              0
+                                            )}</td>
+                                            <td class="font-mono">${currencyUtils.format(
+                                              inv.totalInBaseCurrency
+                                            )}</td>
+                                            ${
+                                              checkPermission(
+                                                "canViewProfitAndLoss"
+                                              )
+                                                ? `<td class="font-mono text-green-400">${currencyUtils.format(
+                                                    profit
+                                                  )}</td>`
+                                                : ""
+                                            }
+                                            <td><span class="px-2 py-1 text-xs font-semibold rounded-full ${
+                                              inv.status === "Paid"
+                                                ? "bg-green-500/20 text-green-300"
+                                                : "bg-yellow-500/20 text-yellow-300"
+                                            }">${inv.status}</span></td>
+                                        </tr>`;
+                                      })
+                                      .join("")}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div id="reports-pagination" class="mt-4"></div>
+                    `;
+
+      // Sales Trend Chart Data
+      let salesLabels, revenueData, profitData;
+      const timeDiffDays = (endDate - startDate) / (1000 * 3600 * 24);
+
+      if (timeDiffDays <= 2) {
+        // Today, Yesterday
+        salesLabels = Array.from({ length: 24 }, (_, i) => {
+          const h = i % 12 === 0 ? 12 : i % 12;
+          const ampm = i < 12 ? "AM" : "PM";
+          return `${h} ${ampm}`;
+        });
+        revenueData = Array(24).fill(0);
+        profitData = Array(24).fill(0);
+        currentMetrics.invoices.forEach((inv) => {
+          const hour = new Date(inv.date).getHours();
+          revenueData[hour] += inv.totalInBaseCurrency;
+          const invoiceProfit = inv.items.reduce((itemProfit, item) => {
+            const product = firestoreData.products.find(
+              (p) => p.id === item.id
+            );
+            const cost = product ? product.costPrice || 0 : item.price;
+            return itemProfit + (item.price - cost) * (item.qty || 1);
+          }, 0);
+          profitData[hour] += invoiceProfit;
+        });
+      } else {
+        // Week, Month, Year, Custom
+        const salesByDay = currentMetrics.invoices.reduce((acc, inv) => {
+          const day = new Date(inv.date).toLocaleDateString([], {
+            month: "short",
+            day: "numeric",
+          });
+          acc[day] = acc[day] || { revenue: 0, profit: 0 };
+          acc[day].revenue += inv.totalInBaseCurrency;
+          const invoiceProfit = inv.items.reduce((itemProfit, item) => {
+            const product = firestoreData.products.find(
+              (p) => p.id === item.id
+            );
+            const cost = product ? product.costPrice || 0 : item.price;
+            return itemProfit + (item.price - cost) * (item.qty || 1);
+          }, 0);
+          acc[day].profit += invoiceProfit;
+          return acc;
+        }, {});
+        salesLabels = Object.keys(salesByDay);
+        revenueData = salesLabels.map((day) => salesByDay[day].revenue);
+        profitData = salesLabels.map((day) => salesByDay[day].profit);
+      }
+
+      const salesTrendCanvas = document.getElementById("sales-trend-chart");
+      if (salesTrendCanvas) {
+        const salesTrendCtx = salesTrendCanvas.getContext("2d");
+        const trendChartDatasets = [
+          {
+            label: "Revenue",
+            data: revenueData,
+            borderColor: chartStyles.palettes.gentleOcean[0],
+            backgroundColor: chartStyles.createGradient(
+              salesTrendCtx,
+              chartStyles.palettes.gentleOcean[0]
+            ),
+            tension: 0.4,
+            fill: true,
+            borderWidth: 2.5,
+          },
+        ];
+        if (checkPermission("canViewProfitAndLoss")) {
+          trendChartDatasets.push({
+            label: "Profit",
+            data: profitData,
+            borderColor: chartStyles.palettes.softMeadow[0],
+            backgroundColor: chartStyles.createGradient(
+              salesTrendCtx,
+              chartStyles.palettes.softMeadow[0]
+            ),
+            tension: 0.4,
+            fill: true,
+            borderWidth: 2.5,
+          });
+        }
+        chartInstances.pnl = new Chart(salesTrendCtx, {
+          type: "line",
+          data: {
+            labels: salesLabels,
+            datasets: trendChartDatasets,
+          },
+          options: commonChartOptions(true, {
+            plugins: {
+              chartGlow: {
+                color: chartStyles.hexToRgba(
+                  chartStyles.palettes.gentleOcean[0],
+                  0.2
+                ),
+                blur: 15,
+              },
+            },
+          }),
+        });
+      }
+
+      // Top Products Chart
+      const productSales = currentMetrics.invoices
+        .flatMap((inv) => inv.items)
+        .reduce((acc, item) => {
+          const product = firestoreData.products.find((p) => p.id === item.id);
+          if (product) {
+            acc[product.name] =
+              (acc[product.name] || 0) + item.price * (item.qty || 1);
+          }
+          return acc;
+        }, {});
+      const topProducts = Object.entries(productSales)
+        .sort(([, a], [, b]) => b - a)
+        .slice(0, 5);
+      const topProductsCtx = document
+        .getElementById("top-products-chart")
+        .getContext("2d");
+      chartInstances.topProducts = new Chart(topProductsCtx, {
+        type: "bar",
+        data: {
+          labels: topProducts.map((p) => p[0]),
+          datasets: [
+            {
+              label: "Revenue",
+              data: topProducts.map((p) => p[1]),
+              backgroundColor: topProducts.map(
+                (_, i) => chartStyles.palettes.softMeadow[i]
+              ),
+              borderColor: topProducts.map((_, i) =>
+                chartStyles.hexToRgba(chartStyles.palettes.softMeadow[i], 0.5)
+              ),
+              borderWidth: 1,
+              borderRadius: 6,
+              hoverBackgroundColor: chartStyles.palettes.softMeadow.map((c) =>
+                chartStyles.hexToRgba(c, 0.8)
+              ),
+            },
+          ],
+        },
+        options: commonChartOptions(true, {
+          indexAxis: "y",
+          plugins: {
+            legend: { display: false },
+            chartGlow: {
+              color: "rgba(74, 222, 128, 0.2)",
+              blur: 12,
+              offsetY: 4,
+            },
+          },
+        }),
+      });
+
+      // Revenue by Category
+      const categorySales = currentMetrics.invoices
+        .flatMap((inv) => inv.items)
+        .reduce((acc, item) => {
+          const product = firestoreData.products.find((p) => p.id === item.id);
+          if (product && product.category) {
+            acc[product.category] =
+              (acc[product.category] || 0) + item.price * (item.qty || 1);
+          }
+          return acc;
+        }, {});
+      const categorySalesCtx = document
+        .getElementById("category-revenue-chart")
+        .getContext("2d");
+      chartInstances.categoryRevenue = new Chart(categorySalesCtx, {
+        type: "doughnut",
+        data: {
+          labels: Object.keys(categorySales),
+          datasets: [
+            {
+              label: "Revenue",
+              data: Object.values(categorySales),
+              backgroundColor: chartStyles.palettes.warmStone,
+              borderColor: "var(--bg-primary)",
+              borderWidth: 3,
+              hoverOffset: 12,
+            },
+          ],
+        },
+        options: commonChartOptions(true, {
+          plugins: { legend: { position: "right" } },
+        }),
+      });
+
+      // Sales by Hour Chart Data
+      const hourlySales = Array(24).fill(0);
+      currentMetrics.invoices.forEach((inv) => {
+        const hour = new Date(inv.date).getHours();
+        hourlySales[hour] += inv.totalInBaseCurrency;
+      });
+      const salesHourCtx = document
+        .getElementById("sales-hour-chart")
+        .getContext("2d");
+      chartInstances.salesHour = new Chart(salesHourCtx, {
+        type: "bar",
+        data: {
+          labels: Array.from({ length: 24 }, (_, i) => {
+            const h = i % 12 === 0 ? 12 : i % 12;
+            const ampm = i < 12 ? "AM" : "PM";
+            return `${h} ${ampm}`;
+          }),
+          datasets: [
+            {
+              label: "Sales",
+              data: hourlySales,
+              backgroundColor: chartStyles.createGradient(
+                salesHourCtx,
+                chartStyles.palettes.warmStone[0]
+              ),
+              borderColor: chartStyles.palettes.warmStone[0],
+              borderWidth: 1,
+              hoverBackgroundColor: chartStyles.hexToRgba(
+                chartStyles.palettes.warmStone[0],
+                0.8
+              ),
+              borderRadius: 6,
+            },
+          ],
+        },
+        options: commonChartOptions(true, {
+          plugins: {
+            legend: { display: false },
+            chartGlow: {
+              color: chartStyles.hexToRgba(
+                chartStyles.palettes.warmStone[0],
+                0.25
+              ),
+              blur: 12,
+              offsetY: 4,
+            },
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+              title: {
+                display: true,
+                text: "Hour of Day (24h)",
+                color: "#9ca3af",
+              },
+            },
+          },
+        }),
+      });
+
+      // Paginate the table
+      const totalItems = currentMetrics.invoices.length;
+      const startIndex = (viewState.currentPage - 1) * appState.itemsPerPage;
+      const endIndex = startIndex + appState.itemsPerPage;
+      const paginatedInvoices = currentMetrics.invoices
+        .sort((a, b) => new Date(b.date) - new Date(a.date))
+        .slice(startIndex, endIndex);
+
+      reportsContainer.querySelector("tbody").innerHTML = paginatedInvoices
+        .map((inv) => {
+          const profit = inv.items.reduce((itemProfit, item) => {
+            const product = firestoreData.products.find(
+              (p) => p.id === item.id
+            );
+            const cost = product ? product.costPrice || 0 : item.price;
+            return itemProfit + (item.price - cost) * (item.qty || 1);
+          }, 0);
+
+          return `
+                                        <tr class="table-row">
+                                            <td class="font-mono text-xs">${
+                                              inv.id
+                                            }</td>
+                                            <td class="text-text-primary font-medium">${
+                                              inv.customerName
+                                            }</td>
+                                            <td>${new Date(
+                                              inv.date
+                                            ).toLocaleDateString()}</td>
+                                            <td class="text-center">${inv.items.reduce(
+                                              (sum, i) => sum + (i.qty || 1),
+                                              0
+                                            )}</td>
+                                            <td class="font-mono">${currencyUtils.format(
+                                              inv.totalInBaseCurrency
+                                            )}</td>
+                                            ${
+                                              checkPermission(
+                                                "canViewProfitAndLoss"
+                                              )
+                                                ? `<td class="font-mono text-green-400">${currencyUtils.format(
+                                                    profit
+                                                  )}</td>`
+                                                : ""
+                                            }
+                                            <td><span class="px-2 py-1 text-xs font-semibold rounded-full ${
+                                              inv.status === "Paid"
+                                                ? "bg-green-500/20 text-green-300"
+                                                : "bg-yellow-500/20 text-yellow-300"
+                                            }">${inv.status}</span></td>
+                                        </tr>`;
+        })
+        .join("");
+
+      renderPaginationControls(
+        reportsContainer.querySelector("#reports-pagination"),
+        totalItems,
+        viewState.currentPage,
+        appState.itemsPerPage,
+        "reports"
+      );
+
+      lucide.createIcons();
+    };
+
+    const renderInventoryReport = (
+      startDate,
+      endDate,
+      prevStartDate,
+      prevEndDate
+    ) => {
+      destroyCharts();
+      const physicalProducts = firestoreData.products.filter(
+        (p) => p.productType === "physical" && !p.parentSKU
+      );
+
+      const getInventoryMetrics = (start, end) => {
+        let periodInvoices = firestoreData.invoices.filter((inv) => {
+          const invDate = new Date(inv.date);
+          return invDate >= start && invDate <= end && inv.status !== "Void";
+        });
+
+        // If the user can see all reports, apply the dropdown filter.
+        // Otherwise (for a cashier), the data is already pre-filtered by the Firestore listener.
+        if (checkPermission("canSeeAllReports")) {
+          const selectedCashierId = viewState.filters.cashierId;
+          if (selectedCashierId && selectedCashierId !== "all") {
+            periodInvoices = periodInvoices.filter(
+              (inv) => inv.cashierId === selectedCashierId
+            );
+          }
+        }
+
+        const physicalItemsSold = periodInvoices
+          .flatMap((inv) => inv.items)
+          .filter((item) => {
+            const product = firestoreData.products.find(
+              (p) => p.id === item.id
+            );
+            return product && product.productType === "physical";
+          });
+
+        const unitsSold = physicalItemsSold.reduce(
+          (sum, item) => sum + (item.qty || 1),
+          0
+        );
+        const revenueFromInventory = physicalItemsSold.reduce(
+          (sum, item) => sum + (item.qty || 1) * item.price,
+          0
+        );
+        return { unitsSold, revenueFromInventory };
+      };
+
+      const currentMetrics = getInventoryMetrics(startDate, endDate);
+      const previousMetrics = getInventoryMetrics(prevStartDate, prevEndDate);
+
+      // Snapshot metrics (don't change with time)
+      const totalValue = physicalProducts.reduce(
+        (sum, p) => sum + (p.stock || 0) * (p.costPrice || 0),
+        0
+      );
+      const totalSKUs = physicalProducts.length;
+
+      const kpis = [
+        {
+          icon: "dollar-sign",
+          label: `Total ${term.inventory} Value`,
+          value: totalValue,
+          isCurrency: true,
+          color: "blue",
+          change: null,
+        },
+        {
+          icon: "boxes",
+          label: `Total SKUs`,
+          value: totalSKUs,
+          isCurrency: false,
+          color: "indigo",
+          change: null,
+        },
+        {
+          icon: "package-check",
+          label: `Units Sold`,
+          value: currentMetrics.unitsSold,
+          isCurrency: false,
+          color: "green",
+          change: calculateChange(
+            currentMetrics.unitsSold,
+            previousMetrics.unitsSold
+          ),
+        },
+        {
+          icon: "trending-up",
+          label: `Revenue from ${term.inventory}`,
+          value: currentMetrics.revenueFromInventory,
+          isCurrency: true,
+          color: "yellow",
+          change: calculateChange(
+            currentMetrics.revenueFromInventory,
+            previousMetrics.revenueFromInventory
+          ),
+        },
+      ];
+
+      const stockValueByCategory = physicalProducts.reduce((acc, p) => {
+        const value = (p.stock || 0) * (p.costPrice || 0);
+        acc[p.category] = (acc[p.category] || 0) + value;
+        return acc;
+      }, {});
+
+      reportsContainer.innerHTML = `
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            ${kpis
+                              .map(
+                                (kpi) => `
+                                <div class="kpi-card glass-pane p-5 rounded-xl flex items-center gap-4">
+                                    <div class="w-12 h-12 rounded-full flex items-center justify-center ${
+                                      colorClasses[kpi.color].bg
+                                    } shrink-0">
+                                        <i data-lucide="${
+                                          kpi.icon
+                                        }" class="w-6 h-6 ${
+                                  colorClasses[kpi.color].text
+                                }"></i>
+                                    </div>
+                                    <div class="overflow-hidden">
+                                        <p class="text-sm font-medium text-text-secondary">${
+                                          kpi.label
+                                        }</p>
+                                        <div class="flex items-baseline gap-2">
+                                            <p class="text-2xl font-bold text-text-primary">${formatAndTruncate(
+                                              kpi.label,
+                                              kpi.value,
+                                              kpi.isCurrency
+                                            )}</p>
+                                            ${
+                                              kpi.change !== null
+                                                ? formatChange(kpi.change)
+                                                : ""
+                                            }
+                                        </div>
+                                    </div>
+                                </div>`
+                              )
+                              .join("")}
+                        </div>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                           <div class="glass-pane p-6 rounded-xl h-96 flex flex-col"><h3 class="text-xl font-semibold text-text-primary mb-4">Stock Value by ${
+                             term.category
+                           } <span class="text-xs font-normal text-text-secondary">(Live)</span></h3><div class="flex-grow"><canvas id="stock-value-chart"></canvas></div></div>
+                           <div class="glass-pane p-6 rounded-xl h-96 flex flex-col"><h3 class="text-xl font-semibold text-text-primary mb-4">Top 5 Most Stocked ${
+                             term.product
+                           }s <span class="text-xs font-normal text-text-secondary">(Live)</span></h3><div class="flex-grow"><canvas id="top-stocked-chart"></canvas></div></div>
+                        </div>
+                        <div class="glass-pane p-6 rounded-xl">
+                            <h3 class="text-xl font-semibold text-text-primary mb-4">${
+                              term.inventory
+                            } List <span class="text-xs font-normal text-text-secondary">(Live)</span></h3>
+                            <div class="overflow-x-auto">
+                                <table class="table-pro">
+                                    <thead><tr><th>SKU</th><th>${
+                                      term.product
+                                    }</th><th>${
+        term.category
+      }</th><th>Stock</th><th>Cost Price</th><th>Stock Value</th></tr></thead>
+                                    <tbody>
+                                    ${physicalProducts
+                                      .sort((a, b) => a.stock - b.stock)
+                                      .map((p) => {
+                                        const stockValue =
+                                          (p.stock || 0) * (p.costPrice || 0);
+                                        let stockClass = "";
+                                        if (p.stock === 0)
+                                          stockClass = "bg-red-900/30";
+                                        else if (p.stock < 20)
+                                          stockClass = "bg-yellow-900/30";
+                                        return `<tr class="table-row ${stockClass}">
+                                            <td class="font-mono text-xs">${
+                                              p.id
+                                            }</td>
+                                            <td class="text-text-primary font-medium">${
+                                              p.name
+                                            }</td>
+                                            <td>${p.category}</td>
+                                            <td class="font-mono ${
+                                              p.stock < 20 && p.stock > 0
+                                                ? "text-yellow-300"
+                                                : p.stock === 0
+                                                ? "text-red-400"
+                                                : ""
+                                            }">${p.stock} ${p.uomId}</td>
+                                            <td class="font-mono">${currencyUtils.format(
+                                              p.costPrice || 0
+                                            )}</td>
+                                            <td class="font-mono">${currencyUtils.format(
+                                              stockValue
+                                            )}</td>
+                                        </tr>`;
+                                      })
+                                      .join("")}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div id="reports-pagination" class="mt-4"></div>
+                    `;
+
+      // Paginate table
+      const totalItems = physicalProducts.length;
+      const startIndex = (viewState.currentPage - 1) * appState.itemsPerPage;
+      const endIndex = startIndex + appState.itemsPerPage;
+      const paginatedProducts = physicalProducts
+        .sort((a, b) => a.stock - b.stock)
+        .slice(startIndex, endIndex);
+
+      reportsContainer.querySelector("tbody").innerHTML = paginatedProducts
+        .map((p) => {
+          const stockValue = (p.stock || 0) * (p.costPrice || 0);
+          let stockClass = "";
+          if (p.stock === 0) stockClass = "bg-red-900/30";
+          else if (p.stock < 20) stockClass = "bg-yellow-900/30";
+          return `<tr class="table-row ${stockClass}">
+                            <td class="font-mono text-xs">${p.id}</td>
+                            <td class="text-text-primary font-medium">${
+                              p.name
+                            }</td>
+                            <td>${p.category}</td>
+                            <td class="font-mono ${
+                              p.stock < 20 && p.stock > 0
+                                ? "text-yellow-300"
+                                : p.stock === 0
+                                ? "text-red-400"
+                                : ""
+                            }">${p.stock} ${p.uomId}</td>
+                            <td class="font-mono">${currencyUtils.format(
+                              p.costPrice || 0
+                            )}</td>
+                            <td class="font-mono">${currencyUtils.format(
+                              stockValue
+                            )}</td>
+                        </tr>`;
+        })
+        .join("");
+
+      renderPaginationControls(
+        reportsContainer.querySelector("#reports-pagination"),
+        totalItems,
+        viewState.currentPage,
+        appState.itemsPerPage,
+        "reports"
+      );
+
+      const stockValueCtx = document
+        .getElementById("stock-value-chart")
+        .getContext("2d");
+      chartInstances.stockValue = new Chart(stockValueCtx, {
+        type: "bar",
+        data: {
+          labels: Object.keys(stockValueByCategory),
+          datasets: [
+            {
+              label: "Stock Value",
+              data: Object.values(stockValueByCategory),
+              backgroundColor: Object.keys(stockValueByCategory).map(
+                (_, i) =>
+                  chartStyles.palettes.coolSlate[
+                    i % chartStyles.palettes.coolSlate.length
+                  ]
+              ),
+              borderColor: Object.keys(stockValueByCategory).map((_, i) =>
+                chartStyles.hexToRgba(
+                  chartStyles.palettes.coolSlate[
+                    i % chartStyles.palettes.coolSlate.length
+                  ],
+                  0.5
+                )
+              ),
+              borderWidth: 1,
+              hoverBackgroundColor: chartStyles.palettes.coolSlate.map((c) =>
+                chartStyles.hexToRgba(c, 0.8)
+              ),
+              borderRadius: 6,
+            },
+          ],
+        },
+        options: commonChartOptions(true, {
+          plugins: {
+            chartGlow: {
+              color: "rgba(148, 163, 184, 0.2)",
+              blur: 15,
+              offsetY: 5,
+            },
+          },
+        }),
+      });
+
+      const topStocked = [...physicalProducts]
+        .sort((a, b) => b.stock - a.stock)
+        .slice(0, 5);
+      const topStockedCtx = document
+        .getElementById("top-stocked-chart")
+        .getContext("2d");
+      chartInstances.topStocked = new Chart(topStockedCtx, {
+        type: "doughnut",
+        data: {
+          labels: topStocked.map((p) => p.name),
+          datasets: [
+            {
+              label: "Stock Quantity",
+              data: topStocked.map((p) => p.stock),
+              backgroundColor: chartStyles.palettes.mutedSunset,
+              borderColor: "var(--bg-primary)",
+              borderWidth: 3,
+              hoverOffset: 12,
+            },
+          ],
+        },
+        options: commonChartOptions(false, {
+          plugins: { legend: { position: "right" } },
+        }),
+      });
+
+      lucide.createIcons();
+    };
+
+    const renderCustomerReport = (
+      startDate,
+      endDate,
+      prevStartDate,
+      prevEndDate
+    ) => {
+      destroyCharts();
+
+      const getCustomerMetrics = (start, end) => {
+        let periodInvoices = firestoreData.invoices.filter((inv) => {
+          const invDate = new Date(inv.date);
+          return invDate >= start && invDate <= end && inv.status !== "Void";
+        });
+
+        // If the user can see all reports, apply the dropdown filter.
+        // Otherwise (for a cashier), the data is already pre-filtered by the Firestore listener.
+        if (checkPermission("canSeeAllReports")) {
+          const selectedCashierId = viewState.filters.cashierId;
+          if (selectedCashierId && selectedCashierId !== "all") {
+            periodInvoices = periodInvoices.filter(
+              (inv) => inv.cashierId === selectedCashierId
+            );
+          }
+        }
+
+        const customerData = firestoreData.customers.map((customer) => {
+          const customerInvoices = periodInvoices.filter(
+            (inv) => inv.customerId === customer.id
+          );
+          const totalSpent = customerInvoices.reduce(
+            (sum, inv) => sum + inv.totalInBaseCurrency,
+            0
+          );
+          return {
+            ...customer,
+            invoiceCount: customerInvoices.length,
+            totalSpent,
+          };
+        });
+
+        const totalSpentAll = customerData.reduce(
+          (sum, c) => sum + c.totalSpent,
+          0
+        );
+        const avgSpend =
+          periodInvoices.length > 0
+            ? totalSpentAll /
+              periodInvoices.filter((inv) => inv.customerId).length
+            : 0;
+
+        const newCustomers = firestoreData.customers.filter((c) => {
+          const joinDate = new Date(c.joinDate);
+          return joinDate >= start && joinDate <= end;
+        }).length;
+
+        return { customerData, totalSpentAll, avgSpend, newCustomers };
+      };
+
+      const currentMetrics = getCustomerMetrics(startDate, endDate);
+      const previousMetrics = getCustomerMetrics(prevStartDate, prevEndDate);
+      const totalCustomers = firestoreData.customers.length; // Snapshot
+
+      const kpis = [
+        {
+          icon: "users",
+          label: "Total Customers",
+          value: totalCustomers,
+          isCurrency: false,
+          color: "green",
+          change: null,
+        },
+        {
+          icon: "user-plus",
+          label: `New Customers`,
+          value: currentMetrics.newCustomers,
+          isCurrency: false,
+          color: "blue",
+          change: calculateChange(
+            currentMetrics.newCustomers,
+            previousMetrics.newCustomers
+          ),
+        },
+        {
+          icon: "wallet",
+          label: `Total Spend`,
+          value: currentMetrics.totalSpentAll,
+          isCurrency: true,
+          color: "indigo",
+          change: calculateChange(
+            currentMetrics.totalSpentAll,
+            previousMetrics.totalSpentAll
+          ),
+        },
+        {
+          icon: "receipt",
+          label: `Avg. Spend / Sale`,
+          value: currentMetrics.avgSpend,
+          isCurrency: true,
+          color: "yellow",
+          change: calculateChange(
+            currentMetrics.avgSpend,
+            previousMetrics.avgSpend
+          ),
+        },
+      ];
+
+      const topCustomers = [...currentMetrics.customerData]
+        .sort((a, b) => b.totalSpent - a.totalSpent)
+        .slice(0, 5);
+
+      reportsContainer.innerHTML = `
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                             ${kpis
+                               .map(
+                                 (kpi) => `
+                                <div class="kpi-card glass-pane p-5 rounded-xl flex items-center gap-4">
+                                    <div class="w-12 h-12 rounded-full flex items-center justify-center ${
+                                      colorClasses[kpi.color].bg
+                                    } shrink-0">
+                                        <i data-lucide="${
+                                          kpi.icon
+                                        }" class="w-6 h-6 ${
+                                   colorClasses[kpi.color].text
+                                 }"></i>
+                                    </div>
+                                    <div class="overflow-hidden">
+                                        <p class="text-sm font-medium text-text-secondary">${
+                                          kpi.label
+                                        }</p>
+                                        <div class="flex items-baseline gap-2">
+                                            <p class="text-2xl font-bold text-text-primary">${formatAndTruncate(
+                                              kpi.label,
+                                              kpi.value,
+                                              kpi.isCurrency
+                                            )}</p>
+                                            ${
+                                              kpi.change !== null
+                                                ? formatChange(kpi.change)
+                                                : ""
+                                            }
+                                        </div>
+                                    </div>
+                                </div>`
+                               )
+                               .join("")}
+                        </div>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div class="glass-pane p-6 rounded-xl h-96 flex flex-col"><h3 class="text-xl font-semibold text-text-primary mb-4">New vs. Returning Customers</h3><div class="flex-grow"><canvas id="customer-retention-chart"></canvas></div></div>
+                            <div class="glass-pane p-6 rounded-xl h-96 flex flex-col"><h3 class="text-xl font-semibold text-text-primary mb-4">Top 5 Customers by Spend</h3><div class="flex-grow"><canvas id="top-customers-chart"></canvas></div></div>
+                        </div>
+                        <div class="glass-pane p-6 rounded-xl">
+                            <h3 class="text-xl font-semibold text-text-primary mb-4">Customer List</h3>
+                            <div class="overflow-x-auto">
+                                <table class="table-pro">
+                                    <thead><tr><th>Customer Name</th><th>Join Date</th><th>Total Invoices</th><th>Total Spent</th><th>Loyalty Points</th></tr></thead>
+                                    <tbody>
+                                    ${currentMetrics.customerData
+                                      .map(
+                                        (c) => `
+                                        <tr class="table-row">
+                                            <td class="text-text-primary font-medium">${
+                                              c.name
+                                            }</td>
+                                            <td>${new Date(
+                                              c.joinDate
+                                            ).toLocaleDateString()}</td>
+                                            <td class="text-center">${
+                                              c.invoiceCount
+                                            }</td>
+                                            <td class="font-mono">${currencyUtils.format(
+                                              c.totalSpent
+                                            )}</td>
+                                            <td class="font-mono">${c.loyaltyPoints.toLocaleString()}</td>
+                                        </tr>`
+                                      )
+                                      .join("")}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div id="reports-pagination" class="mt-4"></div>
+                     `;
+
+      // Paginate table
+      const totalItems = currentMetrics.customerData.length;
+      const startIndex = (viewState.currentPage - 1) * appState.itemsPerPage;
+      const endIndex = startIndex + appState.itemsPerPage;
+      const paginatedCustomers = currentMetrics.customerData
+        .sort((a, b) => b.totalSpent - a.totalSpent)
+        .slice(startIndex, endIndex);
+
+      reportsContainer.querySelector("tbody").innerHTML = paginatedCustomers
+        .map(
+          (c) => `
+                        <tr class="table-row">
+                            <td class="text-text-primary font-medium">${
+                              c.name
+                            }</td>
+                            <td>${new Date(
+                              c.joinDate
+                            ).toLocaleDateString()}</td>
+                            <td class="text-center">${c.invoiceCount}</td>
+                            <td class="font-mono">${currencyUtils.format(
+                              c.totalSpent
+                            )}</td>
+                            <td class="font-mono">${c.loyaltyPoints.toLocaleString()}</td>
+                        </tr>`
+        )
+        .join("");
+
+      renderPaginationControls(
+        reportsContainer.querySelector("#reports-pagination"),
+        totalItems,
+        viewState.currentPage,
+        appState.itemsPerPage,
+        "reports"
+      );
+
+      // Customer Retention Chart
+      const newCustomerSales = new Set();
+      const returningCustomerSales = new Set();
+
+      currentMetrics.customerData.forEach((customer) => {
+        if (customer.invoiceCount > 0) {
+          const joinDate = new Date(customer.joinDate);
+          if (joinDate >= startDate && joinDate <= endDate) {
+            newCustomerSales.add(customer.id);
+          } else {
+            returningCustomerSales.add(customer.id);
+          }
+        }
+      });
+
+      const retentionCtx = document
+        .getElementById("customer-retention-chart")
+        .getContext("2d");
+      chartInstances.retention = new Chart(retentionCtx, {
+        type: "doughnut",
+        data: {
+          labels: ["New Customers", "Returning Customers"],
+          datasets: [
+            {
+              label: "Customer Type",
+              data: [newCustomerSales.size, returningCustomerSales.size],
+              backgroundColor: [
+                chartStyles.palettes.gentleOcean[1],
+                chartStyles.palettes.softMeadow[1],
+              ],
+              borderColor: "var(--bg-primary)",
+              borderWidth: 3,
+              hoverOffset: 12,
+            },
+          ],
+        },
+        options: commonChartOptions(false, {
+          plugins: { legend: { position: "right" } },
+        }),
+      });
+
+      // Top Customers by Spend Chart
+      const topCustomersCtx = document
+        .getElementById("top-customers-chart")
+        ?.getContext("2d");
+      if (topCustomersCtx) {
+        chartInstances.topCustomers = new Chart(topCustomersCtx, {
+          type: "bar",
+          data: {
+            labels: topCustomers.map((c) => c.name),
+            datasets: [
+              {
+                label: "Total Spend",
+                data: topCustomers.map((c) => c.totalSpent),
+                backgroundColor: chartStyles.palettes.warmStone,
+                borderColor: chartStyles.palettes.warmStone.map((c) =>
+                  chartStyles.hexToRgba(c, 0.5)
+                ),
+                borderWidth: 1,
+                borderRadius: 6,
+              },
+            ],
+          },
+          options: commonChartOptions(true, {
+            indexAxis: "y",
+            plugins: { legend: { display: false } },
+            scales: {
+              x: { grid: { display: false } },
+              y: { grid: { color: "rgba(255,255,255,0.05)" } },
+            },
+          }),
+        });
+      }
+
+      lucide.createIcons();
+    };
+
+    const renderCurrentReport = () => {
+      const now = new Date();
+      let startDate,
+        endDate = new Date(now);
+      let prevStartDate, prevEndDate;
+
+      // Update UI to reflect current state before rendering
+      pane
+        .querySelectorAll(".report-type-btn")
+        .forEach((b) =>
+          b.classList.toggle("active", b.dataset.type === viewState.reportType)
+        );
+
+      switch (viewState.period) {
+        case "year":
+          startDate = new Date(now.getFullYear(), 0, 1);
+          prevStartDate = new Date(now.getFullYear() - 1, 0, 1);
+          prevEndDate = new Date(now.getFullYear() - 1, 11, 31);
+          break;
+        case "month":
+          startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+          prevStartDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+          prevEndDate = new Date(now.getFullYear(), now.getMonth(), 0);
+          break;
+        case "last30":
+          startDate = new Date(now);
+          startDate.setDate(now.getDate() - 30);
+          prevEndDate = new Date(startDate);
+          prevEndDate.setDate(prevEndDate.getDate() - 1);
+          prevStartDate = new Date(prevEndDate);
+          prevStartDate.setDate(prevEndDate.getDate() - 30);
+          break;
+        case "week":
+          startDate = new Date(now);
+          startDate.setDate(now.getDate() - now.getDay());
+          startDate.setHours(0, 0, 0, 0);
+          prevEndDate = new Date(startDate);
+          prevEndDate.setDate(prevEndDate.getDate() - 1);
+          prevStartDate = new Date(prevEndDate);
+          prevStartDate.setDate(prevEndDate.getDate() - 6);
+          break;
+        case "last7":
+          startDate = new Date(now);
+          startDate.setDate(now.getDate() - 7);
+          prevEndDate = new Date(startDate);
+          prevEndDate.setDate(prevEndDate.getDate() - 1);
+          prevStartDate = new Date(prevEndDate);
+          prevStartDate.setDate(prevEndDate.getDate() - 6);
+          break;
+        case "yesterday":
+          startDate = new Date(now);
+          startDate.setDate(now.getDate() - 1);
+          startDate.setHours(0, 0, 0, 0);
+          endDate = new Date(startDate);
+          endDate.setHours(23, 59, 59, 999);
+          prevStartDate = new Date(startDate);
+          prevStartDate.setDate(startDate.getDate() - 1);
+          prevEndDate = new Date(prevStartDate);
+          prevEndDate.setHours(23, 59, 59, 999);
+          break;
+        case "custom":
+          startDate = new Date(viewState.customRange.start);
+          startDate.setHours(0, 0, 0, 0);
+          endDate = new Date(viewState.customRange.end);
+          endDate.setHours(23, 59, 59, 999);
+          const diff = endDate.getTime() - startDate.getTime();
+          prevEndDate = new Date(startDate.getTime() - 86400000); // 1 day before start
+          prevStartDate = new Date(prevEndDate.getTime() - diff);
+          break;
+        case "today":
+        default:
+          startDate = new Date(now);
+          startDate.setHours(0, 0, 0, 0);
+          prevStartDate = new Date(startDate);
+          prevStartDate.setDate(startDate.getDate() - 1);
+          prevEndDate = new Date(prevStartDate);
+          prevEndDate.setHours(23, 59, 59, 999);
+          break;
+      }
+
+      switch (viewState.reportType) {
+        case "inventory":
+          renderInventoryReport(startDate, endDate, prevStartDate, prevEndDate);
+          break;
+        case "customer":
+          renderCustomerReport(startDate, endDate, prevStartDate, prevEndDate);
+          break;
+        case "activity":
+          renderActivityReport(startDate, endDate);
+          break; // MODIFIED
+        case "sales":
+        default:
+          renderSalesReport(startDate, endDate, prevStartDate, prevEndDate);
+          break;
+      }
+    };
+
+    // --- ONE-TIME EVENT LISTENERS ---
+    if (!pane.dataset.reportsInitialized) {
+      pane.dataset.reportsInitialized = "true";
+
+      const cashierFilter = pane.querySelector("#report-cashier-filter");
+      if (cashierFilter) {
+        const staff = firestoreData.staff || [];
+        cashierFilter.innerHTML =
+          '<option value="all">All Staff</option>' +
+          staff
+            .map(
+              (member) =>
+                `<option value="${member.id}" ${
+                  viewState.filters.cashierId === member.id ? "selected" : ""
+                }>${member.name}</option>`
+            )
+            .join("");
+
+        cashierFilter.addEventListener("change", (e) => {
+          viewState.filters.cashierId = e.target.value;
+          viewState.currentPage = 1;
+          renderCurrentReport();
+        });
+      }
+
+      // NEW listener for the activity sub-tabs
+      reportsContainer.addEventListener("click", (e) => {
+        const target = e.target.closest(
+          '[data-action="set-activity-report-type"]'
+        );
+        if (target) {
+          viewState.filters.activitySubType = target.dataset.type;
+          viewState.currentPage = 1; // Reset page on tab switch
+          renderCurrentReport();
+        }
+      });
+
+      const dropdownBtn = pane.querySelector("#report-period-dropdown-btn");
+      const dropdownMenu = pane.querySelector("#report-period-dropdown-menu");
+      const customRangeContainer = pane.querySelector("#report-custom-range");
+      const applyRangeBtn = pane.querySelector("#report-apply-range");
+      const dropdownIcon = dropdownBtn?.querySelector(
+        'i[data-lucide="chevron-down"]'
+      );
+
+      if (dropdownBtn && dropdownMenu) {
+        dropdownBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const isHidden = dropdownMenu.classList.toggle("hidden");
+          dropdownIcon?.classList.toggle("rotate-180", !isHidden);
+        });
+      }
+
+      pane
+        .querySelectorAll('[data-action="set-report-period"]')
+        .forEach((item) => {
+          item.addEventListener("click", (e) => {
+            e.preventDefault();
+            const period = e.currentTarget.dataset.period;
+            const label = e.currentTarget.dataset.label;
+            viewState.currentPage = 1;
+
+            pane.querySelector(
+              "#selected-report-period-label"
+            ).textContent = label;
+            pane
+              .querySelectorAll(".report-period-item")
+              .forEach((i) => i.classList.remove("active"));
+            e.currentTarget.classList.add("active");
+
+            if (dropdownMenu) {
+              dropdownMenu.classList.add("hidden");
+              dropdownIcon?.classList.remove("rotate-180");
+            }
+
+            if (period === "custom") {
+              customRangeContainer.classList.remove("hidden");
+            } else {
+              customRangeContainer.classList.add("hidden");
+              viewState.period = period;
+              renderCurrentReport();
+            }
+          });
+        });
+
+      if (applyRangeBtn) {
+        applyRangeBtn.addEventListener("click", () => {
+          const start = pane.querySelector("#report-start-date").value;
+          const end = pane.querySelector("#report-end-date").value;
+          if (start && end) {
+            if (new Date(start) > new Date(end)) {
+              showToast("Start date cannot be after end date.", "error");
+              return;
+            }
+            viewState.period = "custom";
+            viewState.customRange = { start, end };
+            viewState.currentPage = 1;
+            renderCurrentReport();
+          } else {
+            showToast("Please select both start and end dates.", "error");
+          }
+        });
+      }
+
+      pane.querySelectorAll(".report-type-btn").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          viewState.currentPage = 1;
+          viewState.reportType = e.currentTarget.dataset.type;
+          renderCurrentReport();
+        });
+      });
+    }
+
+    // Always call renderCurrentReport when initReports is triggered
+    // Use a timeout to ensure the DOM is ready and data has had a moment to settle during initial loads.
+    setTimeout(renderCurrentReport, 0);
+  }
+
+  // --- UPDATED: Comprehensive Expenses View ---
+  function initExpenses(pane) {
+    const container = pane; // The pane is the container
+    if (!container) return;
+
+    const viewState = appState.viewStates.expenses;
+    const canAdd = checkPermission("canAddExpenses");
+    const canEdit = checkPermission("canEditExpenses");
+    const canDelete = checkPermission("canDeleteExpenses");
+
+    let chartInstances = {}; // To hold chart instances for destruction
+
+    const destroyCharts = () => {
+      Object.values(chartInstances).forEach((chart) => {
+        if (chart) chart.destroy();
+      });
+      chartInstances = {};
+    };
+
+    const renderExpensesView = () => {
+      // --- MODIFIED: Save search input state before re-rendering to prevent losing focus ---
+      const searchInputEl = container.querySelector("#expense-search");
+      const currentSearchValue = searchInputEl
+        ? searchInputEl.value
+        : viewState.searchQuery;
+      const isSearchFocused =
+        searchInputEl && document.activeElement === searchInputEl;
+      // --- END MODIFICATION ---
+
+      destroyCharts(); // Clear old charts before re-rendering
+
+      // --- NEW: Filter expenses for managers ---
+      let allExpenses = firestoreData.expenses;
+      if (appState.session.userRole === "manager") {
+        const currentUserId = appState.session.currentUser?.uid;
+        allExpenses = firestoreData.expenses.filter(
+          (e) => e.recordedBy?.id === currentUserId
+        );
+      }
+      // --- END NEW ---
+
+      // --- Filtering and Data Preparation ---
+      const now = new Date();
+      let startDate,
+        endDate = new Date(now);
+
+      // Determine date range from viewState
+      switch (viewState.filters.period) {
+        case "month":
+          startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+          break;
+        case "last30":
+          startDate = new Date(now);
+          startDate.setDate(now.getDate() - 30);
+          break;
+        case "week":
+          startDate = new Date(now);
+          startDate.setDate(now.getDate() - now.getDay());
+          break;
+        case "today":
+          startDate = new Date(now);
+          startDate.setHours(0, 0, 0, 0);
+          break;
+        case "custom":
+          if (viewState.customRange.start && viewState.customRange.end) {
+            startDate = new Date(viewState.customRange.start);
+            startDate.setHours(0, 0, 0, 0);
+            endDate = new Date(viewState.customRange.end);
+            endDate.setHours(23, 59, 59, 999);
+          } else {
+            // Fallback if custom range is not set
+            startDate = new Date(now);
+            startDate.setDate(now.getDate() - 30);
+          }
+          break;
+        default:
+          startDate = new Date(now);
+          startDate.setDate(now.getDate() - 30);
+          break;
+      }
+
+      // Apply all filters
+      let filteredExpenses = allExpenses.filter((e) => {
+        const expenseDate = new Date(e.date);
+        const isAfterStart = expenseDate >= startDate;
+        const isBeforeEnd = expenseDate <= endDate;
+        const categoryMatch =
+          viewState.filters.category === "all" ||
+          e.category === viewState.filters.category;
+        const paymentMethodMatch =
+          viewState.filters.paymentMethod === "all" ||
+          e.paymentMethod === viewState.filters.paymentMethod;
+        const searchMatch =
+          !viewState.searchQuery ||
+          (e.notes || "")
+            .toLowerCase()
+            .includes(viewState.searchQuery.toLowerCase()) ||
+          e.category
+            .toLowerCase()
+            .includes(viewState.searchQuery.toLowerCase()) ||
+          (e.paidTo || "")
+            .toLowerCase()
+            .includes(viewState.searchQuery.toLowerCase());
+
+        return (
+          isAfterStart &&
+          isBeforeEnd &&
+          categoryMatch &&
+          paymentMethodMatch &&
+          searchMatch
+        );
+      });
+
+      filteredExpenses.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+      // --- Calculations for KPIs and Charts ---
+      const totalExpense = filteredExpenses.reduce(
+        (sum, e) => sum + e.amountInBase,
+        0
+      );
+      const expenseCount = filteredExpenses.length;
+      const avgExpense = expenseCount > 0 ? totalExpense / expenseCount : 0;
+
+      const expensesByCategory = filteredExpenses.reduce((acc, e) => {
+        acc[e.category] = (acc[e.category] || 0) + e.amountInBase;
+        return acc;
+      }, {});
+
+      const expensesByDate = filteredExpenses.reduce((acc, e) => {
+        const day = new Date(e.date).toLocaleDateString([], {
+          month: "short",
+          day: "numeric",
+        });
+        acc[day] = (acc[day] || 0) + e.amountInBase;
+        return acc;
+      }, {});
+      const sortedDates = Object.entries(expensesByDate).sort(
+        ([dateA], [dateB]) => new Date(dateA) - new Date(dateB)
+      );
+
+      // --- Pagination ---
+      const totalItems = filteredExpenses.length;
+      const startIndex = (viewState.currentPage - 1) * appState.itemsPerPage;
+      const endIndex = startIndex + appState.itemsPerPage;
+      const paginatedExpenses = filteredExpenses.slice(startIndex, endIndex);
+
+      // --- Render Full View ---
+      const allCategories = [
+        "all",
+        ...new Set(allExpenses.map((e) => e.category)),
+      ];
+      const allPaymentMethods = [
+        "all",
+        ...new Set(
+          firestoreData.expenses.map((e) => e.paymentMethod).filter(Boolean)
+        ),
+      ];
+
+      // Dynamically determine the label and active state for the period filter
+      const periodOptions = [
+        { period: "today", label: "Today" },
+        { period: "week", label: "This Week" },
+        { period: "last30", label: "Last 30 Days" },
+        { period: "month", label: "This Month" },
+      ];
+
+      let currentPeriodLabel = "Last 30 Days"; // Default
+      const currentOption = periodOptions.find(
+        (p) => p.period === viewState.filters.period
+      );
+      if (currentOption) {
+        currentPeriodLabel = currentOption.label;
+      } else if (viewState.filters.period === "custom") {
+        currentPeriodLabel = "Custom Range";
+      }
+
+      const periodDropdownHTML = periodOptions
+        .map(
+          (p) =>
+            `<div class="action-menu-item" data-action="set-expense-period" data-period="${
+              p.period
+            }" data-label="${p.label}">
+                            <i data-lucide="calendar-days" class="w-4 h-4"></i>
+                            <span>${p.label}</span>
+                            ${
+                              viewState.filters.period === p.period
+                                ? '<i data-lucide="check" class="w-4 h-4 text-accent ml-auto"></i>'
+                                : ""
+                            }
+                        </div>`
+        )
+        .join("");
+
+      container.innerHTML = `
+                        <div class="space-y-6">
+                            <!-- Header -->
+                            <div class="flex flex-col md:flex-row justify-between md:items-center gap-4">
+                                <div>
+                                    <h1 class="text-3xl font-bold text-text-primary">Expense Tracker</h1>
+                                    <p class="text-text-secondary">Monitor and manage all your business expenditures.</p>
+                                </div>
+                                ${
+                                  canAdd
+                                    ? `<button data-action="add-expense" class="btn btn-primary flex-shrink-0"><i data-lucide="plus" class="w-5 h-5 mr-2"></i> Log New Expense</button>`
+                                    : ""
+                                }
+                            </div>
+                            
+                            <!-- Filters -->
+                            <div class="glass-pane p-4 rounded-xl flex flex-col md:flex-row gap-3 relative z-30">
+                                <div class="relative flex-grow">
+                                    <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-text-secondary"></i>
+                                    <input type="text" id="expense-search" placeholder="Search expenses..." class="form-input w-full pl-11" value="${
+                                      viewState.searchQuery
+                                    }">
+                                </div>
+                                <select id="expense-category-filter" class="form-select flex-shrink-0 md:w-48">${allCategories
+                                  .map(
+                                    (c) =>
+                                      `<option value="${c}" ${
+                                        viewState.filters.category === c
+                                          ? "selected"
+                                          : ""
+                                      }>${
+                                        c === "all" ? "All Categories" : c
+                                      }</option>`
+                                  )
+                                  .join("")}</select>
+                                <select id="expense-payment-method-filter" class="form-select flex-shrink-0 md:w-48">${allPaymentMethods
+                                  .map(
+                                    (p) =>
+                                      `<option value="${p}" ${
+                                        viewState.filters.paymentMethod === p
+                                          ? "selected"
+                                          : ""
+                                      }>${
+                                        p === "all" ? "All Methods" : p
+                                      }</option>`
+                                  )
+                                  .join("")}</select>
+                                <div class="relative flex-shrink-0 md:w-48">
+                                    <button id="expense-period-dropdown-btn" data-action="toggle-expense-period-menu" class="btn btn-secondary w-full flex justify-between items-center text-sm p-2.5">
+                                        <span id="selected-expense-period-label">${currentPeriodLabel}</span><i data-lucide="chevron-down" class="w-4 h-4"></i>
+                                    </button>
+                                    <div id="expense-period-dropdown-menu" class="action-menu !w-full z-20 p-1">
+                                        ${periodDropdownHTML}
+                                        <div class="h-px bg-border-color my-1"></div>
+                                        <div class="action-menu-item" data-action="set-expense-period" data-period="custom" data-label="Custom">
+                                            <i data-lucide="calendar-range" class="w-4 h-4"></i>
+                                            <span>Custom Range...</span>
+                                            ${
+                                              viewState.filters.period ===
+                                              "custom"
+                                                ? '<i data-lucide="check" class="w-4 h-4 text-accent ml-auto"></i>'
+                                                : ""
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                             <div id="expense-custom-range" class="hidden flex items-center justify-end gap-2 bg-bg-secondary p-3 rounded-lg border border-border-color">
+                                <label class="text-sm">From:</label><input type="date" id="expense-start-date" class="form-input text-sm p-2 h-auto bg-bg-tertiary">
+                                <label class="text-sm">To:</label><input type="date" id="expense-end-date" class="form-input text-sm p-2 h-auto bg-bg-tertiary">
+                                <button id="expense-apply-range" class="btn btn-primary text-sm py-2">Apply</button>
+                            </div>
+                            
+                            <!-- KPIs -->
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div class="glass-pane p-5 rounded-xl"><p class="text-sm text-text-secondary">Total Expenses</p><p class="text-3xl font-bold font-mono text-red-400">${currencyUtils.format(
+                                  totalExpense
+                                )}</p></div>
+                                <div class="glass-pane p-5 rounded-xl"><p class="text-sm text-text-secondary"># of Expenses</p><p class="text-3xl font-bold font-mono text-text-primary">${expenseCount}</p></div>
+                                <div class="glass-pane p-5 rounded-xl"><p class="text-sm text-text-secondary">Average Expense</p><p class="text-3xl font-bold font-mono text-text-primary">${currencyUtils.format(
+                                  avgExpense
+                                )}</p></div>
+                            </div>
+                            
+                            <!-- Charts -->
+                            <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                                <div class="lg:col-span-2 glass-pane p-6 rounded-xl h-96 flex flex-col"><h3 class="text-xl font-semibold text-text-primary mb-4">By Category</h3><div class="flex-grow flex items-center justify-center"><canvas id="expense-category-chart"></canvas></div></div>
+                                <div class="lg:col-span-3 glass-pane p-6 rounded-xl h-96 flex flex-col"><h3 class="text-xl font-semibold text-text-primary mb-4">Expense Trend</h3><div class="flex-grow"><canvas id="expense-trend-chart"></canvas></div></div>
+                            </div>
+                            
+                            <!-- Table -->
+                            <div class="glass-pane rounded-xl">
+                                <table class="table-pro">
+                                    <thead><tr><th>Date</th><th>Category</th><th>Paid To</th><th>Amount</th><th>Method</th><th>Notes</th>${
+                                      canEdit || canDelete
+                                        ? "<th>Actions</th>"
+                                        : ""
+                                    }</tr></thead>
+                                    <tbody id="expenses-table-body"></tbody>
+                                </table>
+                            </div>
+                            <div id="expenses-pagination" class="mt-4"></div>
+                        </div>
+                    `;
+
+      // --- Populate Table ---
+      const tableBody = container.querySelector("#expenses-table-body");
+      if (tableBody) {
+        tableBody.innerHTML = paginatedExpenses.length
+          ? paginatedExpenses
+              .map(
+                (e) => `
+                            <tr class="table-row">
+                                <td>${new Date(
+                                  e.date
+                                ).toLocaleDateString()}</td>
+                                <td><span class="px-2 py-1 text-xs font-semibold rounded-full bg-indigo-500/20 text-indigo-300">${
+                                  e.category
+                                }</span></td>
+                                <td class="text-sm text-text-secondary">${
+                                  e.paidTo || "N/A"
+                                }</td>
+                                <td class="font-mono text-left">${currencyUtils.format(
+                                  e.amountInBase
+                                )}</td>
+                                <td class="text-sm text-text-secondary">${
+                                  e.paymentMethod || "N/A"
+                                }</td>
+                                <td class="text-sm text-text-secondary truncate max-w-xs" title="${
+                                  e.notes || ""
+                                }">${e.notes || "N/A"}</td>
+                                ${
+                                  canEdit || canDelete
+                                    ? `
+                                <td class="text-right">
+                                    <div class="relative inline-block text-left">
+                                        <button data-action="toggle-action-menu" class="p-2 rounded-md hover:bg-bg-tertiary">
+                                            <i data-lucide="more-vertical" class="w-5 h-5 pointer-events-none"></i>
+                                        </button>
+                                        <div class="action-menu">
+                                            ${
+                                              e.receiptUrl
+                                                ? `<a href="${e.receiptUrl}" target="_blank" class="action-menu-item"><i data-lucide="receipt-text" class="w-4 h-4"></i><span>View Receipt</span></a>`
+                                                : ""
+                                            }
+                                            ${
+                                              canEdit
+                                                ? `<div class="action-menu-item" data-action="edit-expense" data-id="${e.id}"><i data-lucide="edit" class="w-4 h-4"></i><span>Edit</span></div>`
+                                                : ""
+                                            }
+                                            ${
+                                              canDelete
+                                                ? `<div class="action-menu-item danger" data-action="delete-expense" data-id="${e.id}"><i data-lucide="trash-2" class="w-4 h-4"></i><span>Delete</span></div>`
+                                                : ""
+                                            }
+                                        </div>
+                                    </div>
+                                </td>
+                                `
+                                    : ""
+                                }
+                            </tr>
+                        `
+              )
+              .join("")
+          : `<tr><td colspan="${
+              canEdit || canDelete ? 7 : 6
+            }" class="text-center p-8 text-text-secondary">No expenses found for this period.</td></tr>`;
+      }
+
+      renderPaginationControls(
+        container.querySelector("#expenses-pagination"),
+        totalItems,
+        viewState.currentPage,
+        appState.itemsPerPage,
+        "expenses"
+      );
+
+      // --- Render Charts ---
+      const catCtx = container
+        .querySelector("#expense-category-chart")
+        ?.getContext("2d");
+      if (catCtx && Object.keys(expensesByCategory).length > 0) {
+        chartInstances.category = new Chart(catCtx, {
+          type: "doughnut",
+          data: {
+            labels: Object.keys(expensesByCategory),
+            datasets: [
+              {
+                data: Object.values(expensesByCategory),
+                backgroundColor: chartStyles.palettes.mutedSunset,
+                borderColor: "var(--bg-primary)",
+                borderWidth: 4,
+              },
+            ],
+          },
+          options: commonChartOptions(true, {
+            plugins: { legend: { position: "right" } },
+          }),
+        });
+      }
+
+      const trendCtx = container
+        .querySelector("#expense-trend-chart")
+        ?.getContext("2d");
+      if (trendCtx && sortedDates.length > 0) {
+        chartInstances.trend = new Chart(trendCtx, {
+          type: "bar",
+          data: {
+            labels: sortedDates.map((d) => d[0]),
+            datasets: [
+              {
+                label: "Expenses",
+                data: sortedDates.map((d) => d[1]),
+                backgroundColor: chartStyles.createGradient(
+                  trendCtx,
+                  chartStyles.palettes.coolSlate[0]
+                ),
+                borderColor: chartStyles.palettes.coolSlate[0],
+                borderWidth: 2,
+                borderRadius: 4,
+              },
+            ],
+          },
+          options: commonChartOptions(true, {
+            plugins: { legend: { display: false } },
+          }),
+        });
+      }
+
+      lucide.createIcons();
+
+      // --- MODIFIED: Restore search input state after re-rendering ---
+      const newSearchInputEl = container.querySelector("#expense-search");
+      if (newSearchInputEl) {
+        newSearchInputEl.value = currentSearchValue;
+        if (isSearchFocused) {
+          newSearchInputEl.focus();
+          // Move cursor to the end to allow continuous typing
+          newSearchInputEl.setSelectionRange(
+            currentSearchValue.length,
+            currentSearchValue.length
+          );
+        }
+      }
+      // --- END MODIFICATION ---
+    };
+
+    // --- Setup Event Listeners ---
+    container.addEventListener("input", (e) => {
+      const target = e.target;
+      if (target.id === "expense-search") {
+        viewState.searchQuery = target.value;
+        viewState.currentPage = 1;
+        renderExpensesView();
+      }
+    });
+
+    container.addEventListener("change", (e) => {
+      const target = e.target;
+      if (target.id === "expense-category-filter") {
+        viewState.filters.category = target.value;
+        viewState.currentPage = 1;
+        renderExpensesView();
+      }
+      if (target.id === "expense-payment-method-filter") {
+        viewState.filters.paymentMethod = target.value;
+        viewState.currentPage = 1;
+        renderExpensesView();
+      }
+    });
+
+    container.addEventListener("click", (e) => {
+      const target = e.target.closest("[data-action]");
+      if (!target) return;
+      const action = target.dataset.action;
+
+      if (action === "toggle-expense-period-menu") {
+        e.stopPropagation();
+        const dropdownMenu = container.querySelector(
+          "#expense-period-dropdown-menu"
+        );
+        if (dropdownMenu) {
+          dropdownMenu.classList.toggle("open");
+        }
+        return;
+      }
+
+      if (action === "set-expense-period") {
+        const period = target.dataset.period;
+        const label = target.dataset.label;
+        viewState.currentPage = 1;
+
+        container.querySelector(
+          "#selected-expense-period-label"
+        ).textContent = label;
+        container
+          .querySelectorAll(".report-period-item")
+          .forEach((i) => i.classList.remove("active"));
+        target.classList.add("active");
+        container
+          .querySelector("#expense-period-dropdown-menu")
+          .classList.remove("open");
+
+        if (period === "custom") {
+          container
+            .querySelector("#expense-custom-range")
+            .classList.remove("hidden");
+        } else {
+          container
+            .querySelector("#expense-custom-range")
+            .classList.add("hidden");
+          viewState.filters.period = period;
+          renderExpensesView();
+        }
+      }
+    });
+
+    container
+      .querySelector("#expense-apply-range")
+      ?.addEventListener("click", () => {
+        const start = container.querySelector("#expense-start-date").value;
+        const end = container.querySelector("#expense-end-date").value;
+        if (start && end) {
+          viewState.filters.period = "custom";
+          viewState.customRange = { start, end };
+          viewState.currentPage = 1;
+          renderExpensesView();
+        }
+      });
+
+    // --- Initial Render ---
+    renderExpensesView();
+  }
+
+  function openAutomationSettingsModal(automationId) {
+    const automationsConfig = {
+      inventoryOptimization: {
+        icon: "brain-circuit",
+        color: "indigo",
+        title: "Inventory Optimization AI",
+        desc: "Get AI suggestions on what to stock, promote, or discontinue.",
+      },
+      dynamicPricing: {
+        icon: "trending-up",
+        color: "blue",
+        title: "Dynamic Pricing Suggestions",
+        desc:
+          "Get AI-powered price suggestions based on sales data and trends.",
+      },
+      endOfDayReports: {
+        icon: "file-clock",
+        color: "teal",
+        title: "Automated End-of-Day Reports",
+        desc: "Receive an automated sales summary at the end of each day.",
+      },
+      fraudDetection: {
+        icon: "shield-alert",
+        color: "red",
+        title: "AI-Powered Fraud Detection",
+        desc: "Monitor transactions for suspicious activity in real-time.",
+      },
+    };
+
+    const config = automationsConfig[automationId];
+    if (!config) return;
+
+    const automationSettings = appState.settings.automations || {};
+    const settings = automationSettings[automationId] || {};
+    let content = "";
+
+    switch (automationId) {
+      case "inventoryOptimization":
+        content = `
+                            <form id="automation-settings-form" class="space-y-4">
+                                <p class="text-sm text-text-secondary">Choose how often the AI should analyze your inventory and sales data to provide optimization suggestions.</p>
+                                <div>
+                                    <label for="analysisFrequency" class="block text-sm font-medium text-text-secondary mb-1">Analysis Frequency</label>
+                                    <select id="analysisFrequency" name="analysisFrequency" class="form-select w-full">
+                                        <option value="daily" ${
+                                          settings.analysisFrequency === "daily"
+                                            ? "selected"
+                                            : ""
+                                        }>Daily</option>
+                                        <option value="weekly" ${
+                                          settings.analysisFrequency ===
+                                          "weekly"
+                                            ? "selected"
+                                            : ""
+                                        }>Weekly</option>
+                                        <option value="monthly" ${
+                                          settings.analysisFrequency ===
+                                          "monthly"
+                                            ? "selected"
+                                            : ""
+                                        }>Monthly</option>
+                                    </select>
+                                    <p class="text-xs text-text-secondary mt-1">Suggestions will appear as notifications and on your dashboard.</p>
+                                </div>
+                            </form>
+                        `;
+        break;
+      case "dynamicPricing":
+        content = `
+                            <form id="automation-settings-form" class="space-y-4">
+                                <p class="text-sm text-text-secondary">Let the AI adjust pricing to maximize profit based on different strategies.</p>
+                                <div>
+                                    <label for="strategy" class="block text-sm font-medium text-text-secondary mb-1">Pricing Strategy</label>
+                                    <select id="strategy" name="strategy" class="form-select w-full">
+                                        <option value="conservative" ${
+                                          settings.strategy === "conservative"
+                                            ? "selected"
+                                            : ""
+                                        }>Conservative (Minor adjustments)</option>
+                                        <option value="balanced" ${
+                                          settings.strategy === "balanced"
+                                            ? "selected"
+                                            : ""
+                                        }>Balanced (Moderate adjustments)</option>
+                                        <option value="aggressive" ${
+                                          settings.strategy === "aggressive"
+                                            ? "selected"
+                                            : ""
+                                        }>Aggressive (Maximize revenue)</option>
+                                    </select>
+                                    <p class="text-xs text-text-secondary mt-1">The AI will suggest price changes which you can approve or reject.</p>
+                                </div>
+                            </form>
+                        `;
+        break;
+      case "endOfDayReports":
+        content = `
+                            <form id="automation-settings-form" class="space-y-4">
+                                <p class="text-sm text-text-secondary">Set a time for the system to automatically compile and deliver your end-of-day sales summary.</p>
+                                <div>
+                                    <label for="deliveryTime" class="block text-sm font-medium text-text-secondary mb-1">Report Delivery Time</label>
+                                    <input type="time" id="deliveryTime" name="deliveryTime" value="${
+                                      settings.deliveryTime || "22:00"
+                                    }" class="form-input w-full">
+                                    <p class="text-xs text-text-secondary mt-1">The report will be generated daily at this time and sent as a notification.</p>
+                                </div>
+                            </form>
+                        `;
+        break;
+      case "fraudDetection":
+        content = `
+                            <form id="automation-settings-form" class="space-y-4">
+                                <p class="text-sm text-text-secondary">Set the sensitivity for detecting potentially fraudulent transactions.</p>
+                                <div>
+                                    <label for="sensitivity" class="block text-sm font-medium text-text-secondary mb-1">Detection Sensitivity</label>
+                                    <select id="sensitivity" name="sensitivity" class="form-select w-full">
+                                        <option value="low" ${
+                                          settings.sensitivity === "low"
+                                            ? "selected"
+                                            : ""
+                                        }>Low (Fewer alerts, might miss subtle cases)</option>
+                                        <option value="medium" ${
+                                          settings.sensitivity === "medium"
+                                            ? "selected"
+                                            : ""
+                                        }>Medium (Balanced approach)</option>
+                                        <option value="high" ${
+                                          settings.sensitivity === "high"
+                                            ? "selected"
+                                            : ""
+                                        }>High (More alerts, catches more suspicious activity)</option>
+                                    </select>
+                                    <p class="text-xs text-text-secondary mt-1">High sensitivity may flag normal transactions occasionally.</p>
+                                </div>
+                            </form>
+                        `;
+        break;
+      default:
+        content = `<p>Configuration for this automation is not available yet.</p>`;
+    }
+
+    const footer = `<button data-action="close-modal" class="btn btn-secondary">Cancel</button><button type="submit" form="automation-settings-form" class="btn btn-primary">Save Settings</button>`;
+    const modal = showModal(config.title, content, footer, {
+      size: "max-w-xl",
+    });
+
+    modal
+      .querySelector("#automation-settings-form")
+      .addEventListener("submit", (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        for (const [key, value] of formData.entries()) {
+          // Check if value is a number string and convert
+          appState.settings.automations[automationId][key] =
+            !isNaN(value) && value.trim() !== "" ? parseFloat(value) : value;
+        }
+        closeModal(modal);
+        showToast(
+          `${config.title} settings updated. Click 'Save Changes' to make them permanent.`,
+          "info"
+        );
+      });
+  }
+
+  function initSettings(pane) {
+    const businessTypeSelectorContainer = pane.querySelector(
+      "#business-type-selector"
+    );
+    const receiptSelectorContainer = pane.querySelector(
+      "#receipt-template-selector"
+    );
+    const posLayoutSelectorContainer = pane.querySelector(
+      "#pos-layout-selector"
+    );
+    const defaultCurrencySelector = pane.querySelector(
+      "#default-currency-selector"
+    );
+    const defaultUnitSelector = pane.querySelector("#default-unit-selector");
+    const automationsContainer = pane.querySelector("#automations-container");
+
+    if (automationsContainer) {
+      automationsContainer.addEventListener("click", (e) => {
+        const toggleTarget = e.target.closest(
+          '[data-action="toggle-automation"]'
+        );
+        const settingsTarget = e.target.closest(
+          '[data-action="open-automation-settings"]'
+        );
+
+        if (toggleTarget) {
+          const automationId = toggleTarget.dataset.automationId;
+          const isEnabled = toggleTarget.checked;
+          if (!appState.settings.automations) {
+            appState.settings.automations = {};
+          }
+          if (!appState.settings.automations[automationId]) {
+            appState.settings.automations[automationId] = {};
+          }
+          appState.settings.automations[automationId].enabled = isEnabled;
+          showToast(
+            `${automationId} ${
+              isEnabled ? "enabled" : "disabled"
+            }. Save settings to apply.`,
+            "info"
+          );
+        }
+
+        if (settingsTarget) {
+          const automationId = settingsTarget.dataset.automationId;
+          openAutomationSettingsModal(automationId);
+        }
+      });
+    }
+
+    const permissionsContainer = pane.querySelector("#permissions-container");
+    if (permissionsContainer) {
+      permissionsContainer.addEventListener("click", (e) => {
+        const toggle = e.target.closest('[data-action="toggle-permission"]');
+        if (toggle) {
+          const { roleId, permissionId } = toggle.dataset;
+          const isEnabled = toggle.checked;
+          if (
+            appState.settings.permissions?.[roleId]?.permissions?.[permissionId]
+          ) {
+            appState.settings.permissions[roleId].permissions[
+              permissionId
+            ].value = isEnabled;
+            showToast(
+              `${roleId}'s permission for '${permissionId}' ${
+                isEnabled ? "enabled" : "disabled"
+              }. Save settings to apply.`,
+              "info"
+            );
+          }
+        }
+      });
+    }
+
+    if (defaultCurrencySelector && firestoreData.storeInfo.currencies) {
+      defaultCurrencySelector.innerHTML = Object.entries(
+        firestoreData.storeInfo.currencies
+      )
+        .map(
+          ([code, currency]) =>
+            `<option value="${code}" ${
+              appState.settings.defaultCurrency === code ? "selected" : ""
+            }>${code} - ${currency.name}</option>`
+        )
+        .join("");
+    }
+
+    if (defaultUnitSelector && firestoreData.unitsOfMeasurement) {
+      defaultUnitSelector.innerHTML = firestoreData.unitsOfMeasurement
+        .map(
+          (unit) =>
+            `<option value="${unit.id}" ${
+              appState.settings.defaultUnit === unit.id ? "selected" : ""
+            }>${unit.name}</option>`
+        )
+        .join("");
+    }
+
+    const renderPosLayoutSelector = () => {
+      if (!posLayoutSelectorContainer) return; // Add this check
+      const layouts = {
+        classic: {
+          name: "Classic List View",
+          preview: `<div class="w-full h-full border border-slate-700/50 rounded-sm p-1.5 flex flex-col gap-1.5 bg-gradient-to-br from-slate-800 to-slate-900 shadow-inner">
+                                          <!-- Header -->
+                                          <div class="h-3 w-full bg-slate-700/50 rounded-sm flex items-center px-1 gap-1">
+                                              <div class="w-1/4 h-1.5 bg-sky-500/70 rounded-full"></div>
+                                              <div class="w-1/3 h-1.5 bg-slate-600/50 rounded-full"></div>
+                                          </div>
+                                          <div class="flex-grow flex gap-1.5">
+                                              <!-- Main content (list view) -->
+                                              <div class="w-7/12 bg-slate-700/30 rounded-sm p-1 space-y-1">
+                                                  <div class="h-2.5 w-full bg-slate-600/50 rounded-sm"></div> <!-- Search bar -->
+                                                  <!-- Cart items list -->
+                                                  <div class="h-3.5 w-full bg-slate-600/20 rounded-sm flex items-center gap-1 p-0.5"><div class="w-2.5 h-2.5 bg-slate-500/50 rounded-sm shrink-0"></div><div class="h-1 flex-grow bg-slate-500/50 rounded-full"></div></div>
+                                                  <div class="h-3.5 w-full bg-slate-600/20 rounded-sm flex items-center gap-1 p-0.5"><div class="w-2.5 h-2.5 bg-slate-500/50 rounded-sm shrink-0"></div><div class="h-1 flex-grow bg-slate-500/50 rounded-full"></div></div>
+                                                  <div class="h-3.5 w-4/5 bg-slate-600/20 rounded-sm flex items-center gap-1 p-0.5"><div class="w-2.5 h-2.5 bg-slate-500/50 rounded-sm shrink-0"></div><div class="h-1 flex-grow bg-slate-500/50 rounded-full"></div></div>
+                                              </div>
+                                              <!-- Sidebar (cart summary) -->
+                                              <div class="w-5/12 bg-slate-700/30 rounded-sm p-1 flex flex-col justify-end">
+                                                  <div class="h-1 w-full bg-slate-500/50 rounded-full mb-1"></div>
+                                                  <div class="h-1 w-4/5 bg-slate-500/50 rounded-full mb-2"></div>
+                                                  <div class="h-3.5 w-full bg-sky-500/80 rounded-md shadow-sm shadow-sky-500/20"></div> <!-- Pay button -->
+                                              </div>
+                                          </div>
+                                      </div>`,
+        },
+        modern: {
+          name: "Modern Grid View",
+          preview: `<div class="w-full h-full border border-slate-700/50 rounded-sm p-1.5 flex flex-col gap-1.5 bg-gradient-to-br from-slate-800 to-slate-900 shadow-inner">
+                                         <!-- Header -->
+                                        <div class="h-3 w-full bg-slate-700/50 rounded-sm flex items-center px-1 gap-1">
+                                            <div class="w-1/4 h-1.5 bg-sky-500/70 rounded-full"></div>
+                                            <div class="w-1/3 h-1.5 bg-slate-600/50 rounded-full"></div>
+                                        </div>
+                                        <div class="flex-grow flex gap-1.5">
+                                            <!-- Main content (grid view) -->
+                                            <div class="w-7/12 bg-slate-700/30 rounded-sm p-1 flex gap-1">
+                                                <!-- Category sidebar -->
+                                                <div class="w-1/3 bg-slate-600/20 rounded-sm p-0.5 space-y-1">
+                                                    <div class="h-2 w-full bg-sky-500/50 rounded-sm"></div>
+                                                    <div class="h-1.5 w-full bg-slate-500/50 rounded-full"></div>
+                                                    <div class="h-1.5 w-full bg-slate-500/50 rounded-full"></div>
+                                                    <div class="h-1.5 w-full bg-slate-500/50 rounded-full"></div>
+                                                </div>
+                                                <!-- Product grid -->
+                                                <div class="w-2/3 grid grid-cols-2 gap-1">
+                                                    <div class="bg-slate-600/20 rounded p-0.5 space-y-0.5"><div class="aspect-square w-full bg-slate-500/50 rounded-sm"></div><div class="h-1 w-full bg-slate-500/50 rounded-full"></div></div>
+                                                    <div class="bg-slate-600/20 rounded p-0.5 space-y-0.5"><div class="aspect-square w-full bg-slate-500/50 rounded-sm"></div><div class="h-1 w-full bg-slate-500/50 rounded-full"></div></div>
+                                                    <div class="bg-slate-600/20 rounded p-0.5 space-y-0.5"><div class="aspect-square w-full bg-slate-500/50 rounded-sm"></div><div class="h-1 w-full bg-slate-500/50 rounded-full"></div></div>
+                                                    <div class="bg-slate-600/20 rounded p-0.5 space-y-0.5"><div class="aspect-square w-full bg-slate-500/50 rounded-sm"></div><div class="h-1 w-full bg-slate-500/50 rounded-full"></div></div>
+                                                </div>
+                                            </div>
+                                            <!-- Cart -->
+                                            <div class="w-5/12 bg-slate-700/30 rounded-sm p-1 flex flex-col justify-between">
+                                                <div>
+                                                     <div class="h-1 w-full bg-slate-500/50 rounded-full mb-1"></div>
+                                                     <div class="h-1 w-4/5 bg-slate-500/50 rounded-full mb-1"></div>
+                                                </div>
+                                                <div class="h-3.5 w-full bg-sky-500/80 rounded-md shadow-sm shadow-sky-500/20"></div> <!-- Pay button -->
+                                            </div>
+                                        </div>
+                                    </div>`,
+        },
+      };
+      posLayoutSelectorContainer.innerHTML = `
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            ${Object.entries(layouts)
+                              .map(
+                                ([key, layout]) => `
+                                <div data-action="select-pos-layout" data-layout-id="${key}" class="template-selector rounded-lg p-4 bg-bg-secondary ${
+                                  appState.settings.posLayout === key
+                                    ? "active"
+                                    : ""
+                                }">
+                                    <h4 class="font-semibold text-text-primary text-sm mb-2">${
+                                      layout.name
+                                    }</h4>
+                                    <div class="h-20 bg-bg-tertiary rounded overflow-hidden pointer-events-none">
+                                        ${layout.preview}
+                                    </div>
+                                </div>
+                            `
+                              )
+                              .join("")}
+                        </div>
+                    `;
+    };
+
+    if (posLayoutSelectorContainer) {
+      posLayoutSelectorContainer.addEventListener("click", (e) => {
+        const selectTarget = e.target.closest(
+          '[data-action="select-pos-layout"]'
+        );
+        if (selectTarget) {
+          const layoutId = selectTarget.dataset.layoutId;
+          if (appState.settings.posLayout !== layoutId) {
+            appState.settings.posLayout = layoutId;
+            posLayoutSelectorContainer
+              .querySelectorAll('[data-action="select-pos-layout"]')
+              .forEach((el) => el.classList.remove("active"));
+            selectTarget.classList.add("active");
+          }
+        }
+      });
+    }
+
+    const renderBusinessTypeSelector = () => {
+      if (!businessTypeSelectorContainer) return; // Add this check
+      let profilesHTML = Object.entries(businessProfiles)
+        .map(
+          ([id, type]) => `
+                        <div data-action="select-business-type" data-type-id="${id}" class="relative group template-selector rounded-lg p-4 bg-bg-secondary flex flex-col items-center justify-center text-center h-28 ${
+            appState.settings.businessType === id ? "active" : ""
+          }">
+                             <div class="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button data-action="edit-predefined-profile" data-id="${id}" class="p-1.5 bg-bg-tertiary rounded-md hover:text-accent"><i data-lucide="edit" class="w-3 h-3 pointer-events-none"></i></button>
+                            </div>
+                            <i data-lucide="${
+                              type.icon
+                            }" class="w-8 h-8 mb-2 text-accent"></i>
+                            <h4 class="font-semibold text-text-primary text-sm">${
+                              type.name
+                            }</h4>
+                        </div>
+                    `
+        )
+        .join("");
+
+      profilesHTML += Object.entries(appState.customProfiles)
+        .map(
+          ([id, type]) => `
+                         <div data-action="select-business-type" data-type-id="${id}" class="relative group template-selector rounded-lg p-4 bg-bg-secondary flex flex-col items-center justify-center text-center h-28 ${
+            appState.settings.businessType === id ? "active" : ""
+          }">
+                            <div class="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button data-action="edit-custom-profile" data-id="${id}" class="p-1.5 bg-bg-tertiary rounded-md hover:text-accent"><i data-lucide="edit" class="w-3 h-3 pointer-events-none"></i></button>
+                                <button data-action="delete-custom-profile" data-id="${id}" class="p-1.5 bg-bg-tertiary rounded-md hover:text-danger"><i data-lucide="trash-2" class="w-3 h-3 pointer-events-none"></i></button>
+                            </div>
+                            <i data-lucide="${
+                              type.icon
+                            }" class="w-8 h-8 mb-2 text-accent"></i>
+                            <h4 class="font-semibold text-text-primary text-sm">${
+                              type.name
+                            }</h4>
+                        </div>
+                    `
+        )
+        .join("");
+
+      profilesHTML += `
+                         <div data-action="create-custom-profile" class="template-selector rounded-lg p-4 bg-bg-secondary flex flex-col items-center justify-center text-center h-28 border-dashed border-border-color-strong hover:border-accent">
+                            <i data-lucide="plus" class="w-8 h-8 mb-2 text-text-secondary"></i>
+                            <h4 class="font-semibold text-text-primary text-sm">Create Your Own</h4>
+                        </div>
+                    `;
+
+      businessTypeSelectorContainer.innerHTML = `
+                        <p class="text-sm text-text-secondary mb-4">Select your primary business type to tailor the system experience.</p>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                           ${profilesHTML}
+                        </div>
+                    `;
+      lucide.createIcons();
+    };
+
+    if (businessTypeSelectorContainer) {
+      businessTypeSelectorContainer.addEventListener("click", (e) => {
+        const selectTarget = e.target.closest(
+          '[data-action="select-business-type"]'
+        );
+        const createTarget = e.target.closest(
+          '[data-action="create-custom-profile"]'
+        );
+        const editCustomTarget = e.target.closest(
+          '[data-action="edit-custom-profile"]'
+        );
+        const deleteTarget = e.target.closest(
+          '[data-action="delete-custom-profile"]'
+        );
+        const editPredefinedTarget = e.target.closest(
+          '[data-action="edit-predefined-profile"]'
+        );
+
+        if (createTarget) {
+          openCustomProfileModal();
+        } else if (editPredefinedTarget) {
+          e.stopPropagation();
+          openCustomProfileModal(editPredefinedTarget.dataset.id, true);
+        } else if (editCustomTarget) {
+          e.stopPropagation();
+          openCustomProfileModal(editCustomTarget.dataset.id, false);
+        } else if (deleteTarget) {
+          e.stopPropagation();
+          const profileId = deleteTarget.dataset.id;
+          const profileName = appState.customProfiles[profileId].name;
+          const modal = showModal(
+            "Delete Profile",
+            `<p>Are you sure you want to delete the "${profileName}" profile? This action cannot be undone.</p>`,
+            `<button data-action="close-modal" class="btn btn-secondary">Cancel</button><button id="confirm-delete" class="btn btn-danger">Delete</button>`
+          );
+          modal
+            .querySelector("#confirm-delete")
+            .addEventListener("click", () => {
+              const updatedProfiles = { ...appState.customProfiles };
+              delete updatedProfiles[profileId];
+              let newSettings = { ...appState.settings };
+              if (newSettings.businessType === profileId) {
+                newSettings.businessType = "general";
+              }
+              showToast(`Profile "${profileName}" deleted.`);
+              closeModal(modal);
+              updateDoc(storeRef, {
+                customProfiles: updatedProfiles,
+                settings: newSettings,
+              }).catch((err) => {
+                console.error("Failed to delete profile:", err);
+                showToast(`Error deleting profile ${profileName}.`, "error");
+              });
+            });
+        } else if (selectTarget) {
+          const typeId = selectTarget.dataset.typeId;
+          if (appState.settings.businessType !== typeId) {
+            appState.settings.businessType = typeId;
+            businessTypeSelectorContainer
+              .querySelectorAll('[data-action="select-business-type"]')
+              .forEach((el) => el.classList.remove("active"));
+            selectTarget.classList.add("active");
+          }
+        }
+      });
+    }
+
+    const renderReceiptSelector = () => {
+      if (!receiptSelectorContainer) return; // Add this check
+      receiptSelectorContainer.innerHTML = `
+                        <p class="text-sm text-text-secondary mb-4">Choose the default design for printed and digital receipts.</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            ${Object.entries(receiptTemplates)
+                              .map(
+                                ([key, template]) => `
+                                <div data-action="select-template" data-template-id="${key}" class="template-selector rounded-lg p-4 bg-bg-secondary ${
+                                  appState.settings.selectedReceiptTemplate ===
+                                  key
+                                    ? "active"
+                                    : ""
+                                }">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <h4 class="font-semibold text-text-primary capitalize pr-2">${
+                                          template.name
+                                        }</h4>
+                                        <button data-action="preview-template" data-template-id="${key}" class="btn btn-secondary p-1 h-auto text-xs shrink-0"><i data-lucide="eye" class="w-4 h-4"></i></button>
+                                    </div>
+                                    <div class="h-40 bg-bg-tertiary rounded overflow-hidden pointer-events-none scale-[30%] origin-top-left -mb-28">
+                                        ${template.preview}
+                                    </div>
+                                </div>
+                            `
+                              )
+                              .join("")}
+                        </div>
+                    `;
+      lucide.createIcons();
+    };
+
+    if (receiptSelectorContainer) {
+      receiptSelectorContainer.addEventListener("click", (e) => {
+        const previewTarget = e.target.closest(
+          '[data-action="preview-template"]'
+        );
+        const selectTarget = e.target.closest(
+          '[data-action="select-template"]'
+        );
+        if (previewTarget) {
+          e.stopPropagation();
+          const templateId = previewTarget.dataset.templateId;
+          showLargeReceiptPreview(templateId);
+        } else if (selectTarget) {
+          const templateId = selectTarget.dataset.templateId;
+          if (appState.settings.selectedReceiptTemplate !== templateId) {
+            appState.settings.selectedReceiptTemplate = templateId;
+            receiptSelectorContainer
+              .querySelectorAll('[data-action="select-template"]')
+              .forEach((el) => el.classList.remove("active"));
+            selectTarget.classList.add("active");
+          }
+        }
+      });
+    }
+
+    renderPosLayoutSelector();
+    renderBusinessTypeSelector();
+    renderReceiptSelector();
+  }
+
+  // NEW: Function to initialize the User Roles view
+  function initUserRoles(pane) {
+    const container = pane.querySelector("#user-roles-view-container");
+    if (!container) return;
+
+    if (appState.session.userRole !== "admin") {
+      container.innerHTML = `<p class="text-center p-8">You do not have permission to manage user roles.</p>`;
+      return;
+    }
+
+    // --- NEW: State & Data for the redesigned UI ---
+    let selectedRoleId = "manager"; // Default to manager view
+
+    const permissionGroups = {
+      "Dashboard & POS": {
+        icon: "layout-dashboard",
+        permissions: [
+          "canAccessDashboard",
+          "canUsePOS",
+          "canManageInvoices",
+          "canApproveInvoiceVoid",
+          "canDirectlyVoidInvoice",
+          "canRequestInvoiceVoid",
+          "canCancelVoidRequest",
+        ],
+      },
+      "Inventory Management": {
+        icon: "boxes",
+        permissions: [
+          "canViewInventory",
+          "canAddProducts",
+          "canEditProducts",
+          "canDeactivateProducts",
+          "canDeleteProducts",
+        ],
+      },
+      "Reporting & Analytics": {
+        icon: "bar-chart-3",
+        permissions: [
+          "canAccessReports",
+          "canSeeAllReports",
+          "canViewProfitAndLoss",
+        ],
+      },
+      "Customer Relations": {
+        icon: "users",
+        permissions: ["canManageCustomers"],
+      },
+      Administration: {
+        icon: "shield",
+        permissions: [
+          "canManageStaff",
+          "canManageRoles",
+          "canManageSettings",
+          "canInviteCashiers",
+          "canViewStaffPerformance",
+          "canRequestStaffDeactivation",
+          "canEditCashierDetails",
+        ],
+      },
+    };
+
+    // Icons for individual permissions
+    const permissionIcons = {
+      canAccessDashboard: "layout-dashboard",
+      canUsePOS: "terminal",
+      canManageInvoices: "receipt-text",
+      canApproveInvoiceVoid: "shield-check",
+      canDirectlyVoidInvoice: "shield-x",
+      canRequestInvoiceVoid: "shield-alert",
+      canCancelVoidRequest: "rotate-ccw",
+      canViewInventory: "package-search",
+      canAddProducts: "package-plus",
+      canEditProducts: "edit",
+      canDeactivateProducts: "eye-off",
+      canDeleteProducts: "trash-2",
+      canAccessReports: "bar-chart-3",
+      canSeeAllReports: "users-2",
+      canViewProfitAndLoss: "trending-up",
+      canManageCustomers: "contact",
+      canManageStaff: "user-cog",
+      canManageRoles: "shield",
+      canManageSettings: "settings",
+      canInviteCashiers: "user-plus",
+      canViewStaffPerformance: "activity",
+      canRequestStaffDeactivation: "user-x",
+      canEditCashierDetails: "file-pen-line",
+    };
+
+    // --- NEW: Main Render Function ---
+    const renderUserRolesUI = () => {
+      const selectedRole = userRoles[selectedRoleId];
+      if (!selectedRole) return;
+
+      // Group permissions that actually exist for the selected role
+      const groupedPermissionsHTML = Object.entries(permissionGroups)
+        .map(([groupName, groupData]) => {
+          const permissionsInGroup = groupData.permissions.filter((p) =>
+            selectedRole.permissions.hasOwnProperty(p)
+          );
+          if (permissionsInGroup.length === 0) return "";
+
+          // Check if all permissions in this group are enabled
+          const areAllEnabled = permissionsInGroup.every(
+            (pId) =>
+              appState.settings.permissions?.[selectedRoleId]?.permissions?.[
+                pId
+              ]?.value ?? selectedRole.permissions[pId].value
+          );
+
+          return `
+                        <div class="glass-pane p-6 rounded-xl">
+                            <div class="flex justify-between items-center pb-4 border-b border-border-color">
+                                <div class="flex items-center gap-3">
+                                    <i data-lucide="${
+                                      groupData.icon
+                                    }" class="w-6 h-6 text-accent"></i>
+                                    <h4 class="text-lg font-semibold text-text-primary">${groupName}</h4>
+                                </div>
+                                <label class="toggle-switch-label" title="Toggle all in ${groupName}">
+                                    <input type="checkbox" data-action="toggle-permission-group" data-group-name="${groupName}" class="sr-only toggle-switch-input" ${
+            areAllEnabled ? "checked" : ""
+          }>
+                                    <div class="toggle-switch-track"><div class="toggle-switch-thumb"></div></div>
+                                </label>
+                            </div>
+                            <div class="divide-y divide-border-color">
+                                ${permissionsInGroup
+                                  .map((permissionId) => {
+                                    const perm =
+                                      selectedRole.permissions[permissionId];
+                                    const isChecked =
+                                      appState.settings.permissions?.[
+                                        selectedRoleId
+                                      ]?.permissions?.[permissionId]?.value ??
+                                      perm.value;
+                                    return `
+                                    <div class="flex items-center justify-between py-4">
+                                        <div class="flex items-start gap-3">
+                                            <i data-lucide="${
+                                              permissionIcons[permissionId] ||
+                                              "toggle-right"
+                                            }" class="w-5 h-5 text-text-secondary mt-1 shrink-0"></i>
+                                            <div>
+                                                <label for="perm-${selectedRoleId}-${permissionId}" class="font-medium text-sm text-text-primary cursor-pointer">${permissionId
+                                      .replace(/([A-Z])/g, " $1")
+                                      .replace(/^./, (str) =>
+                                        str.toUpperCase()
+                                      )}</label>
+                                                <p class="text-xs text-text-secondary">${
+                                                  perm.description
+                                                }</p>
+                                            </div>
+                                        </div>
+                                        <label class="toggle-switch-label">
+                                            <input type="checkbox" id="perm-${selectedRoleId}-${permissionId}" data-action="toggle-permission" data-role-id="${selectedRoleId}" data-permission-id="${permissionId}" class="sr-only toggle-switch-input" ${
+                                      isChecked ? "checked" : ""
+                                    }>
+                                            <div class="toggle-switch-track"><div class="toggle-switch-thumb"></div></div>
+                                        </label>
+                                    </div>`;
+                                  })
+                                  .join("")}
+                            </div>
+                        </div>
+                        `;
+        })
+        .join("");
+
+      const rolesToDisplay = {
+        manager: userRoles.manager,
+        cashier: userRoles.cashier,
+      };
+
+      container.innerHTML = `
+                    <div class="space-y-6">
+                        <div class="flex flex-col md:flex-row justify-between md:items-start gap-4">
+                            <div>
+                                <h1 class="text-3xl font-bold text-text-primary">User Roles & Permissions</h1>
+                                <p class="text-text-secondary mt-1">Define what different roles can see and do within the system.</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button data-action="reset-permissions" class="btn btn-secondary">
+                                    <i data-lucide="rotate-ccw" class="w-4 h-4 mr-2"></i>Reset to Defaults
+                                </button>
+                                <button data-action="save-permissions" class="btn btn-primary">
+                                    <i data-lucide="save" class="w-4 h-4 mr-2"></i>Save Changes
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8">
+                            <!-- Left: Role Selector -->
+                            <div class="md:col-span-1 lg:col-span-1">
+                                <div class="glass-pane p-4 rounded-xl space-y-2">
+                                    ${Object.entries(rolesToDisplay)
+                                      .map(
+                                        ([roleId, role]) => `
+                                        <button data-action="select-role" data-role-id="${roleId}" class="role-selector-btn ${
+                                          selectedRoleId === roleId
+                                            ? "active"
+                                            : ""
+                                        }">
+                                            <span class="capitalize font-semibold">${roleId}</span>
+                                            <span class="text-xs">${
+                                              role.name
+                                            }</span>
+                                        </button>
+                                    `
+                                      )
+                                      .join("")}
+                                </div>
+                            </div>
+
+                            <!-- Right: Permissions -->
+                            <div class="md:col-span-2 lg:col-span-3 space-y-6">
+                                ${groupedPermissionsHTML}
+                            </div>
+                        </div>
+                    </div>`;
+
+      lucide.createIcons();
+    };
+
+    // --- NEW: Event Delegation ---
+    container.addEventListener("click", (e) => {
+      const target = e.target.closest("[data-action]");
+      if (!target) return;
+
+      const action = target.dataset.action;
+
+      if (action === "select-role") {
+        selectedRoleId = target.dataset.roleId;
+        renderUserRolesUI();
+      }
+
+      if (action === "save-permissions") {
+        const updatedData = {
+          "settings.permissions": appState.settings.permissions,
+        };
+        updateDoc(storeRef, updatedData)
+          .then(() =>
+            showToast("Role permissions saved successfully!", "success")
+          )
+          .catch((err) => {
+            console.error("Error saving permissions:", err);
+            showToast("Failed to save permissions.", "error");
+          });
+      }
+
+      if (action === "reset-permissions") {
+        const modal = showModal(
+          "Reset Permissions",
+          `<p>Are you sure you want to reset all permissions for the <strong>${selectedRoleId}</strong> role to their default values? Your current changes will be lost.</p>`,
+          `<button data-action="close-modal" class="btn btn-secondary">Cancel</button><button id="confirm-reset" class="btn btn-danger">Yes, Reset</button>`
+        );
+
+        modal.querySelector("#confirm-reset").addEventListener("click", () => {
+          const defaultPermissions = JSON.parse(
+            JSON.stringify(userRoles[selectedRoleId].permissions)
+          );
+          appState.settings.permissions[
+            selectedRoleId
+          ].permissions = defaultPermissions;
+          renderUserRolesUI();
+          showToast(`${selectedRoleId} permissions have been reset.`, "info");
+          closeModal(modal);
+        });
+      }
+    });
+
+    container.addEventListener("change", (e) => {
+      const target = e.target.closest("[data-action]");
+      if (!target) return;
+      const action = target.dataset.action;
+
+      if (action === "toggle-permission") {
+        const { roleId, permissionId } = target.dataset;
+        const isEnabled = target.checked;
+        if (
+          appState.settings.permissions?.[roleId]?.permissions?.[permissionId]
+        ) {
+          appState.settings.permissions[roleId].permissions[
+            permissionId
+          ].value = isEnabled;
+        }
+        // Refresh to update the master toggle if needed
+        renderUserRolesUI();
+      }
+
+      if (action === "toggle-permission-group") {
+        const groupName = target.dataset.groupName;
+        const isEnabled = target.checked;
+        const group = permissionGroups[groupName];
+        if (group) {
+          group.permissions.forEach((permissionId) => {
+            if (
+              appState.settings.permissions?.[selectedRoleId]?.permissions?.[
+                permissionId
+              ]
+            ) {
+              appState.settings.permissions[selectedRoleId].permissions[
+                permissionId
+              ].value = isEnabled;
+            }
+          });
+        }
+        // Refresh to update all toggles in the group
+        renderUserRolesUI();
+      }
+    });
+
+    // Initial Render
+    renderUserRolesUI();
+  }
+
+  async function openCustomerModal(customerId = null, callback = null) {
+    const customer = customerId
+      ? firestoreData.customers.find((c) => c.id === customerId)
+      : {};
+    const isEditing = !!customerId;
+    const creditLimitInDisplay = isEditing
+      ? currencyUtils.convert(customer.creditLimit || 0)
+      : 0;
+
+    const userRole = appState.session.userRole;
+    const isAdmin = userRole === "admin";
+    const isManager = userRole === "manager";
+
+    // Determine field states based on role
+    const canEditCredit = isAdmin || isManager;
+    const canEditLoyalty = isAdmin;
+
+    const content = `<form id="customer-form" class="space-y-4"><div><label class="block text-sm font-medium text-text-secondary mb-1">Full Name</label><input type="text" name="name" value="${
+      customer.name || ""
+    }" class="w-full form-input" required></div><div class="grid grid-cols-2 gap-4"><div><label class="block text-sm font-medium text-text-secondary mb-1">Email</label><input type="email" name="email" value="${
+      customer.email || ""
+    }" class="w-full form-input"></div><div><label class="block text-sm font-medium text-text-secondary mb-1">Phone</label><input type="tel" name="phone" value="${
+      customer.phone || ""
+    }" class="w-full form-input"></div></div><div><label class="block text-sm font-medium text-text-secondary mb-1">Address</label><input type="text" name="address" value="${
+      customer.address || ""
+    }" class="w-full form-input"></div><div class="grid grid-cols-2 gap-4"><div><label class="block text-sm font-medium text-text-secondary mb-1">Loyalty ID</label><input type="text" name="loyaltyId" value="${
+      customer.loyaltyId ||
+      `CS-${(customer.name || "CUST")
+        .substring(0, 2)
+        .toUpperCase()}-${Date.now().toString().slice(-3)}`
+    }" class="w-full form-input ${!canEditLoyalty ? "bg-bg-tertiary" : ""}" ${
+      !canEditLoyalty ? "readonly" : ""
+    }></div><div><label class="block text-sm font-medium text-text-secondary mb-1">Credit Limit (${
+      appState.currentCurrency
+    })</label><input type="number" name="creditLimit" value="${creditLimitInDisplay.toFixed(
+      2
+    )}" class="w-full form-input ${!canEditCredit ? "bg-bg-tertiary" : ""}" ${
+      !canEditCredit ? "readonly" : ""
+    }></div></div></form>`;
+    const footer = `<button type="button" data-action="close-modal" class="btn btn-secondary">Cancel</button><button type="submit" form="customer-form" class="btn btn-primary">${
+      isEditing ? "Save Changes" : "Create Customer"
+    }</button>`;
+    const modal = showModal(
+      isEditing ? "Edit Customer" : "Add New Customer",
+      content,
+      footer,
+      { size: "max-w-2xl" }
+    );
+
+    modal.querySelector("#customer-form").addEventListener("submit", (ev) => {
+      ev.preventDefault();
+      const formData = new FormData(ev.target);
+
+      if (isEditing) {
+        const dataToUpdate = {
+          name: formData.get("name"),
+          email: formData.get("email"),
+          phone: formData.get("phone"),
+          address: formData.get("address"),
+        };
+
+        if (canEditCredit) {
+          const creditLimitInDisplay =
+            parseFloat(formData.get("creditLimit")) || 0;
+          dataToUpdate.creditLimit = currencyUtils.convertToBase(
+            creditLimitInDisplay
+          );
+        }
+        if (canEditLoyalty) {
+          dataToUpdate.loyaltyId = formData.get("loyaltyId");
+        }
+
+        updateDoc(doc(customersRef, customerId), dataToUpdate).catch(
+          (error) => {
+            console.error("Error updating customer:", error);
+            showToast("Failed to update customer.", "error");
+          }
+        );
+        showToast(`Customer updated successfully!`);
+      } else {
+        // Creating new customer
+        const dataToCreate = {
+          name: formData.get("name"),
+          email: formData.get("email"),
+          phone: formData.get("phone"),
+          address: formData.get("address"),
+          loyaltyPoints: 0,
+          currentDue: 0,
+          joinDate: new Date().toISOString().slice(0, 10),
+        };
+
+        if (canEditLoyalty) {
+          dataToCreate.loyaltyId = formData.get("loyaltyId");
+        } else {
+          dataToCreate.loyaltyId = `CS-${(formData.get("name") || "CUST")
+            .substring(0, 2)
+            .toUpperCase()}-${Date.now().toString().slice(-3)}`;
+        }
+
+        if (canEditCredit) {
+          const creditLimitInDisplay =
+            parseFloat(formData.get("creditLimit")) || 0;
+          dataToCreate.creditLimit = currencyUtils.convertToBase(
+            creditLimitInDisplay
+          );
+        } else {
+          dataToCreate.creditLimit = 0; // Default for cashiers
+        }
+
+        addDoc(customersRef, dataToCreate)
+          .then((docRef) => {
+            if (callback) callback({ id: docRef.id, ...dataToCreate });
+          })
+          .catch((error) => {
+            console.error("Error adding customer:", error);
+            showToast("Failed to add new customer.", "error");
+          });
+        showToast(`Customer added successfully!`);
+      }
+
+      closeModal(modal);
+    });
+  }
+
+  // NEW FUNCTION to show a customer's invoices in a modal
+  function openCustomerInvoicesModal(customerId) {
+    const customer = firestoreData.customers.find((c) => c.id === customerId);
+    if (!customer) {
+      showToast("Customer not found.", "error");
+      return;
+    }
+
+    const customerInvoices = firestoreData.invoices
+      .filter((inv) => inv.customerId === customerId)
+      .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    const getStatusBadge = (status) => {
+      const base =
+        "px-2 py-0.5 text-xs font-semibold rounded-full inline-block";
+      if (status === "Paid") return `${base} bg-green-500/20 text-green-300`;
+      if (status === "Due") return `${base} bg-red-500/20 text-red-300`;
+      if (status === "Partial")
+        return `${base} bg-yellow-500/20 text-yellow-300`;
+      if (status === "Void")
+        return `${base} bg-red-900/40 text-red-400 border border-red-500/50`;
+      return `${base} bg-gray-500/20 text-gray-300`;
+    };
+
+    const content = `
+                    <div class="space-y-4">
+                        <p>Showing invoice history for <strong class="text-text-primary">${
+                          customer.name
+                        }</strong>.</p>
+                        <div class="max-h-[60vh] overflow-y-auto -mx-6">
+                            <table class="w-full text-sm">
+                                <thead class="sticky top-0 bg-bg-secondary z-10">
+                                    <tr class="text-left text-text-secondary uppercase text-xs">
+                                        <th class="px-6 py-3 font-medium">Invoice ID</th>
+                                        <th class="px-6 py-3 font-medium">Date</th>
+                                        <th class="px-6 py-3 font-medium">Status</th>
+                                        <th class="px-6 py-3 font-medium text-right">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-border-color">
+                                    ${
+                                      customerInvoices.length
+                                        ? customerInvoices
+                                            .map(
+                                              (inv) => `
+                                        <tr class="hover:bg-bg-tertiary">
+                                            <td class="px-6 py-3 font-mono">${
+                                              inv.id
+                                            }</td>
+                                            <td class="px-6 py-3">${new Date(
+                                              inv.date
+                                            ).toLocaleDateString()}</td>
+                                            <td class="px-6 py-3"><span class="${getStatusBadge(
+                                              inv.status
+                                            )}">${inv.status}</span></td>
+                                            <td class="px-6 py-3 text-right font-mono">${currencyUtils.format(
+                                              inv.totalInBaseCurrency,
+                                              inv.currency
+                                            )}</td>
+                                        </tr>
+                                    `
+                                            )
+                                            .join("")
+                                        : `
+                                        <tr>
+                                            <td colspan="4" class="text-center p-8 text-text-secondary">No invoices found for this customer.</td>
+                                        </tr>
+                                    `
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+
+    const footer = `<button data-action="close-modal" class="btn btn-secondary">Close</button>`;
+    showModal(`Invoice History: ${customer.name}`, content, footer, {
+      size: "max-w-3xl",
+      customClasses: "p-0",
+    });
+  }
+
+  async function openReceivePaymentModal(customerId) {
+    const customer = firestoreData.customers.find((c) => c.id === customerId);
+    if (!customer) {
+      showToast("Customer not found.", "error");
+      return;
+    }
+    const currentDueInBase = customer.currentDue || 0;
+    if (currentDueInBase <= 0) {
+      showToast(`${customer.name} has no outstanding balance.`, "info");
+      return;
+    }
+    const currentDueInDisplay = currencyUtils.convert(currentDueInBase);
+
+    const content = `
+                    <form id="receive-payment-form" class="space-y-4">
+                        <p>Receiving payment for: <strong class="text-text-primary">${
+                          customer.name
+                        }</strong></p>
+                        <p class="text-lg">Current Due: <span class="font-mono font-bold text-red-400">${currencyUtils.format(
+                          currentDueInBase
+                        )}</span></p>
+                        <div>
+                            <label class="block text-sm font-medium text-text-secondary mb-1">Payment Amount (in ${
+                              appState.currentCurrency
+                            })</label>
+                            <input type="number" name="amount" value="${currentDueInDisplay.toFixed(
+                              2
+                            )}" step="0.01" class="form-input w-full text-lg" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-text-secondary mb-1">Payment Method</label>
+                             <select name="paymentMethod" class="form-select w-full">
+                                <option value="Cash">Cash</option>
+                                <option value="Card">Card</option>
+                                <option value="Bank Transfer">Bank Transfer</option>
+                            </select>
+                        </div>
+                         <div>
+                            <label class="block text-sm font-medium text-text-secondary mb-1">Notes</label>
+                            <textarea name="notes" class="form-textarea w-full" placeholder="e.g., Payment for invoice #..."></textarea>
+                        </div>
+                    </form>
+                `;
+    const footer = `<button data-action="close-modal" class="btn btn-secondary">Cancel</button><button type="submit" form="receive-payment-form" class="btn btn-primary">Receive Payment</button>`;
+    const modal = showModal("Receive Due Payment", content, footer);
+
+    modal
+      .querySelector("#receive-payment-form")
+      .addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const amountInDisplay = parseFloat(formData.get("amount"));
+        const notes = formData.get("notes");
+        const paymentMethod = formData.get("paymentMethod");
+
+        if (isNaN(amountInDisplay) || amountInDisplay <= 0) {
+          showToast("Please enter a valid payment amount.", "error");
+          return;
+        }
+
+        const amountInBase = currencyUtils.convertToBase(amountInDisplay);
+
+        if (amountInBase > currentDueInBase + 0.001) {
+          // Add a small tolerance for floating point issues
+          showToast("Payment cannot be greater than the due amount.", "error");
+          return;
+        }
+
+        try {
+          let paymentReceiptData;
+
+          await runTransaction(db, async (transaction) => {
+            const customerRef = doc(customersRef, customerId);
+            const customerDoc = await transaction.get(customerRef);
+            if (!customerDoc.exists()) throw new Error("Customer not found");
+
+            const customerData = customerDoc.data();
+            const outstandingInvoices = firestoreData.invoices
+              .filter(
+                (inv) =>
+                  inv.customerId === customerId &&
+                  (inv.status === "Due" || inv.status === "Partial")
+              )
+              .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+            let paymentToApply = amountInBase;
+            let newCustomerDue = customerData.currentDue || 0;
+            const appliedToInvoices = [];
+
+            for (const invoice of outstandingInvoices) {
+              if (paymentToApply <= 0) break;
+
+              const invoiceRef = doc(invoicesRef, invoice.id);
+              const amountToPayOnInvoice = Math.min(
+                paymentToApply,
+                invoice.dueAmount
+              );
+
+              // FIX: Convert payment amount back to the currency of the specific invoice being paid
+              const amountInInvoiceCurrency = currencyUtils.convert(
+                amountToPayOnInvoice,
+                invoice.currency
+              );
+
+              const newInvoiceDue = invoice.dueAmount - amountToPayOnInvoice;
+              const newStatus = newInvoiceDue < 0.001 ? "Paid" : "Partial";
+
+              const paymentRecord = {
+                amount: amountInInvoiceCurrency, // Use the converted amount
+                date: new Date().toISOString(),
+                method: paymentMethod,
+                notes: notes,
+                isDuePayment: true, // Add a flag to identify this as a post-sale payment
+              };
+
+              transaction.update(invoiceRef, {
+                dueAmount: newInvoiceDue,
+                status: newStatus,
+                paymentDetails: [
+                  ...(invoice.paymentDetails || []),
+                  paymentRecord,
+                ],
+              });
+
+              paymentToApply -= amountToPayOnInvoice;
+              newCustomerDue -= amountToPayOnInvoice;
+              appliedToInvoices.push({
+                id: invoice.id,
+                amount: amountToPayOnInvoice,
+              });
+            }
+
+            transaction.update(customerRef, {
+              currentDue: Math.max(0, newCustomerDue),
+            });
+
+            paymentReceiptData = {
+              customer: customer,
+              amountPaid: amountInBase,
+              method: paymentMethod,
+              date: new Date().toISOString(),
+              notes: notes,
+              appliedTo: appliedToInvoices,
+              newBalance: Math.max(0, newCustomerDue),
+            };
+          });
+
+          await createNotification(
+            "sale",
+            `Received payment of <strong>${currencyUtils.format(
+              amountInBase
+            )}</strong> from <strong>${
+              customer.name
+            }</strong>. New balance: ${currencyUtils.format(
+              paymentReceiptData.newBalance
+            )}.`
+          );
+
+          showToast("Payment received successfully!", "success");
+          closeModal(modal);
+          showPaymentReceipt(paymentReceiptData);
+        } catch (error) {
+          console.error("Failed to receive payment:", error);
+          showToast("An error occurred while processing the payment.", "error");
+        }
+      });
+  }
+  const showPaymentReceipt = (receiptData) => {
+    const template = receiptTemplates["payment"];
+    if (!template) {
+      console.error("Payment receipt template is missing.");
+      showToast("Cannot generate payment receipt.", "error");
+      return;
+    }
+    const content = template.getBody(receiptData);
+    const footer = `<button data-action="close-modal" class="btn btn-secondary">Close</button><button id="print-payment-receipt" class="btn btn-primary"><i data-lucide="printer" class="w-4 h-4 mr-2"></i>Print</button>`;
+    const modal = showModal("Payment Confirmation", content, footer, {
+      size: "max-w-2xl",
+      customClasses: "p-0",
+    });
+    lucide.createIcons();
+    modal
+      .querySelector("#print-payment-receipt")
+      .addEventListener("click", () => {
+        printElement("receipt-content");
+      });
+  };
+  function openEditCartItemModal(itemId, serialNumber) {
+    const activeSale = posState.sales.find(
+      (s) => s.id === posState.activeSaleId
+    );
+    if (!activeSale) return;
+
+    const itemIndex = activeSale.cart.findIndex((i) =>
+      i.isSerialized ? i.serialNumber === serialNumber : i.id === itemId
+    );
+    if (itemIndex === -1) return;
+
+    const item = activeSale.cart[itemIndex];
+    if (item.originalPrice === undefined) {
+      item.originalPrice = item.price;
+    }
+
+    const uom = firestoreData.unitsOfMeasurement.find(
+      (u) => u.id === item.uomId
+    ) || { name: "units", allowsDecimal: false };
+    const qtyStep = uom.allowsDecimal ? "0.01" : "1";
+
+    const displayCurrencyCode = appState.currentCurrency;
+    const displayCurrencyInfo = currencyUtils.get(displayCurrencyCode);
+    const priceInDisplay = currencyUtils.convert(
+      item.price,
+      displayCurrencyCode
+    );
+
+    let discountValueForDisplay = item.discount?.value || "";
+    if (item.discount?.type === "fixed" && item.discount.value) {
+      discountValueForDisplay = currencyUtils
+        .convert(item.discount.value, displayCurrencyCode)
+        .toFixed(2);
+    }
+
+    const content = `
+                <form id="edit-cart-item-form" class="space-y-4">
+                    <p class="text-lg font-medium text-text-primary">${
+                      item.name
+                    }</p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-text-secondary mb-1">Quantity</label>
+                            <input type="number" step="${qtyStep}" name="qty" value="${
+      item.qty
+    }" class="w-full form-input" ${item.isSerialized ? "readonly" : ""}>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-text-secondary mb-1">Unit Price (in ${displayCurrencyCode})</label>
+                            <input type="number" step="0.01" name="price" value="${priceInDisplay.toFixed(
+                              2
+                            )}" class="w-full form-input">
+                            <p class="text-xs text-text-secondary mt-1">Original: ${currencyUtils.format(
+                              item.originalPrice,
+                              displayCurrencyCode
+                            )}</p>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-text-secondary mb-1">Line Item Discount (Overrides Price)</label>
+                        <div class="flex">
+                            <select name="discountType" class="form-select rounded-r-none w-20">
+                                <option value="fixed" ${
+                                  item.discount?.type === "fixed"
+                                    ? "selected"
+                                    : ""
+                                }>${displayCurrencyInfo.symbol}</option>
+                                <option value="percent" ${
+                                  item.discount?.type === "percent"
+                                    ? "selected"
+                                    : ""
+                                }>%</option>
+                            </select>
+                            <input type="number" step="0.01" name="discountValue" value="${discountValueForDisplay}" placeholder="e.g., 5 or 10.50" class="w-full form-input rounded-l-none">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-text-secondary mb-1">Notes</label>
+                        <textarea name="notes" class="form-textarea w-full h-20" placeholder="e.g., Customer requested gift wrap">${
+                          item.notes || ""
+                        }</textarea>
+                    </div>
+                </form>
+                `;
+    const footer = `<button data-action="close-modal" class="btn btn-secondary">Cancel</button><button type="submit" form="edit-cart-item-form" class="btn btn-primary">Apply Changes</button>`;
+    const modal = showModal("Edit Item Details", content, footer);
+
+    modal
+      .querySelector("#edit-cart-item-form")
+      .addEventListener("submit", (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+
+        const newQty = parseFloat(formData.get("qty"));
+        const manualPriceInDisplay = parseFloat(formData.get("price"));
+        const discountType = formData.get("discountType");
+        const discountValueInDisplay = parseFloat(
+          formData.get("discountValue")
+        );
+        const notes = formData.get("notes");
+
+        const editedItem = activeSale.cart[itemIndex];
+        editedItem.qty = newQty;
+        editedItem.notes = notes;
+
+        if (!isNaN(discountValueInDisplay) && discountValueInDisplay > 0) {
+          if (discountType === "percent") {
+            editedItem.discount = {
+              type: discountType,
+              value: discountValueInDisplay,
+            };
+            editedItem.price =
+              editedItem.originalPrice * (1 - discountValueInDisplay / 100);
+          } else {
+            // fixed discount
+            const discountValueInBase = currencyUtils.convertToBase(
+              discountValueInDisplay
+            );
+            editedItem.discount = {
+              type: discountType,
+              value: discountValueInBase,
+            };
+            editedItem.price = Math.max(
+              0,
+              editedItem.originalPrice - discountValueInBase
+            );
+          }
+        } else {
+          delete editedItem.discount;
+          editedItem.price = currencyUtils.convertToBase(manualPriceInDisplay);
+        }
+
+        posFullRender(workspaceContent.querySelector(".view-pane"));
+        closeModal(modal);
+        showToast(`${editedItem.name} updated in cart.`, "info");
+      });
+  }
+
+  function openStockAdjustmentModal(productId) {
+    const product = firestoreData.products.find((p) => p.id === productId);
+    if (!product) {
+      showToast("Product not found for stock adjustment.", "error");
+      return;
+    }
+
+    const content = `
+                    <form id="stock-adjustment-form" class="space-y-4">
+                        <p>Adjusting stock for: <strong class="text-text-primary">${product.name}</strong></p>
+                        <p>Current Stock: <span class="font-mono text-accent">${product.stock} ${product.uomId}</span></p>
+                        <div>
+                            <label class="block text-sm font-medium text-text-secondary mb-1">Adjustment Type</label>
+                            <select name="adjustmentType" class="form-select w-full">
+                                <option value="add">Add to Stock</option>
+                                <option value="remove">Remove from Stock</option>
+                                <option value="set">Set New Quantity</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-text-secondary mb-1">Quantity</label>
+                            <input type="number" name="quantity" class="form-input w-full" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-text-secondary mb-1">Reason / Notes</label>
+                            <textarea name="notes" class="form-textarea w-full" placeholder="e.g., Physical count correction, Damaged goods"></textarea>
+                        </div>
+                    </form>
+                `;
+    const footer = `<button data-action="close-modal" class="btn btn-secondary">Cancel</button><button type="submit" form="stock-adjustment-form" class="btn btn-primary">Apply Adjustment</button>`;
+    const modal = showModal("Stock Adjustment", content, footer);
+
+    modal
+      .querySelector("#stock-adjustment-form")
+      .addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const type = formData.get("adjustmentType");
+        const quantity = parseFloat(formData.get("quantity"));
+        const notes = formData.get("notes");
+
+        if (isNaN(quantity) || quantity < 0) {
+          showToast("Please enter a valid, non-negative quantity.", "error");
+          return;
+        }
+
+        let newStock;
+        switch (type) {
+          case "add":
+            newStock = (product.stock || 0) + quantity;
+            break;
+          case "remove":
+            newStock = Math.max(0, (product.stock || 0) - quantity);
+            break;
+          case "set":
+            newStock = quantity;
+            break;
+        }
+
+        showToast(
+          `Stock for ${product.name} adjusted to ${newStock}.`,
+          "success"
+        );
+        closeModal(modal);
+
+        // NEW: If a manager adjusts stock, create an audit log and notify the admin.
+        if (appState.session.userRole === "manager") {
+          const managerName = appState.session.currentUser.name;
+          const term = getCurrentProfile().terminology;
+          const logDetails = `Manager '${managerName}' adjusted stock for ${
+            term.product
+          } '${
+            product.name
+          }'. Type: ${type}, Quantity: ${quantity}. New stock: ${newStock}. Notes: ${
+            notes || "N/A"
+          }`;
+          const notificationMessage = `Manager <strong>${managerName}</strong> adjusted stock for <strong>${product.name}</strong>.`;
+
+          // 1. Create Audit Log
+          addDoc(auditLogRef, {
+            type: "inventory_adjustment",
+            timestamp: new Date().toISOString(),
+            productId: product.id,
+            productName: product.name,
+            details: logDetails,
+            user: {
+              id: appState.session.currentUser.uid,
+              name: managerName,
+            },
+          }).catch(console.error);
+
+          // 2. Create Notification for Admin
+          createNotification("info", notificationMessage, {
+            targetRoles: ["admin"],
+          });
+        }
+
+        updateDoc(doc(productsRef, productId), { stock: newStock }).catch(
+          (error) => {
+            console.error("Failed to adjust stock:", error);
+            showToast(`Error adjusting stock for ${product.name}.`, "error");
+          }
+        );
+      });
+  }
+
+  function openReceiveStockModal(productId = null) {
+    const product = productId
+      ? firestoreData.products.find((p) => p.id === productId)
+      : null;
+    if (productId && !product) {
+      showToast("Product not found.", "error");
+      return;
+    }
+    if (product && product.productType !== "physical") {
+      showToast("Cannot adjust stock for a service item.", "info");
+      return;
+    }
+
+    let productSelectorHTML = "";
+    if (!productId) {
+      productSelectorHTML = `
+                        <div>
+                            <label class="block text-sm font-medium text-text-secondary mb-1">Product</label>
+                            <select name="productId" class="form-select w-full" required>
+                                <option value="" disabled selected>Select a product...</option>
+                                ${firestoreData.products
+                                  .filter((p) => p.productType === "physical")
+                                  .map(
+                                    (p) =>
+                                      `<option value="${p.id}">${p.name} (${p.id})</option>`
+                                  )
+                                  .join("")}
+                            </select>
+                        </div>
+                    `;
+    }
+
+    const content = `
+                    <form id="receive-stock-form" class="space-y-4">
+                        <p>Adding new stock. Current quantities will be increased.</p>
+                        ${productSelectorHTML}
+                        ${
+                          productId
+                            ? `<p>Receiving stock for: <strong class="text-text-primary">${product.name}</strong></p><p>Current Stock: <span class="font-mono text-accent">${product.stock} ${product.uomId}</span></p>`
+                            : ""
+                        }
+                        <div>
+                            <label class="block text-sm font-medium text-text-secondary mb-1">Quantity to Add</label>
+                            <input type="number" name="quantity" class="form-input w-full" required min="0">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-text-secondary mb-1">Reason / Notes</label>
+                            <textarea name="notes" class="form-textarea w-full" placeholder="e.g., Received from supplier, Initial stock"></textarea>
+                        </div>
+                    </form>
+                `;
+    const footer = `<button data-action="close-modal" class="btn btn-secondary">Cancel</button><button type="submit" form="receive-stock-form" class="btn btn-primary">Add to Stock</button>`;
+    const modal = showModal("Receive Stock", content, footer);
+
+    modal
+      .querySelector("#receive-stock-form")
+      .addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const selectedProductId = productId || formData.get("productId");
+        const productToUpdate = firestoreData.products.find(
+          (p) => p.id === selectedProductId
+        );
+
+        if (!productToUpdate) {
+          showToast("Product not selected or found.", "error");
+          return;
+        }
+
+        const quantity = parseFloat(formData.get("quantity"));
+        const notes = formData.get("notes");
+
+        if (isNaN(quantity) || quantity <= 0) {
+          showToast("Please enter a valid, positive quantity.", "error");
+          return;
+        }
+
+        const newStock = (productToUpdate.stock || 0) + quantity;
+
+        showToast(
+          `Stock for ${productToUpdate.name} increased by ${quantity}. New total: ${newStock}.`,
+          "success"
+        );
+        closeModal(modal);
+
+        // NEW: If a manager receives stock, create an audit log and notify the admin.
+        if (appState.session.userRole === "manager") {
+          const managerName = appState.session.currentUser.name;
+          const term = getCurrentProfile().terminology;
+          const logDetails = `Manager '${managerName}' received stock for ${
+            term.product
+          } '${
+            productToUpdate.name
+          }'. Quantity added: ${quantity}. New stock: ${newStock}. Notes: ${
+            notes || "N/A"
+          }`;
+          const notificationMessage = `Manager <strong>${managerName}</strong> received stock for <strong>${productToUpdate.name}</strong>.`;
+
+          // 1. Create Audit Log
+          addDoc(auditLogRef, {
+            type: "inventory_receive",
+            timestamp: new Date().toISOString(),
+            productId: productToUpdate.id,
+            productName: productToUpdate.name,
+            details: logDetails,
+            user: {
+              id: appState.session.currentUser.uid,
+              name: managerName,
+            },
+          }).catch(console.error);
+
+          // 2. Create Notification for Admin
+          createNotification("info", notificationMessage, {
+            targetRoles: ["admin"],
+          });
+        }
+
+        updateDoc(doc(productsRef, selectedProductId), {
+          stock: newStock,
+        }).catch((error) => {
+          console.error("Failed to receive stock:", error);
+          showToast(
+            `Error receiving stock for ${productToUpdate.name}.`,
+            "error"
+          );
+        });
+      });
+  }
+
+  function openEmailInvoiceModal(invoiceId) {
+    const invoice = firestoreData.invoices.find((i) => i.id === invoiceId);
+    if (!invoice) return;
+
+    const customer = invoice.customerId
+      ? firestoreData.customers.find((c) => c.id === invoice.customerId)
+      : null;
+    const customerEmail = customer?.email || "";
+
+    const content = `
+                    <form id="email-invoice-form" class="space-y-4">
+                        <p>Send invoice <strong class="text-text-primary font-mono">${invoice.id}</strong> to:</p>
+                        <div>
+                            <label class="block text-sm font-medium text-text-secondary mb-1">Recipient Email</label>
+                            <input type="email" name="email" value="${customerEmail}" class="form-input w-full" placeholder="Enter email address" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-text-secondary mb-1">Message (Optional)</label>
+                            <textarea name="message" class="form-textarea w-full h-24">Here is your invoice from ${firestoreData.storeInfo.name}. Thank you for your business!</textarea>
+                        </div>
+                    </form>
+                `;
+    const footer = `<button data-action="close-modal" class="btn btn-secondary">Cancel</button><button type="submit" form="email-invoice-form" class="btn btn-primary"><i data-lucide="send" class="w-4 h-4 mr-2"></i>Send Email</button>`;
+    const modal = showModal("Email Invoice", content, footer);
+    lucide.createIcons();
+
+    modal
+      .querySelector("#email-invoice-form")
+      .addEventListener("submit", (e) => {
+        e.preventDefault();
+        const email = e.target.querySelector('[name="email"]').value;
+        showToast(`Invoice sent to ${email}.`, "success");
+        closeModal(modal);
+      });
+  }
+
+  const toggleMobileSidebar = (forceClose = false) => {
+    const isOpen = sidebar.classList.contains("mobile-open");
+    if (forceClose || isOpen) {
+      sidebar.classList.remove("mobile-open");
+      sidebarBackdrop.classList.add("hidden");
+    } else {
+      sidebar.classList.add("mobile-open");
+      sidebarBackdrop.classList.remove("hidden");
+    }
+  };
+
+  const checkScreenSize = () => {
+    const isMobile = window.innerWidth < 1024;
+    if (isMobile) {
+      toggleMobileSidebar(true);
+      sidebar.classList.remove("sidebar-collapsed", "w-20");
+      sidebar.classList.add("w-64");
+      sidebarToggleBtn.innerHTML = `<i data-lucide="menu" class="w-6 h-6"></i>`;
+    } else {
+      // On desktop, respect the persisted state
+      sidebar.classList.toggle("w-64", !appState.isSidebarCollapsed);
+      sidebar.classList.toggle("w-20", appState.isSidebarCollapsed);
+      sidebar.classList.toggle(
+        "sidebar-collapsed",
+        appState.isSidebarCollapsed
+      );
+      sidebarToggleBtn.innerHTML = `<i data-lucide="${
+        appState.isSidebarCollapsed ? "panel-right-close" : "panel-left-close"
+      }" class="w-6 h-6"></i>`;
+    }
+    lucide.createIcons();
+  };
+
+  function showShortcutsModal() {
+    const term = getCurrentProfile().terminology;
+    const shortcuts = [
+      { scope: "Global", key: "⌘ / Ctrl + K", desc: "Open universal search" },
+      { scope: "Global", key: "Alt + Q", desc: "Open AI Assistant" },
+      { scope: "Global", key: "?", desc: "Show this shortcuts guide" },
+      { scope: "Global", key: "Escape", desc: "Close modals & menus" },
+      { scope: "Navigation", key: "Alt + D", desc: "Go to Dashboard" },
+      { scope: "Navigation", key: "Alt + P", desc: "Go to POS Terminal" },
+      { scope: "Navigation", key: "Alt + I", desc: "Go to Invoices" },
+      { scope: "Navigation", key: "Alt + N", desc: `Go to ${term.inventory}` },
+      { scope: "Navigation", key: "Alt + C", desc: "Go to Customers" },
+      { scope: "Navigation", key: "Alt + R", desc: "Go to Reports" },
+      { scope: "Navigation", key: "Alt + S", desc: "Go to Settings" },
+      {
+        scope: "POS Terminal",
+        key: "F2 / Ctrl + I",
+        desc: `Focus ${term.product} search`,
+      },
+      {
+        scope: "POS Terminal",
+        key: "F4 / Ctrl + P",
+        desc: "Open Payment screen",
+      },
+      { scope: "POS Terminal", key: "Alt + A", desc: "Add Customer to sale" },
+      { scope: "POS Terminal", key: "Alt + N", desc: "Create a new sale tab" },
+      { scope: "Forms", key: "⌘ / Ctrl + S", desc: "Save changes in forms" },
+    ];
+
+    const groupedShortcuts = shortcuts.reduce((acc, s) => {
+      (acc[s.scope] = acc[s.scope] || []).push(s);
+      return acc;
+    }, {});
+
+    let content = Object.entries(groupedShortcuts)
+      .map(
+        ([scope, list]) => `
+                    <h4 class="font-semibold text-text-primary mt-4 mb-2 text-lg">${scope}</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 text-sm">
+                        ${list
+                          .map(
+                            (s) => `
+                            <div class="flex justify-between items-center py-1">
+                                <span class="text-text-secondary">${s.desc}</span>
+                                <kbd class="font-sans text-xs border border-border-color-strong rounded px-2 py-1 bg-bg-tertiary text-text-primary">${s.key}</kbd>
+                            </div>
+                        `
+                          )
+                          .join("")}
+                    </div>
+                `
+      )
+      .join("");
+
+    showModal(
+      "Keyboard Shortcuts",
+      content,
+      `<button data-action="close-modal" class="btn btn-secondary">Close</button>`,
+      { size: "max-w-3xl" }
+    );
+  }
+
+  sidebarToggleBtn.addEventListener("click", () => {
+    if (window.innerWidth < 1024) {
+      toggleMobileSidebar();
+    } else {
+      appState.isSidebarCollapsed = !appState.isSidebarCollapsed;
+      sidebar.classList.toggle("w-64", !appState.isSidebarCollapsed);
+      sidebar.classList.toggle("w-20", appState.isSidebarCollapsed);
+      sidebar.classList.toggle(
+        "sidebar-collapsed",
+        appState.isSidebarCollapsed
+      );
+      sidebarToggleBtn.innerHTML = `<i data-lucide="${
+        appState.isSidebarCollapsed ? "panel-right-close" : "panel-left-close"
+      }" class="w-6 h-6"></i>`;
+      lucide.createIcons();
+      saveState();
+    }
+  });
+
+  sidebarBackdrop.addEventListener("click", () => toggleMobileSidebar(true));
+
+  async function processAiCommand(prompt) {
+    const term = getCurrentProfile().terminology;
+    const userRole = appState.session.userRole; // Get current user's role
+
+    const response = await getIntentFromAI(prompt, userRole);
+
+    if (!response.success) {
+      return "I'm sorry, I had trouble understanding that command. Could you please rephrase it?";
+    }
+
+    console.log("AI Reasoning:", response.reasoning); // Log the reasoning
+    const { intent, entities = {} } = response;
+
+    switch (intent) {
+      case "GREETING": {
+        // All roles can do this
+        const greetings = [
+          "Hello! How can I assist you today?",
+          "Hi there! What can I do for you?",
+          "Greetings! I'm here to help with your store management.",
+        ];
+        return greetings[Math.floor(Math.random() * greetings.length)];
+      }
+      case "ADD_ITEM_TO_SALE": {
+        // All roles can do this
+        if (!entities.productName)
+          return `Which ${term.product} would you like to add?`;
+
+        const product = firestoreData.products.find(
+          (p) =>
+            p.name.toLowerCase().includes(entities.productName.toLowerCase()) ||
+            p.id.toLowerCase() === entities.productName.toLowerCase()
+        );
+        if (product) {
+          openOrSwitchTab("pos");
+          setTimeout(() => {
+            const productToAdd = { ...product };
+            productToAdd.qty = entities.quantity || 1;
+            addProductToActiveCart(productToAdd);
+          }, 200);
+          return `<i data-lucide="check-circle" class="inline w-4 h-4 mr-1 text-green-400"></i> Understood. Adding ${
+            entities.quantity || 1
+          } x <strong>${product.name}</strong> to the active sale.`;
+        }
+        return `I couldn't find a ${term.product} named "${entities.productName}".`;
+      }
+
+      case "CREATE_PRODUCT": {
+        // Manager and Admin only
+        if (userRole !== "manager" && userRole !== "admin") {
+          return "I'm sorry, you don't have permission to create new products.";
+        }
+        // Handle multi-product creation
+        if (
+          entities.items &&
+          Array.isArray(entities.items) &&
+          entities.items.length > 0
+        ) {
+          let responseMsg = `Okay, I'm creating ${entities.items.length} new ${term.product}s for you:<br>`;
+          entities.items.forEach((item) => {
+            // Reconstruct a detailed prompt for each item to send to the product generation AI
+            let individualPrompt = `Create a product named "${
+              item.productName || "Unnamed Product"
+            }"`;
+            if (item.category)
+              individualPrompt += `, category ${item.category}`;
+            if (item.price) individualPrompt += `, selling price ${item.price}`;
+            if (item.costPrice)
+              individualPrompt += `, cost price ${item.costPrice}`;
+            if (item.stock) individualPrompt += `, stock ${item.stock}`;
+            // Asynchronously call the handler for each product
+            handleAiProductGeneration(individualPrompt);
+            responseMsg += `- <strong>${
+              item.productName || "Unnamed Product"
+            }</strong><br>`;
+          });
+          responseMsg += `The product forms will open shortly for your review.`;
+          return responseMsg;
+        }
+        // Handle single product creation (legacy or simple prompts)
+        else if (entities.productName) {
+          handleAiProductGeneration(prompt); // Pass the original, detailed prompt
+          return `Okay, I'm analyzing the details you provided for <strong>${entities.productName}</strong> to create a new ${term.product} listing. The product form will open shortly.`;
+        }
+        // Handle insufficient information
+        else {
+          return `Please specify which ${term.product}(s) you'd like me to create, including details like name, price, and category.`;
+        }
+      }
+
+      case "VIEW_PRODUCT_DETAILS": {
+        // All roles can do this, but with different levels of detail
+        if (!entities.productName)
+          return `Which ${term.product} would you like me to show you details for?`;
+        const product = firestoreData.products.find(
+          (p) =>
+            p.name.toLowerCase().includes(entities.productName.toLowerCase()) ||
+            p.id.toLowerCase() === entities.productName.toLowerCase()
+        );
+        if (!product)
+          return `I couldn't find a ${term.product} named "${entities.productName}".`;
+
+        let details = `<strong>Details for ${product.name} (SKU: ${product.id})</strong><br>`;
+        details += `- Category: ${product.category}<br>`;
+        details += `- Price: ${currencyUtils.format(product.price)}<br>`;
+
+        // Role-based cost price visibility
+        if (userRole === "manager" || userRole === "admin") {
+          details += `- Cost: ${currencyUtils.format(product.costPrice)}<br>`;
+        }
+
+        details += `- Stock: ${
+          product.productType === "physical" ? product.stock : "N/A"
+        }<br>`;
+        if (product.customData) {
+          details += `<strong>Custom Details:</strong><br>`;
+          for (const [key, value] of Object.entries(product.customData)) {
+            if (value) details += `- ${key}: ${value}<br>`;
+          }
+        }
+        return details;
+      }
+
+      case "DELETE_PRODUCT": {
+        // Manager and Admin only
+        if (userRole !== "manager" && userRole !== "admin") {
+          return "I'm sorry, you don't have permission to delete products.";
+        }
+        if (!entities.productName)
+          return `Which ${term.product} do you want to delete?`;
+        const product = firestoreData.products.find(
+          (p) =>
+            p.name.toLowerCase().includes(entities.productName.toLowerCase()) ||
+            p.id.toLowerCase() === entities.productName.toLowerCase()
+        );
+        if (!product)
+          return `I couldn't find a ${term.product} named "${entities.productName}" to delete.`;
+
+        try {
+          await deleteDoc(doc(productsRef, product.id));
+          showToast(`${product.name} was deleted successfully.`, "success");
+          return `<i data-lucide="trash-2" class="inline w-4 h-4 mr-1 text-red-400"></i> Okay, I have permanently deleted <strong>${product.name}</strong>.`;
+        } catch (error) {
+          console.error("AI failed to delete product:", error);
+          return `Sorry, I encountered an error while deleting ${product.name}.`;
+        }
+      }
+
+      case "UPDATE_PRODUCT": {
+        // Manager and Admin only
+        if (userRole !== "manager" && userRole !== "admin") {
+          return "I'm sorry, you don't have permission to update products.";
+        }
+        if (!entities.productName)
+          return `Which ${term.product} do you want to update?`;
+        if (entities.quantity === undefined && entities.price === undefined)
+          return `What do you want to update for ${entities.productName}? You can update the stock quantity or the price.`;
+
+        const product = firestoreData.products.find(
+          (p) =>
+            p.name.toLowerCase().includes(entities.productName.toLowerCase()) ||
+            p.id.toLowerCase() === entities.productName.toLowerCase()
+        );
+        if (!product)
+          return `I couldn't find a ${term.product} named "${entities.productName}".`;
+
+        const updates = {};
+        let responseMsg = `Okay, I've updated <strong>${product.name}</strong>:`;
+
+        if (entities.quantity !== undefined) {
+          updates.stock = entities.quantity;
+          responseMsg += `<br>- Stock set to <strong>${entities.quantity}</strong>.`;
+        }
+        if (entities.price !== undefined) {
+          updates.price = entities.price; // Assuming AI gives price in base currency
+          responseMsg += `<br>- Price set to <strong>${currencyUtils.format(
+            entities.price
+          )}</strong>.`;
+        }
+
+        try {
+          await updateDoc(doc(productsRef, product.id), updates);
+          showToast(`${product.name} was updated successfully.`, "success");
+          return responseMsg;
+        } catch (error) {
+          console.error("AI failed to update product:", error);
+          return `Sorry, I encountered an error while updating ${product.name}.`;
+        }
+      }
+
+      case "CREATE_INVOICE": {
+        // All roles can do this
+        if (!entities.items || entities.items.length === 0) {
+          return `I can create a new sale for you, but please tell me which ${term.product}s to add.`;
+        }
+        openOrSwitchTab("pos");
+
+        // Wait for the POS view to render
+        await new Promise((resolve) => setTimeout(resolve, 200));
+
+        // Create a new sale tab
+        const newSaleId = `sale_${Date.now()}`;
+        posState.sales.push({
+          id: newSaleId,
+          name: `Sale ${posState.saleCounter++}`,
+          cart: [],
+          customer: null,
+          status: "active",
+        });
+        posState.activeSaleId = newSaleId;
+        const activeSale = posState.sales.find((s) => s.id === newSaleId);
+
+        let responseMsg = "I've created a new sale for you";
+
+        // Add customer if specified
+        if (entities.customerName) {
+          const customer = firestoreData.customers.find((c) =>
+            c.name.toLowerCase().includes(entities.customerName.toLowerCase())
+          );
+          if (customer) {
+            activeSale.customer = customer;
+            responseMsg += ` for <strong>${customer.name}</strong>`;
+          }
+        }
+        responseMsg += " with the following items:<br>";
+
+        // Add items to the cart
+        for (const item of entities.items) {
+          const product = firestoreData.products.find((p) =>
+            p.name.toLowerCase().includes(item.productName.toLowerCase())
+          );
+          if (product) {
+            activeSale.cart.push({ ...product, qty: item.quantity || 1 });
+            responseMsg += `- ${item.quantity || 1} x ${product.name}<br>`;
+          } else {
+            responseMsg += `- (Could not find a ${term.product} named "${item.productName}")<br>`;
+          }
+        }
+
+        posFullRender(workspaceContent.querySelector(".view-pane"));
+        return responseMsg;
+      }
+
+      case "APPLY_DISCOUNT_TO_SALE": {
+        // All roles can do this, but logic for limits would be elsewhere (e.g., in the discount modal)
+        openOrSwitchTab("pos");
+        await new Promise((resolve) => setTimeout(resolve, 150));
+
+        const activeSale = posState.sales.find(
+          (s) => s.id === posState.activeSaleId
+        );
+        if (!activeSale || activeSale.cart.length === 0) {
+          return "There is no active sale or the cart is empty. I can't apply a discount.";
+        }
+        if (!entities.discountType || !entities.discountValue) {
+          return "Please specify the discount type (percent or fixed) and value.";
+        }
+
+        // A simplified application. A real implementation would check role-based limits here.
+        activeSale.discount = {
+          type: entities.discountType,
+          value: entities.discountValue,
+        };
+
+        posFullRender(workspaceContent.querySelector(".view-pane"));
+        return `I've applied a <strong>${entities.discountValue}${
+          entities.discountType === "percent" ? "%" : currencyUtils.get().symbol
+        }</strong> discount to the current sale.`;
+      }
+
+      case "VIEW_PAGE": {
+        if (!entities.page) return "Which page would you like to see?";
+        const validPages = [
+          "dashboard",
+          "pos",
+          "inventory",
+          "invoices",
+          "reports",
+          "customers",
+          "settings",
+        ];
+        const pageToOpen = entities.page.toLowerCase().replace(/\s+/g, "");
+        if (!validPages.includes(pageToOpen)) {
+          return `I can't find a page named "${entities.page}".`;
+        }
+
+        // Role-based page access
+        const cashierPages = ["pos", "customers", "invoices"];
+        if (userRole === "cashier" && !cashierPages.includes(pageToOpen)) {
+          return `I'm sorry, you don't have permission to access the <strong>${pageToOpen}</strong> page.`;
+        }
+
+        // The existing `checkPermission` in the getViewContent and other places already handles this, but an upfront check is better UX.
+        openOrSwitchTab(pageToOpen);
+        return `<i data-lucide="compass" class="inline w-4 h-4 mr-1 text-blue-400"></i> Of course. Opening the <strong>${entities.page}</strong> page.`;
+      }
+
+      case "QUERY_DATA": {
+        // Manager and Admin only
+        if (userRole !== "manager" && userRole !== "admin") {
+          return "I'm sorry, you don't have permission to query business data.";
+        }
+        if (!entities.query) return "What would you like to know?";
+
+        const queryLower = entities.query.toLowerCase();
+
+        // Handle simple stock checks first
+        if (
+          queryLower.includes("stock") ||
+          queryLower.includes("how many") ||
+          queryLower.includes("স্টক")
+        ) {
+          const productName =
+            entities.productName ||
+            queryLower
+              .split("of ")
+              .pop()
+              .split("stock")
+              .pop()
+              .replace("?", "")
+              .trim();
+          const product = firestoreData.products.find((p) =>
+            p.name.toLowerCase().includes(productName.toLowerCase())
+          );
+          if (product) {
+            if (product.productType !== "physical")
+              return `${product.name} is a service and does not have a stock quantity.`;
+            return `There are <strong>${product.stock}</strong> units of <strong>${product.name}</strong> in stock.`;
+          }
+          return `I couldn't find a ${term.product} named "${productName}" to check its stock.`;
+        }
+
+        // Handle complex queries with filters
+        if (
+          queryLower.includes("product") &&
+          (queryLower.includes("<") ||
+            queryLower.includes(">") ||
+            queryLower.includes("="))
+        ) {
+          try {
+            const [field, operator, valueStr] = queryLower
+              .replace("products with", "")
+              .trim()
+              .split(/([<>=]+)/);
+            const value = parseFloat(valueStr);
+            if (!field || !operator || isNaN(value))
+              throw new Error("Invalid query format.");
+
+            let results = firestoreData.products;
+            if (field.trim().includes("stock")) {
+              if (operator === "<")
+                results = results.filter((p) => p.stock < value);
+              else if (operator === ">")
+                results = results.filter((p) => p.stock > value);
+              else results = results.filter((p) => p.stock == value);
+            } else if (field.trim().includes("price")) {
+              if (operator === "<")
+                results = results.filter((p) => p.price < value);
+              else if (operator === ">")
+                results = results.filter((p) => p.price > value);
+              else results = results.filter((p) => p.price == value);
+            } else {
+              return "I can only filter products by 'stock' or 'price'.";
+            }
+
+            if (results.length === 0)
+              return `No ${term.product}s found matching that criteria.`;
+
+            let response = `Found <strong>${results.length}</strong> ${
+              term.product
+            }(s) with ${field.trim()} ${operator} ${value}:<br>`;
+            response += results
+              .slice(0, 5)
+              .map(
+                (p) =>
+                  `- ${p.name} (${field.trim()}: ${
+                    field.trim() === "price"
+                      ? currencyUtils.format(p.price)
+                      : p.stock
+                  })`
+              )
+              .join("<br>");
+            if (results.length > 5)
+              response += `<br>...and ${results.length - 5} more.`;
+            return response;
+          } catch (e) {
+            return "I couldn't understand that filter. Please try a format like 'list all products with stock < 50'.";
+          }
+        }
+
+        // Handle Top X Customers query
+        if (queryLower.includes("top") && queryLower.includes("customer")) {
+          const count = parseInt(queryLower.match(/\d+/)?.[0] || "5");
+          const customerSpending = firestoreData.invoices.reduce((acc, inv) => {
+            if (inv.customerId) {
+              acc[inv.customerId] =
+                (acc[inv.customerId] || 0) + inv.totalInBaseCurrency;
+            }
+            return acc;
+          }, {});
+
+          const topCustomerIds = Object.entries(customerSpending)
+            .sort(([, a], [, b]) => b - a)
+            .slice(0, count)
+            .map(([id]) => id);
+
+          if (topCustomerIds.length === 0)
+            return "Not enough sales data to determine top customers.";
+
+          let response = `Your top <strong>${topCustomerIds.length}</strong> customer(s) are:<br>`;
+          topCustomerIds.forEach((id, index) => {
+            const customer = firestoreData.customers.find((c) => c.id === id);
+            if (customer) {
+              response += `${index + 1}. <strong>${
+                customer.name
+              }</strong> with ${currencyUtils.format(
+                customerSpending[id]
+              )} spent.<br>`;
+            }
+          });
+          return response;
+        }
+
+        if (
+          queryLower.includes("last order") ||
+          queryLower.includes("last purchase")
+        ) {
+          const customerName =
+            entities.customerName ||
+            queryLower.split("for ").pop().replace("?", "").trim();
+          const customer = firestoreData.customers.find((c) =>
+            c.name.toLowerCase().includes(customerName.toLowerCase())
+          );
+          if (!customer)
+            return `I couldn't find a customer named "${customerName}".`;
+
+          const lastInvoice = firestoreData.invoices
+            .filter((i) => i.customerId === customer.id)
+            .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+
+          if (lastInvoice) {
+            return `${customer.name}'s last order was on ${new Date(
+              lastInvoice.date
+            ).toLocaleDateString()} for a total of ${currencyUtils.format(
+              lastInvoice.totalInBaseCurrency
+            )}.`;
+          }
+        }
+        return `I'm not equipped to answer that specific question yet, but I'm learning! You can ask me about stock levels, top customers, or filter products by price/stock.`;
+      }
+
+      case "ANALYZE_DASHBOARD": {
+        // Manager and Admin only
+        if (userRole !== "manager" && userRole !== "admin") {
+          return "I'm sorry, you don't have permission to analyze dashboard data.";
+        }
+        const analysisType = entities.analysisType || entities.query;
+        if (!analysisType)
+          return `What aspect of the dashboard would you like me to analyze? For example: "top selling products this month".`;
+
+        const analysisLower = analysisType.toLowerCase();
+
+        if (
+          analysisLower.includes("top selling") ||
+          analysisLower.includes("best selling")
+        ) {
+          const salesByProduct = firestoreData.invoices
+            .flatMap((inv) => inv.items)
+            .reduce((acc, item) => {
+              acc[item.id] = (acc[item.id] || 0) + item.price * (item.qty || 1);
+              return acc;
+            }, {});
+
+          const topProducts = Object.entries(salesByProduct)
+            .sort(([, a], [, b]) => b - a)
+            .slice(0, 5)
+            .map(([id, revenue]) => ({
+              product: firestoreData.products.find((p) => p.id === id),
+              revenue,
+            }));
+
+          if (topProducts.length === 0) {
+            return `There's not enough sales data to determine top selling ${term.product}s yet.`;
+          }
+
+          let response = `<strong>Here are your top 5 selling ${term.product}s:</strong><br>`;
+          topProducts.forEach((item, index) => {
+            response += `${index + 1}. <strong>${
+              item.product?.name || "Unknown"
+            }</strong> with ${currencyUtils.format(
+              item.revenue
+            )} in sales.<br>`;
+          });
+          return response;
+        }
+
+        if (analysisLower.includes("profit margin")) {
+          // This permission is implicitly checked by the ANALYZE_DASHBOARD check for manager/admin.
+          if (!entities.productName) {
+            return `Which ${term.product} would you like me to analyze the profit margin for?`;
+          }
+          const product = firestoreData.products.find((p) =>
+            p.name.toLowerCase().includes(entities.productName.toLowerCase())
+          );
+          if (!product) {
+            return `I couldn't find a ${term.product} named "${entities.productName}".`;
+          }
+          if (!product.costPrice || !product.price) {
+            return `I can't calculate the profit margin for <strong>${product.name}</strong> because its cost or selling price is missing.`;
+          }
+          const margin =
+            ((product.price - product.costPrice) / product.price) * 100;
+          const profit = product.price - product.costPrice;
+          return `The profit margin for <strong>${
+            product.name
+          }</strong> is <strong>${margin.toFixed(
+            2
+          )}%</strong> (a profit of ${currencyUtils.format(profit)} per unit).`;
+        }
+
+        if (
+          analysisLower.includes("category comparison") ||
+          (analysisLower.includes("compare") && analysisLower.includes("vs"))
+        ) {
+          const categories = [
+            ...new Set(firestoreData.products.map((p) => p.category)),
+          ];
+          const comparisonMatch = prompt
+            .toLowerCase()
+            .match(/compare sales of (.*) vs (.*)/);
+          if (!comparisonMatch)
+            return "I can compare categories, but please phrase it like 'compare sales of Category A vs Category B'.";
+
+          const catA = categories.find((c) =>
+            c.toLowerCase().includes(comparisonMatch[1].trim())
+          );
+          const catB = categories.find((c) =>
+            c.toLowerCase().includes(comparisonMatch[2].trim())
+          );
+
+          if (!catA || !catB)
+            return "I couldn't find one or both of those categories to compare.";
+
+          const salesA = firestoreData.invoices
+            .flatMap((i) => i.items)
+            .filter(
+              (item) =>
+                firestoreData.products.find((p) => p.id === item.id)
+                  ?.category === catA
+            )
+            .reduce((sum, item) => sum + item.price * (item.qty || 1), 0);
+          const salesB = firestoreData.invoices
+            .flatMap((i) => i.items)
+            .filter(
+              (item) =>
+                firestoreData.products.find((p) => p.id === item.id)
+                  ?.category === catB
+            )
+            .reduce((sum, item) => sum + item.price * (item.qty || 1), 0);
+
+          let response = `Here's a comparison of total sales:<br>`;
+          response += `- <strong>${catA}:</strong> ${currencyUtils.format(
+            salesA
+          )}<br>`;
+          response += `- <strong>${catB}:</strong> ${currencyUtils.format(
+            salesB
+          )}<br>`;
+          if (salesA > salesB) {
+            response += `<strong>${catA}</strong> is outperforming <strong>${catB}</strong>.`;
+          } else if (salesB > salesA) {
+            response += `<strong>${catB}</strong> is outperforming <strong>${catA}</strong>.`;
+          } else {
+            response += `Both categories have similar sales performance.`;
+          }
+          return response;
+        }
+
+        if (
+          analysisLower.includes("revenue trend") ||
+          analysisLower.includes("sales performance")
+        ) {
+          const now = new Date("2025-09-18T14:39:00");
+          const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+          const startOfLastMonth = new Date(
+            now.getFullYear(),
+            now.getMonth() - 1,
+            1
+          );
+
+          const thisMonthRevenue = firestoreData.invoices
+            .filter((i) => new Date(i.date) >= startOfMonth)
+            .reduce((sum, i) => sum + i.totalInBaseCurrency, 0);
+
+          const lastMonthRevenue = firestoreData.invoices
+            .filter(
+              (i) =>
+                new Date(i.date) >= startOfLastMonth &&
+                new Date(i.date) < startOfMonth
+            )
+            .reduce((sum, i) => sum + i.totalInBaseCurrency, 0);
+
+          let trend = "flat";
+          let change = 0;
+          if (lastMonthRevenue > 0) {
+            change =
+              ((thisMonthRevenue - lastMonthRevenue) / lastMonthRevenue) * 100;
+            if (change > 5) trend = "upward";
+            if (change < -5) trend = "downward";
+          } else if (thisMonthRevenue > 0) {
+            trend = "upward";
+          }
+
+          return `This month's revenue is <strong>${currencyUtils.format(
+            thisMonthRevenue
+          )}</strong>. Compared to last month, the trend is <strong>${trend}</strong> (${change.toFixed(
+            1
+          )}%).`;
+        }
+
+        return `I can analyze 'top selling products', 'profit margins', 'category comparisons', and 'revenue trends'. What would you like to know?`;
+      }
+
+      case "GENERATE_REPORT": {
+        // Manager and Admin only
+        if (userRole !== "manager" && userRole !== "admin") {
+          return "I'm sorry, you don't have permission to generate reports.";
+        }
+        if (!entities.reportType)
+          return "What type of report would you like? (sales, inventory, or customer)";
+
+        openOrSwitchTab("reports");
+        await new Promise((resolve) => setTimeout(resolve, 200));
+
+        const reportPane = workspaceContent.querySelector(".view-pane");
+        const reportButton = reportPane.querySelector(
+          `.report-type-btn[data-type="${entities.reportType}"]`
+        );
+
+        if (reportButton) {
+          reportButton.click();
+          return `Okay, I've generated the <strong>${entities.reportType} report</strong> for you.`;
+        }
+        return `I couldn't find a report type called '${entities.reportType}'.`;
+      }
+
+      case "CREATE_CUSTOMER": {
+        // All roles can do this
+        if (!entities.customerName)
+          return "What is the name of the customer you want to create?";
+        const newCustomerData = {
+          name: entities.customerName,
+          phone: entities.customerPhone || "",
+          email: entities.customerEmail || "",
+          address: entities.customerAddress || "",
+          loyaltyPoints: 0,
+          joinDate: new Date().toISOString().slice(0, 10),
+          loyaltyId: `CS-${entities.customerName
+            .substring(0, 2)
+            .toUpperCase()}-${Date.now().toString().slice(-4)}`,
+        };
+        try {
+          await addDoc(customersRef, newCustomerData);
+          showToast(
+            `Customer "${entities.customerName}" created successfully.`,
+            "success"
+          );
+          return `I've created a new profile for <strong>${entities.customerName}</strong>.`;
+        } catch (error) {
+          console.error("AI failed to create customer:", error);
+          return `I encountered an error trying to create ${entities.customerName}.`;
+        }
+      }
+
+      case "DELETE_CUSTOMER": {
+        // Manager and Admin only
+        if (userRole !== "manager" && userRole !== "admin") {
+          return "I'm sorry, you don't have permission to delete customers.";
+        }
+        if (!entities.customerName)
+          return "Which customer do you want to delete?";
+        const customer = firestoreData.customers.find((c) =>
+          c.name.toLowerCase().includes(entities.customerName.toLowerCase())
+        );
+        if (!customer)
+          return `I couldn't find a customer named "${entities.customerName}".`;
+
+        try {
+          await deleteDoc(doc(customersRef, customer.id));
+          showToast(`Customer "${customer.name}" was deleted.`, "success");
+          return `Okay, I have deleted <strong>${customer.name}</strong> from your records.`;
+        } catch (error) {
+          console.error("AI failed to delete customer:", error);
+          return `I couldn't delete ${customer.name}. An error occurred.`;
+        }
+      }
+
+      case "UPDATE_CUSTOMER": {
+        // All roles can do this (with business logic limiting cashiers elsewhere)
+        if (!entities.customerName)
+          return "Which customer's profile do you want to update?";
+        const customer = firestoreData.customers.find((c) =>
+          c.name.toLowerCase().includes(entities.customerName.toLowerCase())
+        );
+        if (!customer)
+          return `I couldn't find a customer named "${entities.customerName}".`;
+
+        const updates = {};
+        if (entities.customerPhone) updates.phone = entities.customerPhone;
+        if (entities.customerEmail) updates.email = entities.customerEmail;
+        if (entities.customerAddress)
+          updates.address = entities.customerAddress;
+
+        if (Object.keys(updates).length === 0)
+          return `What information would you like to update for ${customer.name}? You can change their phone, email, or address.`;
+
+        try {
+          await updateDoc(doc(customersRef, customer.id), updates);
+          showToast(`Updated ${customer.name}'s profile.`, "success");
+          return `I've updated the profile for <strong>${customer.name}</strong>.`;
+        } catch (error) {
+          console.error("AI failed to update customer:", error);
+          return `I couldn't update ${customer.name}. An error occurred.`;
+        }
+      }
+
+      case "CREATE_SALE_WITH_NEW_CUSTOMER": {
+        // All roles can do this
+        if (
+          !entities.customerName ||
+          !entities.items ||
+          entities.items.length === 0
+        ) {
+          return "To start a sale for a new customer, please provide their name and the items they want to buy.";
+        }
+
+        // 1. Create the new customer
+        const newCustomerData = {
+          name: entities.customerName,
+          phone: entities.customerPhone || "",
+          email: entities.customerEmail || "",
+          address: entities.customerAddress || "",
+          loyaltyPoints: 0,
+          joinDate: new Date().toISOString().slice(0, 10),
+          loyaltyId: `CS-${entities.customerName
+            .substring(0, 2)
+            .toUpperCase()}-${Date.now().toString().slice(-4)}`,
+        };
+        let newCustomerRef;
+        try {
+          newCustomerRef = await addDoc(customersRef, newCustomerData);
+          showToast(`Customer "${entities.customerName}" created.`, "success");
+        } catch (error) {
+          return `I couldn't create the new customer profile. Please try again.`;
+        }
+
+        // 2. Open POS and create a new sale
+        openOrSwitchTab("pos");
+        await new Promise((resolve) => setTimeout(resolve, 200));
+
+        const newSaleId = `sale_${Date.now()}`;
+        posState.sales.push({
+          id: newSaleId,
+          name: `Sale ${posState.saleCounter++}`,
+          cart: [],
+          customer: { id: newCustomerRef.id, ...newCustomerData },
+          status: "active",
+        });
+        posState.activeSaleId = newSaleId;
+        const activeSale = posState.sales.find((s) => s.id === newSaleId);
+
+        let responseMsg = `I've created a new profile for <strong>${entities.customerName}</strong> and started a new sale with the following items:<br>`;
+
+        // 3. Add items to the cart
+        for (const item of entities.items) {
+          const product = firestoreData.products.find((p) =>
+            p.name.toLowerCase().includes(item.productName.toLowerCase())
+          );
+          if (product) {
+            activeSale.cart.push({ ...product, qty: item.quantity || 1 });
+            responseMsg += `- ${item.quantity || 1} x ${product.name}<br>`;
+          } else {
+            responseMsg += `- (Could not find a ${term.product} named "${item.productName}")<br>`;
+          }
+        }
+
+        posFullRender(workspaceContent.querySelector(".view-pane"));
+        return responseMsg;
+      }
+
+      case "CREATE_PROFILE": {
+        // Admin only
+        if (userRole !== "admin") {
+          return "I'm sorry, only Administrators can create new business profiles.";
+        }
+        if (!entities.profileName) {
+          openCustomProfileModal();
+          return `Okay, I've opened the form for you to create a new custom business profile.`;
+        }
+        openCustomProfileModal();
+        setTimeout(() => {
+          const form = document.getElementById("custom-profile-form");
+          if (form)
+            form.querySelector('[name="name"]').value = entities.profileName;
+        }, 100);
+        return `I've started a new profile named <strong>${entities.profileName}</strong> for you. Please fill in the rest of the details.`;
+      }
+
+      case "UPDATE_SETTING": {
+        // Admin only
+        if (userRole !== "admin") {
+          return "I'm sorry, you don't have permission to change system settings.";
+        }
+        if (!entities.settingName || !entities.settingValue) {
+          return "Which setting would you like to change, and what should its new value be?";
+        }
+        const settingName = entities.settingName.toLowerCase();
+        const settingValue = entities.settingValue;
+
+        if (settingName.includes("tax")) {
+          const rate = parseFloat(settingValue);
+          if (!isNaN(rate)) {
+            await updateDoc(storeRef, { "settings.taxRate": rate });
+            showToast(`Tax rate updated to ${rate}%.`, "success");
+            return `Okay, I've updated the tax rate to <strong>${rate}%</strong>.`;
+          }
+          return `"${settingValue}" is not a valid number for the tax rate.`;
+        }
+        if (settingName.includes("currency")) {
+          const code = settingValue.toUpperCase();
+          if (firestoreData.storeInfo.currencies[code]) {
+            await updateDoc(storeRef, { "settings.defaultCurrency": code });
+            showToast(`Default currency set to ${code}.`, "success");
+            return `Right away. The default currency has been set to <strong>${code}</strong>.`;
+          }
+          return `I don't recognize the currency code "${code}".`;
+        }
+        return `I can't change the "${settingName}" setting yet. I can currently update 'tax rate' or 'default currency'.`;
+      }
+
+      case "UNKNOWN":
+      default:
+        return "I'm sorry, I can't perform that action yet. I can help with tasks like 'add product to pos', 'show sales report', or 'what is the stock of apples?'.";
+    }
+  }
+
+  document.getElementById("main-nav").addEventListener("click", (e) => {
+    const viewTarget = e.target.closest("[data-view]");
+    if (viewTarget) {
+      e.preventDefault();
+      openOrSwitchTab(viewTarget.dataset.view);
+      if (window.innerWidth < 1024) {
+        toggleMobileSidebar(true);
+      }
+    }
+  });
+
+  document.body.addEventListener("click", async (e) => {
+    // MODIFIED: Close any open pop-up menus when clicking outside
+    document.querySelectorAll(".action-menu.open").forEach((openMenu) => {
+      if (openMenu.id === "user-menu") {
+        const userMenuTrigger = document.getElementById("user-profile-section");
+        // For the user menu, check if the click is outside BOTH the menu and its trigger
+        if (
+          !userMenuTrigger.contains(e.target) &&
+          !openMenu.contains(e.target)
+        ) {
+          openMenu.classList.remove("open");
+        }
+      } else if (!openMenu.parentElement.contains(e.target)) {
+        // Original logic for other menus
+        openMenu.classList.remove("open", "open-up");
+      }
+    });
+
+    const actionTarget = e.target.closest("[data-action]");
+    if (!actionTarget) return;
+
+    // --- NEW: Global Header Actions ---
+    if (actionTarget.dataset.action === "open-search") {
+      e.preventDefault();
+      openGlobalSearchModal();
+      return;
+    }
+    if (actionTarget.dataset.action === "open-notifications") {
+      openNotificationsModal();
+      return;
+    }
+    // --- END NEW ---
+
+    // --- NEW: Calculator Actions ---
+    if (actionTarget.dataset.action === "toggle-calculator-menu") {
+      e.stopPropagation();
+      const menu = document.getElementById("calculator-menu");
+      if (menu) {
+        const isCurrentlyOpen = menu.classList.contains("open");
+        document
+          .querySelectorAll(".action-menu.open")
+          .forEach((m) => m.classList.remove("open", "open-up"));
+        if (!isCurrentlyOpen) {
+          menu.classList.add("open");
+        }
+      }
+      return;
+    }
+    if (actionTarget.dataset.action === "open-calculator") {
+      e.preventDefault();
+      const type = actionTarget.dataset.type;
+      const menu = document.getElementById("calculator-menu");
+      if (menu) menu.classList.remove("open", "open-up");
+      openCalculatorModal(type);
+      return;
+    }
+    // --- END NEW ---
+
+    // MODIFIED: Handle user profile menu toggle with dynamic positioning
+    if (actionTarget.dataset.action === "toggle-user-menu") {
+      e.stopPropagation();
+      const menu = document.getElementById("user-menu");
+      if (!menu) return;
+
+      const isCurrentlyOpen = menu.classList.contains("open");
+
+      // Close all OTHER menus
+      document.querySelectorAll(".action-menu.open").forEach((m) => {
+        if (m !== menu) m.classList.remove("open", "open-up");
+      });
+
+      if (isCurrentlyOpen) {
+        menu.classList.remove("open");
+      } else {
+        const triggerRect = actionTarget.getBoundingClientRect();
+        const sidebarEl = document.getElementById("sidebar");
+
+        menu.style.position = "fixed";
+        menu.style.zIndex = "50";
+
+        // Position the bottom of the menu at the top of the trigger button
+        menu.style.bottom = `${window.innerHeight - triggerRect.top}px`;
+
+        // If sidebar is collapsed, position menu to its right. Otherwise, align with the trigger's left.
+        if (sidebarEl && sidebarEl.classList.contains("sidebar-collapsed")) {
+          menu.style.left = `${triggerRect.right + 8}px`; // 8px margin
+        } else {
+          menu.style.left = `${triggerRect.left}px`;
+        }
+
+        // Unset conflicting style properties from original absolute positioning
+        menu.style.top = "auto";
+        menu.style.right = "auto";
+
+        menu.classList.add("open");
+      }
+    }
+
+    // --- NEW: Fullscreen Toggle Action ---
+    if (actionTarget.dataset.action === "toggle-fullscreen") {
+      toggleFullScreen();
+    }
+
+    if (actionTarget.dataset.action === "toggle-store-menu") {
+      e.stopPropagation();
+      const menu = document.getElementById("store-menu");
+      if (menu) {
+        const isCurrentlyOpen = menu.classList.contains("open");
+        document
+          .querySelectorAll(".action-menu.open")
+          .forEach((m) => m.classList.remove("open", "open-up"));
+        if (!isCurrentlyOpen) {
+          menu.classList.add("open");
+        }
+      }
+    }
+
+    if (actionTarget.dataset.action === "switch-store") {
+      e.stopPropagation();
+      const newStoreId = actionTarget.dataset.id;
+      switchStore(newStoreId);
+    }
+
+    if (actionTarget.dataset.action === "add-new-store") {
+      e.stopPropagation();
+      document
+        .querySelectorAll(".action-menu.open")
+        .forEach((m) => m.classList.remove("open", "open-up"));
+      const content = `
+                        <form id="add-new-store-form" class="space-y-4">
+                            <p class="text-sm text-text-secondary">You are creating a new, separate business. This will not affect your existing stores.</p>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">New Business Name</label>
+                                <input type="text" name="name" class="form-input w-full" required>
+                            </div>
+                        </form>
+                    `;
+      const footer = `<button data-action="close-modal" class="btn btn-secondary">Cancel</button><button type="submit" form="add-new-store-form" class="btn btn-primary">Create Store</button>`;
+      const modal = showModal("Create New Store", content, footer);
+
+      modal
+        .querySelector("#add-new-store-form")
+        .addEventListener("submit", async (ev) => {
+          ev.preventDefault();
+          const storeName = ev.target.name.value;
+          if (!storeName.trim()) {
+            showToast("Please enter a valid business name.", "error");
+            return;
+          }
+
+          closeModal(modal);
+          showToast(`Creating your new store: ${storeName}...`, "info");
+
+          try {
+            // The function will create the store and set it as current
+            await addNewStoreToExistingUser(auth.currentUser, storeName);
+            // Then reload the page to reflect the change
+            window.location.reload();
+          } catch (error) {
+            console.error("Failed to create new store:", error);
+            showToast("There was an error creating your new store.", "error");
+          }
+        });
+    }
+
+    // --- FIX: Add Product button handler ---
+    if (actionTarget.dataset.action === "add-product") {
+      if (!checkPermission("canAddProducts")) {
+        showToast("You don't have permission to add products.", "error");
+        return;
+      }
+      openProductFormModal(false, {}); // false for isEditing, empty object for new product
+    }
+
+    if (actionTarget.closest(".action-menu")) {
+      e.stopPropagation();
+    }
+
+    const action = actionTarget.dataset.action;
+    const targetId = actionTarget.dataset.id;
+    const serial = actionTarget.dataset.serial;
+    const currentViewPane = workspaceContent.querySelector(".view-pane");
+
+    if (action === "view-my-profile") {
+      e.preventDefault();
+      // Close the menu before opening the modal
+      const menu = document.getElementById("user-menu");
+      if (menu) menu.classList.remove("open", "open-up");
+      openMyProfileModal();
+    }
+
+    if (action === "paginate") {
+      const viewType = actionTarget.dataset.viewType;
+      const page = parseInt(actionTarget.dataset.page);
+      if (appState.viewStates[viewType]) {
+        appState.viewStates[viewType].currentPage = page;
+        // Re-render the active view
+        const activeTab = appState.tabs.find(
+          (t) => t.id === appState.activeTabId
+        );
+        if (activeTab && viewInitializers[activeTab.viewType]) {
+          viewInitializers[activeTab.viewType](currentViewPane);
+        }
+      }
+    }
+
+    if (action === "show-shortcuts") {
+      showShortcutsModal();
+    }
+    if (action === "switch-tab") {
+      appState.activeTabId = targetId;
+      renderApp();
+    }
+    if (action === "close-tab") {
+      e.stopPropagation();
+      const tabIdToClose = targetId;
+      const tabIndex = appState.tabs.findIndex((t) => t.id === tabIdToClose);
+      appState.tabs.splice(tabIndex, 1);
+      if (appState.activeTabId === tabIdToClose) {
+        const newActiveTab =
+          appState.tabs[tabIndex] || appState.tabs[tabIndex - 1];
+        appState.activeTabId = newActiveTab ? newActiveTab.id : null;
+      }
+      renderApp();
+    }
+
+    const activeTab = appState.tabs.find((t) => t.id === appState.activeTabId);
+
+    // --- NEW: INVENTORY-SPECIFIC ACTIONS ---
+    if (activeTab?.viewType === "inventory") {
+      switch (action) {
+        case "edit-product": {
+          if (!checkPermission("canEditProducts")) {
+            showToast("You don't have permission to edit products.", "error");
+            return;
+          }
+          e.stopPropagation();
+          const productToEdit = firestoreData.products.find(
+            (p) => p.id === targetId
+          );
+          if (productToEdit) openProductFormModal(true, productToEdit);
+          break;
+        }
+        case "adjust-stock": {
+          if (!checkPermission("canEditProducts")) {
+            showToast("You don't have permission to adjust stock.", "error");
+            return;
+          }
+          e.stopPropagation();
+          openStockAdjustmentModal(targetId);
+          break;
+        }
+        case "receive-stock": {
+          if (!checkPermission("canEditProducts")) {
+            showToast("You don't have permission to receive stock.", "error");
+            return;
+          }
+          e.stopPropagation();
+          openReceiveStockModal(targetId);
+          break;
+        }
+      }
+    }
+    // --- END INVENTORY ACTIONS ---
+
+    if (activeTab?.viewType === "pos") {
+      const activeSale = posState.sales.find(
+        (s) => s.id === posState.activeSaleId
+      );
+      switch (action) {
+        case "switch-sale": {
+          const saleId = actionTarget.dataset.id;
+          if (posState.activeSaleId !== saleId) {
+            posState.activeSaleId = saleId;
+            posFullRender(currentViewPane);
+          }
+          break;
+        }
+        case "new-sale": {
+          const newSaleId = `sale_${Date.now()}`;
+          posState.sales.push({
+            id: newSaleId,
+            name: `Sale ${posState.saleCounter++}`,
+            cart: [],
+            customer: null,
+            status: "active",
+            discount: { type: "percent", value: 0 },
+          });
+          posState.activeSaleId = newSaleId;
+          posFullRender(currentViewPane);
+          showToast("New sale created.", "success");
+
+          // Scroll the new tab into view
+          const tabsContainer = currentViewPane.querySelector(
+            "#pos-tabs-container"
+          );
+          if (tabsContainer) {
+            // Use a timeout to allow the DOM to update before scrolling
+            setTimeout(() => {
+              tabsContainer.scrollTo({
+                left: tabsContainer.scrollWidth,
+                behavior: "smooth",
+              });
+            }, 50);
+          }
+          break;
+        }
+        case "cancel-sale": {
+          if (!activeSale || activeSale.cart.length === 0) {
+            showToast("Cart is already empty.", "info");
+            return;
+          }
+          const modal = showModal(
+            "Cancel Sale",
+            "<p>Are you sure you want to clear all items from this sale? This action cannot be undone.</p>",
+            `<button data-action="close-modal" class="btn btn-secondary">Keep Sale</button><button id="confirm-cancel" class="btn btn-danger">Yes, Cancel It</button>`
+          );
+          modal
+            .querySelector("#confirm-cancel")
+            .addEventListener("click", () => {
+              activeSale.cart = [];
+              activeSale.customer = null;
+              posFullRender(currentViewPane);
+              showToast("Sale has been cancelled.", "success");
+              closeModal(modal);
+            });
+          break;
+        }
+        case "hold-sale": {
+          if (!activeSale || activeSale.cart.length === 0) {
+            showToast("Cannot hold an empty sale.", "info");
+            return;
+          }
+          const heldSaleName = activeSale.name;
+          activeSale.status = "held";
+
+          let nextSale = posState.sales.find(
+            (s) => s.status === "active" && s.id !== activeSale.id
+          );
+          if (!nextSale) {
+            const newSaleId = `sale_${Date.now()}`;
+            posState.sales.push({
+              id: newSaleId,
+              name: `Sale ${posState.saleCounter++}`,
+              cart: [],
+              customer: null,
+              status: "active",
+            });
+            posState.activeSaleId = newSaleId;
+          } else {
+            posState.activeSaleId = nextSale.id;
+          }
+
+          posFullRender(currentViewPane);
+          showToast(`${heldSaleName} is now on hold.`, "success");
+          break;
+        }
+        case "close-sale": {
+          e.stopPropagation();
+          const saleIdToClose = targetId;
+          const saleToClose = posState.sales.find(
+            (s) => s.id === saleIdToClose
+          );
+
+          const closeTheTab = () => {
+            const saleIndex = posState.sales.findIndex(
+              (s) => s.id === saleIdToClose
+            );
+            if (saleIndex === -1) return;
+
+            posState.sales.splice(saleIndex, 1);
+            if (posState.activeSaleId === saleIdToClose) {
+              const nextSale =
+                posState.sales.find((s) => s.status !== "held") ||
+                posState.sales[0];
+              posState.activeSaleId = nextSale ? nextSale.id : null;
+            }
+            if (posState.sales.length === 0) {
+              const newSaleId = `sale_${Date.now()}`;
+              posState.sales.push({
+                id: newSaleId,
+                name: `Sale ${posState.saleCounter++}`,
+                cart: [],
+                customer: null,
+                status: "active",
+              });
+              posState.activeSaleId = newSaleId;
+            }
+            posFullRender(currentViewPane);
+          };
+
+          if (saleToClose) {
+            if (saleToClose.cart.length > 0 && saleToClose.status !== "held") {
+              const modal = showModal(
+                "Cancel Sale",
+                "<p>Are you sure you want to clear all items from this sale? This action cannot be undone.</p>",
+                `<button data-action="close-modal" class="btn btn-secondary">Keep Sale</button><button id="confirm-cancel-and-close" class="btn btn-danger">Yes, Cancel It</button>`
+              );
+              modal
+                .querySelector("#confirm-cancel-and-close")
+                .addEventListener("click", () => {
+                  saleToClose.cart = [];
+                  saleToClose.customer = null;
+                  closeTheTab();
+                  showToast("Sale cancelled and tab closed.", "success");
+                  closeModal(modal);
+                });
+            } else {
+              closeTheTab();
+            }
+          }
+          break;
+        }
+        case "increment-qty": {
+          e.stopPropagation();
+          if (activeSale) {
+            const item = activeSale.cart.find((i) =>
+              i.isSerialized ? i.serialNumber === serial : i.id === targetId
+            );
+            if (item) {
+              if (item.stock === Infinity || item.qty < item.stock) {
+                item.qty++;
+              } else {
+                showToast(`No more stock for ${item.name}.`, "warning");
+              }
+              posFullRender(currentViewPane);
+            }
+          }
+          break;
+        }
+        case "decrement-qty": {
+          e.stopPropagation();
+          if (activeSale) {
+            const item = activeSale.cart.find((i) =>
+              i.isSerialized ? i.serialNumber === serial : i.id === targetId
+            );
+            if (item && item.qty > 1) {
+              item.qty--;
+              posFullRender(currentViewPane);
+            }
+          }
+          break;
+        }
+        case "remove-from-cart": {
+          if (activeSale) {
+            e.stopPropagation();
+            activeSale.cart = activeSale.cart.filter((item) =>
+              item.isSerialized
+                ? item.serialNumber !== serial
+                : item.id !== targetId
+            );
+            posFullRender(currentViewPane);
+          }
+          break;
+        }
+        case "edit-cart-item": {
+          e.stopPropagation();
+          if (activeSale) {
+            openEditCartItemModal(targetId, serial);
+          }
+          break;
+        }
+        case "process-payment": {
+          if (!activeSale || activeSale.cart.length === 0) {
+            showToast("Cart is empty!", "error");
+            return;
+          }
+
+          const taxRate = (appState.settings.taxRate ?? 0) / 100;
+          const subtotalBase = activeSale.cart.reduce(
+            (acc, item) => acc + item.price * item.qty,
+            0
+          );
+
+          let discountAmountBase = 0;
+          if (activeSale.discount && activeSale.discount.value > 0) {
+            if (activeSale.discount.type === "percent") {
+              discountAmountBase =
+                subtotalBase * (activeSale.discount.value / 100);
+            } else {
+              // fixed
+              discountAmountBase = activeSale.discount.value;
+            }
+          }
+          const subtotalAfterDiscount = subtotalBase - discountAmountBase;
+
+          const taxableSubtotal = activeSale.cart
+            .filter((i) => i.taxable)
+            .reduce((acc, item) => acc + item.price * item.qty, 0);
+
+          // Apply discount proportionally to the taxable amount
+          const proportionOfTaxable =
+            subtotalBase > 0 ? taxableSubtotal / subtotalBase : 0;
+          const discountOnTaxable = discountAmountBase * proportionOfTaxable;
+          const taxableAmount = taxableSubtotal - discountOnTaxable;
+
+          const taxBase = taxableAmount * taxRate;
+          const totalBase = subtotalAfterDiscount + taxBase;
+          const totalCurrent = currencyUtils.convert(totalBase);
+
+          const getSmartSuggestions = (totalDue) => {
+            const suggestions = new Set();
+            if (totalDue > 1 && totalDue % 1 !== 0)
+              suggestions.add(Math.ceil(totalDue));
+            const denominations = [10, 20, 50, 100, 500, 1000, 5000, 10000];
+            denominations.forEach((d) => {
+              if (totalDue < d * 4 && totalDue > d / 10) {
+                const rounded = Math.ceil(totalDue / d) * d;
+                if (rounded > totalDue) suggestions.add(rounded);
+              }
+            });
+            let finalSuggestions = [...suggestions].sort((a, b) => a - b);
+            if (finalSuggestions.length < 3) {
+              let lastNum = Math.max(totalDue, ...finalSuggestions);
+              while (finalSuggestions.length < 3 && lastNum < totalDue * 5) {
+                const magnitude = Math.pow(10, Math.floor(Math.log10(lastNum)));
+                lastNum =
+                  Math.ceil((lastNum + 1) / (magnitude / 2)) * (magnitude / 2);
+                if (!finalSuggestions.includes(lastNum))
+                  finalSuggestions.push(lastNum);
+              }
+            }
+            return [...new Set(finalSuggestions)].slice(0, 3);
+          };
+
+          const quickCashButtons = [
+            ...getSmartSuggestions(totalCurrent),
+            "Exact",
+          ];
+
+          const paymentState = {
+            total: totalCurrent,
+            payments: [],
+            activePaymentMethod: "Cash",
+            userInputStarted: false,
+            get totalPaid() {
+              return this.payments.reduce((sum, p) => sum + p.amount, 0);
+            },
+            get remaining() {
+              return this.total - this.totalPaid;
+            },
+          };
+
+          const getPaymentIcons = (method) =>
+            ({
+              Cash: "dollar-sign",
+              Card: "credit-card",
+              "QR Code": "qr-code",
+              "Add to Due": "file-plus-2",
+            }[method]);
+
+          const content = `<div class="grid grid-cols-1 md:grid-cols-2 gap-6 -m-6 p-0">
+                                <!-- Left Side: Keypad & Info -->
+                                <div class="bg-[var(--bg-secondary)]/50 p-6 rounded-l-xl flex flex-col">
+                                    <div class="flex-1 space-y-4">
+                                        <p class="text-text-secondary">Total Due</p>
+                                        <p class="text-6xl font-bold text-text-primary font-mono tracking-tighter">${currencyUtils.format(
+                                          totalBase,
+                                          appState.currentCurrency,
+                                          { currencyDisplay: "symbol" }
+                                        )}</p>
+                                        <div id="payment-status-display" class="h-16"></div>
+                                        <div class="space-y-2 pt-2" id="payment-splits-container"></div>
+                                    </div>
+                                    <div class="grid grid-cols-4 gap-2">
+                                        ${quickCashButtons
+                                          .map((val) => {
+                                            const amount =
+                                              val === "Exact"
+                                                ? totalCurrent.toFixed(2)
+                                                : val.toFixed(2);
+                                            const amountInBase =
+                                              val === "Exact"
+                                                ? totalBase
+                                                : val /
+                                                  currencyUtils.get().rate;
+                                            const display =
+                                              val === "Exact"
+                                                ? "Exact"
+                                                : currencyUtils.format(
+                                                    amountInBase,
+                                                    appState.currentCurrency,
+                                                    {
+                                                      minimumFractionDigits: 0,
+                                                      maximumFractionDigits: 0,
+                                                    }
+                                                  );
+                                            return `<button data-payment-action="quick-cash" data-amount="${amount}" class="keypad-btn rounded-md h-14 text-lg font-semibold">${display}</button>`;
+                                          })
+                                          .join("")}
+                                    </div>
+                                </div>
+                                <!-- Right Side: Actions -->
+                                <div class="p-6 flex flex-col">
+                                    <div class="grid grid-cols-2 gap-3 mb-4">
+                                        <button data-payment-action="set-method" data-method="Cash" class="payment-method-btn btn btn-secondary h-16 flex-col gap-1 active"><i data-lucide="dollar-sign" class="w-6 h-6"></i>Cash</button>
+                                        <button data-payment-action="set-method" data-method="Card" class="payment-method-btn btn btn-secondary h-16 flex-col gap-1"><i data-lucide="credit-card" class="w-6 h-6"></i>Card</button>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-3 mb-4">
+                                         <button data-payment-action="set-method" data-method="QR Code" class="payment-method-btn btn btn-secondary h-16 flex-col gap-1"><i data-lucide="qr-code" class="w-6 h-6"></i>QR</button>
+                                         <button data-payment-action="set-method" data-method="Add to Due" class="payment-method-btn btn btn-secondary h-16 flex-col gap-1" ${
+                                           !activeSale.customer
+                                             ? "disabled"
+                                             : ""
+                                         } title="${
+            !activeSale.customer
+              ? "Select a customer to enable due payment"
+              : ""
+          }"><i data-lucide="file-plus-2" class="w-6 h-6"></i>Add to Due</button>
+                                    </div>
+                                    <div class="relative mb-4">
+                                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-mono text-text-secondary">${
+                                          currencyUtils.get().symbol
+                                        }</span>
+                                        <input type="text" id="payment-input" class="form-input w-full text-right text-4xl font-mono p-4 pr-6 bg-transparent" value="${paymentState.remaining.toFixed(
+                                          2
+                                        )}" readonly>
+                                    </div>
+                                    <div class="grid grid-cols-3 gap-2 flex-1">
+                                        ${[
+                                          "1",
+                                          "2",
+                                          "3",
+                                          "4",
+                                          "5",
+                                          "6",
+                                          "7",
+                                          "8",
+                                          "9",
+                                          "00",
+                                          "0",
+                                          ".",
+                                        ]
+                                          .map(
+                                            (key) =>
+                                              `<button data-payment-action="keypad" data-key="${key}" class="keypad-btn rounded-md text-2xl font-mono h-full">${key}</button>`
+                                          )
+                                          .join("")}
+                                        <button data-payment-action="keypad" data-key="del" class="keypad-btn rounded-md text-2xl font-mono h-full flex items-center justify-center"><i data-lucide="delete" class="w-6 h-6 pointer-events-none"></i></button>
+                                    </div>
+                                    <button id="add-payment-btn" data-payment-action="add-payment" class="btn btn-primary w-full mt-4 text-lg py-4">Add Payment</button>
+                                </div>
+                            </div>`;
+
+          const footer = `<button data-action="close-modal" class="btn btn-secondary">Cancel Transaction</button><button id="finalize-payment" class="btn btn-success text-white" disabled><i data-lucide="check-circle" class="w-5 h-5 mr-2"></i>Finalize Payment</button>`;
+          const modal = showModal("Process Payment", content, footer, {
+            size: "max-w-4xl",
+            customClasses: "p-0",
+          });
+          lucide.createIcons();
+
+          const inputEl = modal.querySelector("#payment-input");
+          const statusDisplay = modal.querySelector("#payment-status-display");
+          const splitsContainer = modal.querySelector(
+            "#payment-splits-container"
+          );
+          const addPaymentBtn = modal.querySelector("#add-payment-btn");
+          const finalizeBtn = modal.querySelector("#finalize-payment");
+
+          const renderPaymentState = () => {
+            const remainingValue = parseFloat(
+              paymentState.remaining.toPrecision(15)
+            );
+            inputEl.value =
+              remainingValue > 0 ? remainingValue.toFixed(2) : "0.00";
+            const remainingBase = remainingValue / currencyUtils.get().rate;
+            const formattedRemaining = currencyUtils.format(remainingBase);
+            const formattedChange = currencyUtils.format(
+              Math.abs(remainingBase)
+            );
+
+            finalizeBtn.removeAttribute("title"); // Clear title first
+
+            if (remainingValue > 0.001) {
+              statusDisplay.innerHTML = `<p class="text-text-secondary">Amount Remaining</p><p class="text-4xl font-bold text-danger font-mono tracking-tight">- ${formattedRemaining}</p>`;
+              const inputValue = parseFloat(inputEl.value) || 0;
+              addPaymentBtn.textContent = `Add ${
+                currencyUtils.get().symbol
+              }${inputValue.toFixed(2)} Payment`;
+              addPaymentBtn.disabled = inputValue <= 0;
+
+              let canFinalize = false;
+              let reason = "A payment is still due.";
+
+              if (activeSale.customer) {
+                const customer = firestoreData.customers.find(
+                  (c) => c.id === activeSale.customer.id
+                );
+                if (customer) {
+                  const potentialDue =
+                    (customer.currentDue || 0) + remainingBase;
+                  if (potentialDue <= customer.creditLimit) {
+                    canFinalize = true;
+                  } else {
+                    reason = `Remaining amount exceeds customer's credit limit of ${currencyUtils.format(
+                      customer.creditLimit
+                    )}.`;
+                  }
+                } else {
+                  reason = "Selected customer could not be found.";
+                }
+              } else {
+                reason = "Select a customer to finalize a due payment.";
+              }
+
+              finalizeBtn.disabled = !canFinalize;
+              if (!canFinalize) {
+                finalizeBtn.setAttribute("title", reason);
+              }
+            } else {
+              const change = Math.abs(remainingValue);
+              statusDisplay.innerHTML = `<p class="text-text-secondary">Change Due</p><p class="text-4xl font-bold text-success font-mono tracking-tight">${formattedChange}</p>`;
+              addPaymentBtn.textContent = "Add Payment";
+              addPaymentBtn.disabled = true;
+              finalizeBtn.disabled = false;
+            }
+
+            splitsContainer.innerHTML = paymentState.payments
+              .map(
+                (p, i) => `
+                                    <div class="payment-split-item flex items-center justify-between p-2 bg-bg-tertiary rounded-md text-sm">
+                                        <div class="flex items-center gap-2"><i data-lucide="${getPaymentIcons(
+                                          p.method
+                                        )}" class="w-4 h-4 text-accent"></i><span>${
+                  p.method
+                } Payment</span></div>
+                                        <div class="flex items-center gap-2"><span class="font-mono text-text-primary font-medium">${
+                                          currencyUtils.get().symbol
+                                        }${p.amount.toFixed(
+                  2
+                )}</span><button data-payment-action="remove-split" data-index="${i}" class="text-danger/70 hover:text-danger"><i data-lucide="x" class="w-4 h-4"></i></button></div>
+                                    </div>
+                                `
+              )
+              .join("");
+            lucide.createIcons();
+            paymentState.userInputStarted = false;
+          };
+
+          modal.addEventListener("click", (e) => {
+            const target = e.target.closest("[data-payment-action]");
+            if (!target) return;
+            const {
+              paymentAction,
+              method,
+              amount,
+              key,
+              index,
+            } = target.dataset;
+
+            switch (paymentAction) {
+              case "set-method":
+                paymentState.activePaymentMethod = method;
+                modal
+                  .querySelectorAll(".payment-method-btn")
+                  .forEach((btn) => btn.classList.remove("active"));
+                target.classList.add("active");
+                if (method === "Add to Due") {
+                  inputEl.value = paymentState.remaining.toFixed(2);
+                  document.getElementById("add-payment-btn").click();
+                }
+                break;
+              case "quick-cash":
+                inputEl.value = parseFloat(amount).toFixed(2);
+                paymentState.userInputStarted = true;
+                paymentState.activePaymentMethod = "Cash";
+                modal
+                  .querySelectorAll(".payment-method-btn")
+                  .forEach((btn) =>
+                    btn.classList.toggle(
+                      "active",
+                      btn.dataset.method === "Cash"
+                    )
+                  );
+                document.getElementById("add-payment-btn").click();
+                break;
+              case "keypad": {
+                let currentVal = inputEl.value;
+                if (!paymentState.userInputStarted) {
+                  currentVal = "";
+                  paymentState.userInputStarted = true;
+                }
+
+                if (key === "del") {
+                  currentVal = currentVal.slice(0, -1) || "";
+                } else if (key === "." && !currentVal.includes(".")) {
+                  currentVal += ".";
+                } else if (key === "00" && currentVal !== "0") {
+                  currentVal += "00";
+                } else if (!isNaN(parseInt(key))) {
+                  if (currentVal === "0" && key !== ".") {
+                    currentVal = key;
+                  } else {
+                    if (currentVal.length < 12) currentVal += key;
+                  }
+                }
+                inputEl.value = currentVal;
+                break;
+              }
+              case "add-payment": {
+                const paymentAmount = parseFloat(inputEl.value);
+                if (paymentAmount > 0) {
+                  paymentState.payments.push({
+                    method: paymentState.activePaymentMethod,
+                    amount: paymentAmount,
+                    ref:
+                      paymentState.activePaymentMethod !== "Cash"
+                        ? `TRX_${Date.now()}`
+                        : null,
+                  });
+                  renderPaymentState();
+                }
+                break;
+              }
+              case "remove-split":
+                paymentState.payments.splice(parseInt(index), 1);
+                renderPaymentState();
+                break;
+            }
+            if (paymentAction === "keypad" || paymentAction === "set-method") {
+              const inputValue = parseFloat(inputEl.value) || 0;
+              if (paymentState.remaining > 0.001) {
+                addPaymentBtn.textContent = `Add ${
+                  currencyUtils.get().symbol
+                }${inputValue.toFixed(2)} Payment`;
+                addPaymentBtn.disabled = inputValue <= 0;
+              }
+            }
+          });
+
+          inputEl.addEventListener("input", () => {
+            const inputValue = parseFloat(inputEl.value) || 0;
+            if (paymentState.remaining > 0.001) {
+              addPaymentBtn.textContent = `Add ${
+                currencyUtils.get().symbol
+              }${inputValue.toFixed(2)} Payment`;
+              addPaymentBtn.disabled = inputValue <= 0;
+            }
+          });
+
+          finalizeBtn.addEventListener("click", async () => {
+            try {
+              // Use a transaction to ensure atomic updates
+              await runTransaction(db, async (transaction) => {
+                // --- STAGE 1: READ ALL DOCUMENTS FIRST ---
+                const customer = activeSale.customer
+                  ? firestoreData.customers.find(
+                      (c) => c.id === activeSale.customer.id
+                    )
+                  : null;
+
+                // ** FIX START: Recalculate true paid amount and remaining due **
+                // The original logic incorrectly included 'Add to Due' as a payment, causing the remaining amount to be zero.
+                const actualPaidAmountCurrent = paymentState.payments
+                  .filter((p) => p.method !== "Add to Due")
+                  .reduce((sum, p) => sum + p.amount, 0);
+
+                const remainingAmountCurrent =
+                  totalCurrent - actualPaidAmountCurrent;
+                const remainingAmountBase =
+                  remainingAmountCurrent > 0.001
+                    ? currencyUtils.convertToBase(remainingAmountCurrent)
+                    : 0;
+                // ** FIX END **
+
+                const productRefs = activeSale.cart.map((item) =>
+                  doc(productsRef, item.id)
+                );
+                const productDocsPromises = productRefs.map((ref) =>
+                  transaction.get(ref)
+                );
+
+                let customerRef = null;
+                let customerDocPromise = null;
+                if (customer) {
+                  customerRef = doc(customersRef, customer.id);
+                  customerDocPromise = transaction.get(customerRef);
+                }
+
+                const productDocs = await Promise.all(productDocsPromises);
+                const customerDoc = customerDocPromise
+                  ? await customerDocPromise
+                  : null;
+
+                // --- STAGE 2: PERFORM ALL WRITES ---
+                const pointsEarned = Math.floor(
+                  totalBase - remainingAmountBase
+                ); // Earn points only on paid amount
+
+                // 1. Update stock and sales for each product.
+                // This is a system action triggered by a sale, so it bypasses the manual 'canManageInventory' permission.
+                productDocs.forEach((productDoc, index) => {
+                  if (!productDoc.exists()) {
+                    throw `Product ${activeSale.cart[index].id} not found!`;
+                  }
+                  const productData = productDoc.data();
+                  const cartItem = activeSale.cart[index];
+                  const productRef = productRefs[index];
+
+                  const updatePayload = {
+                    sales: (productData.sales || 0) + (cartItem.qty || 1),
+                  };
+
+                  if (productData.productType === "physical") {
+                    if (productData.isSerialized) {
+                      const newSerials = (productData.serials || []).filter(
+                        (sn) => sn !== cartItem.serialNumber
+                      );
+                      updatePayload.serials = newSerials;
+                      updatePayload.stock = newSerials.length;
+                    } else {
+                      updatePayload.stock = productData.stock - cartItem.qty;
+                    }
+                  }
+                  transaction.update(productRef, updatePayload);
+                });
+
+                // 2. Award loyalty points & update due if there's a customer
+                if (customer && customerDoc) {
+                  if (!customerDoc.exists())
+                    throw `Customer ${customer.id} not found!`;
+                  const customerData = customerDoc.data();
+                  const newPoints =
+                    (customerData.loyaltyPoints || 0) + pointsEarned;
+
+                  const updatePayload = { loyaltyPoints: newPoints };
+
+                  if (remainingAmountBase > 0.001) {
+                    const newDue =
+                      (customerData.currentDue || 0) + remainingAmountBase;
+                    if (newDue > customerData.creditLimit) {
+                      throw `Sale exceeds customer's credit limit. Limit: ${currencyUtils.format(
+                        customerData.creditLimit
+                      )}, New Due: ${currencyUtils.format(newDue)}`;
+                    }
+                    updatePayload.currentDue = newDue;
+                  }
+                  transaction.update(customerRef, updatePayload);
+                } else if (remainingAmountBase > 0.001) {
+                  throw "Cannot complete a due sale without a selected customer.";
+                }
+
+                // 3. Create invoice
+                const newInvoiceRef = doc(invoicesRef);
+
+                const actualPaidInBase = currencyUtils.convertToBase(
+                  actualPaidAmountCurrent
+                );
+                let invoiceStatus = "Paid";
+                if (remainingAmountBase > 0.001) {
+                  if (actualPaidInBase > 0.001) {
+                    invoiceStatus = "Partial";
+                  } else {
+                    invoiceStatus = "Due";
+                  }
+                }
+
+                const newInvoice = {
+                  customerId: customer?.id || null,
+                  customerName: customer?.name || "Walk-in Customer",
+                  total: totalCurrent,
+                  totalInBaseCurrency: totalBase,
+                  subtotalInBaseCurrency: subtotalBase,
+                  discount: activeSale.discount || {
+                    type: "percent",
+                    value: 0,
+                    reason: "",
+                  },
+                  discountInBaseCurrency: discountAmountBase,
+                  taxInBaseCurrency: taxBase,
+                  dueAmount: remainingAmountBase,
+                  currency: appState.currentCurrency,
+                  exchangeRate: currencyUtils.get().rate,
+                  status: invoiceStatus,
+                  date: new Date().toISOString(),
+                  items: activeSale.cart,
+                  paymentDetails: paymentState.payments.map((p) => ({
+                    ...p,
+                    date: new Date().toISOString(),
+                  })),
+                  cashierId: appState.session.currentUser.uid,
+                  cashierName: appState.session.currentUser.name,
+                  storeId: appState.session.storeId,
+                  pointsEarned,
+                };
+                transaction.set(newInvoiceRef, newInvoice);
+
+                finalizeBtn.dataset.newInvoiceId = newInvoiceRef.id;
+              });
+
+              // Post-transaction UI updates & automation triggers
+              simulateFraudDetection(totalBase, appState.session.currentUser); // Run fraud detection on the final amount, passing the cashier info
+
+              const newInvoiceId = finalizeBtn.dataset.newInvoiceId;
+              const finalInvoice = {
+                id: newInvoiceId,
+                ...(await getDoc(doc(invoicesRef, newInvoiceId)).then((d) =>
+                  d.data()
+                )),
+              };
+
+              closeModal(modal);
+              showReceipt(finalInvoice, paymentState);
+
+              // Remove the completed sale and create a new one to replace it.
+              posState.sales = posState.sales.filter(
+                (s) => s.id !== activeSale.id
+              );
+              const newSaleId = `sale_${Date.now()}`;
+              posState.sales.push({
+                id: newSaleId,
+                name: `Sale ${posState.saleCounter++}`,
+                cart: [],
+                customer: null,
+                status: "active",
+                discount: { type: "percent", value: 0 },
+              });
+              posState.activeSaleId = newSaleId;
+
+              renderApp();
+            } catch (error) {
+              console.error("Payment failed:", error);
+              showToast("Transaction failed. Please try again.", "error");
+            }
+          });
+
+          renderPaymentState();
+          break;
+        }
+        case "add-customer-to-sale": {
+          if (!activeSale) {
+            showToast("No active sale", "error");
+            return;
+          }
+          let content = `
+                                <input type="text" id="customer-search" placeholder="Search by name, phone, or email..." class="form-input w-full mb-4">
+                                <div id="customer-list" class="space-y-2 max-h-60 overflow-y-auto"></div>
+                                <div class="text-center pt-4 border-t border-border-color mt-4">
+                                    <button id="create-new-customer-btn" class="btn btn-secondary w-full">
+                                        <i data-lucide="user-plus" class="w-4 h-4 mr-2"></i>Create New Customer
+                                    </button>
+                                </div>
+                            `;
+          const modal = showModal("Select Customer", content, "");
+          lucide.createIcons();
+          const customerListEl = modal.querySelector("#customer-list");
+
+          const renderCustomerList = (filter = "") => {
+            const query = filter.toLowerCase();
+            const filteredCustomers = firestoreData.customers.filter(
+              (c) =>
+                c.name.toLowerCase().includes(query) ||
+                c.phone.includes(query) ||
+                c.email.toLowerCase().includes(query)
+            );
+            customerListEl.innerHTML =
+              filteredCustomers.length > 0
+                ? filteredCustomers
+                    .map(
+                      (c) =>
+                        `<div data-action="select-customer" data-id="${c.id}" class="p-3 rounded-lg hover:bg-bg-tertiary cursor-pointer"><p class="font-medium text-text-primary">${c.name}</p><p class="text-sm">${c.phone}</p></div>`
+                    )
+                    .join("")
+                : '<p class="text-center text-sm p-4">No customers found.</p>';
+          };
+
+          modal
+            .querySelector("#customer-search")
+            .addEventListener("input", (e) =>
+              renderCustomerList(e.target.value)
+            );
+
+          customerListEl.addEventListener("click", (e) => {
+            const customerTarget = e.target.closest(
+              '[data-action="select-customer"]'
+            );
+            if (customerTarget) {
+              const customer = firestoreData.customers.find(
+                (c) => c.id === customerTarget.dataset.id
+              );
+              activeSale.customer = customer;
+              activeSale.status = "active";
+              posFullRender(currentViewPane);
+              closeModal(modal);
+            }
+          });
+
+          modal
+            .querySelector("#create-new-customer-btn")
+            .addEventListener("click", () => {
+              closeModal(modal);
+              openCustomerModal(null, (newCustomer) => {
+                const activeSaleForCallback = posState.sales.find(
+                  (s) => s.id === posState.activeSaleId
+                );
+                if (activeSaleForCallback && newCustomer) {
+                  activeSaleForCallback.customer = newCustomer;
+                  const currentPosPane = document
+                    .getElementById("workspace-content")
+                    .querySelector(".view-pane");
+                  posFullRender(currentPosPane);
+                }
+              });
+            });
+
+          renderCustomerList();
+          break;
+        }
+        case "remove-customer-from-sale": {
+          if (activeSale) activeSale.customer = null;
+          posFullRender(currentViewPane);
+          break;
+        }
+        case "apply-total-discount": {
+          openTotalDiscountModal();
+          break;
+        }
+      }
+    }
+
+    // This is the code for the "logout" job
+    if (action === "logout") {
+      signOut(auth)
+        .then(() => {
+          // Clear local state to ensure a clean login next time
+          appState.tabs = [];
+          appState.activeTabId = null;
+          appState.session.currentUser = null;
+          appState.session.userRole = null;
+          appState.session.userPermissions = {};
+          posState = { sales: [], activeSaleId: null, saleCounter: 1 };
+          saveState(); // Persist the cleared state
+          // The onAuthStateChanged listener will automatically handle showing the login screen.
+          console.log("User signed out successfully.");
+          showToast("You have been logged out.", "info");
+        })
+        .catch((error) => {
+          console.error("Sign out error", error);
+          showToast(`Error logging out: ${error.message}`, "error");
+        });
+    }
+
+    if (action === "invite-staff") {
+      const currentUserRole = appState.session.userRole;
+      if (currentUserRole === "admin") {
+        openAdminInviteStaffModal();
+      } else if (
+        currentUserRole === "manager" &&
+        checkPermission("canInviteCashiers")
+      ) {
+        openManagerInviteCashierModal();
+      } else {
+        showToast("You do not have permission to invite staff.", "error");
+      }
+      return;
+    }
+
+    if (action === "edit-staff") {
+      const currentUserRole = appState.session.userRole;
+      if (currentUserRole === "admin" && checkPermission("canManageStaff")) {
+        openAdminEditStaffModal(targetId);
+      } else if (
+        currentUserRole === "manager" &&
+        checkPermission("canEditCashierDetails")
+      ) {
+        openManagerEditStaffModal(targetId);
+      } else {
+        showToast("You do not have permission to edit staff details.", "error");
+      }
+      return;
+    }
+
+    if (action === "view-staff-details") {
+      const staffId = actionTarget.dataset.id;
+      const container = currentViewPane.querySelector("#staff-view-container");
+      if (container) {
+        renderStaffDetailView(staffId, container);
+      }
+    }
+
+    if (action === "back-to-staff-list") {
+      // NEW
+      const container = currentViewPane.querySelector("#staff-view-container");
+      if (container) {
+        // We pass currentViewPane because initStaff expects the parent pane
+        initStaff(currentViewPane.querySelector("#staff-view-container"));
+      }
+    }
+
+    // --- NEW VOID FUNCTIONS START ---
+    async function voidInvoice(invoiceId, reason, requestDetails = {}) {
+      const invoice = firestoreData.invoices.find((i) => i.id === invoiceId);
+      if (!invoice) {
+        showToast("Invoice not found.", "error");
+        return;
+      }
+
+      try {
+        await runTransaction(db, async (transaction) => {
+          const invoiceRef = doc(invoicesRef, invoice.id);
+
+          // 1. Restore inventory for each product
+          for (const item of invoice.items) {
+            const productRef = doc(productsRef, item.id);
+            const productDoc = await transaction.get(productRef);
+            if (productDoc.exists()) {
+              const productData = productDoc.data();
+              const updatePayload = {};
+
+              if (productData.productType === "physical") {
+                if (productData.isSerialized) {
+                  const newSerials = [
+                    ...(productData.serials || []),
+                    item.serialNumber,
+                  ];
+                  updatePayload.serials = newSerials;
+                  updatePayload.stock = newSerials.length;
+                } else {
+                  updatePayload.stock =
+                    (productData.stock || 0) + (item.qty || 1);
+                }
+              }
+
+              // Reverse sales count
+              updatePayload.sales = Math.max(
+                0,
+                (productData.sales || 0) - (item.qty || 1)
+              );
+
+              transaction.update(productRef, updatePayload);
+            }
+          }
+
+          // 2. Reverse customer due balance and loyalty points
+          if (invoice.customerId) {
+            const customerRef = doc(customersRef, invoice.customerId);
+            const customerDoc = await transaction.get(customerRef);
+            if (customerDoc.exists()) {
+              const customerData = customerDoc.data();
+              const newDue = (customerData.currentDue || 0) - invoice.dueAmount;
+              const newPoints =
+                (customerData.loyaltyPoints || 0) - invoice.pointsEarned;
+              transaction.update(customerRef, {
+                currentDue: Math.max(0, newDue),
+                loyaltyPoints: Math.max(0, newPoints),
+              });
+            }
+          }
+
+          // 3. Update invoice status
+          const voidDetails = {
+            ...requestDetails,
+            approvedBy: appState.session.currentUser.uid,
+            approvedByName: appState.session.currentUser.name,
+            approvedAt: new Date().toISOString(),
+            reason: reason,
+          };
+          transaction.update(invoiceRef, {
+            status: "Void",
+            voidDetails: voidDetails,
+          });
+
+          // 4. Create audit log
+          const auditLogRefNew = doc(auditLogRef);
+          transaction.set(auditLogRefNew, {
+            type: "invoice_void",
+            timestamp: new Date().toISOString(),
+            originalInvoiceId: invoice.id,
+            details: `Invoice ${invoice.id} was voided.`,
+            user: {
+              id: appState.session.currentUser.uid,
+              name: appState.session.currentUser.name,
+            },
+            voidDetails: voidDetails,
+          });
+        });
+
+        showToast(`Invoice ${invoiceId} has been voided.`, "success");
+
+        // If a manager performed the void (either directly or by approving a request), notify the admin.
+        if (appState.session.userRole === "manager") {
+          const managerName = appState.session.currentUser.name;
+          const message = `Manager <strong>${managerName}</strong> voided invoice <strong>${invoiceId}</strong>. Reason: ${reason}`;
+          await createNotification("warning", message, {
+            targetRoles: ["admin"],
+          });
+        }
+      } catch (error) {
+        console.error("Failed to void invoice:", error);
+        showToast(`Error: ${error.message}`, "error");
+      }
+    }
+
+    function openRequestVoidModal(invoiceId) {
+      const invoice = firestoreData.invoices.find((i) => i.id === invoiceId);
+      if (!invoice) return;
+
+      const content = `
+                        <form id="request-void-form" class="space-y-4">
+                            <p>You are requesting to void invoice <strong class="text-text-primary font-mono">${invoice.id}</strong>. This requires approval from a manager.</p>
+                            <div>
+                                <label for="reason" class="block text-sm font-medium mb-1">Reason for Void Request</label>
+                                <textarea name="reason" class="form-textarea w-full" required></textarea>
+                            </div>
+                        </form>`;
+      const footer = `<button data-action="close-modal" class="btn btn-secondary">Cancel</button><button type="submit" form="request-void-form" class="btn btn-danger">Submit Request</button>`;
+      const modal = showModal("Request Invoice Void", content, footer);
+
+      modal
+        .querySelector("#request-void-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const reason = e.target.reason.value;
+
+          const voidDetails = {
+            requestedBy: appState.session.currentUser.uid,
+            requestedByName: appState.session.currentUser.name,
+            requestedAt: new Date().toISOString(),
+            requestReason: reason,
+          };
+
+          await updateDoc(doc(invoicesRef, invoiceId), {
+            status: "Void Requested",
+            voidDetails: voidDetails,
+          });
+
+          await createNotification(
+            "warning",
+            `<strong>${appState.session.currentUser.name}</strong> requested to void invoice <strong>${invoiceId}</strong>. Reason: ${reason}`,
+            { targetRoles: ["admin", "manager"] }
+          );
+
+          showToast("Void request submitted for approval.", "success");
+          closeModal(modal);
+        });
+    }
+
+    function openDirectVoidModal(invoiceId) {
+      const invoice = firestoreData.invoices.find((i) => i.id === invoiceId);
+      if (!invoice) return;
+
+      const content = `
+                        <form id="direct-void-form" class="space-y-4">
+                            <p>You are about to void invoice <strong class="text-text-primary font-mono">${invoice.id}</strong>. This will restore inventory and reverse the transaction. This action is irreversible.</p>
+                            <div>
+                                <label for="reason" class="block text-sm font-medium mb-1">Reason for Void</label>
+                                <textarea name="reason" class="form-textarea w-full" required></textarea>
+                            </div>
+                        </form>`;
+      const footer = `<button data-action="close-modal" class="btn btn-secondary">Cancel</button><button type="submit" form="direct-void-form" class="btn btn-danger">Confirm Void</button>`;
+      const modal = showModal("Void Invoice", content, footer);
+
+      modal
+        .querySelector("#direct-void-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const reason = e.target.reason.value;
+          closeModal(modal);
+          await voidInvoice(invoiceId, reason);
+        });
+    }
+
+    function openReviewVoidRequestModal(invoiceId) {
+      const invoice = firestoreData.invoices.find((i) => i.id === invoiceId);
+      if (!invoice || !invoice.voidDetails) return;
+
+      const content = `
+                        <div class="space-y-4">
+                            <p>Reviewing void request for invoice <strong class="text-text-primary font-mono">${
+                              invoice.id
+                            }</strong>.</p>
+                            <div class="bg-bg-tertiary p-3 rounded-lg">
+                                <p class="text-xs text-text-secondary">Requested by: <strong>${
+                                  invoice.voidDetails.requestedByName
+                                }</strong> on ${new Date(
+        invoice.voidDetails.requestedAt
+      ).toLocaleString()}</p>
+                                <p class="mt-2">Reason: <span class="text-text-primary">${
+                                  invoice.voidDetails.requestReason
+                                }</span></p>
+                            </div>
+                            <div>
+                                <label for="approval-reason" class="block text-sm font-medium mb-1">Your Reason / Notes (Required for Approval)</label>
+                                <textarea id="approval-reason" class="form-textarea w-full"></textarea>
+                            </div>
+                        </div>
+                    `;
+      const footer = `
+                        <button id="reject-void" class="btn btn-secondary">Reject Request</button>
+                        <button id="approve-void" class="btn btn-danger">Approve & Void Invoice</button>`;
+      const modal = showModal("Review Void Request", content, footer);
+
+      modal
+        .querySelector("#reject-void")
+        .addEventListener("click", async () => {
+          await updateDoc(doc(invoicesRef, invoiceId), {
+            status: "Paid", // Revert to a default "good" state. A more complex system might store the pre-request state.
+            voidDetails: null,
+          });
+          showToast("Void request rejected.", "info");
+          closeModal(modal);
+        });
+
+      modal
+        .querySelector("#approve-void")
+        .addEventListener("click", async () => {
+          const reason = modal.querySelector("#approval-reason").value;
+          if (!reason.trim()) {
+            showToast("A reason for approval is required.", "error");
+            return;
+          }
+          closeModal(modal);
+          await voidInvoice(invoiceId, reason, invoice.voidDetails);
+        });
+    }
+    // --- NEW VOID FUNCTIONS END ---
+
+    if (action === "close-modal") {
+      closeModal(actionTarget.closest(".modal-overlay"));
+    }
+
+    if (action === "view-staff-performance") {
+      if (!checkPermission("canViewStaffPerformance")) {
+        showToast("You don't have permission to view performance.", "error");
+        return;
+      }
+      openViewStaffPerformanceModal(targetId);
+    }
+
+    if (action === "toggle-staff-status") {
+      if (!checkPermission("canManageStaff")) {
+        showToast("You don't have permission to change staff status.", "error");
+        return;
+      }
+      const member = firestoreData.staff.find((m) => m.id === targetId);
+      if (!member) return;
+      const newStatus = actionTarget.dataset.newStatus;
+      const actionText = newStatus === "inactive" ? "Deactivate" : "Activate";
+
+      const modal = showModal(
+        `${actionText} Account`,
+        `<p>Are you sure you want to ${actionText.toLowerCase()} the account for <strong>${
+          member.name
+        }</strong>? An inactive user will not be able to log in.</p>`,
+        `<button data-action="close-modal" class="btn btn-secondary">Cancel</button><button id="confirm-status-change" class="btn ${
+          newStatus === "inactive" ? "btn-danger" : "btn-primary"
+        }">${actionText}</button>`
+      );
+      modal
+        .querySelector("#confirm-status-change")
+        .addEventListener("click", async () => {
+          try {
+            await updateDoc(doc(staffRef, targetId), { status: newStatus });
+            showToast(
+              `${member.name}'s account has been ${newStatus}.`,
+              "success"
+            );
+            closeModal(modal);
+          } catch (error) {
+            showToast("Failed to update status.", "error");
+            console.error(error);
+          }
+        });
+    }
+
+    if (action === "delete-staff") {
+      if (!checkPermission("canManageStaff")) {
+        showToast("You don't have permission to delete staff.", "error");
+        return;
+      }
+      const member = firestoreData.staff.find((m) => m.id === targetId);
+      if (!member) return;
+
+      const modal = showModal(
+        "Delete Staff Member",
+        `<div class="space-y-2"><p>Are you sure you want to permanently delete <strong>${member.name}</strong>?</p><p class="text-sm text-yellow-300 bg-yellow-900/50 p-3 rounded-lg"><i data-lucide="alert-triangle" class="inline w-4 h-4 mr-1"></i> This action is irreversible and will remove their access and data permanently.</p></div>`,
+        `<button data-action="close-modal" class="btn btn-secondary">Cancel</button><button id="confirm-delete" class="btn btn-danger">Yes, Delete Permanently</button>`
+      );
+      lucide.createIcons();
+      modal
+        .querySelector("#confirm-delete")
+        .addEventListener("click", async () => {
+          try {
+            // Note: In a real app, you might want to disable the Auth user too, but that requires a backend. Here we just delete the Firestore doc.
+            await deleteDoc(doc(staffRef, targetId));
+            showToast(`${member.name} has been deleted.`, "success");
+            closeModal(modal);
+          } catch (error) {
+            showToast("Failed to delete staff member.", "error");
+            console.error(error);
+          }
+        });
+    }
+
+    if (action === "approve-staff") {
+      if (!checkPermission("canManageStaff")) return;
+      const member = firestoreData.staff.find((m) => m.id === targetId);
+      if (!member) return;
+      const modal = showModal(
+        "Approve Staff Member",
+        `<p>Are you sure you want to approve <strong>${member.name}</strong>? They will be granted access to the system as a Cashier.</p>`,
+        `<button data-action="close-modal" class="btn btn-secondary">Cancel</button><button id="confirm-approve" class="btn btn-primary">Approve</button>`
+      );
+      modal
+        .querySelector("#confirm-approve")
+        .addEventListener("click", async () => {
+          try {
+            await updateDoc(doc(staffRef, targetId), { status: "active" });
+            showToast(
+              `${member.name} has been approved and is now active.`,
+              "success"
+            );
+            closeModal(modal);
+          } catch (error) {
+            showToast("Failed to approve staff member.", "error");
+            console.error(error);
+          }
+        });
+    }
+
+    if (action === "request-deactivation") {
+      if (!checkPermission("canRequestStaffDeactivation")) return;
+      openRequestDeactivationModal(targetId);
+    }
+
+    if (action === "approve-deactivation") {
+      if (!checkPermission("canManageStaff")) return;
+      const member = firestoreData.staff.find((m) => m.id === targetId);
+      if (!member) return;
+      const modal = showModal(
+        "Approve Deactivation",
+        `<p>Are you sure you want to approve the request to deactivate <strong>${member.name}</strong>? Their account will become inactive and they will not be able to log in.</p>`,
+        `<button data-action="close-modal" class="btn btn-secondary">Cancel</button><button id="confirm-approve-deactivation" class="btn btn-danger">Yes, Deactivate</button>`
+      );
+      modal
+        .querySelector("#confirm-approve-deactivation")
+        .addEventListener("click", async () => {
+          try {
+            await updateDoc(doc(staffRef, targetId), {
+              status: "inactive",
+              deactivationRequest: null,
+            });
+            showToast(`${member.name} has been deactivated.`, "success");
+            closeModal(modal);
+          } catch (error) {
+            showToast("Failed to deactivate staff member.", "error");
+            console.error(error);
+          }
+        });
+    }
+
+    if (action === "reject-deactivation") {
+      if (!checkPermission("canManageStaff")) return;
+      const member = firestoreData.staff.find((m) => m.id === targetId);
+      if (!member) return;
+      const modal = showModal(
+        "Reject Deactivation",
+        `<p>Are you sure you want to reject the request to deactivate <strong>${member.name}</strong>? Their account will remain active.</p>`,
+        `<button data-action="close-modal" class="btn btn-secondary">Cancel</button><button id="confirm-reject-deactivation" class="btn btn-primary">Reject Request</button>`
+      );
+      modal
+        .querySelector("#confirm-reject-deactivation")
+        .addEventListener("click", async () => {
+          try {
+            await updateDoc(doc(staffRef, targetId), {
+              status: "active",
+              deactivationRequest: null,
+            });
+            showToast(
+              `Deactivation request for ${member.name} has been rejected.`,
+              "success"
+            );
+            closeModal(modal);
+          } catch (error) {
+            showToast("Failed to reject request.", "error");
+            console.error(error);
+          }
+        });
+    }
+
+    if (action === "close-modal") {
+      closeModal(actionTarget.closest(".modal-overlay"));
+    }
+    if (action === "set-currency") {
+      appState.currentCurrency = actionTarget.dataset.currencyCode;
+      renderApp();
+    }
+
+    if (action === "toggle-action-menu") {
+      e.stopPropagation();
+      const menu = actionTarget.nextElementSibling;
+      if (!menu || !menu.classList.contains("action-menu")) return;
+      const isCurrentlyOpen = menu.classList.contains("open");
+      document.querySelectorAll(".action-menu.open").forEach((m) => {
+        if (m !== menu) m.classList.remove("open", "open-up");
+      });
+
+      if (!isCurrentlyOpen) {
+        const rect = actionTarget.getBoundingClientRect();
+        const menuHeight = menu.offsetHeight > 0 ? menu.offsetHeight : 220;
+        if (rect.bottom + menuHeight > window.innerHeight) {
+          menu.classList.add("open-up");
+        } else {
+          menu.classList.remove("open-up");
+        }
+        menu.classList.add("open");
+      } else {
+        menu.classList.remove("open", "open-up");
+      }
+    }
+
+    if (action === "show-full-stat") {
+      const label = actionTarget.dataset.label;
+      const fullValue = actionTarget.dataset.fullValue;
+      const content = `<p class="text-2xl font-mono text-center p-4">${fullValue}</p>`;
+      showModal(
+        label,
+        content,
+        `<button data-action="close-modal" class="btn btn-secondary">Close</button>`,
+        { size: "max-w-md" }
+      );
+    }
+
+    if (action === "toggle-product-status") {
+      // NEW
+      if (!checkPermission("canDeactivateProducts")) {
+        showToast(
+          "You don't have permission to change product status.",
+          "error"
+        );
+        return;
+      }
+      const productId = targetId;
+      const product = firestoreData.products.find((p) => p.id === productId);
+      if (!product) return;
+
+      const term = getCurrentProfile().terminology;
+      const currentStatus = product.status || "active";
+      const newStatus = currentStatus === "active" ? "inactive" : "active";
+      const actionText = newStatus === "inactive" ? "Deactivate" : "Activate";
+
+      const modal = showModal(
+        `${actionText} ${term.product}`,
+        `<p>Are you sure you want to ${actionText.toLowerCase()} <strong>${
+          product.name
+        }</strong>? An inactive product will be hidden from the POS terminal.</p>`,
+        `<button data-action="close-modal" class="btn btn-secondary">Cancel</button><button id="confirm-status-change" class="btn ${
+          newStatus === "inactive" ? "btn-danger" : "btn-primary"
+        }">${actionText}</button>`
+      );
+
+      modal
+        .querySelector("#confirm-status-change")
+        .addEventListener("click", async () => {
+          try {
+            // 1. Update Firestore document
+            await updateDoc(doc(productsRef, productId), { status: newStatus });
+
+            // 2. Create Audit Log
+            await addDoc(auditLogRef, {
+              type: "product_status_change",
+              timestamp: new Date().toISOString(),
+              productId: product.id,
+              productName: product.name,
+              details: `Product status changed from '${currentStatus}' to '${newStatus}'.`,
+              user: {
+                id: appState.session.currentUser.uid,
+                name: appState.session.currentUser.name,
+              },
+            });
+
+            // NEW: If a manager deactivates a product, create a notification for the admin.
+            if (
+              appState.session.userRole === "manager" &&
+              newStatus === "inactive"
+            ) {
+              const managerName = appState.session.currentUser.name;
+              const message = `Manager <strong>${managerName}</strong> deactivated ${term.product}: <strong>${product.name}</strong>.`;
+              await createNotification("warning", message, {
+                targetRoles: ["admin"],
+              });
+            }
+
+            showToast(`${product.name} has been ${newStatus}.`, "success");
+            closeModal(modal);
+          } catch (error) {
+            showToast("Failed to update product status.", "error");
+            console.error(error);
+          }
+        });
+    }
+
+    if (action === "delete-product") {
+      if (!checkPermission("canDeleteProducts")) {
+        // MODIFIED to use new permission
+        showToast("You don't have permission to delete products.", "error");
+        return;
+      }
+      const productIdToDelete = targetId;
+      const productToDelete = firestoreData.products.find(
+        (p) => p.id === productIdToDelete
+      );
+      if (!productToDelete) return;
+
+      const modal = showModal(
+        "Confirm Deletion",
+        `<p>Are you sure you want to permanently delete <strong>${productToDelete.name}</strong>? This action cannot be undone.</p>`,
+        `<button data-action="close-modal" class="btn btn-secondary">Cancel</button><button id="confirm-delete-product" class="btn btn-danger">Delete</button>`
+      );
+
+      modal
+        .querySelector("#confirm-delete-product")
+        .addEventListener("click", async () => {
+          // MODIFIED to be async
+          closeModal(modal);
+          try {
+            // 1. Create Audit Log for deletion
+            await addDoc(auditLogRef, {
+              type: "product_delete",
+              timestamp: new Date().toISOString(),
+              productId: productToDelete.id,
+              productName: productToDelete.name,
+              details: `Product '${productToDelete.name}' was permanently deleted.`,
+              user: {
+                id: appState.session.currentUser.uid,
+                name: appState.session.currentUser.name,
+              },
+            });
+
+            // NEW: If a manager deletes a product, create a notification for the admin.
+            if (appState.session.userRole === "manager") {
+              const managerName = appState.session.currentUser.name;
+              const term = getCurrentProfile().terminology;
+              const message = `Manager <strong>${managerName}</strong> deleted ${term.product}: <strong>${productToDelete.name}</strong>.`;
+              await createNotification("warning", message, {
+                targetRoles: ["admin"],
+              });
+            }
+
+            // 2. Delete the product document
+            await deleteDoc(doc(productsRef, productIdToDelete));
+
+            showToast(
+              `Product "${productToDelete.name}" has been deleted.`,
+              "success"
+            );
+          } catch (err) {
+            console.error("Failed to delete product or log action:", err);
+            showToast(`Error deleting ${productToDelete.name}.`, "error");
+          }
+        });
+    }
+    // --- NEW VOID ACTIONS ---
+    if (action === "request-void") {
+      openRequestVoidModal(targetId);
+    }
+    if (action === "review-void-request") {
+      openReviewVoidRequestModal(targetId);
+    }
+    if (action === "void-invoice") {
+      openDirectVoidModal(targetId);
+    }
+    if (action === "cancel-void-request") {
+      const invoiceId = targetId;
+      const invoice = firestoreData.invoices.find((i) => i.id === invoiceId);
+      if (
+        !invoice ||
+        invoice.status !== "Void Requested" ||
+        invoice.voidDetails.requestedBy !== appState.session.currentUser.uid
+      ) {
+        showToast("Cannot cancel this request.", "error");
+        return;
+      }
+
+      const modal = showModal(
+        "Cancel Void Request",
+        `<p>Are you sure you want to cancel your request to void invoice <strong>${invoiceId}</strong>?</p>`,
+        `<button data-action="close-modal" class="btn btn-secondary">No</button><button id="confirm-cancel-void" class="btn btn-primary">Yes, Cancel Request</button>`
+      );
+
+      modal
+        .querySelector("#confirm-cancel-void")
+        .addEventListener("click", async () => {
+          try {
+            let previousStatus = "Paid"; // Default
+            if (invoice.dueAmount > 0.001) {
+              if (
+                Math.abs(invoice.dueAmount - invoice.totalInBaseCurrency) <
+                0.001
+              ) {
+                previousStatus = "Due";
+              } else {
+                previousStatus = "Partial";
+              }
+            }
+            await updateDoc(doc(invoicesRef, invoiceId), {
+              status: previousStatus,
+              voidDetails: null,
+            });
+            showToast("Void request has been cancelled.", "success");
+            closeModal(modal);
+          } catch (error) {
+            console.error("Error cancelling void request:", error);
+            showToast("Failed to cancel request.", "error");
+          }
+        });
+    }
+
+    if (action === "close-modal") {
+      closeModal(actionTarget.closest(".modal-overlay"));
+    }
+
+    if (action === "view-staff-performance") {
+      openProductFormModal(isEditing, product);
+    }
+
+    if (action === "receive-payment") {
+      e.stopPropagation();
+      openReceivePaymentModal(targetId);
+    }
+
+    if (action === "view-product-details") {
+      const container = currentViewPane.querySelector(
+        "#inventory-view-container"
+      );
+      if (container) renderProductDetailView(targetId, container);
+    }
+
+    if (action === "add-customer") {
+      if (!checkPermission("canManageCustomers")) {
+        showToast("You don't have permission to add customers.", "error");
+        return;
+      }
+      e.stopPropagation();
+      openCustomerModal(null);
+    }
+    if (action === "edit-customer") {
+      if (!checkPermission("canManageStaff")) {
+        showToast("You don't have permission to edit customers.", "error");
+        return;
+      }
+      e.stopPropagation();
+      const customerId = targetId;
+      openCustomerModal(customerId);
+    }
+
+    if (action === "view-customer-invoices") {
+      e.stopPropagation();
+      openCustomerInvoicesModal(targetId);
+    }
+
+    if (action === "view-invoice" || action === "print-invoice") {
+      const invoiceId = targetId;
+      const invoice = firestoreData.invoices.find((i) => i.id === invoiceId);
+      if (!invoice) return;
+
+      if (invoice.customerId) {
+        invoice.customer = firestoreData.customers.find(
+          (c) => c.id === invoice.customerId
+        );
+      }
+      showReceipt(invoice);
+    }
+
+    if (action === "email-invoice") {
+      openEmailInvoiceModal(targetId);
+    }
+
+    if (action === "delete-invoice") {
+      if (appState.session.userRole !== "admin") return;
+      const invoiceId = targetId;
+      const modal = showModal(
+        "Delete Invoice",
+        `<p>Are you sure you want to permanently delete invoice <strong>${invoiceId}</strong>? This will NOT restore stock and is irreversible.</p>`,
+        `<button data-action="close-modal" class="btn btn-secondary">Cancel</button><button id="confirm-delete" class="btn btn-danger">Delete</button>`
+      );
+      modal.querySelector("#confirm-delete").addEventListener("click", () => {
+        deleteDoc(doc(invoicesRef, invoiceId));
+        showToast(`Invoice ${invoiceId} deleted.`, "success");
+        closeModal(modal);
+      });
+    }
+
+    if (action === "delete-expense") {
+      // NEW
+      const expenseId = actionTarget.dataset.id;
+      const expense = firestoreData.expenses.find((e) => e.id === expenseId);
+      if (!expense) return;
+
+      const modal = showModal(
+        "Delete Expense",
+        `<p>Are you sure you want to permanently delete this expense of <strong>${currencyUtils.format(
+          expense.amountInBase
+        )}</strong> for <strong>${expense.category}</strong>?</p>`,
+        `<button data-action="close-modal" class="btn btn-secondary">Cancel</button><button id="confirm-delete-expense" class="btn btn-danger">Delete</button>`
+      );
+      modal
+        .querySelector("#confirm-delete-expense")
+        .addEventListener("click", async () => {
+          closeModal(modal);
+          try {
+            await deleteDoc(doc(expensesRef, expenseId));
+            showToast("Expense deleted successfully.", "success");
+          } catch (error) {
+            console.error("Error deleting expense:", error);
+            showToast("Failed to delete expense.", "error");
+          }
+        });
+    }
+
+    if (action === "add-expense" || action === "edit-expense") {
+      if (!checkPermission("canManageExpenses")) {
+        showToast("You don't have permission to manage expenses.", "error");
+        return;
+      }
+      const expenseId = action === "edit-expense" ? targetId : null;
+      openExpenseModal(expenseId);
+    }
+
+    if (action === "save-settings") {
+      const settingsForm = document.getElementById("settings-form");
+      const currentUserRole = appState.session.userRole;
+      const oldStoreName = firestoreData.storeInfo.name; // Capture old name
+      let updatedData = {};
+
+      // Handle Cashier role: they can only save their own POS Layout preference.
+      if (currentUserRole === "cashier") {
+        updatedData = {
+          "settings.posLayout": appState.settings.posLayout,
+        };
+      } else {
+        // For Admins and Managers
+        if (!checkPermission("canManageSettings")) {
+          showToast("You don't have permission to change settings.", "error");
+          return;
+        }
+
+        // Query for all potential form elements and add checks to prevent errors if they are missing.
+        const nameInput = settingsForm.querySelector('[name="name"]');
+        const addressInput = settingsForm.querySelector('[name="address"]');
+        const currencyInput = settingsForm.querySelector(
+          '[name="defaultCurrency"]'
+        );
+        const taxInput = settingsForm.querySelector('[name="taxRate"]');
+        const unitInput = settingsForm.querySelector('[name="defaultUnit"]');
+        const parsedTax = parseFloat(taxInput?.value);
+
+        updatedData = {
+          // Use optional chaining and nullish coalescing to safely access values.
+          name: nameInput?.value || firestoreData.storeInfo.name || "",
+          address: addressInput?.value || firestoreData.storeInfo.address || "",
+          "settings.defaultCurrency":
+            currencyInput?.value || appState.settings.defaultCurrency,
+          "settings.businessType": appState.settings.businessType,
+          "settings.posLayout": appState.settings.posLayout,
+          "settings.selectedReceiptTemplate":
+            appState.settings.selectedReceiptTemplate,
+          "settings.taxRate": !isNaN(parsedTax)
+            ? parsedTax
+            : appState.settings.taxRate ?? 0,
+          "settings.defaultUnit":
+            unitInput?.value || appState.settings.defaultUnit,
+          "settings.automations": appState.settings.automations,
+          customProfiles: appState.customProfiles,
+        };
+      }
+
+      try {
+        // The main update to the store document. Await this to ensure it succeeds first.
+        await updateDoc(storeRef, updatedData);
+        showToast("Settings saved successfully!", "success");
+
+        const newStoreName = updatedData.name;
+        // Check if an admin changed the store name.
+        if (
+          currentUserRole === "admin" &&
+          newStoreName &&
+          newStoreName !== oldStoreName
+        ) {
+          // Trigger the background sync. We don't need to await it.
+          syncStoreNameToUserProfiles(appState.session.storeId, newStoreName);
+        }
+      } catch (error) {
+        console.error("Error saving settings:", error);
+        showToast("Failed to save settings.", "error");
+      }
+    }
+
+    if (action === "grant-store-access") {
+      // This action is now handled inside openAdminEditStaffModal to pass necessary data.
+      // This is a placeholder to prevent any other logic from firing.
+      e.stopPropagation();
+    }
+
+    if (action === "toggle-pos-category-sidebar") {
+      appState.viewStates.posModern.isCategoryPanelCollapsed = !appState
+        .viewStates.posModern.isCategoryPanelCollapsed;
+      applyPosCategoryPanelState(currentViewPane);
+      saveState();
+    }
+  });
+
+  async function handleAiProductGeneration(prompt) {
+    if (!prompt) {
+      showToast("Please enter a product description.", "error");
+      return;
+    }
+
+    // Pass the current profile to the AI call for context
+    const profile = getCurrentProfile();
+    const aiResponse = await callGenerativeAI(prompt, profile);
+
+    if (aiResponse.success && aiResponse.product) {
+      showToast(
+        "Product details generated! Please review and save.",
+        "success"
+      );
+      // The AI returns a product object, now we pass it to the form modal
+      // The API returns prices in USD, which is our base currency, so no conversion needed here.
+      openProductFormModal(false, aiResponse.product);
+    } else {
+      showToast(
+        aiResponse.error || "Failed to generate product details.",
+        "error"
+      );
+    }
+  }
+
+  function openExpenseModal(expenseId = null) {
+    const isEditing = !!expenseId;
+    const expense = isEditing
+      ? firestoreData.expenses.find((e) => e.id === expenseId)
+      : {};
+    const amountInDisplay = isEditing
+      ? currencyUtils.convert(expense.amountInBase || 0).toFixed(2)
+      : "";
+
+    const isManager = appState.session.userRole === "manager";
+
+    const baseCategories = [
+      "Rent",
+      "Utilities",
+      "Supplies",
+      "Salaries",
+      "Marketing",
+      "Maintenance",
+      "Travel",
+      "Insurance",
+      "Taxes",
+      "Miscellaneous",
+    ];
+    const paymentMethods = ["Cash", "Card", "Bank Transfer", "Other"];
+
+    const content = `
+                <form id="expense-form" class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-text-secondary mb-1">Amount (${
+                              appState.currentCurrency
+                            })</label>
+                            <input type="number" name="amount" value="${amountInDisplay}" class="w-full form-input" required step="0.01">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-text-secondary mb-1">Date</label>
+                            <input type="date" name="date" value="${
+                              expense.date ||
+                              new Date().toISOString().slice(0, 10)
+                            }" class="w-full form-input" required>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-text-secondary mb-1">Paid To (Vendor/Recipient)</label>
+                        <input type="text" name="paidTo" value="${
+                          expense.paidTo || ""
+                        }" class="w-full form-input" placeholder="e.g., Office Supplies Co.">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-text-secondary mb-1">Category</label>
+                            ${
+                              isManager
+                                ? `
+                                <input type="text" name="category" value="Utilities" class="w-full form-input bg-bg-tertiary" readonly>
+                            `
+                                : `
+                                <div id="category-wrapper">
+                                    <!-- This container will be dynamically filled -->
+                                </div>
+                            `
+                            }
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-text-secondary mb-1">Payment Method</label>
+                            <select name="paymentMethod" class="form-select w-full">
+                                ${paymentMethods
+                                  .map(
+                                    (p) =>
+                                      `<option value="${p}" ${
+                                        expense.paymentMethod === p
+                                          ? "selected"
+                                          : ""
+                                      }>${p}</option>`
+                                  )
+                                  .join("")}
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-text-secondary mb-1">Receipt URL (Optional)</label>
+                        <input type="url" name="receiptUrl" value="${
+                          expense.receiptUrl || ""
+                        }" class="w-full form-input" placeholder="https://">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-text-secondary mb-1">Notes (Optional)</label>
+                        <textarea name="notes" class="form-textarea w-full h-24">${
+                          expense.notes || ""
+                        }</textarea>
+                    </div>
+                </form>
+                `;
+
+    const footer = `<button data-action="close-modal" class="btn btn-secondary">Cancel</button><button type="submit" form="expense-form" class="btn btn-primary">${
+      isEditing ? "Save Changes" : "Log Expense"
+    }</button>`;
+    const modal = showModal(
+      isEditing ? "Edit Expense" : "Log New Expense",
+      content,
+      footer
+    );
+
+    // --- NEW: Dynamic Category UI Logic ---
+    const renderCategorySelector = (selectedCategory = null) => {
+      const customCategories = appState.settings.expenseCategories || [];
+      const allCategories = [
+        ...new Set([...baseCategories, ...customCategories]),
+      ].sort();
+      const categoryWrapper = modal.querySelector("#category-wrapper");
+
+      categoryWrapper.innerHTML = `
+                        <select name="category" class="form-select w-full" required>
+                            <option value="" disabled ${
+                              !selectedCategory ? "selected" : ""
+                            }>Select a category...</option>
+                            ${allCategories
+                              .map(
+                                (c) =>
+                                  `<option value="${c}" ${
+                                    selectedCategory === c ? "selected" : ""
+                                  }>${c}</option>`
+                              )
+                              .join("")}
+                            <option value="--new--" class="text-accent font-semibold border-t border-border-color mt-1 pt-1">-- Add New Category --</option>
+                        </select>
+                    `;
+
+      const categorySelect = categoryWrapper.querySelector("select");
+      categorySelect.addEventListener("change", () => {
+        if (categorySelect.value === "--new--") {
+          renderNewCategoryInput(selectedCategory);
+        }
+      });
+    };
+
+    const renderNewCategoryInput = (previousSelection) => {
+      const categoryWrapper = modal.querySelector("#category-wrapper");
+      categoryWrapper.innerHTML = `
+                        <div class="flex items-center gap-2">
+                            <input type="text" id="new-expense-category-input" class="form-input w-full" placeholder="New category name...">
+                            <button type="button" id="save-new-category-btn" class="btn btn-success p-2 shrink-0" title="Save Category"><i data-lucide="check" class="w-4 h-4 pointer-events-none"></i></button>
+                            <button type="button" id="cancel-new-category-btn" class="btn btn-secondary p-2 shrink-0" title="Cancel"><i data-lucide="x" class="w-4 h-4 pointer-events-none"></i></button>
+                        </div>
+                    `;
+      lucide.createIcons();
+
+      const newCategoryInput = categoryWrapper.querySelector(
+        "#new-expense-category-input"
+      );
+      newCategoryInput.focus();
+
+      categoryWrapper
+        .querySelector("#cancel-new-category-btn")
+        .addEventListener("click", () => {
+          renderCategorySelector(previousSelection);
+        });
+
+      const saveNewCategory = async () => {
+        const newCategoryName = newCategoryInput.value.trim();
+        if (!newCategoryName) {
+          showToast("Please enter a name for the new category.", "error");
+          newCategoryInput.focus();
+          return;
+        }
+
+        const currentCustomCategories =
+          appState.settings.expenseCategories || [];
+        const allExistingCategories = [
+          ...baseCategories,
+          ...currentCustomCategories,
+        ];
+
+        if (
+          !allExistingCategories.find(
+            (c) => c.toLowerCase() === newCategoryName.toLowerCase()
+          )
+        ) {
+          const updatedCategories = [
+            ...currentCustomCategories,
+            newCategoryName,
+          ];
+          await updateDoc(storeRef, {
+            "settings.expenseCategories": updatedCategories,
+          });
+          showToast(`New category "${newCategoryName}" saved.`, "info");
+          renderCategorySelector(newCategoryName);
+        } else {
+          showToast(`Category "${newCategoryName}" already exists.`, "warning");
+          renderCategorySelector(newCategoryName);
+        }
+      };
+
+      categoryWrapper
+        .querySelector("#save-new-category-btn")
+        .addEventListener("click", saveNewCategory);
+      newCategoryInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          saveNewCategory();
+        } else if (e.key === "Escape") {
+          renderCategorySelector(previousSelection);
+        }
+      });
+    };
+
+    // Initial Render
+    if (!isManager) {
+      renderCategorySelector(expense.category);
+    }
+    // --- END NEW ---
+
+    modal
+      .querySelector("#expense-form")
+      .addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const amountInDisplay = parseFloat(formData.get("amount"));
+        const finalCategory = formData.get("category");
+
+        if (!finalCategory) {
+          showToast("Please select or create a category.", "error");
+          return;
+        }
+
+        const data = {
+          amountInBase: currencyUtils.convertToBase(amountInDisplay),
+          currency: appState.currentCurrency,
+          date: formData.get("date"),
+          category: finalCategory,
+          paidTo: formData.get("paidTo"),
+          paymentMethod: formData.get("paymentMethod"),
+          receiptUrl: formData.get("receiptUrl"),
+          notes: formData.get("notes"),
+          recordedBy: {
+            id: appState.session.currentUser.uid,
+            name: appState.session.currentUser.name,
+          },
+          lastUpdatedAt: new Date().toISOString(),
+        };
+
+        try {
+          if (isEditing) {
+            await updateDoc(doc(expensesRef, expenseId), data);
+            showToast("Expense updated successfully.", "success");
+          } else {
+            data.createdAt = new Date().toISOString();
+            const docRef = await addDoc(expensesRef, data);
+            showToast("Expense logged successfully.", "success");
+
+            if (appState.session.userRole === "manager") {
+              const managerName = appState.session.currentUser.name;
+              const logDetails = `Manager '${managerName}' logged a new expense of ${currencyUtils.format(
+                data.amountInBase
+              )} for '${data.category}'.`;
+
+              await addDoc(auditLogRef, {
+                type: "expense_add",
+                timestamp: new Date().toISOString(),
+                expenseId: docRef.id,
+                details: logDetails,
+                user: {
+                  id: appState.session.currentUser.uid,
+                  name: managerName,
+                },
+              });
+
+              const notificationMessage = `Manager <strong>${managerName}</strong> logged a new expense of <strong>${currencyUtils.format(
+                data.amountInBase
+              )}</strong> for '${data.category}'.`;
+              await createNotification("info", notificationMessage, {
+                targetRoles: ["admin"],
+              });
+            }
+          }
+          closeModal(modal);
+          // The onSnapshot listener should handle this, but as a direct fix
+          // to ensure the UI refreshes, we'll manually trigger a re-render if the
+          // expenses tab is currently active.
+          const activeTab = appState.tabs.find(
+            (t) => t.id === appState.activeTabId
+          );
+          if (activeTab?.viewType === "expenses") {
+            renderApp();
+          }
+        } catch (error) {
+          console.error("Error saving expense:", error);
+          showToast("Failed to save expense.", "error");
+        }
+      });
+  }
+
+  const openCustomProfileModal = (profileId = null, isTemplate = false) => {
+    const isEditing = profileId !== null && !isTemplate;
+    const baseProfile = isTemplate
+      ? businessProfiles[profileId]
+      : isEditing
+      ? appState.customProfiles[profileId]
+      : {
+          name: "New Custom Profile",
+          icon: "box",
+          terminology: {
+            product: "Item",
+            inventory: "Stock",
+            category: "Type",
+          },
+          features: {
+            serials: false,
+            expiry: false,
+            service: false,
+            hasInventoryTab: true,
+          },
+          customFields: [],
+        };
+    const currentProfile = JSON.parse(JSON.stringify(baseProfile));
+
+    if (isTemplate) {
+      currentProfile.name = `${currentProfile.name} (Custom)`;
+    }
+
+    let fieldsHTML = currentProfile.customFields
+      .map(
+        (field) => `
+                    <div class="custom-field-row flex items-center gap-2 p-2 bg-bg-tertiary rounded">
+                        <input type="text" value="${
+                          field.label
+                        }" placeholder="Field Label" class="form-input p-2 flex-1 custom-field-label">
+                        <select class="form-select p-2 custom-field-type">
+                            <option value="text" ${
+                              field.type === "text" ? "selected" : ""
+                            }>Text</option>
+                            <option value="textarea" ${
+                              field.type === "textarea" ? "selected" : ""
+                            }>Text Area</option>
+                            <option value="select" ${
+                              field.type === "select" ? "selected" : ""
+                            }>Select</option>
+                            <option value="checkbox" ${
+                              field.type === "checkbox" ? "selected" : ""
+                            }>Checkbox</option>
+                        </select>
+                         <input type="text" value="${
+                           field.options?.join(",") || ""
+                         }" placeholder="Options (comma-sep)" class="form-input p-2 flex-1 custom-field-options ${
+          field.type !== "select" ? "hidden" : ""
+        }">
+                        <button type="button" data-action="remove-custom-field" class="btn btn-danger p-2 h-auto"><i data-lucide="trash-2" class="w-4 h-4 pointer-events-none"></i></button>
+                    </div>
+                `
+      )
+      .join("");
+
+    const content = `
+                    <form id="custom-profile-form" class="space-y-4">
+                        <div><label class="block text-sm font-medium mb-1">Profile Name</label><input type="text" name="name" value="${
+                          currentProfile.name
+                        }" class="form-input w-full"></div>
+                        <h4 class="font-semibold text-text-primary pt-2 border-t border-border-color">Terminology</h4>
+                        <div class="grid grid-cols-3 gap-2">
+                             <div><label class="block text-xs font-medium mb-1">Product</label><input type="text" name="term_product" value="${
+                               currentProfile.terminology.product
+                             }" class="form-input w-full p-2 text-sm"></div>
+                             <div><label class="block text-xs font-medium mb-1">Inventory</label><input type="text" name="term_inventory" value="${
+                               currentProfile.terminology.inventory
+                             }" class="form-input w-full p-2 text-sm"></div>
+                             <div><label class="block text-xs font-medium mb-1">Category</label><input type="text" name="term_category" value="${
+                               currentProfile.terminology.category
+                             }" class="form-input w-full p-2 text-sm"></div>
+                        </div>
+                         <h4 class="font-semibold text-text-primary pt-2 border-t border-border-color">Features</h4>
+                         <div class="grid grid-cols-3 gap-2 text-sm">
+                            <div class="flex items-center"><input type="checkbox" id="feature_serials" name="feature_serials" class="h-4 w-4 rounded" ${
+                              currentProfile.features.serials ? "checked" : ""
+                            }><label for="feature_serials" class="ml-2">Serial Tracking</label></div>
+                            <div class="flex items-center"><input type="checkbox" id="feature_expiry" name="feature_expiry" class="h-4 w-4 rounded" ${
+                              currentProfile.features.expiry ? "checked" : ""
+                            }><label for="feature_expiry" class="ml-2">Expiry Tracking</label></div>
+                            <div class="flex items-center"><input type="checkbox" id="feature_service" name="feature_service" class="h-4 w-4 rounded" ${
+                              currentProfile.features.service ? "checked" : ""
+                            }><label for="feature_service" class="ml-2">Service Items</label></div>
+                         </div>
+                         <h4 class="font-semibold text-text-primary pt-2 border-t border-border-color">Product Form Configuration</h4>
+                         <div class="grid grid-cols-3 gap-2 text-sm">
+                            <div class="flex items-center"><input type="checkbox" id="feature_inventory_tab" name="feature_inventory_tab" class="h-4 w-4 rounded" ${
+                              currentProfile.features.hasInventoryTab !== false
+                                ? "checked"
+                                : ""
+                            }><label for="feature_inventory_tab" class="ml-2">Enable Inventory Tab</label></div>
+                         </div>
+                         <h4 class="font-semibold text-text-primary pt-2 border-t border-border-color">Custom Fields</h4>
+                         <div id="custom-fields-container" class="space-y-2">${fieldsHTML}</div>
+                         <button type="button" data-action="add-custom-field" class="btn btn-secondary text-sm w-full"><i data-lucide="plus" class="w-4 h-4 mr-2"></i>Add Field</button>
+                    </form>
+                `;
+    const footer = `<button data-action="close-modal" class="btn btn-secondary">Cancel</button><button type="submit" form="custom-profile-form" class="btn btn-primary">Save Custom Profile</button>`;
+    const modal = showModal("Customize Business Profile", content, footer, {
+      size: "max-w-3xl",
+    });
+    lucide.createIcons();
+
+    const fieldsContainer = modal.querySelector("#custom-fields-container");
+
+    modal.addEventListener("click", (e) => {
+      const target = e.target.closest("[data-action]");
+      if (!target) return;
+
+      if (target.dataset.action === "add-custom-field") {
+        const newField = document.createElement("div");
+        newField.className =
+          "custom-field-row flex items-center gap-2 p-2 bg-bg-tertiary rounded";
+        newField.innerHTML = `
+                            <input type="text" placeholder="Field Label" class="form-input p-2 flex-1 custom-field-label">
+                            <select class="form-select p-2 custom-field-type">
+                                <option value="text">Text</option>
+                                <option value="textarea">Text Area</option>
+                                <option value="select">Select</option>
+                                <option value="checkbox">Checkbox</option>
+                            </select>
+                            <input type="text" placeholder="Options (comma-sep)" class="form-input p-2 flex-1 custom-field-options hidden">
+                            <button type="button" data-action="remove-custom-field" class="btn btn-danger p-2 h-auto"><i data-lucide="trash-2" class="w-4 h-4 pointer-events-none"></i></button>
+                        `;
+        fieldsContainer.appendChild(newField);
+        lucide.createIcons();
+      }
+
+      if (target.dataset.action === "remove-custom-field") {
+        target.closest(".custom-field-row").remove();
+      }
+    });
+
+    modal.addEventListener("change", (e) => {
+      if (e.target.classList.contains("custom-field-type")) {
+        const optionsInput = e.target.parentElement.querySelector(
+          ".custom-field-options"
+        );
+        optionsInput.classList.toggle("hidden", e.target.value !== "select");
+      }
+    });
+
+    modal
+      .querySelector("#custom-profile-form")
+      .addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const newProfile = {
+          name: formData.get("name"),
+          icon: "settings-2",
+          terminology: {
+            product: formData.get("term_product"),
+            inventory: formData.get("term_inventory"),
+            category: formData.get("term_category"),
+          },
+          features: {
+            serials: formData.has("feature_serials"),
+            expiry: formData.has("feature_expiry"),
+            service: formData.has("feature_service"),
+            hasInventoryTab: formData.has("feature_inventory_tab"),
+          },
+          customFields: [],
+        };
+
+        fieldsContainer.querySelectorAll(".custom-field-row").forEach((row) => {
+          const label = row.querySelector(".custom-field-label").value;
+          const type = row.querySelector(".custom-field-type").value;
+          if (label) {
+            const field = {
+              name: label.toLowerCase().replace(/\s+/g, ""),
+              label,
+              type,
+            };
+            if (type === "select") {
+              field.options = row
+                .querySelector(".custom-field-options")
+                .value.split(",")
+                .map((s) => s.trim())
+                .filter(Boolean);
+            }
+            newProfile.customFields.push(field);
+          }
+        });
+
+        const newId = isEditing ? profileId : `custom_${Date.now()}`;
+        const updatedProfiles = {
+          ...appState.customProfiles,
+          [newId]: newProfile,
+        };
+        const newSettings = { ...appState.settings, businessType: newId };
+
+        try {
+          await updateDoc(storeRef, {
+            customProfiles: updatedProfiles,
+            settings: newSettings,
+          });
+          showToast("Custom profile saved and applied!", "success");
+          closeModal(modal);
+        } catch (error) {
+          showToast("Failed to save profile.", "error");
+          console.error(error);
+        }
+      });
+  };
+
+  const openProductFormModal = (isEditing, product) => {
+    const profile = getCurrentProfile();
+    const term = profile.terminology;
+    const features = profile.features;
+    const displayCurrency =
+      appState.currentCurrency ||
+      firestoreData.storeInfo?.baseCurrency ||
+      "USD";
+
+    // Determine the selected product type
+    // If editing, use the product's existing type.
+    // If creating a new product:
+    // - If the profile supports services AND does NOT have an inventory tab, default to 'service'.
+    // - Otherwise, default to 'physical'.
+    const selectedProductType = isEditing
+      ? product.productType
+      : features.service && features.hasInventoryTab === false
+      ? "service"
+      : "physical";
+
+    const selectedUomId = isEditing
+      ? product.uomId
+      : appState.settings.defaultUnit || "pcs";
+    const uomOptions = firestoreData.unitsOfMeasurement
+      .map(
+        (uom) =>
+          `<option value="${uom.id}" ${
+            selectedUomId === uom.id ? "selected" : ""
+          }>${uom.name}</option>`
+      )
+      .join("");
+
+    let customFieldsHTML = "";
+    if (profile.customFields && profile.customFields.length > 0) {
+      customFieldsHTML +=
+        '<div class="border-t border-border-color pt-4 mt-4 space-y-4">';
+      profile.customFields.forEach((field) => {
+        const value = product.customData
+          ? product.customData[field.label] || ""
+          : "";
+        customFieldsHTML += "<div>";
+        switch (field.type) {
+          case "textarea":
+            customFieldsHTML += `<label class="block text-sm font-medium text-text-secondary mb-1">${field.label}</label><textarea name="customData_${field.name}" class="form-textarea w-full">${value}</textarea>`;
+            break;
+          case "select":
+            const options = field.options
+              .map(
+                (opt) =>
+                  `<option value="${opt}" ${
+                    value === opt ? "selected" : ""
+                  }>${opt}</option>`
+              )
+              .join("");
+            customFieldsHTML += `<label class="block text-sm font-medium text-text-secondary mb-1">${field.label}</label><select name="customData_${field.name}" class="form-select w-full">${options}</select>`;
+            break;
+          case "checkbox":
+            customFieldsHTML += `<div class="flex items-center"><input type="checkbox" id="customData_${
+              field.name
+            }" name="customData_${field.name}" class="h-4 w-4 rounded" ${
+              value ? "checked" : ""
+            }><label for="customData_${field.name}" class="ml-2">${
+              field.label
+            }</label></div>`;
+            break;
+          default:
+            customFieldsHTML += `<label class="block text-sm font-medium text-text-secondary mb-1">${
+              field.label
+            }</label><input type="text" name="customData_${
+              field.name
+            }" value="${value}" class="form-input w-full" placeholder="${
+              field.placeholder || ""
+            }">`;
+        }
+        customFieldsHTML += "</div>";
+      });
+      customFieldsHTML += "</div>";
+    }
+
+    const content = `
+                    <form id="product-form" class="space-y-4">
+                        <input type="hidden" name="id" value="${
+                          product.id || ""
+                        }">
+                        <div class="border-b border-border-color flex space-x-4">
+                            <button type="button" data-tab="general" class="form-tab active px-1 py-3 text-sm font-medium">General</button>
+                            ${
+                              profile.features.hasInventoryTab
+                                ? `<button type="button" data-tab="inventory" class="form-tab px-1 py-3 text-sm font-medium">${term.inventory}</button>`
+                                : ""
+                            }
+                            <button type="button" data-tab="pricing" class="form-tab px-1 py-3 text-sm font-medium">Pricing & Tax</button>
+                        </div>
+                        <div id="form-content" class="pt-4">
+                            <div class="form-pane active" data-pane="general">
+                                <div class="space-y-4">
+                                    <div><label class="block text-sm font-medium text-text-secondary mb-1">${
+                                      term.product
+                                    } Name</label><input type="text" name="name" value="${
+      product.name || ""
+    }" class="w-full form-input" required></div>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div><label class="block text-sm font-medium text-text-secondary mb-1">SKU</label><input type="text" name="sku" value="${
+                                          product.id ||
+                                          `SKU${Date.now()
+                                            .toString()
+                                            .slice(-4)}`
+                                        }" class="w-full form-input bg-bg-tertiary" ${
+      isEditing ? "readonly" : ""
+    }></div>
+                                        <div><label class="block text-sm font-medium text-text-secondary mb-1">${
+                                          term.category
+                                        }</label><input type="text" name="category" value="${
+      product.category || ""
+    }" class="w-full form-input"></div>
+                                    </div>
+                                    <div><label class="block text-sm font-medium text-text-secondary mb-1">Barcode (UPC/EAN)</label><input type="text" name="barcode" value="${
+                                      product.barcode || ""
+                                    }" class="w-full form-input" placeholder="Scan or type barcode here"></div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-text-secondary mb-1">${
+                                          term.product
+                                        } Type</label>
+                                        <select name="productType" class="form-select w-full">
+                                            <option value="physical" ${
+                                              selectedProductType === "physical"
+                                                ? "selected"
+                                                : ""
+                                            }>Physical</option>
+                                            ${
+                                              features.service
+                                                ? `<option value="service" ${
+                                                    selectedProductType ===
+                                                    "service"
+                                                      ? "selected"
+                                                      : ""
+                                                  }>Service</option>`
+                                                : ""
+                                            }
+                                        </select>
+                                    </div>
+                                    ${customFieldsHTML}
+                                </div>
+                            </div>
+                            ${
+                              profile.features.hasInventoryTab
+                                ? `
+                            <div class="form-pane" data-pane="inventory">
+                                <div class="space-y-4">
+                                     <div class="grid grid-cols-1 gap-4">
+                                        <div><label class="block text-sm font-medium text-text-secondary mb-1">Unit of Measure</label><select name="uomId" class="form-select w-full">${uomOptions}</select></div>
+                                    </div>
+                                    <div><label class="block text-sm font-medium text-text-secondary mb-1">Initial Stock</label><input type="number" name="stock" value="${
+                                      product.stock || ""
+                                    }" class="w-full form-input"></div>
+                                    <div class="border-t border-border-color pt-4 mt-4 space-y-3">
+                                        ${
+                                          features.serials
+                                            ? `<div class="flex items-center"><input type="checkbox" id="isSerialized" name="isSerialized" class="h-4 w-4 rounded" ${
+                                                product.isSerialized
+                                                  ? "checked"
+                                                  : ""
+                                              }><label for="isSerialized" class="ml-2">Track by Serial Number</label></div>`
+                                            : ""
+                                        }
+                                        <div id="serial-number-section" class="${
+                                          product.isSerialized &&
+                                          features.serials
+                                            ? ""
+                                            : "hidden"
+                                        }"><label class="block text-sm font-medium text-text-secondary mb-1">Serial Numbers (one per line)</label><textarea name="serials" class="form-textarea w-full h-24 font-mono text-xs">${
+                                    product.serials?.join("\\n") || ""
+                                  }</textarea></div>
+                                        ${
+                                          features.expiry
+                                            ? `<div class="flex items-center"><input type="checkbox" id="hasExpiry" name="hasExpiry" class="h-4 w-4 rounded" ${
+                                                product.hasExpiry
+                                                  ? "checked"
+                                                  : ""
+                                              }><label for="hasExpiry" class="ml-2">Track by Expiry Date</label></div>`
+                                            : ""
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            `
+                                : ""
+                            }
+                            <div class="form-pane" data-pane="pricing">
+                                 <div class="grid grid-cols-2 gap-4">
+                                    ${
+                                      checkPermission("canViewProfitAndLoss")
+                                        ? `<div><label class="block text-sm font-medium text-text-secondary mb-1">Cost Price (in ${displayCurrency})</label><input type="number" name="costPrice" step="0.01" value="${
+                                            isEditing && product.costPrice
+                                              ? currencyUtils
+                                                  .convert(
+                                                    product.costPrice,
+                                                    displayCurrency
+                                                  )
+                                                  .toFixed(2)
+                                              : ""
+                                          }" class="w-full form-input"></div>`
+                                        : ""
+                                    }
+                                    <div><label class="block text-sm font-medium text-text-secondary mb-1">Selling Price (in ${displayCurrency})</label><input type="number" name="price" step="0.01" value="${
+      isEditing && product.price
+        ? currencyUtils.convert(product.price, displayCurrency).toFixed(2)
+        : ""
+    }" class="w-full form-input" required></div>
+                                 </div>
+                                 <div class="flex items-center mt-4"><input type="checkbox" id="taxable" name="taxable" class="h-4 w-4 rounded" ${
+                                   product.taxable !== false ? "checked" : ""
+                                 }><label for="taxable" class="ml-2">This item is taxable</label></div>
+                            </div>
+                        </div>
+                    </form>`;
+    const footer = `<button type="button" data-action="close-modal" class="btn btn-secondary">Cancel</button><button type="submit" form="product-form" class="btn btn-primary">${
+      isEditing ? "Save Changes" : `Create ${term.product}`
+    }</button>`;
+    const modal = showModal(
+      isEditing ? `Edit ${term.product}` : `Add New ${term.product}`,
+      content,
+      footer,
+      { size: "max-w-3xl" }
+    );
+
+    const tabs = modal.querySelectorAll(".form-tab");
+    const panes = modal.querySelectorAll(".form-pane");
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        tabs.forEach((t) => t.classList.remove("active"));
+        panes.forEach((p) => p.classList.remove("active"));
+        tab.classList.add("active");
+        modal
+          .querySelector(`.form-pane[data-pane="${tab.dataset.tab}"]`)
+          .classList.add("active");
+      });
+    });
+
+    const isSerializedCheckbox = modal.querySelector("#isSerialized");
+    if (isSerializedCheckbox) {
+      isSerializedCheckbox.addEventListener("change", (e) => {
+        modal
+          .querySelector("#serial-number-section")
+          .classList.toggle("hidden", !e.target.checked);
+      });
+    }
+
+    modal.querySelector("#product-form").addEventListener("submit", (ev) => {
+      ev.preventDefault();
+      const formData = new FormData(ev.target);
+      const sku = isEditing ? product.id : formData.get("sku");
+      if (!sku) {
+        showToast("SKU is required.", "error");
+        return;
+      }
+      const term = getCurrentProfile().terminology;
+
+      const costPriceInDisplay = parseFloat(formData.get("costPrice")) || 0;
+      const priceInDisplay = parseFloat(formData.get("price")) || 0;
+
+      const newProductData = {
+        name: formData.get("name"),
+        category: formData.get("category"),
+        barcode: formData.get("barcode"),
+        productType: formData.get("productType"),
+        uomId: formData.get("uomId"),
+        stock: parseFloat(formData.get("stock")) || 0,
+        price: currencyUtils.convertToBase(
+          priceInDisplay,
+          appState.currentCurrency
+        ),
+        costPrice: currencyUtils.convertToBase(
+          costPriceInDisplay,
+          appState.currentCurrency
+        ),
+        taxable: formData.has("taxable"),
+        isSerialized: formData.has("isSerialized"),
+        hasExpiry: formData.has("hasExpiry"),
+        customData: {},
+        status: product.status || "active",
+      };
+
+      const profile = getCurrentProfile();
+      profile.customFields.forEach((field) => {
+        if (field.type === "checkbox") {
+          newProductData.customData[field.label] = formData.has(
+            `customData_${field.name}`
+          );
+        } else {
+          const value = formData.get(`customData_${field.name}`);
+          if (value) {
+            newProductData.customData[field.label] = value;
+          }
+        }
+      });
+
+      if (newProductData.isSerialized) {
+        const serials = formData
+          .get("serials")
+          .split("\n")
+          .map((s) => s.trim())
+          .filter(Boolean);
+        newProductData.serials = serials;
+        newProductData.stock = serials.length; // Stock is determined by serial count
+      }
+
+      const promise = isEditing
+        ? updateDoc(doc(productsRef, sku), newProductData)
+        : setDoc(doc(productsRef, sku), newProductData);
+
+      promise
+        .then(() => {
+          showToast(
+            `${term.product} ${
+              isEditing ? "updated" : "created"
+            } successfully!`,
+            "success"
+          );
+          closeModal(modal);
+
+          // --- NEW LOGIC for Audit & Notifications ---
+          const currentUserRole = appState.session.userRole;
+          const currentUserName = appState.session.currentUser.name;
+
+          // If a manager creates or edits a product, log it and notify the admin.
+          if (currentUserRole === "manager") {
+            const actionType = isEditing ? "product_edit" : "product_add";
+            const actionDescription = isEditing ? "edited" : "added";
+            const logDetails = `Manager '${currentUserName}' ${actionDescription} product: ${newProductData.name} (SKU: ${sku}).`;
+
+            // 1. Create the audit log entry
+            addDoc(auditLogRef, {
+              type: actionType,
+              timestamp: new Date().toISOString(),
+              productId: sku,
+              productName: newProductData.name,
+              details: logDetails,
+              user: {
+                id: appState.session.currentUser.uid,
+                name: currentUserName,
+              },
+            }).catch(console.error);
+
+            // 2. Create a notification specifically for the admin role
+            const notificationMessage = `Manager <strong>${currentUserName}</strong> just ${actionDescription} a product: <strong>${newProductData.name}</strong>.`;
+            createNotification("info", notificationMessage, {
+              targetRoles: ["admin"],
+            });
+          }
+          // --- END NEW LOGIC ---
+        })
+        .catch((error) => {
+          console.error("Error saving product:", error);
+          showToast("Failed to save product.", "error");
+        });
+    });
+  };
+
+  function openTotalDiscountModal() {
+    const activeSale = posState.sales.find(
+      (s) => s.id === posState.activeSaleId
+    );
+    if (!activeSale) {
+      showToast("No active sale to apply a discount to.", "error");
+      return;
+    }
+
+    const subtotalBase = activeSale.cart.reduce((acc, item) => {
+      const price =
+        item.originalPrice !== undefined ? item.originalPrice : item.price;
+      return acc + price * (item.qty || 1);
+    }, 0);
+
+    const displayCurrencyInfo = currencyUtils.get(appState.currentCurrency);
+
+    let initialDiscountValueForDisplay = "";
+    // Logic to determine initial input value based on current discount
+    if (activeSale.discount?.value) {
+      if (activeSale.discount.type === "fixed") {
+        initialDiscountValueForDisplay = currencyUtils
+          .convert(activeSale.discount.value, appState.currentCurrency)
+          .toFixed(2);
+      } else {
+        // percent
+        initialDiscountValueForDisplay = activeSale.discount.value;
+      }
+    }
+
+    const content = `
+                <form id="total-discount-form" class="space-y-4">
+                    <div class="p-4 bg-bg-tertiary rounded-lg space-y-2">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-text-secondary">Subtotal</span>
+                            <span class="font-mono text-text-primary font-medium">${currencyUtils.format(
+                              subtotalBase
+                            )}</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-text-secondary">Discount Amount</span>
+                            <span id="discount-preview" class="font-mono text-red-400 font-medium">-${currencyUtils.format(
+                              0
+                            )}</span>
+                        </div>
+                        <div class="flex justify-between text-lg border-t border-border-color pt-2 mt-2">
+                            <span class="text-text-primary font-bold">New Total (Est.)</span>
+                            <span id="new-total-preview" class="font-mono text-accent font-bold">${currencyUtils.format(
+                              subtotalBase
+                            )}</span>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-text-secondary mb-1">Discount Method</label>
+                        <div class="flex">
+                            <select id="discount-type-selector" name="discountType" class="form-select rounded-r-none w-40">
+                                <option value="percent" ${
+                                  activeSale.discount?.type === "percent"
+                                    ? "selected"
+                                    : ""
+                                }>Percentage (%)</option>
+                                <option value="fixed" ${
+                                  activeSale.discount?.type === "fixed"
+                                    ? "selected"
+                                    : ""
+                                }>Fixed Amount (${
+      displayCurrencyInfo.symbol
+    })</option>
+                                <option value="set-total">Set Manual Total</option>
+                            </select>
+                            <input type="number" step="0.01" id="discount-value-input" name="discountValue" value="${initialDiscountValueForDisplay}" placeholder="e.g., 5 or 10.50" class="w-full form-input rounded-l-none">
+                        </div>
+                        <p id="discount-helper-text" class="text-xs text-text-secondary mt-1">Leave value blank or 0 to remove discount.</p>
+                    </div>
+                     <div>
+                        <label class="block text-sm font-medium text-text-secondary mb-1">Reason (Optional)</label>
+                        <input type="text" name="discountReason" value="${
+                          activeSale.discount?.reason || ""
+                        }" placeholder="e.g., Holiday promotion, Staff discount" class="w-full form-input">
+                    </div>
+                </form>
+                `;
+    const footer = `<button data-action="close-modal" class="btn btn-secondary">Cancel</button><button type="submit" form="total-discount-form" class="btn btn-primary">Apply Discount</button>`;
+    const modal = showModal("Apply Total Discount", content, footer);
+
+    const typeSelector = modal.querySelector("#discount-type-selector");
+    const valueInput = modal.querySelector("#discount-value-input");
+    const discountPreviewEl = modal.querySelector("#discount-preview");
+    const newTotalPreviewEl = modal.querySelector("#new-total-preview");
+    const submitBtn = modal.querySelector('button[type="submit"]');
+    const helperText = modal.querySelector("#discount-helper-text");
+
+    const updateDiscountPreview = () => {
+      const type = typeSelector.value;
+      const value = parseFloat(valueInput.value) || 0;
+      let discountAmountBase = 0;
+      let error = null;
+
+      if (value < 0) {
+        error = "Value can't be negative.";
+      } else if (type === "percent") {
+        if (value > 100) {
+          error = "Percent discount cannot exceed 100%.";
+        } else {
+          discountAmountBase = subtotalBase * (value / 100);
+        }
+      } else if (type === "fixed") {
+        const valueInBase = currencyUtils.convertToBase(
+          value,
+          appState.currentCurrency
+        );
+        if (valueInBase > subtotalBase) {
+          error = "Fixed discount cannot be greater than the subtotal.";
+        } else {
+          discountAmountBase = valueInBase;
+        }
+      } else if (type === "set-total") {
+        const newTotalInBase = currencyUtils.convertToBase(
+          value,
+          appState.currentCurrency
+        );
+        if (newTotalInBase > subtotalBase) {
+          error = "New total cannot be greater than the original subtotal.";
+        } else {
+          discountAmountBase = subtotalBase - newTotalInBase;
+        }
+      }
+
+      if (error) {
+        discountPreviewEl.textContent = error;
+        discountPreviewEl.classList.remove("text-red-400");
+        discountPreviewEl.classList.add("text-yellow-400");
+        newTotalPreviewEl.textContent = "-";
+        submitBtn.disabled = true;
+      } else {
+        discountPreviewEl.textContent = `-${currencyUtils.format(
+          discountAmountBase
+        )}`;
+        discountPreviewEl.classList.add("text-red-400");
+        discountPreviewEl.classList.remove("text-yellow-400");
+        const newTotalBase = subtotalBase - discountAmountBase;
+        newTotalPreviewEl.textContent = currencyUtils.format(newTotalBase);
+        submitBtn.disabled = false;
+      }
+    };
+
+    const setupInputForType = (type) => {
+      if (type === "set-total") {
+        valueInput.placeholder = "e.g., 250.00";
+        helperText.textContent = `Enter the final price you want for the total.`;
+        const currentDiscountValue = activeSale.discount?.value || 0;
+        const currentDiscountType = activeSale.discount?.type || "percent";
+        const currentDiscountAmountBase =
+          currentDiscountType === "percent"
+            ? subtotalBase * (currentDiscountValue / 100)
+            : currentDiscountValue;
+        const currentTotalBase = subtotalBase - currentDiscountAmountBase;
+        valueInput.value = currencyUtils.convert(currentTotalBase).toFixed(2);
+      } else {
+        valueInput.placeholder = "e.g., 5 or 10.50";
+        helperText.textContent = "Leave value blank or 0 to remove discount.";
+        if (type === "percent" && activeSale.discount?.type === "percent") {
+          valueInput.value = activeSale.discount.value || "";
+        } else if (type === "fixed" && activeSale.discount?.type === "fixed") {
+          valueInput.value = activeSale.discount.value
+            ? currencyUtils.convert(activeSale.discount.value).toFixed(2)
+            : "";
+        } else {
+          valueInput.value = "";
+        }
+      }
+      updateDiscountPreview();
+    };
+
+    typeSelector.addEventListener("input", () =>
+      setupInputForType(typeSelector.value)
+    );
+    valueInput.addEventListener("input", updateDiscountPreview);
+
+    // Initial setup and calculation
+    setupInputForType(typeSelector.value);
+
+    modal
+      .querySelector("#total-discount-form")
+      .addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const subtotalBaseForSubmit = activeSale.cart.reduce((acc, item) => {
+          const price =
+            item.originalPrice !== undefined ? item.originalPrice : item.price;
+          return acc + price * (item.qty || 1);
+        }, 0);
+
+        const formData = new FormData(e.target);
+        const type = formData.get("discountType");
+        const valueInDisplay = parseFloat(formData.get("discountValue")) || 0;
+
+        let discountTypeToSave = "fixed"; // Default to fixed
+        let discountValueToSave = 0;
+
+        if (valueInDisplay === 0) {
+          discountTypeToSave = activeSale.discount?.type || "percent"; // Keep old type if removing
+          discountValueToSave = 0;
+        } else if (type === "set-total") {
+          const newTotalInBase = currencyUtils.convertToBase(
+            valueInDisplay,
+            appState.currentCurrency
+          );
+          if (newTotalInBase < 0 || newTotalInBase > subtotalBaseForSubmit) {
+            updateDiscountPreview();
+            return;
+          }
+          discountTypeToSave = "fixed";
+          discountValueToSave = subtotalBaseForSubmit - newTotalInBase;
+        } else if (type === "percent") {
+          if (valueInDisplay < 0 || valueInDisplay > 100) {
+            updateDiscountPreview();
+            return;
+          }
+          discountTypeToSave = "percent";
+          discountValueToSave = valueInDisplay;
+        } else {
+          // fixed
+          const valueInBase = currencyUtils.convertToBase(
+            valueInDisplay,
+            appState.currentCurrency
+          );
+          if (valueInBase < 0 || valueInBase > subtotalBaseForSubmit) {
+            updateDiscountPreview();
+            return;
+          }
+          discountTypeToSave = "fixed";
+          discountValueToSave = valueInBase;
+        }
+
+        activeSale.cart.forEach((item) => {
+          if (item.discount) {
+            item.price = item.originalPrice;
+            delete item.discount;
+            delete item.originalPrice;
+          }
+        });
+
+        activeSale.discount = {
+          type: discountTypeToSave,
+          value: discountValueToSave,
+          reason: formData.get("discountReason"),
+        };
+
+        showToast("Discount applied successfully.", "success");
+        closeModal(modal);
+        posFullRender(
+          document
+            .getElementById("workspace-content")
+            .querySelector(".view-pane")
+        );
+      });
+  }
+
+  const renderProductDetailView = (productId, container) => {
+    const product = firestoreData.products.find((p) => p.id === productId);
+    if (!product) {
+      container.innerHTML = `<p>Product not found.</p>`;
+      return;
+    }
+
+    const profile = getCurrentProfile();
+    const term = profile.terminology;
+
+    let customDataHTML = "";
+    if (product.customData && Object.keys(product.customData).length > 0) {
+      customDataHTML = Object.entries(product.customData)
+        .map(([key, value]) => {
+          if (value === true) value = "Yes";
+          if (value === false) value = "No";
+          if (!value) return "";
+          return `<div class="flex justify-between py-3 border-b border-border-color/50"><span class="text-text-secondary">${key}</span><span class="text-text-primary font-medium text-right">${value}</span></div>`;
+        })
+        .join("");
+    } else {
+      customDataHTML =
+        '<p class="text-sm text-text-secondary py-3">No additional details available.</p>';
+    }
+
+    let advancedInventoryHTML = "";
+    if (product.isSerialized && product.serials && product.serials.length > 0) {
+      advancedInventoryHTML = `<h4 class="font-semibold text-text-primary mt-6 mb-2">Serial Numbers in Stock</h4><div class="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs font-mono">${product.serials
+        .map(
+          (sn) =>
+            `<span class="bg-bg-tertiary px-2 py-1 rounded text-text-secondary">${sn}</span>`
+        )
+        .join("")}</div>`;
+    }
+    if (product.hasExpiry && product.batches && product.batches.length > 0) {
+      advancedInventoryHTML = `<h4 class="font-semibold text-text-primary mt-6 mb-2">Batches</h4><table class="w-full text-left text-sm"><thead class="text-xs text-text-secondary uppercase"><tr><th class="py-1 font-normal">Batch ID</th><th class="py-1 font-normal">Expiry</th><th class="py-1 text-right font-normal">Stock</th></tr></thead><tbody>${product.batches
+        .map(
+          (b) =>
+            `<tr class="border-b border-border-color/50"><td class="py-2">${b.batchId}</td><td class="py-2">${b.expiryDate}</td><td class="py-2 text-right">${b.stock}</td></tr>`
+        )
+        .join("")}</tbody></table>`;
+    }
+
+    const content = `
+                <div class="view-pane">
+                    <div class="flex justify-between items-center mb-6">
+                         <button data-action="back-to-inventory" class="btn btn-secondary"><i data-lucide="arrow-left" class="w-5 h-5 mr-2"></i> Back to ${
+                           term.inventory
+                         }</button>
+                         ${
+                           checkPermission("canManageInventory")
+                             ? `<button data-action="edit-product" data-id="${productId}" class="btn btn-primary"><i data-lucide="edit" class="w-4 h-4 mr-2"></i>Edit ${term.product}</button>`
+                             : ""
+                         }
+                    </div>
+                    <div class="glass-pane p-8 rounded-xl grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div class="md:col-span-1">
+                            <img src="https://placehold.co/400x400/121212/444444?text=${encodeURIComponent(
+                              product.name
+                            )}" class="rounded-lg w-full aspect-square object-cover" alt="${
+      product.name
+    }">
+                        </div>
+                        <div class="md:col-span-2">
+                            <h2 class="text-3xl font-bold text-text-primary">${
+                              product.name
+                            }</h2>
+                            <p class="font-mono text-xs text-text-secondary mb-4">${
+                              product.id
+                            }</p>
+                            
+                            <div class="grid grid-cols-2 gap-x-6 gap-y-4 text-sm my-6">
+                                <div class="flex flex-col"><span class="text-xs text-text-secondary uppercase">Price</span><span class="text-2xl font-mono text-accent font-bold">${currencyUtils.format(
+                                  product.price
+                                )}</span></div>
+                                <div class="flex flex-col"><span class="text-xs text-text-secondary uppercase">Stock</span><span class="text-2xl font-mono text-text-primary font-bold">${
+                                  product.productType === "physical"
+                                    ? product.stock
+                                    : "N/A"
+                                }</span></div>
+                                <div class="flex flex-col"><span class="text-xs text-text-secondary uppercase">${
+                                  term.category
+                                }</span><span class="text-text-primary font-medium">${
+      product.category
+    }</span></div>
+                                <div class="flex flex-col"><span class="text-xs text-text-secondary uppercase">${
+                                  term.product
+                                } Type</span><span class="text-text-primary font-medium capitalize">${
+      product.productType
+    }</span></div>
+                            </div>
+                            
+                            <div id="barcode-container" class="mt-2 mb-4"></div>
+
+                            <div class="border-t border-border-color pt-2 text-sm">${customDataHTML}</div>
+                            ${advancedInventoryHTML}
+                        </div>
+                    </div>
+                </div>`;
+
+    container.innerHTML = content;
+
+    if (product.barcode && typeof JsBarcode === "function") {
+      try {
+        const barcodeContainer = container.querySelector("#barcode-container");
+        const svg = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "svg"
+        );
+        svg.id = `barcode-${product.id}`;
+        barcodeContainer.appendChild(svg);
+
+        JsBarcode(svg, product.barcode, {
+          displayValue: true,
+          fontSize: 14,
+          lineColor: "#e5e7eb",
+          fontColor: "#d1d5db",
+          background: "transparent",
+          margin: 10,
+          height: 60,
+        });
+      } catch (e) {
+        console.error("JsBarcode error:", e);
+        container.querySelector(
+          "#barcode-container"
+        ).innerHTML = `<p class="text-xs text-red-400">Invalid Barcode: ${product.barcode}</p>`;
+      }
+    }
+
+    lucide.createIcons();
+
+    container
+      .querySelector('[data-action="back-to-inventory"]')
+      .addEventListener("click", () => {
+        initInventory(container);
+      });
+
+    const editButton = container.querySelector(`[data-action="edit-product"]`);
+    if (editButton) {
+      editButton.addEventListener("click", () => {
+        openProductFormModal(true, product);
+      });
+    }
+  };
+
+  document.getElementById("ai-assistant-btn").addEventListener("click", () => {
+    const term = getCurrentProfile().terminology;
+    const promptSuggestions = [
+      `Add 2 Espresso Coffee Beans to the current sale`,
+      `Create a new sale for customer "Jane Doe" with 1 Organic Apple`,
+      `What is the profit margin on "Hyperion X1 Smartphone"?`,
+      `Delete customer "John Doe"`,
+      `আমার সবচেয়ে বেশি বিক্রি হওয়া পণ্য কোনটি?`,
+    ];
+
+    const content = `<div class="ai-chat-container flex flex-col h-[80vh] max-h-[900px] bg-transparent">
+                    <div class="ai-chat-header p-4 border-b border-white/10 flex items-center gap-4 shrink-0">
+                        <div class="relative">
+                            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-accent to-blue-500 flex items-center justify-center ring-2 ring-white/20">
+                                <i data-lucide="sparkles" class="w-7 h-7 text-white"></i>
+                            </div>
+                            <div class="absolute bottom-0 right-0 w-4 h-4 bg-green-500 rounded-full border-2 border-bg-secondary"></div>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg text-white">Global AI Assistant</h3>
+                            <p class="text-xs text-green-300">Online</p>
+                        </div>
+                    </div>
+
+                    <div class="flex-1 overflow-y-auto p-4 space-y-6 text-sm" id="ai-chat-history">
+                        <!-- Initial Welcome Message -->
+                        <div class="ai-message flex gap-3">
+                            <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 self-end bg-bg-tertiary">
+                                <i data-lucide="sparkles" class="w-5 h-5 text-accent"></i>
+                            </div>
+                            <div class="bg-bg-secondary rounded-2xl rounded-bl-lg p-3 max-w-md border border-white/10 shadow-lg">
+                                <p class="text-text-primary">I'm now fully integrated with your system. You can ask me to do anything from analyzing sales data to creating a ${
+                                  term.product
+                                }. How can I help?</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ai-chat-footer p-4 border-t border-white/10 shrink-0">
+                        <!-- Prompt Suggestions -->
+                        <div class="w-full overflow-x-auto pb-3 mb-2 scrollbar-hide" id="ai-prompt-suggestions-container">
+                             <div class="flex items-center gap-2 text-xs whitespace-nowrap">
+                                ${promptSuggestions
+                                  .map(
+                                    (p) =>
+                                      `<button class="prompt-suggestion">${p}</button>`
+                                  )
+                                  .join("")}
+                             </div>
+                        </div>
+                        <!-- Input Form -->
+                        <form id="ai-input-form" class="relative">
+                            <textarea id="ai-input" placeholder="Ask the AI anything..." class="w-full form-input pr-14 pl-5 py-3 bg-bg-tertiary/80 border-border-color rounded-xl resize-none" rows="1"></textarea>
+                            <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2 p-2.5 bg-accent text-white rounded-lg hover:bg-accent-hover transition-all duration-300 disabled:opacity-50 disabled:scale-90">
+                                <i data-lucide="send-horizontal" class="w-5 h-5"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>`;
+
+    const modal = showModal("AI Assistant", content, "", {
+      size: "max-w-2xl",
+      customClasses: "p-0 ai-modal-pane",
+    });
+    lucide.createIcons();
+
+    const input = modal.querySelector("#ai-input");
+    const form = modal.querySelector("#ai-input-form");
+    const history = modal.querySelector("#ai-chat-history");
+
+    modal
+      .querySelector("#ai-prompt-suggestions-container")
+      .addEventListener("click", (e) => {
+        const target = e.target.closest(".prompt-suggestion");
+        if (target) {
+          input.value = target.textContent;
+          form.dispatchEvent(
+            new Event("submit", { cancelable: true, bubbles: true })
+          );
+        }
+      });
+
+    // Auto-resize textarea
+    input.addEventListener("input", () => {
+      input.style.height = "auto";
+      const scrollHeight = input.scrollHeight;
+      if (scrollHeight < 150) {
+        // Max height of ~4 rows
+        input.style.height = scrollHeight + "px";
+      } else {
+        input.style.height = "150px";
+      }
+    });
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const userPrompt = input.value;
+      if (!userPrompt.trim()) return;
+
+      const sanitizedPrompt = userPrompt
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+
+      // Display user's prompt
+      const userMessage = document.createElement("div");
+      userMessage.className = "user-message flex justify-end gap-3";
+      userMessage.innerHTML = `
+                        <div class="bg-gradient-to-br from-accent to-blue-500 text-white rounded-2xl rounded-br-lg p-3 max-w-md border border-blue-400/50 shadow-lg">
+                           <p class="break-words">${sanitizedPrompt}</p>
+                        </div>`;
+      history.appendChild(userMessage);
+
+      // Hide suggestions after first prompt
+      const suggestions = modal.querySelector(
+        "#ai-prompt-suggestions-container"
+      );
+      if (suggestions) suggestions.style.display = "none";
+
+      input.value = "";
+      input.style.height = "auto";
+      input.disabled = true;
+      form.querySelector("button").disabled = true;
+
+      // Show typing indicator
+      const typingIndicator = document.createElement("div");
+      typingIndicator.className = "ai-message flex gap-3 typing-indicator";
+      typingIndicator.innerHTML = `
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 self-end bg-bg-tertiary">
+                            <i data-lucide="sparkles" class="w-5 h-5 text-accent"></i>
+                        </div>
+                        <div class="bg-bg-secondary rounded-2xl rounded-bl-lg p-3 max-w-md flex items-center gap-2">
+                            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                        </div>`;
+      history.appendChild(typingIndicator);
+      history.scrollTop = history.scrollHeight;
+
+      // Process command and display AI's response
+      const aiResponse = await processAiCommand(userPrompt);
+
+      typingIndicator.remove(); // Remove typing indicator
+
+      const aiMessage = document.createElement("div");
+      aiMessage.className = "ai-message flex gap-3";
+      aiMessage.innerHTML = `
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 self-end bg-bg-tertiary">
+                            <i data-lucide="sparkles" class="w-5 h-5 text-accent"></i>
+                        </div>
+                        <div class="bg-bg-secondary rounded-2xl rounded-bl-lg p-3 max-w-md border border-white/10 shadow-lg">
+                            <p class="text-text-primary break-words">${aiResponse}</p>
+                        </div>`;
+      history.appendChild(aiMessage);
+      history.scrollTop = history.scrollHeight;
+      lucide.createIcons();
+
+      input.disabled = false;
+      form.querySelector("button").disabled = false;
+      input.focus();
+
+      const existingModal = document.getElementById(modal.id);
+      if (
+        aiResponse.toLowerCase().includes("opening") ||
+        aiResponse.toLowerCase().includes("creating")
+      ) {
+        setTimeout(() => {
+          if (existingModal) closeModal(existingModal);
+        }, 1500);
+      }
+    });
+
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        form.requestSubmit();
+      }
+    });
+  });
+
+  const showLargeReceiptPreview = (templateId) => {
+    const template = receiptTemplates[templateId];
+    if (!template) return;
+
+    const mockInvoice = {
+      id: "PREVIEW-001",
+      customerName: "Amelia Chen",
+      customer:
+        firestoreData.customers.length > 0
+          ? firestoreData.customers[0]
+          : { name: "Amelia Chen", loyaltyId: "CUST-PREVIEW" },
+      total: 0,
+      date: new Date().toISOString(),
+      items: [],
+      cashier: "Preview Mode",
+      storeId: "STR-PV",
+      pointsEarned: 0,
+      currency: appState.currentCurrency,
+      exchangeRate: currencyUtils.get().rate,
+    };
+
+    // Safely add products to the mock invoice for preview
+    if (firestoreData.products.length > 0)
+      mockInvoice.items.push(
+        JSON.parse(JSON.stringify(firestoreData.products[0]))
+      );
+    if (firestoreData.products.length > 1)
+      mockInvoice.items.push({
+        ...JSON.parse(JSON.stringify(firestoreData.products[1])),
+        serialNumber: "SN-HX1-PREVIEW",
+      });
+    if (firestoreData.products.length > 2)
+      mockInvoice.items.push({
+        ...JSON.parse(JSON.stringify(firestoreData.products[2])),
+        qty: 2.5,
+      });
+
+    // If there are no products at all, add a generic placeholder to prevent errors
+    if (mockInvoice.items.length === 0) {
+      mockInvoice.items.push({
+        id: "SKU-PV",
+        name: "Sample Product",
+        price: 25.0,
+        qty: 1,
+        taxable: true,
+      });
+    }
+
+    const taxRate = (appState.settings.taxRate ?? 0) / 100;
+    const subtotalBase = mockInvoice.items.reduce(
+      (acc, item) => acc + item.price * (item.qty || 1),
+      0
+    );
+    const taxableSubtotal = mockInvoice.items
+      .filter((i) => i.taxable)
+      .reduce((acc, item) => acc + item.price * (item.qty || 1), 0);
+    const taxBase = taxableSubtotal * taxRate;
+    mockInvoice.totalInBaseCurrency = subtotalBase + taxBase;
+    mockInvoice.total = currencyUtils.convert(mockInvoice.totalInBaseCurrency);
+    mockInvoice.pointsEarned = Math.floor(mockInvoice.totalInBaseCurrency);
+
+    const mockPaymentState = {
+      payments: [
+        { method: "Card", amount: currencyUtils.convert(80.0) },
+        { method: "Cash", amount: currencyUtils.convert(10.0) },
+      ],
+      total: mockInvoice.total,
+    };
+
+    const content = template.getBody(mockInvoice, mockPaymentState);
+    const modal = showModal(
+      `Preview: ${template.name}`,
+      content,
+      `<button data-action="close-modal" class="btn btn-secondary">Close</button>`,
+      { size: "max-w-2xl", customClasses: "p-0" }
+    );
+    lucide.createIcons();
+  };
+
+  const receiptTemplates = {
+    modern: {
+      name: "Futuristic",
+      preview: `<div class="bg-blue-900/50 p-4 font-sans text-[8px] leading-tight text-white"><div class="flex justify-between items-center"><div class="w-8 h-8 bg-blue-400 rounded-full flex items-center justify-center"><i data-lucide="gem" class="w-4 h-4 text-white"></i></div><p class="font-bold text-blue-300 text-[10px]">INVOICE</p></div><div class="mt-4 space-y-1"><div class="h-2 w-full bg-blue-500/50 rounded-full"></div><div class="h-2 w-3/4 bg-blue-500/50 rounded-full"></div></div><div class="mt-4 h-px bg-blue-400/50"></div><p class="text-right text-blue-300 font-bold text-[10px] mt-2">TOTAL: ${currencyUtils.format(
+        25,
+        appState.currentCurrency
+      )}</p></div>`,
+      getBody: (invoice, paymentState) => {
+        const { storeInfo } = firestoreData;
+        const taxRate = appState.settings.taxRate ?? 0;
+        const subtotalBase = invoice.items.reduce(
+          (sum, item) => sum + (item.qty || 1) * item.price,
+          0
+        );
+        const taxableSubtotal = invoice.items
+          .filter((i) => i.taxable)
+          .reduce((acc, item) => acc + item.price * (item.qty || 1), 0);
+        const taxBase = taxableSubtotal * (taxRate / 100);
+        const totalBase = subtotalBase + taxBase;
+
+        // Handle both live and historical receipt views
+        const payments = paymentState
+          ? paymentState.payments
+          : invoice.paymentDetails || [];
+        const totalPaidCurrent = payments.reduce((sum, p) => sum + p.amount, 0);
+        const changeDueCurrent = paymentState
+          ? totalPaidCurrent - paymentState.total
+          : 0; // Only relevant for live payment
+        const amountDueBase = invoice.dueAmount || 0;
+        const currency = invoice.currency || appState.currentCurrency;
+
+        let recommendations = "";
+        const hasCoffee = invoice.items.some((i) => i.id === "SKU001");
+        const hasElectronics = invoice.items.some(
+          (i) => i.category === "Electronics"
+        );
+        if (hasCoffee) {
+          recommendations += `<p class="mt-1">You may also love our <span class="text-blue-300 font-semibold">Organic Green Tea</span>.</p>`;
+        }
+        if (!hasElectronics) {
+          recommendations += `<p class="mt-1">Check out our new <span class="text-blue-300 font-semibold">Hyperion X1 Smartphones</span> in store!</p>`;
+        }
+
+        let warrantyInfo = "";
+        const electronicItems = invoice.items.filter(
+          (p) => p.category === "Electronics"
+        );
+        if (electronicItems.length > 0) {
+          warrantyInfo = `<div class="mt-4 p-3 bg-blue-900/50 rounded-lg text-xs"><h4 class="font-bold text-blue-300 mb-1">Warranty Information</h4>${electronicItems
+            .map(
+              (p) =>
+                `<p><span class="font-medium">${p.name}:</span> 2-Year Limited Warranty</p>`
+            )
+            .join("")}</div>`;
+        }
+
+        return `<div class="bg-gray-900 text-gray-200 font-sans p-8" id="receipt-content" style="font-family: 'Inter', sans-serif; background: linear-gradient(145deg, #101827, #0b111e);">
+                            <div class="flex justify-between items-start pb-4 border-b border-blue-800">
+                                <div>
+                                    <h1 class="text-2xl font-bold text-white flex items-center gap-3"><img src="${
+                                      storeInfo.logoUrl
+                                    }" class="w-8 h-8 rounded-full bg-blue-600/50" alt="logo"/> ${
+          storeInfo.name
+        }</h1>
+                                    <p class="text-xs text-blue-300 mt-2">${
+                                      storeInfo.address
+                                    }<br>Ph: ${storeInfo.contact} | Web: ${
+          storeInfo.website
+        }<br>BIN: ${storeInfo.taxId}</p>
+                                </div>
+                                <div class="text-right">
+                                    <h2 class="text-xl font-semibold text-white uppercase tracking-widest">Receipt</h2>
+                                    <p class="text-sm font-mono text-blue-400">${
+                                      invoice.id
+                                    }</p>
+                                </div>
+                            </div>
+                            <div class="flex justify-between text-xs mt-4 text-blue-300">
+                                <p>Date: ${new Date(
+                                  invoice.date
+                                ).toLocaleString()}</p>
+                                <p>Cashier: ${invoice.cashierName} / Store: ${
+          invoice.storeId
+        }</p>
+                            </div>
+                             ${
+                               invoice.customer
+                                 ? `<div class="mt-6 border-t border-blue-800 pt-4"><h3 class="text-sm font-semibold text-blue-300">Billed To:</h3><p class="text-white font-medium">${invoice.customer.name}</p><p class="text-xs text-blue-300">Loyalty ID: ${invoice.customer.loyaltyId}</p></div>`
+                                 : ""
+                             }
+                            <div class="mt-6"><table class="w-full text-sm text-gray-300">
+                                <thead><tr class="text-left text-blue-300 uppercase text-xs border-b-2 border-blue-800"><th class="py-2 font-semibold tracking-wider">Item / SKU</th><th class="py-2 text-center">Qty×Price</th><th class="py-2 text-right font-semibold tracking-wider">Total</th></tr></thead>
+                                <tbody>${invoice.items
+                                  .map(
+                                    (item) =>
+                                      `<tr><td class="py-2 pr-2">${
+                                        item.name
+                                      }<br><span class="text-blue-400 text-xs font-mono">${
+                                        item.id
+                                      } ${
+                                        item.serialNumber
+                                          ? `(${item.serialNumber})`
+                                          : ""
+                                      }</span></td><td class="py-2 text-center font-mono">${
+                                        item.qty || 1
+                                      } × ${currencyUtils.format(
+                                        item.price,
+                                        currency
+                                      )}</td><td class="py-2 text-right font-mono">${currencyUtils.format(
+                                        (item.qty || 1) * item.price,
+                                        currency
+                                      )}</td></tr>`
+                                  )
+                                  .join("")}</tbody>
+                            </table></div>
+                            <div class="mt-6 flex justify-end"><div class="w-full max-w-xs text-sm">
+                                <div class="flex justify-between text-blue-300"><span>Subtotal:</span><span class="font-mono">${currencyUtils.format(
+                                  invoice.subtotalInBaseCurrency ||
+                                    subtotalBase,
+                                  currency
+                                )}</span></div>
+                                ${
+                                  invoice.discountInBaseCurrency > 0
+                                    ? `<div class="flex justify-between text-red-300"><span>Discount:</span><span class="font-mono">-${currencyUtils.format(
+                                        invoice.discountInBaseCurrency,
+                                        currency
+                                      )}</span></div>`
+                                    : ""
+                                }
+                                <div class="flex justify-between text-blue-300"><span>Tax (${taxRate}%):</span><span class="font-mono">${currencyUtils.format(
+          invoice.taxInBaseCurrency || taxBase,
+          currency
+        )}</span></div>
+                                <div class="h-px bg-blue-800 my-2"></div>
+                                <div class="flex justify-between font-bold text-2xl text-white"><span>Grand Total:</span><span class="font-mono">${currencyUtils.format(
+                                  invoice.totalInBaseCurrency,
+                                  currency
+                                )}</span></div>
+                            </div></div>
+                             <div class="mt-4 pt-4 border-t border-blue-800"><div class="w-full max-w-xs text-sm ml-auto">
+                                ${payments
+                                  .map((p) => {
+                                    let label = `Paid (${p.method}):`;
+                                    if (p.method === "Add to Due") {
+                                      label = "Added to Due:";
+                                    } else if (p.isDuePayment) {
+                                      label = `Due Payment (${
+                                        p.method
+                                      }) on ${new Date(
+                                        p.date
+                                      ).toLocaleDateString()}:`;
+                                    } else if (!paymentState) {
+                                      label = `Paid at Sale (${p.method}):`;
+                                    }
+
+                                    return `<div class="flex justify-between mt-1 text-blue-300">
+                                        <span>${label}</span>
+                                        <span class="font-mono">${
+                                          currencyUtils.get(currency).symbol
+                                        }${p.amount.toFixed(2)}</span>
+                                    </div>`;
+                                  })
+                                  .join("")}
+
+                                ${
+                                  amountDueBase > 0.001
+                                    ? `<div class="flex justify-between mt-1 font-bold text-red-300"><span>Remaining Due:</span><span class="font-mono">${currencyUtils.format(
+                                        amountDueBase,
+                                        currency
+                                      )}</span></div>`
+                                    : ""
+                                }
+                                ${
+                                  changeDueCurrent > 0.001
+                                    ? `<div class="flex justify-between mt-1 font-semibold text-white"><span>Change Due:</span><span class="font-mono">${
+                                        currencyUtils.get(currency).symbol
+                                      }${changeDueCurrent.toFixed(
+                                        2
+                                      )}</span></div>`
+                                    : ""
+                                }
+                                
+                                ${
+                                  invoice.status === "Paid" &&
+                                  amountDueBase < 0.001 &&
+                                  changeDueCurrent < 0.001
+                                    ? `
+                                <div class="flex justify-between mt-2 pt-2 border-t border-blue-800 font-bold text-green-300">
+                                    <span>Status:</span>
+                                    <span>Paid in Full</span>
+                                </div>`
+                                    : ""
+                                }
+                             </div></div>
+                            <div class="mt-6 text-center text-xs text-blue-300 p-3 bg-blue-500/10 rounded-lg">
+                                <p>You earned <span class="font-bold text-white">${
+                                  invoice.pointsEarned
+                                }</span> points on this purchase!</p>
+                                <p class="mt-1">Get 15% OFF your next purchase with code: <span class="font-bold text-white font-mono bg-blue-500/20 px-1 py-0.5 rounded">WELCOME15</span></p>
+                                <p class="mt-2 opacity-70">30-day return/exchange policy on most items.</p>
+                            </div>
+                            ${
+                              recommendations || warrantyInfo
+                                ? `<div class="mt-4 text-xs text-blue-200"><h4 class="font-bold text-blue-300">Just For You:</h4>${recommendations}${warrantyInfo}</div>`
+                                : ""
+                            }
+                            <div class="mt-8 text-center text-xs text-blue-400">
+                                <p class="text-base font-semibold text-white">Thank you, ${
+                                  invoice.customerName.split(" ")[0]
+                                }!</p>
+                                <p>Rate your experience | Follow us ${
+                                  storeInfo.socials
+                                }</p>
+                                <p class="mt-2 opacity-70">🌱 Request an e-receipt next time to save paper.</p>
+                            </div>
+                        </div>`;
+      },
+    },
+    payment: {
+      name: "Payment Receipt",
+      preview: `<div class="bg-green-900/50 p-4 font-sans text-[8px] leading-tight text-white"><div class="flex justify-between items-center"><div class="w-8 h-8 bg-green-400 rounded-full flex items-center justify-center"><i data-lucide="check" class="w-4 h-4 text-white"></i></div><p class="font-bold text-green-300 text-[10px]">PAYMENT</p></div><div class="mt-4 text-[10px]"><p>RECEIVED: ${currencyUtils.format(
+        100
+      )}</p></div><div class="mt-2 h-px bg-green-400/50"></div><p class="text-right text-green-300 font-bold text-[10px] mt-2">NEW BALANCE: ${currencyUtils.format(
+        50
+      )}</p></div>`,
+      getBody: (receiptData) => {
+        const { storeInfo } = firestoreData;
+        return `<div class="bg-gray-900 text-gray-200 font-sans p-8" id="receipt-content" style="font-family: 'Inter', sans-serif; background: linear-gradient(145deg, #101827, #0b111e);">
+                            <div class="flex justify-between items-start pb-4 border-b border-green-800">
+                                <div>
+                                    <h1 class="text-2xl font-bold text-white flex items-center gap-3"><img src="${
+                                      storeInfo.logoUrl
+                                    }" class="w-8 h-8 rounded-full bg-green-600/50" alt="logo"/> ${
+          storeInfo.name
+        }</h1>
+                                    <p class="text-xs text-green-300 mt-2">${
+                                      storeInfo.address
+                                    }<br>Ph: ${storeInfo.contact}</p>
+                                </div>
+                                <div class="text-right">
+                                    <h2 class="text-xl font-semibold text-white uppercase tracking-widest">Payment Receipt</h2>
+                                    <p class="text-sm font-mono text-green-400">PAY-${Date.now()
+                                      .toString()
+                                      .slice(-6)}</p>
+                                </div>
+                            </div>
+                            <div class="flex justify-between text-xs mt-4 text-green-300">
+                                <p>Date: ${new Date(
+                                  receiptData.date
+                                ).toLocaleString()}</p>
+                            </div>
+                             <div class="mt-6 border-t border-green-800 pt-4">
+                                <h3 class="text-sm font-semibold text-green-300">Payment From:</h3>
+                                <p class="text-white font-medium">${
+                                  receiptData.customer.name
+                                }</p>
+                                <p class="text-xs text-green-300">Loyalty ID: ${
+                                  receiptData.customer.loyaltyId
+                                }</p>
+                             </div>
+                             <div class="mt-6 p-6 bg-green-500/10 rounded-lg text-center">
+                                <p class="text-sm text-green-200">Amount Received</p>
+                                <p class="text-4xl font-bold font-mono text-white">${currencyUtils.format(
+                                  receiptData.amountPaid
+                                )}</p>
+                                <p class="text-sm text-green-200 mt-1">via ${
+                                  receiptData.method
+                                }</p>
+                             </div>
+                             <div class="mt-6">
+                                <h4 class="text-sm font-semibold text-green-300 mb-2">Payment applied to the following invoice(s):</h4>
+                                <div class="space-y-1 text-sm">
+                                    ${receiptData.appliedTo
+                                      .map(
+                                        (item) => `
+                                        <div class="flex justify-between items-center p-2 bg-bg-tertiary rounded">
+                                            <span class="font-mono text-xs text-green-300">${
+                                              item.id
+                                            }</span>
+                                            <span class="font-mono text-white">${currencyUtils.format(
+                                              item.amount
+                                            )}</span>
+                                        </div>
+                                    `
+                                      )
+                                      .join("")}
+                                </div>
+                             </div>
+                             <div class="mt-6 pt-4 border-t border-green-800 text-right">
+                                <p class="text-sm text-green-200">Previous Balance: ${currencyUtils.format(
+                                  receiptData.customer.currentDue
+                                )}</p>
+                                <p class="text-sm text-green-200">Amount Paid: -${currencyUtils.format(
+                                  receiptData.amountPaid
+                                )}</p>
+                                <p class="text-lg font-bold text-white mt-1">New Outstanding Balance: <span class="font-mono">${currencyUtils.format(
+                                  receiptData.newBalance
+                                )}</span></p>
+                             </div>
+                             <div class="mt-8 text-center text-xs text-green-400">
+                                <p class="text-base font-semibold text-white">Thank you for your payment!</p>
+                             </div>
+                        </div>`;
+      },
+    },
+  };
+
+  const showReceipt = (invoice, paymentState = null) => {
+    const template =
+      receiptTemplates[appState.settings.selectedReceiptTemplate] ||
+      receiptTemplates.modern;
+    const content = template.getBody(invoice, paymentState);
+
+    const footer = `<button data-action="close-modal" class="btn btn-secondary">Close</button><button id="print-receipt" class="btn btn-primary"><i data-lucide="printer" class="w-4 h-4 mr-2"></i>Print</button>`;
+    const modal = showModal(`Receipt / Invoice`, content, footer, {
+      size: "max-w-2xl",
+      customClasses: "p-0",
+    });
+    lucide.createIcons();
+    modal.querySelector("#print-receipt").addEventListener("click", () => {
+      printElement("receipt-content"); // This line is changed
+    });
+  };
+
+  function openAdminInviteStaffModal() {
+    const currentUserRole = appState.session.userRole;
+    const content = `
+                    <form id="invite-staff-form" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div><label class="block text-sm font-medium mb-1">Full Name</label><input type="text" name="name" class="form-input w-full" required></div>
+                            <div><label class="block text-sm font-medium mb-1">Date of Birth</label><input type="date" name="dob" class="form-input w-full"></div>
+                        </div>
+                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div><label class="block text-sm font-medium mb-1">Email</label><input type="email" name="email" class="form-input w-full" required></div>
+                            <div><label class="block text-sm font-medium mb-1">Phone</label><input type="tel" name="phone" class="form-input w-full"></div>
+                        </div>
+                        <div><label class="block text-sm font-medium mb-1">Address</label><input type="text" name="address" class="form-input w-full"></div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-border-color pt-4">
+                            <div><label class="block text-sm font-medium mb-1">Emergency Contact Name</label><input type="text" name="emergencyContactName" class="form-input w-full"></div>
+                            <div><label class="block text-sm font-medium mb-1">Emergency Contact Phone</label><input type="tel" name="emergencyContactPhone" class="form-input w-full"></div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-border-color pt-4">
+                            <div><label class="block text-sm font-medium mb-1">Role</label>
+                                <select name="role" class="form-select w-full">
+                                    <option value="cashier">Cashier</option>
+                                    ${
+                                      currentUserRole === "admin"
+                                        ? `<option value="manager">Manager</option><option value="admin">Administrator</option>`
+                                        : ""
+                                    }
+                                </select>
+                            </div>
+                            <div><label class="block text-sm font-medium mb-1">Password</label><input type="password" name="password" class="form-input w-full" required placeholder="Min. 6 characters"></div>
+                        </div>
+                        <p id="invite-error" class="text-red-400 text-sm hidden"></p>
+                    </form>`;
+    const footer = `<button data-action="close-modal" class="btn btn-secondary">Cancel</button><button type="submit" form="invite-staff-form" class="btn btn-primary">Create Account</button>`;
+    const modal = showModal("Invite New Staff Member", content, footer, {
+      size: "max-w-3xl",
+    });
+
+    modal
+      .querySelector("#invite-staff-form")
+      .addEventListener("submit", async (ev) => {
+        ev.preventDefault();
+        const errorEl = modal.querySelector("#invite-error");
+        errorEl.classList.add("hidden");
+
+        const tempApp = initializeApp(firebaseConfig, `temp-app-${Date.now()}`);
+        const tempAuth = getAuth(tempApp);
+
+        const name = ev.target.name.value;
+        const email = ev.target.email.value;
+        const password = ev.target.password.value;
+        const role = ev.target.role.value;
+
+        try {
+          const userCredential = await createUserWithEmailAndPassword(
+            tempAuth,
+            email,
+            password
+          );
+
+          // Use a batch to ensure both documents are created successfully
+          const batch = writeBatch(db);
+
+          // 1. Create the staff document inside the store
+          const newStaffRef = doc(staffRef, userCredential.user.uid);
+          batch.set(newStaffRef, {
+            name,
+            email,
+            role,
+            phone: ev.target.phone.value,
+            address: ev.target.address.value,
+            dob: ev.target.dob.value,
+            emergencyContactName: ev.target.emergencyContactName.value,
+            emergencyContactPhone: ev.target.emergencyContactPhone.value,
+            joinDate: new Date().toISOString(),
+            status: "active",
+          });
+
+          // 2. Create the user profile document in the top-level 'users' collection
+          const newUserProfileRef = doc(usersRef, userCredential.user.uid);
+          batch.set(newUserProfileRef, {
+            stores: [
+              {
+                id: appState.session.storeId,
+                name: firestoreData.storeInfo.name,
+              },
+            ],
+            currentStoreId: appState.session.storeId,
+          });
+
+          await batch.commit();
+
+          showToast("Staff member created successfully!", "success");
+          closeModal(modal);
+        } catch (error) {
+          console.error("Error inviting staff:", error);
+          errorEl.textContent = error.message.replace("Firebase: ", "");
+          errorEl.classList.remove("hidden");
+        } finally {
+          // No public API to delete temp app, will be garbage collected.
+        }
+      });
+  }
+
+  function openManagerInviteCashierModal() {
+    const content = `
+                    <form id="invite-cashier-form" class="space-y-4">
+                        <p class="text-sm text-text-secondary">You are inviting a new Cashier. This will require approval from an Administrator before they can log in.</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div><label class="block text-sm font-medium mb-1">Full Name</label><input type="text" name="name" class="form-input w-full" required></div>
+                             <div><label class="block text-sm font-medium mb-1">Phone</label><input type="tel" name="phone" class="form-input w-full"></div>
+                        </div>
+                        <div><label class="block text-sm font-medium mb-1">Email</label><input type="email" name="email" class="form-input w-full" required></div>
+                        <div><label class="block text-sm font-medium mb-1">Temporary Password</label><input type="password" name="password" class="form-input w-full" required placeholder="Min. 6 characters"></div>
+                        <p id="invite-error" class="text-red-400 text-sm hidden"></p>
+                    </form>`;
+    const footer = `<button data-action="close-modal" class="btn btn-secondary">Cancel</button><button type="submit" form="invite-cashier-form" class="btn btn-primary">Send Invitation</button>`;
+    const modal = showModal("Invite New Cashier", content, footer, {
+      size: "max-w-2xl",
+    });
+
+    modal
+      .querySelector("#invite-cashier-form")
+      .addEventListener("submit", async (ev) => {
+        ev.preventDefault();
+        const errorEl = modal.querySelector("#invite-error");
+        errorEl.classList.add("hidden");
+
+        const tempApp = initializeApp(firebaseConfig, `temp-app-${Date.now()}`);
+        const tempAuth = getAuth(tempApp);
+
+        const name = ev.target.name.value;
+        const email = ev.target.email.value;
+        const password = ev.target.password.value;
+
+        try {
+          const userCredential = await createUserWithEmailAndPassword(
+            tempAuth,
+            email,
+            password
+          );
+
+          // Use a batch to ensure both documents are created successfully
+          const batch = writeBatch(db);
+
+          // 1. Create the staff document inside the store
+          const newStaffRef = doc(staffRef, userCredential.user.uid);
+          batch.set(newStaffRef, {
+            name,
+            email,
+            role: "cashier",
+            phone: ev.target.phone.value,
+            joinDate: new Date().toISOString(),
+            status: "pending",
+            invitedBy: appState.session.currentUser.uid,
+          });
+
+          // 2. Create the user profile document in the top-level 'users' collection
+          const newUserProfileRef = doc(usersRef, userCredential.user.uid);
+          batch.set(newUserProfileRef, {
+            stores: [
+              {
+                id: appState.session.storeId,
+                name: firestoreData.storeInfo.name,
+              },
+            ],
+            currentStoreId: appState.session.storeId,
+          });
+
+          await batch.commit();
+
+          await createNotification(
+            "info",
+            `Manager <strong>${appState.session.currentUser.name}</strong> has invited a new cashier, <strong>${name}</strong>, who requires approval.`,
+            { targetRoles: ["admin"] }
+          );
+
+          showToast("Invitation sent for admin approval!", "success");
+          closeModal(modal);
+        } catch (error) {
+          console.error("Error inviting cashier:", error);
+          errorEl.textContent = error.message.replace("Firebase: ", "");
+          errorEl.classList.remove("hidden");
+        }
+      });
+  }
+
+  function openRequestDeactivationModal(staffId) {
+    const member = firestoreData.staff.find((m) => m.id === staffId);
+    if (!member) return showToast("Staff member not found.", "error");
+
+    const content = `
+                    <form id="request-deactivation-form" class="space-y-4">
+                        <p>You are requesting to deactivate the account for <strong class="text-text-primary">${member.name}</strong>. Please provide a reason for this request. An administrator will review and approve or deny it.</p>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Reason for Deactivation</label>
+                            <textarea name="reason" class="form-textarea w-full h-24" placeholder="e.g., End of contract, Performance issues..." required></textarea>
+                        </div>
+                        <p id="request-error" class="text-red-400 text-sm hidden"></p>
+                    </form>
+                `;
+    const footer = `<button data-action="close-modal" class="btn btn-secondary">Cancel</button><button type="submit" form="request-deactivation-form" class="btn btn-danger">Submit Request</button>`;
+    const modal = showModal("Request Deactivation", content, footer);
+
+    modal
+      .querySelector("#request-deactivation-form")
+      .addEventListener("submit", async (ev) => {
+        ev.preventDefault();
+        const reason = ev.target.reason.value;
+        if (!reason.trim()) {
+          const errorEl = modal.querySelector("#request-error");
+          errorEl.textContent = "A reason is required.";
+          errorEl.classList.remove("hidden");
+          return;
+        }
+
+        try {
+          const deactivationRequest = {
+            reason: reason,
+            requestedBy: appState.session.currentUser.uid,
+            requestedByName: appState.session.currentUser.name,
+            date: new Date().toISOString(),
+          };
+
+          await updateDoc(doc(staffRef, staffId), {
+            status: "deactivation_pending",
+            deactivationRequest: deactivationRequest,
+          });
+
+          await createNotification(
+            "warning",
+            `Manager <strong>${appState.session.currentUser.name}</strong> has requested to deactivate cashier <strong>${member.name}</strong>. Reason: ${reason}`,
+            { targetRoles: ["admin"] }
+          );
+
+          showToast("Deactivation request sent for admin approval.", "success");
+          closeModal(modal);
+        } catch (error) {
+          console.error("Error requesting deactivation:", error);
+          showToast("Failed to send deactivation request.", "error");
+        }
+      });
+  }
+
+  function openViewStaffPerformanceModal(staffId) {
+    const member = firestoreData.staff.find((m) => m.id === staffId);
+    if (!member) return showToast("Staff member not found.", "error");
+
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const relevantInvoices = firestoreData.invoices.filter(
+      (inv) =>
+        inv.cashierId === staffId &&
+        new Date(inv.date) >= thirtyDaysAgo &&
+        inv.status !== "Void"
+    );
+
+    const totalSales = relevantInvoices.reduce(
+      (sum, inv) => sum + inv.totalInBaseCurrency,
+      0
+    );
+    const transactionCount = relevantInvoices.length;
+    const avgSaleValue =
+      transactionCount > 0 ? totalSales / transactionCount : 0;
+    const itemsSold = relevantInvoices
+      .flatMap((inv) => inv.items)
+      .reduce((sum, item) => sum + (item.qty || 1), 0);
+
+    const salesByDay = relevantInvoices.reduce((acc, inv) => {
+      const day = new Date(inv.date).toLocaleDateString([], {
+        month: "short",
+        day: "numeric",
+      });
+      acc[day] = (acc[day] || 0) + inv.totalInBaseCurrency;
+      return acc;
+    }, {});
+
+    const content = `
+                    <div class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-center">
+                            <div class="bg-bg-tertiary p-4 rounded-lg"><p class="text-xs text-text-secondary uppercase">Total Sales</p><p class="text-xl font-bold font-mono">${currencyUtils.format(
+                              totalSales
+                            )}</p></div>
+                            <div class="bg-bg-tertiary p-4 rounded-lg"><p class="text-xs text-text-secondary uppercase">Transactions</p><p class="text-xl font-bold font-mono">${transactionCount}</p></div>
+                            <div class="bg-bg-tertiary p-4 rounded-lg"><p class="text-xs text-text-secondary uppercase">Avg. Sale Value</p><p class="text-xl font-bold font-mono">${currencyUtils.format(
+                              avgSaleValue
+                            )}</p></div>
+                            <div class="bg-bg-tertiary p-4 rounded-lg"><p class="text-xs text-text-secondary uppercase">Items Sold</p><p class="text-xl font-bold font-mono">${itemsSold}</p></div>
+                        </div>
+                        <div class="h-64"><canvas id="staff-sales-chart"></canvas></div>
+                    </div>
+                `;
+    const modal = showModal(
+      `Performance: ${member.name} (Last 30 Days)`,
+      content,
+      `<button data-action="close-modal" class="btn btn-secondary">Close</button>`,
+      { size: "max-w-3xl" }
+    );
+
+    const ctx = modal.querySelector("#staff-sales-chart").getContext("2d");
+    if (ctx) {
+      new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: Object.keys(salesByDay),
+          datasets: [
+            {
+              label: "Sales",
+              data: Object.values(salesByDay),
+              borderColor: chartStyles.palettes.gentleOcean[0],
+              backgroundColor: chartStyles.createGradient(
+                ctx,
+                chartStyles.palettes.gentleOcean[0]
+              ),
+              tension: 0.3,
+              fill: true,
+            },
+          ],
+        },
+        options: commonChartOptions(true),
+      });
+    }
+  }
+
+  function openAdminEditStaffModal(staffId) {
+    const member = firestoreData.staff.find((m) => m.id === staffId);
+    if (!member) return showToast("Staff member not found.", "error");
+
+    const content = `
+                    <form id="edit-staff-form" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div><label class="block text-sm font-medium mb-1">Full Name</label><input type="text" name="name" value="${
+                              member.name || ""
+                            }" class="form-input w-full"></div>
+                            <div><label class="block text-sm font-medium mb-1">Date of Birth</label><input type="date" name="dob" value="${
+                              member.dob || ""
+                            }" class="form-input w-full"></div>
+                        </div>
+                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div><label class="block text-sm font-medium mb-1">Email</label><input type="email" value="${
+                              member.email
+                            }" class="form-input w-full bg-bg-tertiary" readonly></div>
+                            <div><label class="block text-sm font-medium mb-1">Phone</label><input type="tel" name="phone" value="${
+                              member.phone || ""
+                            }" class="form-input w-full"></div>
+                        </div>
+                        <div><label class="block text-sm font-medium mb-1">Address</label><input type="text" name="address" value="${
+                          member.address || ""
+                        }" class="form-input w-full"></div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-border-color pt-4">
+                            <div><label class="block text-sm font-medium mb-1">Emergency Contact Name</label><input type="text" name="emergencyContactName" value="${
+                              member.emergencyContactName || ""
+                            }" class="form-input w-full"></div>
+                            <div><label class="block text-sm font-medium mb-1">Emergency Contact Phone</label><input type="tel" name="emergencyContactPhone" value="${
+                              member.emergencyContactPhone || ""
+                            }" class="form-input w-full"></div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-border-color pt-4">
+                            <div><label class="block text-sm font-medium mb-1">Role</label>
+                                <select name="role" class="form-select w-full" ${
+                                  member.role === "admin" ? "disabled" : ""
+                                }>
+                                    <option value="cashier" ${
+                                      member.role === "cashier"
+                                        ? "selected"
+                                        : ""
+                                    }>Cashier</option>
+                                    <option value="manager" ${
+                                      member.role === "manager"
+                                        ? "selected"
+                                        : ""
+                                    }>Manager</option>
+                                </select>
+                            </div>
+                            <div><label class="block text-sm font-medium mb-1">Account Status</label>
+                                <select name="status" class="form-select w-full">
+                                    <option value="active" ${
+                                      member.status === "active" ||
+                                      !member.status
+                                        ? "selected"
+                                        : ""
+                                    }>Active</option>
+                                    <option value="inactive" ${
+                                      member.status === "inactive"
+                                        ? "selected"
+                                        : ""
+                                    }>Inactive</option>
+                                    <option value="pending" ${
+                                      member.status === "pending"
+                                        ? "selected"
+                                        : ""
+                                    }>Pending</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>`;
+    const footer = `<button data-action="close-modal" class="btn btn-secondary">Cancel</button><button type="submit" form="edit-staff-form" class="btn btn-primary">Save Changes</button>`;
+    const modal = showModal("Edit Staff Member", content, footer, {
+      size: "max-w-3xl",
+    });
+
+    modal
+      .querySelector("#edit-staff-form")
+      .addEventListener("submit", async (ev) => {
+        ev.preventDefault();
+        const formData = new FormData(ev.target);
+        try {
+          await updateDoc(doc(staffRef, staffId), {
+            name: formData.get("name"),
+            dob: formData.get("dob"),
+            phone: formData.get("phone"),
+            address: formData.get("address"),
+            emergencyContactName: formData.get("emergencyContactName"),
+            emergencyContactPhone: formData.get("emergencyContactPhone"),
+            role: formData.get("role"),
+            status: formData.get("status"),
+          });
+          showToast(`${member.name}'s profile updated.`, "success");
+          closeModal(modal);
+        } catch (error) {
+          console.error("Error updating staff profile:", error);
+          showToast(`Error: ${error.message}`, "error");
+        }
+      });
+  }
+
+  function openManagerEditStaffModal(staffId) {
+    const member = firestoreData.staff.find((m) => m.id === staffId);
+    if (!member) return showToast("Staff member not found.", "error");
+
+    const content = `
+                    <form id="edit-staff-form-manager" class="space-y-4">
+                         <p class="text-sm text-text-secondary">As a manager, you can update a cashier's contact and emergency information.</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div><label class="block text-sm font-medium mb-1">Full Name</label><input type="text" name="name" value="${
+                              member.name || ""
+                            }" class="form-input w-full"></div>
+                             <div><label class="block text-sm font-medium mb-1">Phone</label><input type="tel" name="phone" value="${
+                               member.phone || ""
+                             }" class="form-input w-full"></div>
+                        </div>
+                        <div><label class="block text-sm font-medium mb-1">Address</label><input type="text" name="address" value="${
+                          member.address || ""
+                        }" class="form-input w-full"></div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-border-color pt-4">
+                            <div><label class="block text-sm font-medium mb-1">Emergency Contact Name</label><input type="text" name="emergencyContactName" value="${
+                              member.emergencyContactName || ""
+                            }" class="form-input w-full"></div>
+                            <div><label class="block text-sm font-medium mb-1">Emergency Contact Phone</label><input type="tel" name="emergencyContactPhone" value="${
+                              member.emergencyContactPhone || ""
+                            }" class="form-input w-full"></div>
+                        </div>
+                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-border-color pt-4">
+                            <div><label class="block text-sm font-medium mb-1">Email</label><input type="email" value="${
+                              member.email
+                            }" class="form-input w-full bg-bg-tertiary" readonly></div>
+                            <div><label class="block text-sm font-medium mb-1">Role</label><input type="text" value="${
+                              member.role
+                            }" class="form-input w-full bg-bg-tertiary" readonly></div>
+                         </div>
+                    </form>`;
+    const footer = `<button data-action="close-modal" class="btn btn-secondary">Cancel</button><button type="submit" form="edit-staff-form-manager" class="btn btn-primary">Save Changes</button>`;
+    const modal = showModal("Edit Cashier Details", content, footer, {
+      size: "max-w-2xl",
+    });
+
+    modal
+      .querySelector("#edit-staff-form-manager")
+      .addEventListener("submit", async (ev) => {
+        ev.preventDefault();
+        const formData = new FormData(ev.target);
+        try {
+          await updateDoc(doc(staffRef, staffId), {
+            name: formData.get("name"),
+            phone: formData.get("phone"),
+            address: formData.get("address"),
+            emergencyContactName: formData.get("emergencyContactName"),
+            emergencyContactPhone: formData.get("emergencyContactPhone"),
+          });
+          showToast(
+            `${formData.get("name")}'s details have been updated.`,
+            "success"
+          );
+          closeModal(modal);
+        } catch (error) {
+          console.error("Error updating staff name:", error);
+          showToast(`Error: ${error.message}`, "error");
+        }
+      });
+  }
+
+  async function openAdminEditStaffModal(staffId) {
+    const member = firestoreData.staff.find((m) => m.id === staffId);
+    if (!member) return showToast("Staff member not found.", "error");
+
+    let userStores = [];
+    let userProfileError = null;
+    try {
+      const userProfileRef = doc(usersRef, staffId);
+      const userProfileSnap = await getDoc(userProfileRef);
+      if (userProfileSnap.exists()) {
+        userStores = userProfileSnap.data().stores || [];
+      } else {
+        console.warn(
+          `User profile for staff ${staffId} not found in 'users' collection.`
+        );
+        userStores = [
+          { id: appState.session.storeId, name: firestoreData.storeInfo.name },
+        ];
+      }
+    } catch (error) {
+      console.error(
+        "Failed to fetch user profile for store access list:",
+        error
+      );
+      userProfileError = "Could not load store access list.";
+    }
+
+    let storeAccessHTML = "";
+    if (member.role === "manager") {
+      storeAccessHTML = `
+                        <div class="border-t border-border-color pt-4 mt-4">
+                            <h4 class="text-base font-semibold text-text-primary mb-2">Store Access</h4>
+                            ${
+                              userProfileError
+                                ? `<p class="text-sm text-red-400">${userProfileError}</p>`
+                                : `
+                            <div class="space-y-2 max-h-40 overflow-y-auto pr-2">
+                                ${userStores
+                                  .map(
+                                    (store) => `
+                                    <div class="flex items-center gap-2 p-2 bg-bg-tertiary rounded-md text-sm">
+                                        <i data-lucide="store" class="w-4 h-4 text-text-secondary"></i>
+                                        <span class="text-text-primary font-medium">${store.name}</span>
+                                        <span class="text-xs text-text-secondary font-mono ml-auto">ID: ${store.id}</span>
+                                    </div>
+                                `
+                                  )
+                                  .join("")}
+                            </div>
+                             <div class="grid grid-cols-2 gap-2 mt-3">
+                                <button type="button" data-action="grant-store-access" data-id="${staffId}" class="btn btn-secondary w-full text-sm">
+                                    <i data-lucide="plus-circle" class="w-4 h-4 mr-2"></i>Grant Access
+                                </button>
+                                <button type="button" data-action="remove-store-access" data-id="${staffId}" class="btn btn-danger-secondary w-full text-sm">
+                                    <i data-lucide="minus-circle" class="w-4 h-4 mr-2"></i>Remove Access
+                                </button>
+                            </div>
+                            `
+                            }
+                        </div>
+                    `;
+    }
+
+    const content = `
+                    <form id="edit-staff-form" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div><label class="block text-sm font-medium mb-1">Full Name</label><input type="text" name="name" value="${
+                              member.name || ""
+                            }" class="form-input w-full"></div>
+                            <div><label class="block text-sm font-medium mb-1">Date of Birth</label><input type="date" name="dob" value="${
+                              member.dob || ""
+                            }" class="form-input w-full"></div>
+                        </div>
+                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div><label class="block text-sm font-medium mb-1">Email</label><input type="email" value="${
+                              member.email
+                            }" class="form-input w-full bg-bg-tertiary" readonly></div>
+                            <div><label class="block text-sm font-medium mb-1">Phone</label><input type="tel" name="phone" value="${
+                              member.phone || ""
+                            }" class="form-input w-full"></div>
+                        </div>
+                        <div><label class="block text-sm font-medium mb-1">Address</label><input type="text" name="address" value="${
+                          member.address || ""
+                        }" class="form-input w-full"></div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-border-color pt-4">
+                            <div><label class="block text-sm font-medium mb-1">Emergency Contact Name</label><input type="text" name="emergencyContactName" value="${
+                              member.emergencyContactName || ""
+                            }" class="form-input w-full"></div>
+                            <div><label class="block text-sm font-medium mb-1">Emergency Contact Phone</label><input type="tel" name="emergencyContactPhone" value="${
+                              member.emergencyContactPhone || ""
+                            }" class="form-input w-full"></div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-border-color pt-4">
+                            <div><label class="block text-sm font-medium mb-1">Role</label>
+                                <select name="role" class="form-select w-full" ${
+                                  member.role === "admin" ? "disabled" : ""
+                                }>
+                                    <option value="cashier" ${
+                                      member.role === "cashier"
+                                        ? "selected"
+                                        : ""
+                                    }>Cashier</option>
+                                    <option value="manager" ${
+                                      member.role === "manager"
+                                        ? "selected"
+                                        : ""
+                                    }>Manager</option>
+                                </select>
+                            </div>
+                            <div><label class="block text-sm font-medium mb-1">Account Status</label>
+                                <select name="status" class="form-select w-full">
+                                    <option value="active" ${
+                                      member.status === "active" ||
+                                      !member.status
+                                        ? "selected"
+                                        : ""
+                                    }>Active</option>
+                                    <option value="inactive" ${
+                                      member.status === "inactive"
+                                        ? "selected"
+                                        : ""
+                                    }>Inactive</option>
+                                    <option value="pending" ${
+                                      member.status === "pending"
+                                        ? "selected"
+                                        : ""
+                                    }>Pending</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                    ${storeAccessHTML}
+                    `;
+    const footer = `<button data-action="close-modal" class="btn btn-secondary">Cancel</button><button type="submit" form="edit-staff-form" class="btn btn-primary">Save Changes</button>`;
+    const modal = showModal("Edit Staff Member", content, footer, {
+      size: "max-w-3xl",
+    });
+    lucide.createIcons();
+
+    const grantAccessBtn = modal.querySelector(
+      '[data-action="grant-store-access"]'
+    );
+    if (grantAccessBtn) {
+      grantAccessBtn.addEventListener("click", () => {
+        closeModal(modal);
+        openGrantStoreAccessModal(staffId, member.name, userStores);
+      });
+    }
+    const removeAccessBtn = modal.querySelector(
+      '[data-action="remove-store-access"]'
+    );
+    if (removeAccessBtn) {
+      removeAccessBtn.addEventListener("click", () => {
+        closeModal(modal);
+        openRemoveStoreAccessModal(staffId, member.name, userStores);
+      });
+    }
+
+    modal
+      .querySelector("#edit-staff-form")
+      .addEventListener("submit", async (ev) => {
+        ev.preventDefault();
+        const formData = new FormData(ev.target);
+        const updates = {
+          name: formData.get("name"),
+          dob: formData.get("dob"),
+          phone: formData.get("phone"),
+          address: formData.get("address"),
+          emergencyContactName: formData.get("emergencyContactName"),
+          emergencyContactPhone: formData.get("emergencyContactPhone"),
+          role: formData.get("role") || member.role, // Preserve admin role if field is disabled
+          status: formData.get("status"),
+        };
+        try {
+          const isEditingSelfAsAdmin =
+            member.role === "admin" && staffId === auth.currentUser.uid;
+          const isEditingManager = member.role === "manager";
+
+          if (isEditingSelfAsAdmin) {
+            // Admins are global. Sync all changes, including status, across all stores.
+            console.log(
+              `[Profile Sync] Syncing admin profile for ${member.name} across all associated stores.`
+            );
+            const batch = writeBatch(db);
+            const userProfileRef = doc(usersRef, staffId);
+            const userProfileSnap = await getDoc(userProfileRef);
+
+            if (userProfileSnap.exists()) {
+              const userStores = userProfileSnap.data().stores || [];
+              userStores.forEach((store) => {
+                const storeStaffRef = doc(
+                  db,
+                  "stores",
+                  store.id,
+                  "staff",
+                  staffId
+                );
+                batch.update(storeStaffRef, updates);
+              });
+              await batch.commit();
+            } else {
+              console.warn(
+                `[Profile Sync] Could not find user profile for admin ${staffId}. Updating current store only.`
+              );
+              await updateDoc(doc(staffRef, staffId), updates);
+            }
+          } else if (isEditingManager) {
+            // Managers have global profile info but store-specific status.
+            console.log(
+              `[Profile Sync] Syncing manager profile for ${member.name}. Status is store-specific.`
+            );
+
+            // Separate the status from other profile updates.
+            const { status, ...globalUpdates } = updates;
+
+            const batch = writeBatch(db);
+            const userProfileRef = doc(usersRef, staffId);
+            const userProfileSnap = await getDoc(userProfileRef);
+
+            if (userProfileSnap.exists()) {
+              const userStores = userProfileSnap.data().stores || [];
+
+              // 1. Apply global profile updates to all stores the manager belongs to.
+              userStores.forEach((store) => {
+                const storeStaffRef = doc(
+                  db,
+                  "stores",
+                  store.id,
+                  "staff",
+                  staffId
+                );
+                batch.update(storeStaffRef, globalUpdates);
+              });
+
+              // 2. Apply the status update ONLY to the current store.
+              // The `staffRef` variable is already scoped to the current active store.
+              const currentStoreStaffRef = doc(staffRef, staffId);
+              batch.update(currentStoreStaffRef, { status: status });
+
+              await batch.commit();
+            } else {
+              console.warn(
+                `[Profile Sync] Could not find user profile for manager ${staffId}. Updating current store only.`
+              );
+              await updateDoc(doc(staffRef, staffId), updates); // Fallback to updating just the current store with all data.
+            }
+          } else {
+            // Logic for editing other staff members (e.g., cashiers), which is always store-specific.
+            await updateDoc(doc(staffRef, staffId), updates);
+          }
+
+          // If the logged-in user is editing their own profile, update the session state
+          if (
+            appState.session.currentUser &&
+            appState.session.currentUser.uid === staffId
+          ) {
+            appState.session.currentUser = {
+              ...appState.session.currentUser,
+              ...updates,
+            };
+            appState.session.userRole = updates.role; // Explicitly update the session role
+            updateUIPermissions();
+          }
+
+          showToast(`${member.name}'s profile updated.`, "success");
+          closeModal(modal);
+        } catch (error) {
+          console.error("Error updating staff profile:", error);
+          showToast(`Error: ${error.message}`, "error");
+        }
+      });
+  }
+
+  async function openGrantStoreAccessModal(staffId, staffName, userStores) {
+    const adminStores = appState.session.availableStores;
+    const currentStoreIds = userStores.map((s) => s.id);
+    const grantableStores = adminStores.filter(
+      (store) => !currentStoreIds.includes(store.id)
+    );
+
+    if (grantableStores.length === 0) {
+      showToast(`There are no other stores to grant access to.`, "info");
+      return;
+    }
+
+    const content = `
+                    <form id="grant-access-form" class="space-y-4">
+                        <p class="text-sm text-text-secondary">Select which store(s) you want to grant access to for <strong class="text-text-primary">${staffName}</strong>. They will be added as a 'Cashier' by default.</p>
+                        <div class="space-y-2 max-h-60 overflow-y-auto p-2 bg-bg-tertiary rounded-lg">
+                            ${grantableStores
+                              .map(
+                                (store) => `
+                                <label class="flex items-center p-2 rounded-md hover:bg-bg-secondary cursor-pointer">
+                                    <input type="checkbox" name="storeIds" value="${store.id}" class="form-checkbox h-4 w-4 rounded mr-3">
+                                    <div>
+                                        <p class="text-text-primary font-medium">${store.name}</p>
+                                        <p class="text-xs text-text-secondary font-mono">${store.id}</p>
+                                    </div>
+                                </label>
+                            `
+                              )
+                              .join("")}
+                        </div>
+                    </form>
+                `;
+    const footer = `<button data-action="close-modal" class="btn btn-secondary">Cancel</button><button type="submit" form="grant-access-form" class="btn btn-primary">Grant Access</button>`;
+    const modal = showModal(`Grant Store Access`, content, footer);
+
+    modal
+      .querySelector("#grant-access-form")
+      .addEventListener("submit", async (ev) => {
+        ev.preventDefault();
+        const formData = new FormData(ev.target);
+        const selectedStoreIds = formData.getAll("storeIds");
+
+        if (selectedStoreIds.length === 0) {
+          showToast("Please select at least one store.", "error");
+          return;
+        }
+
+        closeModal(modal);
+        showToast(
+          `Granting access to ${selectedStoreIds.length} store(s)...`,
+          "info"
+        );
+
+        try {
+          const member = firestoreData.staff.find((m) => m.id === staffId);
+          if (!member) throw new Error("Staff member data not found locally.");
+
+          const batch = writeBatch(db);
+
+          const userProfileRef = doc(usersRef, staffId);
+          const newStoresToAdd = grantableStores.filter((s) =>
+            selectedStoreIds.includes(s.id)
+          );
+          const userProfileUpdate = {
+            stores: [...userStores, ...newStoresToAdd],
+          };
+          batch.update(userProfileRef, userProfileUpdate);
+
+          newStoresToAdd.forEach((store) => {
+            const newStaffDocRef = doc(
+              db,
+              "stores",
+              store.id,
+              "staff",
+              staffId
+            );
+            // BUG FIX: The original code incorrectly set the role to 'cashier' and didn't copy all profile data.
+            // This corrected version copies the member's actual role and all their relevant personal details.
+            // Performance data like sales are store-specific and are correctly NOT copied.
+            batch.set(newStaffDocRef, {
+              name: member.name,
+              email: member.email,
+              role: member.role, // FIX: Use the member's existing role instead of hardcoding 'cashier'
+              status: "active",
+              joinDate: new Date().toISOString(),
+              // FIX: Add all other relevant profile fields from the original store profile
+              phone: member.phone || null,
+              address: member.address || null,
+              dob: member.dob || null,
+              emergencyContactName: member.emergencyContactName || null,
+              emergencyContactPhone: member.emergencyContactPhone || null,
+            });
+          });
+
+          await batch.commit();
+          showToast(
+            `${staffName} has been granted access to ${selectedStoreIds.length} new store(s).`,
+            "success"
+          );
+        } catch (error) {
+          console.error("Failed to grant store access:", error);
+          showToast("An error occurred while granting access.", "error");
+        }
+      });
+  }
+
+  async function openRemoveStoreAccessModal(staffId, staffName, userStores) {
+    if (userStores.length <= 1) {
+      showToast(
+        `${staffName} only has access to one store. To remove access, deactivate or delete their account.`,
+        "warning"
+      );
+      return;
+    }
+
+    const content = `
+                    <form id="remove-access-form" class="space-y-4">
+                        <p class="text-sm text-text-secondary">Select the store from which you want to remove access for <strong class="text-text-primary">${staffName}</strong>. This is a permanent action for that store.</p>
+                        <div class="space-y-2 max-h-60 overflow-y-auto p-2 bg-bg-tertiary rounded-lg">
+                            ${userStores
+                              .map(
+                                (store) => `
+                                <label class="flex items-center p-2 rounded-md hover:bg-bg-secondary cursor-pointer">
+                                    <input type="radio" name="storeId" value="${store.id}" class="form-radio h-4 w-4 mr-3 text-accent focus:ring-accent">
+                                    <div>
+                                        <p class="text-text-primary font-medium">${store.name}</p>
+                                        <p class="text-xs text-text-secondary font-mono">${store.id}</p>
+                                    </div>
+                                </label>
+                            `
+                              )
+                              .join("")}
+                        </div>
+                    </form>
+                `;
+    const footer = `<button data-action="close-modal" class="btn btn-secondary">Cancel</button><button type="submit" form="remove-access-form" class="btn btn-danger">Confirm Removal</button>`;
+    const modal = showModal("Remove Store Access", content, footer);
+
+    modal
+      .querySelector("#remove-access-form")
+      .addEventListener("submit", async (ev) => {
+        ev.preventDefault();
+        const formData = new FormData(ev.target);
+        const storeIdToRemove = formData.get("storeId");
+
+        if (!storeIdToRemove) {
+          showToast("Please select a store to remove.", "error");
+          return;
+        }
+
+        closeModal(modal);
+        showToast(`Removing access from store...`, "info");
+
+        try {
+          const batch = writeBatch(db);
+
+          // 1. Delete the staff document from the specified store
+          const staffDocToRemoveRef = doc(
+            db,
+            "stores",
+            storeIdToRemove,
+            "staff",
+            staffId
+          );
+          batch.delete(staffDocToRemoveRef);
+
+          // 2. Update the user's top-level profile to remove the store from their list
+          const userProfileRef = doc(usersRef, staffId);
+          const updatedStores = userStores.filter(
+            (s) => s.id !== storeIdToRemove
+          );
+          const userProfileUpdate = { stores: updatedStores };
+
+          // If the store being removed is their current store, switch them to another one.
+          const userProfileSnap = await getDoc(userProfileRef);
+          if (
+            userProfileSnap.exists() &&
+            userProfileSnap.data().currentStoreId === storeIdToRemove
+          ) {
+            userProfileUpdate.currentStoreId = updatedStores[0]?.id || null;
+          }
+          batch.update(userProfileRef, userProfileUpdate);
+
+          await batch.commit();
+          showToast(
+            `${staffName}'s access has been removed from the selected store.`,
+            "success"
+          );
+        } catch (error) {
+          console.error("Failed to remove store access:", error);
+          showToast("An error occurred while removing access.", "error");
+        }
+      });
+  }
+
+  window.addEventListener("keydown", (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+      e.preventDefault();
+      document.querySelector('[data-action="open-search"]').click();
+    }
+  });
+
+  window.addEventListener("resize", checkScreenSize);
+});
