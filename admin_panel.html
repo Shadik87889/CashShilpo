@@ -1,0 +1,2977 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Super Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg-primary: #0a0a0a;
+        --bg-secondary: #121212;
+        --bg-tertiary: #1a1a1a;
+        --sidebar-bg: #151515;
+        --header-bg: rgba(18, 18, 18, 0.6);
+        --border-color: rgba(255, 255, 255, 0.1);
+        --border-color-hover: rgba(255, 255, 255, 0.2);
+        --text-primary: #e5e7eb; /* gray-200 */
+        --text-secondary: #9ca3af; /* gray-400 */
+        --accent: #0077ff; /* Vibrant Blue */
+        --accent-hover: #3391ff;
+        --accent-glow: rgba(0, 119, 255, 0.3);
+        --accent-glow-strong: rgba(0, 119, 255, 0.5);
+        --danger: #ff4560;
+        --success: #00e396;
+        --warning: #feb019;
+      }
+
+      /* @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes slideInDown {
+        from {
+          opacity: 0;
+          transform: translateY(-100%);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes slideInLeft {
+        from {
+          opacity: 0;
+          transform: translateX(-100%);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+      @keyframes backgroundShine {
+        from {
+          background-position: 200% 0;
+        }
+        to {
+          background-position: -200% 0;
+        }
+      } */
+
+      body {
+        background-color: var(--bg-primary);
+        color: var(--text-primary);
+        font-family: "Inter", sans-serif;
+        overflow: hidden;
+      }
+
+      .animated-gradient-text {
+        background: linear-gradient(
+          90deg,
+          var(--text-secondary),
+          var(--text-primary),
+          var(--text-secondary)
+        );
+        background-size: 200% auto;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: backgroundShine 5s linear infinite;
+      }
+
+      .glass-pane {
+        background-color: rgba(26, 26, 26, 0.5);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid var(--border-color);
+        border-radius: 1rem;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      }
+
+      .glass-pane:hover {
+        border-color: var(--border-color-hover);
+        box-shadow: 0 0 40px rgba(0, 0, 0, 0.3);
+      }
+
+      .form-input,
+      .form-select,
+      .form-textarea {
+        background-color: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        color: var(--text-primary);
+        border-radius: 0.5rem;
+        transition: all 0.2s ease;
+        padding: 0.75rem 1rem;
+      }
+
+      .form-input:focus,
+      .form-select:focus,
+      .form-textarea:focus {
+        box-shadow: 0 0 0 3px var(--accent-glow);
+        border-color: var(--accent);
+        outline: none;
+        background-color: var(--bg-tertiary);
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid transparent;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+      }
+      .btn::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 300%;
+        height: 300%;
+        background: radial-gradient(
+          circle,
+          rgba(255, 255, 255, 0.2) 0%,
+          rgba(255, 255, 255, 0) 60%
+        );
+        transform: translate(-50%, -50%) scale(0);
+        transition: transform 0.5s ease;
+        border-radius: 50%;
+      }
+      .btn:hover::before {
+        transform: translate(-50%, -50%) scale(1);
+      }
+
+      .btn-primary {
+        background-color: var(--accent);
+        color: white;
+        border-color: var(--accent);
+        box-shadow: 0 0 25px var(--accent-glow);
+      }
+
+      .btn-primary:hover {
+        background-color: var(--accent-hover);
+      }
+      .btn-secondary {
+        background-color: var(--bg-tertiary);
+        color: var(--text-primary);
+        border-color: var(--border-color);
+      }
+      .btn-secondary:hover {
+        background-color: #2a2a2a;
+        border-color: var(--border-color-hover);
+      }
+
+      .table-pro {
+        width: 100%;
+        text-align: left;
+        border-collapse: separate;
+        border-spacing: 0;
+      }
+      .table-pro th {
+        padding: 1rem;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+        border-bottom: 1px solid var(--border-color);
+      }
+      .table-pro td {
+        padding: 1rem 1rem;
+        border-bottom: 1px solid var(--border-color);
+        transition: background-color 0.2s ease;
+      }
+      .table-pro tbody tr:last-child td {
+        border-bottom: none;
+      }
+      .table-pro tbody tr:hover td {
+        background-color: rgba(255, 255, 255, 0.03);
+      }
+      .table-pro tbody tr.user-row.expanded td {
+        background-color: rgba(26, 26, 26, 0.7);
+      }
+
+      .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: capitalize;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+      }
+      .status-badge::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+      }
+      .status-badge.trial {
+        background-color: rgba(254, 176, 25, 0.1);
+        color: var(--warning);
+      }
+      .status-badge.trial::before {
+        background-color: var(--warning);
+      }
+      .status-badge.active {
+        background-color: rgba(0, 227, 150, 0.1);
+        color: var(--success);
+      }
+      .status-badge.active::before {
+        background-color: var(--success);
+      }
+      .status-badge.expired,
+      .status-badge.disabled {
+        background-color: rgba(255, 69, 96, 0.1);
+        color: var(--danger);
+      }
+      .status-badge.expired::before,
+      .status-badge.disabled::before {
+        background-color: var(--danger);
+      }
+      .status-badge.unknown {
+        background-color: rgba(156, 163, 175, 0.1);
+        color: var(--text-secondary);
+      }
+      .status-badge.unknown::before {
+        background-color: var(--text-secondary);
+      }
+
+      .modal-overlay {
+        transition: opacity 0.2s ease-out;
+      }
+      .modal-content {
+        transition: opacity 0.2s ease-out,
+          transform 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+      }
+      .loader {
+        width: 48px;
+        height: 48px;
+        border: 5px solid var(--bg-tertiary);
+        border-bottom-color: var(--accent);
+        border-radius: 50%;
+        display: inline-block;
+        box-sizing: border-box;
+        animation: rotation 1s linear infinite;
+      }
+      @keyframes rotation {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: var(--bg-secondary);
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--border-color);
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--border-color-hover);
+      }
+
+      .toggle-switch-label {
+        display: inline-flex;
+        align-items: center;
+        cursor: pointer;
+      }
+      .toggle-switch-input {
+        display: none;
+      }
+      .toggle-switch-track {
+        width: 44px;
+        height: 24px;
+        background-color: var(--bg-tertiary);
+        border-radius: 9999px;
+        position: relative;
+        transition: background-color 0.2s ease;
+        border: 1px solid var(--border-color);
+      }
+      .toggle-switch-thumb {
+        content: "";
+        width: 20px;
+        height: 20px;
+        background-color: white;
+        border-radius: 50%;
+        position: absolute;
+        top: 1px;
+        left: 1px;
+        transition: transform 0.2s ease;
+      }
+      .toggle-switch-input:checked + .toggle-switch-track {
+        background-color: var(--accent);
+        border-color: var(--accent);
+      }
+      .toggle-switch-input:checked + .toggle-switch-track .toggle-switch-thumb {
+        transform: translateX(20px);
+      }
+
+      .stores-row.hidden {
+        display: none;
+      }
+      .user-row i[data-lucide="chevron-down"] {
+        transition: transform 0.2s ease-in-out;
+      }
+      .user-row.expanded i[data-lucide="chevron-down"] {
+        transform: rotate(180deg);
+      }
+
+      .ticket-row.hidden {
+        display: none;
+      }
+      .ticket-message-row.hidden {
+        display: none;
+      }
+
+      #workspace-content > div {
+        animation: fadeIn 0.5s ease-out;
+      }
+
+      .tooltip {
+        position: absolute;
+        left: 110%;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: var(--bg-tertiary);
+        color: var(--text-primary);
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.2s ease, visibility 0.2s ease;
+        pointer-events: none;
+        z-index: 10;
+        border: 1px solid var(--border-color);
+      }
+      [data-tooltip]:hover .tooltip {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      #app-sidebar.animated {
+        animation: slideInLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      #app-header.animated {
+        animation: slideInDown 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.2s;
+        animation-fill-mode: backwards;
+      }
+
+      #main-nav > a.active {
+        background-color: var(--accent);
+        color: white;
+      }
+
+      .toast {
+        animation: fadeIn 0.3s ease-out;
+        transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+        border: 1px solid;
+      }
+    </style>
+  </head>
+  <body class="antialiased">
+    <!-- Login Screen -->
+    <div
+      id="login-container"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-bg-primary bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(0,119,255,0.3),rgba(255,255,255,0))]"
+    >
+      <div class="w-full max-w-sm p-8 space-y-8 rounded-2xl glass-pane">
+        <div class="text-center">
+          <i
+            data-lucide="shield-half"
+            class="mx-auto h-16 w-16 text-accent"
+          ></i>
+          <h1 class="text-3xl font-bold text-white mt-4">Super Admin</h1>
+          <p class="animated-gradient-text">Control Panel Access</p>
+        </div>
+        <form id="login-form" class="space-y-6">
+          <div>
+            <label
+              for="email"
+              class="block text-sm font-medium text-text-secondary"
+              >Admin Email</label
+            >
+            <input
+              id="email"
+              name="email"
+              type="email"
+              autocomplete="email"
+              required
+              class="form-input w-full mt-1"
+              value="admin@cashshilpo.com"
+            />
+          </div>
+          <div>
+            <label
+              for="password"
+              class="block text-sm font-medium text-text-secondary"
+              >Password</label
+            >
+            <input
+              id="password"
+              name="password"
+              type="password"
+              required
+              class="form-input w-full mt-1"
+              value="superadmin123"
+            />
+          </div>
+          <p id="auth-error" class="text-red-400 text-sm hidden"></p>
+          <div>
+            <button type="submit" class="btn btn-primary w-full text-base py-3">
+              <i data-lucide="lock" class="w-4 h-4 mr-2"></i>
+              Secure Login
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div
+      id="loading-overlay"
+      class="fixed inset-0 z-[60] flex flex-col items-center justify-center bg-bg-primary/80 backdrop-blur-sm hidden"
+    >
+      <div class="loader"></div>
+      <p class="mt-4 text-text-secondary animated-gradient-text">
+        Connecting to mission control...
+      </p>
+    </div>
+
+    <!-- Main App Layout -->
+    <div id="app-container" class="hidden h-screen overflow-hidden">
+      <div class="flex h-full">
+        <!-- Floating Sidebar -->
+        <aside
+          id="app-sidebar"
+          class="h-full flex items-center justify-center p-4"
+        >
+          <div
+            class="flex flex-col items-center gap-2 h-full max-h-[95vh] w-20 py-6 bg-sidebar-bg border border-border-color rounded-2xl shadow-2xl shadow-black/30"
+          >
+            <a href="#" class="flex-shrink-0 mb-6">
+              <div
+                class="w-12 h-12 rounded-xl bg-gradient-to-br from-accent to-blue-700 flex items-center justify-center shadow-lg shadow-accent-glow"
+              >
+                <i data-lucide="shield-check" class="w-7 h-7 text-white"></i>
+              </div>
+            </a>
+            <nav
+              id="main-nav"
+              class="flex-grow w-full flex flex-col items-center space-y-2"
+            >
+              <a
+                href="#"
+                data-view="dashboard"
+                class="group relative flex items-center justify-center h-14 w-14 rounded-xl text-text-secondary hover:bg-bg-tertiary hover:text-white transition-all duration-200"
+                data-tooltip="Dashboard"
+              >
+                <i data-lucide="layout-dashboard" class="w-6 h-6"></i>
+                <div class="tooltip">Dashboard</div>
+              </a>
+              <a
+                href="#"
+                data-view="users"
+                class="group relative flex items-center justify-center h-14 w-14 rounded-xl text-text-secondary hover:bg-bg-tertiary hover:text-white transition-all duration-200"
+                data-tooltip="Users"
+              >
+                <i data-lucide="users" class="w-6 h-6"></i>
+                <div class="tooltip">User Management</div>
+              </a>
+              <a
+                href="#"
+                data-view="subscriptions"
+                class="group relative flex items-center justify-center h-14 w-14 rounded-xl text-text-secondary hover:bg-bg-tertiary hover:text-white transition-all duration-200"
+                data-tooltip="Subscriptions"
+              >
+                <i data-lucide="credit-card" class="w-6 h-6"></i>
+                <div class="tooltip">Subscriptions</div>
+              </a>
+              <a
+                href="#"
+                data-view="support_tickets"
+                class="group relative flex items-center justify-center h-14 w-14 rounded-xl text-text-secondary hover:bg-bg-tertiary hover:text-white transition-all duration-200"
+                data-tooltip="Support"
+              >
+                <i data-lucide="life-buoy" class="w-6 h-6"></i>
+                <div class="tooltip">Support Tickets</div>
+              </a>
+              <a
+                href="#"
+                data-view="audit_log"
+                class="group relative flex items-center justify-center h-14 w-14 rounded-xl text-text-secondary hover:bg-bg-tertiary hover:text-white transition-all duration-200"
+                data-tooltip="Audit Log"
+              >
+                <i data-lucide="history" class="w-6 h-6"></i>
+                <div class="tooltip">Audit Log</div>
+              </a>
+              <a
+                href="#"
+                data-view="settings"
+                class="group relative flex items-center justify-center h-14 w-14 rounded-xl text-text-secondary hover:bg-bg-tertiary hover:text-white transition-all duration-200"
+                data-tooltip="Settings"
+              >
+                <i data-lucide="sliders-horizontal" class="w-6 h-6"></i>
+                <div class="tooltip">System Settings</div>
+              </a>
+            </nav>
+            <div class="w-full flex flex-col items-center mt-auto space-y-2">
+              <div
+                data-action="logout"
+                class="group relative flex items-center justify-center h-14 w-14 rounded-xl text-text-secondary hover:bg-red-500/10 hover:text-red-400 transition-colors cursor-pointer"
+                data-tooltip="Sign Out"
+              >
+                <i data-lucide="log-out" class="w-6 h-6"></i>
+                <div class="tooltip">Sign Out</div>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+          <!-- Header -->
+          <header
+            id="app-header"
+            class="flex-shrink-0 h-20 px-8 flex items-center justify-between border-b border-border-color bg-header-bg backdrop-blur-xl"
+          >
+            <div class="flex items-center gap-4">
+              <h1 id="view-title" class="text-2xl font-bold">Dashboard</h1>
+            </div>
+            <div class="flex items-center gap-6">
+              <div class="relative w-72">
+                <i
+                  data-lucide="search"
+                  class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-secondary"
+                ></i>
+                <input
+                  type="text"
+                  id="global-search-input"
+                  placeholder="Search users, subscriptions..."
+                  class="form-input w-full pl-12 bg-bg-tertiary border-border-color focus:bg-bg-secondary"
+                />
+              </div>
+              <div class="flex items-center gap-4">
+                <button
+                  id="notification-bell"
+                  data-action="open-notifications"
+                  class="relative w-10 h-10 flex items-center justify-center rounded-full bg-bg-tertiary border border-border-color text-text-secondary hover:text-white hover:border-border-color-hover transition-colors"
+                >
+                  <i data-lucide="bell" class="w-5 h-5"></i>
+                  <div
+                    id="notification-badge"
+                    class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-danger border-2 border-sidebar-bg text-white text-xs flex items-center justify-center hidden"
+                  ></div>
+                </button>
+                <div class="text-right">
+                  <p
+                    id="current-time"
+                    class="font-semibold text-text-primary"
+                  ></p>
+                  <p id="current-date" class="text-xs text-text-secondary"></p>
+                </div>
+              </div>
+            </div>
+          </header>
+
+          <!-- Workspace -->
+          <main
+            id="workspace-content"
+            class="flex-1 overflow-y-auto p-8 lg:p-12"
+          >
+            <!-- Content will be injected here -->
+          </main>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modals & Toasts Containers -->
+    <div id="modals-container"></div>
+    <div
+      id="toasts-container"
+      class="fixed top-5 right-5 z-[100] space-y-2"
+    ></div>
+
+    <script type="module">
+      // --- FIREBASE SDK IMPORTS ---
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+      import {
+        getAuth,
+        signInWithEmailAndPassword,
+        signOut,
+        onAuthStateChanged,
+      } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+      import {
+        getFirestore,
+        doc,
+        getDoc,
+        setDoc,
+        updateDoc,
+        onSnapshot,
+        collection,
+        query,
+        writeBatch,
+        addDoc,
+        serverTimestamp,
+        where,
+        Timestamp,
+        orderBy,
+        limit,
+        deleteDoc,
+        getDocs, // <-- IMPORT getDocs
+      } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+      // --- SESSION START TIME ---
+      const sessionStartTime = new Date();
+
+      // --- FIREBASE CONFIG & INITIALIZATION ---
+      const firebaseConfig = {
+        apiKey: "AIzaSyCBhzyl_1KpaROyjDaXX7fyLv-gQRoOTY0",
+        authDomain: "cashshilpo.firebaseapp.com",
+        projectId: "cashshilpo",
+        storageBucket: "cashshilpo.firebasestorage.app",
+        messagingSenderId: "544846655087",
+        appId: "1:544846655087:web:0269ce6564c6b42c62a79a",
+        measurementId: "G-GT06B6K2T6",
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
+
+      // --- APPLICATION STATE ---
+      let appState = {
+        activeView: "dashboard",
+        settings: {
+          defaultTrialDays: 7,
+          featureFlags: {},
+        },
+        viewStates: {
+          users: { currentPage: 1, searchQuery: "", filter: "all" },
+          audit_log: { currentPage: 1, filter: "all" },
+          subscriptions: { currentPage: 1, filter: "pending" },
+          support_tickets: { currentPage: 1, filter: "open" },
+        },
+        itemsPerPage: 10,
+      };
+
+      let firestoreData = {
+        stores: [],
+        users: [],
+        auditLog: [],
+        subscriptionRequests: [],
+        supportTickets: [],
+        notifications: [],
+      };
+
+      let activeListeners = [];
+      let chartInstances = {};
+      let clockInterval;
+      let processedNotificationIds = new Set(); // Track processed doc IDs to prevent duplicates
+      // This variable is no longer used and will be replaced by logic inside the listener.
+
+      // --- NEW: Comprehensive Plan Details (Fallback) ---
+      // This object provides a complete fallback for all plan details.
+      // The "approve" logic will first try to use limits from the request object,
+      // but will use this if the request object is missing them.
+      const YEARLY_DISCOUNT_PERCENT = 20;
+      const LOCAL_PLANS_DETAILS = {
+        basic_monthly: {
+          id: "basic_monthly",
+          name: "Basic (Monthly Plan)",
+          price: 1499,
+          duration: "monthly",
+          limits: { stores: 1, products: 1000, staff: 5, ai: "none" },
+        },
+        basic_yearly: {
+          id: "basic_yearly",
+          name: "Basic (Yearly Plan)",
+          price: Math.round(1499 * 12 * (1 - YEARLY_DISCOUNT_PERCENT / 100)),
+          duration: "yearly",
+          limits: { stores: 1, products: 1000, staff: 5, ai: "none" },
+        },
+        standard_monthly: {
+          id: "standard_monthly",
+          name: "Standard (Monthly Plan)",
+          price: 2999,
+          duration: "monthly",
+          limits: { stores: 3, products: 10000, staff: 20, ai: "basic" },
+        },
+        standard_yearly: {
+          id: "standard_yearly",
+          name: "Standard (Yearly Plan)",
+          price: Math.round(2999 * 12 * (1 - YEARLY_DISCOUNT_PERCENT / 100)),
+          duration: "yearly",
+          limits: { stores: 3, products: 10000, staff: 20, ai: "basic" },
+        },
+        premium_monthly: {
+          id: "premium_monthly",
+          name: "Premium (Monthly Plan)",
+          price: 5999,
+          duration: "monthly",
+          limits: { stores: 10, products: 50000, staff: 50, ai: "advanced" },
+        },
+        premium_yearly: {
+          id: "premium_yearly",
+          name: "Premium (Yearly Plan)",
+          price: Math.round(5999 * 12 * (1 - YEARLY_DISCOUNT_PERCENT / 100)),
+          duration: "yearly",
+          limits: { stores: 10, products: 50000, staff: 50, ai: "advanced" },
+        },
+      };
+      // --- END NEW ---
+
+      // --- NEW: Flags to prevent notification creation on initial data load ---
+      let isInitialDataLoaded = {
+        users: false,
+        subscriptions: false,
+        tickets: false,
+      };
+
+      // --- NEW/UPDATED UI UTILITIES (from Canvas code) ---
+      const playNotificationSound = () => {
+        const audioContext = new (window.AudioContext ||
+          window.webkitAudioContext)();
+        if (!audioContext) return;
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+        gainNode.gain.linearRampToValueAtTime(
+          0.3,
+          audioContext.currentTime + 0.01
+        );
+        oscillator.type = "sine";
+        oscillator.frequency.setValueAtTime(880, audioContext.currentTime);
+        oscillator.start(audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(
+          0.00001,
+          audioContext.currentTime + 0.15
+        );
+        oscillator.stop(audioContext.currentTime + 0.15);
+      };
+
+      const showToast = (message, type = "success") => {
+        const toastsContainer = document.getElementById("toasts-container");
+        if (!toastsContainer) return;
+        const toastStyles = {
+          success: {
+            bg: "bg-green-500/10 border-green-500/50",
+            icon: "check-circle",
+            iconColor: "text-green-400",
+          },
+          error: {
+            bg: "bg-red-500/10 border-red-500/50",
+            icon: "alert-circle",
+            iconColor: "text-red-400",
+          },
+          info: {
+            bg: "bg-blue-500/10 border-blue-500/50",
+            icon: "info",
+            iconColor: "text-blue-400",
+          },
+          warning: {
+            bg: "bg-yellow-500/10 border-yellow-500/50",
+            icon: "alert-triangle",
+            iconColor: "text-yellow-400",
+          },
+        };
+        const style = toastStyles[type] || toastStyles.info;
+        const toast = document.createElement("div");
+        toast.className = `toast glass-pane flex items-center gap-4 text-text-primary text-sm font-medium px-4 py-3 rounded-xl shadow-lg ${style.bg}`;
+        toast.innerHTML = `<i data-lucide="${style.icon}" class="w-6 h-6 ${style.iconColor}"></i><p class="flex-1">${message}</p>`;
+        toastsContainer.prepend(toast);
+        lucide.createIcons();
+        setTimeout(() => {
+          toast.style.transform = "translateX(100%)";
+          toast.style.opacity = "0";
+          setTimeout(() => toast.remove(), 300);
+        }, 5000);
+      };
+
+      const showModal = (title, content, footer, options = {}) => {
+        const modalsContainer = document.getElementById("modals-container");
+        const { size = "max-w-xl", customClasses = "" } = options;
+        const modalId = `modal-${Date.now()}`;
+        const modalHTML = `
+                <div id="${modalId}" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm opacity-0">
+                    <div class="modal-content glass-pane rounded-xl shadow-2xl w-full ${size} ${customClasses} scale-95 transform">
+                        <div class="flex justify-between items-center p-5 border-b border-border-color">
+                            <h3 class="text-xl font-semibold text-text-primary">${title}</h3>
+                            <button data-action="close-modal" class="p-1 rounded-full text-text-secondary hover:bg-bg-tertiary hover:text-white">
+                                <i data-lucide="x" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                        <div class="p-6 text-text-secondary max-h-[70vh] overflow-y-auto">${content}</div>
+                        ${
+                          footer
+                            ? `<div class="flex justify-end items-center p-4 bg-bg-secondary/50 rounded-b-xl space-x-3">${footer}</div>`
+                            : ""
+                        }
+                    </div>
+                </div>`;
+        modalsContainer.insertAdjacentHTML("beforeend", modalHTML);
+        if (typeof lucide !== "undefined") lucide.createIcons();
+        const modalEl = document.getElementById(modalId);
+        setTimeout(() => {
+          modalEl.classList.remove("opacity-0");
+          modalEl.querySelector(".modal-content").classList.remove("scale-95");
+        }, 10);
+        return modalEl;
+      };
+
+      const closeModal = (modalEl) => {
+        if (!modalEl) return;
+        modalEl.classList.add("opacity-0");
+        modalEl.querySelector(".modal-content").classList.add("scale-95");
+        setTimeout(() => modalEl.remove(), 200);
+      };
+
+      // --- EXISTING UTILITIES (Unchanged) ---
+      const renderPaginationControls = (
+        container,
+        totalItems,
+        currentPage,
+        itemsPerPage,
+        viewType
+      ) => {
+        const totalPages = Math.ceil(totalItems / itemsPerPage);
+        if (totalPages <= 1) {
+          container.innerHTML = "";
+          return;
+        }
+        const startItem = (currentPage - 1) * itemsPerPage + 1;
+        const endItem = Math.min(startItem + itemsPerPage - 1, totalItems);
+        let paginationHTML = `<div class="flex items-center justify-between text-sm text-text-secondary">
+                <div>Showing <span class="font-medium text-text-primary">${startItem}</span> to <span class="font-medium text-text-primary">${endItem}</span> of <span class="font-medium text-text-primary">${totalItems}</span> results</div>
+                <div class="flex items-center gap-2">
+                    <button data-action="paginate" data-view-type="${viewType}" data-page="${
+          currentPage - 1
+        }" class="px-2 py-1 border border-border-color rounded-md disabled:opacity-50 disabled:cursor-not-allowed" ${
+          currentPage === 1 ? "disabled" : ""
+        }><i data-lucide="chevron-left" class="w-5 h-5"></i></button>
+                    <span class="px-2">Page ${currentPage} of ${totalPages}</span>
+                    <button data-action="paginate" data-view-type="${viewType}" data-page="${
+          currentPage + 1
+        }" class="px-2 py-1 border border-border-color rounded-md disabled:opacity-50 disabled:cursor-not-allowed" ${
+          currentPage === totalPages ? "disabled" : ""
+        }><i data-lucide="chevron-right" class="w-5 h-5"></i></button>
+                </div></div>`;
+        container.innerHTML = paginationHTML;
+        if (typeof lucide !== "undefined") lucide.createIcons();
+      };
+      const destroyCharts = () => {
+        Object.values(chartInstances).forEach((chart) => chart.destroy());
+        chartInstances = {};
+      };
+      const updateClock = () => {
+        const now = new Date();
+        const optionsTime = {
+          timeZone: "Asia/Dhaka",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: true,
+        };
+        const optionsDate = {
+          timeZone: "Asia/Dhaka",
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        };
+        const timeEl = document.getElementById("current-time");
+        const dateEl = document.getElementById("current-date");
+        if (timeEl)
+          timeEl.textContent = now.toLocaleTimeString("en-US", optionsTime);
+        if (dateEl)
+          dateEl.textContent = now.toLocaleDateString("en-US", optionsDate);
+      };
+      const formatTimeAgo = (date) => {
+        if (!date) return "";
+        const seconds = Math.floor((new Date() - date) / 1000);
+        let interval = seconds / 31536000;
+        if (interval > 1) return Math.floor(interval) + " years ago";
+        interval = seconds / 2592000;
+        if (interval > 1) return Math.floor(interval) + " months ago";
+        interval = seconds / 86400;
+        if (interval > 1) return Math.floor(interval) + " days ago";
+        interval = seconds / 3600;
+        if (interval > 1) return Math.floor(interval) + " hours ago";
+        interval = seconds / 60;
+        if (interval > 1) return Math.floor(interval) + " minutes ago";
+        return Math.floor(seconds) + " seconds ago";
+      };
+
+      // --- REWRITTEN NOTIFICATION SYSTEM ---
+      async function openNotificationsModal() {
+        const notifications = firestoreData.notifications;
+
+        const content = `
+                <div class="max-h-[60vh] overflow-y-auto -mx-6">
+                    <div class="divide-y divide-border-color">
+                        ${
+                          notifications.length > 0
+                            ? notifications
+                                .map((n) => {
+                                  const icons = {
+                                    "user-plus": "user-plus",
+                                    "credit-card": "credit-card",
+                                    "life-buoy": "life-buoy",
+                                    info: "info",
+                                    warning: "alert-triangle",
+                                    success: "check-circle",
+                                    store: "store", // <-- ADDED
+                                    "user-check": "user-check", // <-- ADDED
+                                  };
+                                  const icon = icons[n.icon] || "bell";
+                                  const isUnread = !n.read;
+                                  return `
+                                <div class="notification-item flex items-start gap-4 py-4 px-6 ${
+                                  isUnread ? "bg-blue-500/10" : "opacity-60"
+                                } hover:opacity-100 hover:bg-bg-secondary transition-all duration-200">
+                                    <div class="w-8 h-8 rounded-full flex items-center justify-center bg-accent/10 text-accent shrink-0 mt-1">
+                                        <i data-lucide="${icon}" class="w-5 h-5"></i>
+                                    </div>
+                                    <div class="flex-grow">
+                                        <p class="text-sm text-text-primary">${n.message.replace(
+                                          /<strong>/g,
+                                          '<strong class="font-semibold text-white">'
+                                        )}</p>
+                                        <p class="text-xs text-text-secondary mt-1">${formatTimeAgo(
+                                          n.timestamp?.toDate()
+                                        )}</p>
+                                    </div>
+                                    ${
+                                      isUnread
+                                        ? '<div class="w-2.5 h-2.5 bg-blue-400 rounded-full ml-2 self-center shrink-0"></div>'
+                                        : ""
+                                    }
+                                </div>
+                                `;
+                                })
+                                .join("")
+                            : `<p class="text-center text-text-secondary py-8 px-6">You have no notifications.</p>`
+                        }
+                    </div>
+                </div>
+            `;
+
+        const footer =
+          notifications.length > 0
+            ? `<button data-action="clear-all-notifications" class="btn btn-secondary text-sm">Clear All</button>`
+            : "";
+
+        const modal = showModal("Notifications", content, footer, {
+          size: "max-w-lg",
+        });
+        if (!modal) return;
+
+        lucide.createIcons();
+
+        // Mark as read when the modal is closed
+        modal
+          .querySelector('button[data-action="close-modal"]')
+          .addEventListener("click", async () => {
+            const unreadNotifications = firestoreData.notifications.filter(
+              (n) => !n.read
+            );
+            if (unreadNotifications.length > 0) {
+              try {
+                const batch = writeBatch(db);
+                unreadNotifications.forEach((n) => {
+                  const notifRef = doc(db, "global_notifications", n.id);
+                  batch.update(notifRef, { read: true });
+                });
+                await batch.commit();
+              } catch (error) {
+                console.error("Error marking notifications as read:", error);
+              }
+            }
+          });
+
+        const clearAllBtn = modal.querySelector(
+          '[data-action="clear-all-notifications"]'
+        );
+        if (clearAllBtn) {
+          clearAllBtn.addEventListener("click", async () => {
+            const confirmModal = showModal(
+              "Confirm Clear",
+              "Are you sure you want to delete all notifications?",
+              `<button data-action="close-modal" class="btn btn-secondary">Cancel</button><button id="confirm-clear" class="btn btn-danger">Yes, Clear All</button>`
+            );
+
+            confirmModal
+              .querySelector("#confirm-clear")
+              .addEventListener("click", async () => {
+                clearAllBtn.disabled = true;
+                clearAllBtn.textContent = "Clearing...";
+                try {
+                  const batch = writeBatch(db);
+                  firestoreData.notifications.forEach((n) => {
+                    const notifRef = doc(db, "global_notifications", n.id);
+                    batch.delete(notifRef);
+                  });
+                  await batch.commit();
+                  showToast("All notifications cleared.", "success");
+                  closeModal(confirmModal);
+                  closeModal(modal);
+                } catch (error) {
+                  console.error("Error clearing notifications:", error);
+                  showToast("Could not clear notifications.", "error");
+                  clearAllBtn.disabled = false;
+                  clearAllBtn.textContent = "Clear All";
+                }
+              });
+          });
+        }
+      }
+
+      const updateNotificationBadge = () => {
+        const badge = document.getElementById("notification-badge");
+        const unreadCount = firestoreData.notifications.filter((n) => !n.read)
+          .length;
+
+        if (unreadCount > 0) {
+          badge.textContent = unreadCount;
+          badge.classList.remove("hidden");
+        } else {
+          badge.classList.add("hidden");
+        }
+      };
+
+      // --- VIEW RENDERERS ---
+      // --- Copying full implementations of render functions ---
+      function renderDashboardView() {
+        destroyCharts();
+        const container = document.getElementById("workspace-content");
+
+        const now = new Date();
+        const users = firestoreData.users;
+
+        const totalUsers = users.length;
+        const onTrial = users.filter(
+          (u) =>
+            u.subscription?.status === "trial" &&
+            u.subscription.trialEndsAt.toDate() > now
+        ).length;
+        const activeSubs = users.filter(
+          (u) => u.subscription?.status === "active"
+        ).length;
+        const expired = users.filter(
+          (u) =>
+            u.subscription?.status === "expired" ||
+            (u.subscription?.status === "trial" &&
+              u.subscription.trialEndsAt.toDate() < now)
+        ).length;
+
+        const signupsByMonth = users.reduce((acc, user) => {
+          if (!user.createdAt) return acc;
+          const month = new Date(
+            user.createdAt.toDate()
+          ).toLocaleString("default", { month: "short", year: "2-digit" });
+          acc[month] = (acc[month] || 0) + 1;
+          return acc;
+        }, {});
+
+        const pendingSubs = firestoreData.subscriptionRequests.filter(
+          (req) => req.status === "pending"
+        ).length;
+        const openTickets = firestoreData.supportTickets.filter(
+          (t) => t.status === "open"
+        ).length;
+
+        container.innerHTML = `
+                <div class="space-y-8">
+                    <!-- KPIs -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="glass-pane p-6 rounded-xl"><div class="flex items-center gap-4"><i data-lucide="users" class="w-8 h-8 text-accent"></i><div><p class="text-sm text-text-secondary">Total Users</p><p class="text-3xl font-bold">${totalUsers}</p></div></div></div>
+                        <div class="glass-pane p-6 rounded-xl"><div class="flex items-center gap-4"><i data-lucide="shield-check" class="w-8 h-8 text-success"></i><div><p class="text-sm text-text-secondary">Active Subscriptions</p><p class="text-3xl font-bold">${activeSubs}</p></div></div></div>
+                        <div class="glass-pane p-6 rounded-xl"><div class="flex items-center gap-4"><i data-lucide="clock" class="w-8 h-8 text-warning"></i><div><p class="text-sm text-text-secondary">Users on Trial</p><p class="text-3xl font-bold">${onTrial}</p></div></div></div>
+                        <div class="glass-pane p-6 rounded-xl"><div class="flex items-center gap-4"><i data-lucide="shield-off" class="w-8 h-8 text-danger"></i><div><p class="text-sm text-text-secondary">Expired / Action Required</p><p class="text-3xl font-bold">${expired}</p></div></div></div>
+                    </div>
+                    <!-- Charts & Lists -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="lg:col-span-2 glass-pane p-6 rounded-xl h-96 flex flex-col">
+                            <h3 class="text-xl font-semibold mb-4">User Signups Over Time</h3>
+                            <div class="flex-grow"><canvas id="signups-chart"></canvas></div>
+                        </div>
+                        <div class="glass-pane p-6 rounded-xl">
+                            <h3 class="text-xl font-semibold mb-4">Pending Requests</h3>
+                            <div class="space-y-4">
+                                <a href="#" data-action="quick-nav" data-view="subscriptions" class="flex justify-between items-center p-4 bg-bg-tertiary/70 rounded-lg hover:bg-border-color transition-colors">
+                                    <div><p class="font-semibold text-text-primary">Subscription Renewals</p><p class="text-xs text-text-secondary">Users waiting for verification.</p></div>
+                                    <div id="pending-subs-count" class="w-8 h-8 rounded-full bg-accent text-white flex items-center justify-center font-bold text-sm">${pendingSubs}</div>
+                                </a>
+                                 <a href="#" data-action="quick-nav" data-view="support_tickets" class="flex justify-between items-center p-4 bg-bg-tertiary/70 rounded-lg hover:bg-border-color transition-colors">
+                                    <div><p class="font-semibold text-text-primary">Support Tickets</p><p class="text-xs text-text-secondary">Users requiring assistance.</p></div>
+                                    <div id="open-tickets-count" class="w-8 h-8 rounded-full bg-warning text-black flex items-center justify-center font-bold text-sm">${openTickets}</div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        if (typeof lucide !== "undefined") lucide.createIcons();
+
+        const chartCtx = document
+          .getElementById("signups-chart")
+          .getContext("2d");
+        const gradient = chartCtx.createLinearGradient(0, 0, 0, 300);
+        gradient.addColorStop(0, "rgba(0, 119, 255, 0.4)");
+        gradient.addColorStop(1, "rgba(0, 119, 255, 0)");
+
+        chartInstances.signups = new Chart(chartCtx, {
+          type: "line",
+          data: {
+            labels: Object.keys(signupsByMonth),
+            datasets: [
+              {
+                label: "New Users",
+                data: Object.values(signupsByMonth),
+                borderColor: "var(--accent)",
+                backgroundColor: gradient,
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: "var(--accent)",
+                pointBorderColor: "var(--bg-primary)",
+                pointHoverBackgroundColor: "#fff",
+                pointHoverBorderColor: "var(--accent)",
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: {
+                beginAtZero: true,
+                grid: { color: "rgba(255,255,255,0.05)" },
+                ticks: { color: "var(--text-secondary)" },
+                border: { dash: [4, 4] },
+              },
+              x: {
+                grid: { display: false },
+                ticks: { color: "var(--text-secondary)" },
+              },
+            },
+            plugins: { legend: { display: false } },
+          },
+        });
+      }
+
+      // --- *** UPDATED: renderUsersView *** ---
+      function renderUsersView() {
+        destroyCharts();
+        const container = document.getElementById("workspace-content");
+        const viewState = appState.viewStates.users;
+
+        container.innerHTML = `
+                <div class="space-y-6">
+                    <div class="glass-pane p-4 rounded-xl flex items-center gap-4">
+                        <div class="relative flex-grow">
+                             <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-text-secondary"></i>
+                             <input type="text" id="user-search" placeholder="Search by Owner Name, UID, or Store Name..." class="form-input w-full pl-10" value="${viewState.searchQuery}">
+                        </div>
+                        <select id="user-filter" class="form-select w-64">
+                            <option value="all">All Statuses</option>
+                            <option value="trial">On Trial</option>
+                            <option value="active">Active</option>
+                            <option value="expired">Expired</option>
+                            <option value="disabled">Disabled</option>
+                        </select>
+                    </div>
+                    <div class="glass-pane rounded-xl overflow-hidden">
+                        <table class="table-pro">
+                            <thead><tr><th class="w-12"></th><th>Store Owner (Admin)</th><th>Store Usage</th><th>Subscription Status</th><th>Actions</th></tr></thead>
+                            <tbody id="users-table-body"></tbody>
+                        </table>
+                    </div>
+                    <div id="users-pagination"></div>
+                </div>
+            `;
+        container.querySelector("#user-filter").value = viewState.filter;
+
+        const renderTable = () => {
+          const storesByUser = firestoreData.stores.reduce((acc, store) => {
+            const ownerId = store.ownerUid;
+            if (!acc[ownerId]) acc[ownerId] = [];
+            acc[ownerId].push(store);
+            return acc;
+          }, {});
+
+          const storeOwnerIds = new Set(
+            firestoreData.stores.map((store) => store.ownerUid)
+          );
+
+          let usersToShow = firestoreData.users.filter((user) =>
+            storeOwnerIds.has(user.id)
+          );
+
+          let filteredUsers = [...usersToShow];
+
+          if (viewState.searchQuery) {
+            const query = viewState.searchQuery.toLowerCase();
+            filteredUsers = filteredUsers.filter((user) => {
+              const userStores = storesByUser[user.id] || [];
+              const userName = user?.displayName?.toLowerCase() || "";
+              return (
+                user.id.toLowerCase().includes(query) ||
+                userName.includes(query) ||
+                userStores.some((s) => s.name.toLowerCase().includes(query))
+              );
+            });
+          }
+
+          if (viewState.filter !== "all") {
+            filteredUsers = filteredUsers.filter((user) => {
+              // Get current status, respecting auto-expiry logic
+              const sub = user.subscription || {};
+              let status = sub.status || "unknown";
+              const now = new Date();
+
+              const trialEndsDate = sub.trialEndsAt
+                ? sub.trialEndsAt.toDate()
+                : null;
+              const activeEndsDate = sub.expiresAt
+                ? sub.expiresAt.toDate()
+                : null;
+
+              if (status === "trial" && trialEndsDate && trialEndsDate < now) {
+                status = "expired";
+              } else if (
+                status === "active" &&
+                activeEndsDate &&
+                activeEndsDate < now
+              ) {
+                status = "expired";
+              }
+
+              return status === viewState.filter;
+            });
+          }
+
+          const totalItems = filteredUsers.length;
+          const startIndex =
+            (viewState.currentPage - 1) * appState.itemsPerPage;
+          const paginatedUsers = filteredUsers.slice(
+            startIndex,
+            startIndex + appState.itemsPerPage
+          );
+
+          const tableBody = container.querySelector("#users-table-body");
+          let tableHTML = "";
+          if (paginatedUsers.length === 0) {
+            tableHTML = `<tr><td colspan="5" class="text-center py-12 text-text-secondary">No store owners found.</td></tr>`;
+          } else {
+            paginatedUsers.forEach((user) => {
+              const userStores = storesByUser[user.id] || [];
+              const userName = user?.displayName || "Unknown User";
+              const storeLimit = user?.storeLimit || 1;
+
+              // --- NEW: Status and Days Left Logic ---
+              const sub = user.subscription || {};
+              let status = sub.status || "unknown";
+              let expiryDate = null;
+              const now = new Date();
+
+              if (status === "trial") {
+                expiryDate = sub.trialEndsAt ? sub.trialEndsAt.toDate() : null;
+              } else if (status === "active") {
+                expiryDate = sub.expiresAt ? sub.expiresAt.toDate() : null;
+              }
+
+              // Auto-detect expired status for display
+              if (
+                expiryDate &&
+                expiryDate < now &&
+                (status === "trial" || status === "active")
+              ) {
+                status = "expired";
+              }
+
+              let daysLeftString = "";
+              if (expiryDate && (status === "trial" || status === "active")) {
+                const diffTime = expiryDate.getTime() - now.getTime();
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                if (diffDays > 0) {
+                  daysLeftString = `<span class="text-xs text-text-secondary mt-1">${diffDays} ${
+                    diffDays === 1 ? "day" : "days"
+                  } left</span>`;
+                } else {
+                  // This branch will be hit if status is 'trial'/'active' but date is in the past
+                  // We already set status = 'expired' above, so this will be overwritten
+                  // But we keep it just in case
+                  const pastDays = Math.abs(
+                    Math.floor(diffTime / (1000 * 60 * 60 * 24))
+                  );
+                  daysLeftString = `<span class="text-xs text-danger mt-1">Expired ${pastDays} ${
+                    pastDays === 1 ? "day" : "days"
+                  } ago</span>`;
+                }
+              }
+
+              if (status === "expired") {
+                let expiredAgoString = "Subscription has expired";
+                if (expiryDate) {
+                  // Show how long ago it expired
+                  const diffTime = now.getTime() - expiryDate.getTime();
+                  const pastDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                  if (pastDays >= 0) {
+                    expiredAgoString = `Expired ${pastDays} ${
+                      pastDays === 1 ? "day" : "days"
+                    } ago`;
+                  }
+                }
+                daysLeftString = `<span class="text-xs text-danger mt-1">${expiredAgoString}</span>`;
+              } else if (status === "disabled") {
+                daysLeftString = `<span class="text-xs text-danger mt-1">Account disabled</span>`;
+              }
+              // --- END: Status and Days Left Logic ---
+
+              tableHTML += `
+                            <tr class="user-row cursor-pointer" data-action="toggle-stores" data-uid="${
+                              user.id
+                            }">
+                                <td><i data-lucide="chevron-down" class="w-5 h-5 text-text-secondary"></i></td>
+                                <td>
+                                    <p class="font-medium text-text-primary">${userName}</p>
+                                    <p class="font-mono text-xs text-text-secondary">${
+                                      user.id
+                                    }</p>
+                                </td>
+                                <td>
+                                    <span class="font-semibold text-lg">${
+                                      userStores.length
+                                    }</span>
+                                    <span class="text-text-secondary">/ ${storeLimit} Stores</span>
+                                </td>
+                                <td>
+                                    <div class="flex flex-col">
+                                        <div class="status-badge ${status}">${status}</div>
+                                        ${daysLeftString} <!-- NEW: Display days left -->
+                                    </div>
+                                </td>
+                                <td><button data-action="manage-user" data-uid="${
+                                  user.id
+                                }" class="btn btn-secondary btn-sm">Manage User</button></td>
+                            </tr>
+                            <tr class="stores-row hidden" data-stores-for="${
+                              user.id
+                            }">
+                                <td colspan="5" class="p-0"><div class="p-4 bg-bg-primary">
+                                    <h4 class="px-4 pb-2 font-semibold text-text-secondary">Stores for ${userName}</h4>
+                                    <div class="rounded-lg border border-border-color overflow-hidden">
+                                        <table class="table-pro w-full">
+                                            <thead><tr><th>Store Name</th><th>Created On</th><th>Status</th><th>Actions</th></tr></thead>
+                                            <tbody>
+                                                ${
+                                                  userStores.length > 0
+                                                    ? userStores
+                                                        .map((store) => {
+                                                          const isEnabled =
+                                                            store.isEnabled !==
+                                                            false;
+                                                          return `<tr>
+                                                        <td class="font-medium">${
+                                                          store.name
+                                                        }</td>
+                                                        <td>${new Date(
+                                                          store.createdAt
+                                                        ).toLocaleDateString()}</td>
+                                                        <td>
+                                                            <label class="toggle-switch-label">
+                                                                <input type="checkbox" data-action="toggle-store-enabled" data-store-id="${
+                                                                  store.id
+                                                                }" class="toggle-switch-input" ${
+                                                            isEnabled
+                                                              ? "checked"
+                                                              : ""
+                                                          }>
+                                                                <div class="toggle-switch-track"><div class="toggle-switch-thumb"></div></div>
+                                                                <span class="ml-3 text-sm font-medium ${
+                                                                  isEnabled
+                                                                    ? "text-success"
+                                                                    : "text-danger"
+                                                                }">${
+                                                            isEnabled
+                                                              ? "Enabled"
+                                                              : "Disabled"
+                                                          }</span>
+                                                            </label>
+                                                        </td>
+                                                        <td>
+                                                            <button data-action="view-store-staff" data-store-id="${
+                                                              store.id
+                                                            }" class="btn btn-secondary btn-sm">
+                                                                <i data-lucide="users" class="w-4 h-4 mr-2"></i>View Staff
+                                                            </button>
+                                                        </td>
+                                                    </tr>`;
+                                                        })
+                                                        .join("")
+                                                    : `<tr><td colspan="4" class="text-center text-text-secondary py-4">No stores created by this user.</td></tr>`
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div></td>
+                            </tr>
+                        `;
+            });
+          }
+          tableBody.innerHTML = tableHTML;
+          renderPaginationControls(
+            container.querySelector("#users-pagination"),
+            totalItems,
+            viewState.currentPage,
+            appState.itemsPerPage,
+            "users"
+          );
+          if (typeof lucide !== "undefined") lucide.createIcons();
+        };
+
+        renderTable();
+
+        container
+          .querySelector("#user-search")
+          .addEventListener("input", (e) => {
+            viewState.searchQuery = e.target.value;
+            viewState.currentPage = 1;
+            renderTable();
+          });
+        container
+          .querySelector("#user-filter")
+          .addEventListener("change", (e) => {
+            viewState.filter = e.target.value;
+            viewState.currentPage = 1;
+            renderTable();
+          });
+      }
+
+      // --- NEW FUNCTION: openStoreStaffModal ---
+      async function openStoreStaffModal(storeId) {
+        const store = firestoreData.stores.find((s) => s.id === storeId);
+        if (!store) {
+          showToast("Store not found.", "error");
+          return;
+        }
+
+        const modalContent = `
+              <p class="mb-4">Showing all staff for <strong>${store.name}</strong>.</p>
+              <div id="staff-list-container" class="max-h-96 overflow-y-auto space-y-2">
+                  <div class="text-center p-8"><span class="loader"></span></div>
+              </div>
+          `;
+        const modal = showModal(
+          `Staff for ${store.name}`,
+          modalContent,
+          `<button data-action="close-modal" class="btn btn-secondary">Close</button>`,
+          { size: "max-w-2xl" }
+        );
+
+        try {
+          const staffQuery = query(collection(db, `stores/${storeId}/staff`));
+          const staffSnapshot = await getDocs(staffQuery);
+          const staffList = staffSnapshot.docs.map((doc) => doc.data());
+
+          const container = modal.querySelector("#staff-list-container");
+          if (staffList.length === 0) {
+            container.innerHTML =
+              '<p class="text-center text-text-secondary p-8">No staff members found for this store.</p>';
+            return;
+          }
+
+          container.innerHTML = staffList
+            .map((staff) => {
+              const roleBadge =
+                staff.role === "admin"
+                  ? "bg-accent/20 text-accent"
+                  : staff.role === "manager"
+                  ? "bg-blue-500/20 text-blue-300"
+                  : "bg-gray-500/20 text-gray-300";
+
+              return `
+                      <div class="flex items-center justify-between p-3 bg-bg-tertiary rounded-lg">
+                          <div>
+                              <p class="font-medium text-text-primary">${staff.name}</p>
+                              <p class="text-xs text-text-secondary">${staff.email}</p>
+                          </div>
+                          <span class="px-2 py-1 text-xs font-semibold rounded-full ${roleBadge} capitalize">${staff.role}</span>
+                      </div>
+                  `;
+            })
+            .join("");
+        } catch (error) {
+          console.error("Error fetching staff for store:", error);
+          modal.querySelector(
+            "#staff-list-container"
+          ).innerHTML = `<p class="text-center text-danger p-8">Could not load staff: ${error.message}</p>`;
+        }
+      }
+
+      function renderSubscriptionsView() {
+        destroyCharts();
+        const container = document.getElementById("workspace-content");
+        const viewState = appState.viewStates.subscriptions;
+
+        container.innerHTML = `
+                <div class="space-y-6">
+                    <div class="glass-pane p-4 rounded-xl">
+                        <select id="subs-filter" class="form-select w-64">
+                            <option value="pending" ${
+                              viewState.filter === "pending" ? "selected" : ""
+                            }>Pending Requests</option>
+                            <option value="approved" ${
+                              viewState.filter === "approved" ? "selected" : ""
+                            }>Approved Requests</option>
+                            <option value="rejected" ${
+                              viewState.filter === "rejected" ? "selected" : ""
+                            }>Rejected Requests</option>
+                        </select>
+                    </div>
+                    <div class="glass-pane rounded-xl overflow-hidden">
+                        <table class="table-pro">
+                            <thead><tr><th>User</th><th>Plan</th><th>Payment Details</th><th>Date</th><th>Actions</th></tr></thead>
+                            <tbody id="subs-table-body"></tbody>
+                        </table>
+                    </div>
+                    <div id="subs-pagination"></div>
+                </div>
+            `;
+        const renderTable = () => {
+          let filteredRequests = firestoreData.subscriptionRequests.filter(
+            (req) => req.status === viewState.filter
+          );
+
+          const totalItems = filteredRequests.length;
+          const startIndex =
+            (viewState.currentPage - 1) * appState.itemsPerPage;
+          const paginatedRequests = filteredRequests.slice(
+            startIndex,
+            startIndex + appState.itemsPerPage
+          );
+
+          const tableBody = container.querySelector("#subs-table-body");
+          tableBody.innerHTML = paginatedRequests.length
+            ? paginatedRequests
+                .map(
+                  (req) => `
+                        <tr>
+                            <td>
+                                <p class="font-medium text-text-primary">${
+                                  req.userEmail
+                                }</p>
+                                <p class="font-mono text-xs text-text-secondary">${
+                                  req.userId
+                                }</p>
+                            </td>
+                            <td>
+                                <p class="font-medium">${req.planName}</p>
+                                <p class="text-sm text-text-secondary">৳${
+                                  req.planPrice
+                                }</p>
+                            </td>
+                            <td>
+                                <p><strong>Method:</strong> ${
+                                  req.paymentMethod
+                                }</p>
+                                <p><strong>TrxID:</strong> <span class="font-mono text-sm">${
+                                  req.transactionId
+                                }</span></p>
+                                <p><strong>From:</strong> ${
+                                  req.senderNumber
+                                }</p>
+                            </td>
+                            <td>${
+                              req.requestDate
+                                ? new Date(
+                                    req.requestDate.toDate()
+                                  ).toLocaleString()
+                                : "N/A"
+                            }</td>
+                            <td>
+                                ${
+                                  viewState.filter === "pending"
+                                    ? `
+                                <div class="flex gap-2">
+                                    <button data-action="reject-renewal" data-id="${req.id}" class="btn btn-secondary btn-sm">Reject</button>
+                                    <button data-action="approve-renewal" data-id="${req.id}" class="btn btn-primary btn-sm">Approve</button>
+                                </div>
+                                `
+                                    : `<div class="status-badge ${
+                                        req.status === "approved"
+                                          ? "active"
+                                          : "expired"
+                                      }">${req.status}</div>`
+                                }
+                            </td>
+                        </tr>
+                `
+                )
+                .join("")
+            : `<tr><td colspan="5" class="text-center py-12 text-text-secondary">No ${viewState.filter} requests found.</td></tr>`;
+
+          renderPaginationControls(
+            container.querySelector("#subs-pagination"),
+            totalItems,
+            viewState.currentPage,
+            appState.itemsPerPage,
+            "subscriptions"
+          );
+        };
+        renderTable();
+        container
+          .querySelector("#subs-filter")
+          .addEventListener("change", (e) => {
+            viewState.filter = e.target.value;
+            viewState.currentPage = 1;
+            renderTable();
+          });
+      }
+      // --- UPDATED: renderSupportTicketsView ---
+      function renderSupportTicketsView() {
+        destroyCharts();
+        const container = document.getElementById("workspace-content");
+        const viewState = appState.viewStates.support_tickets;
+
+        container.innerHTML = `
+                <div class="space-y-6">
+                    <div class="glass-pane p-4 rounded-xl">
+                        <select id="tickets-filter" class="form-select w-64">
+                            <option value="open" ${
+                              viewState.filter === "open" ? "selected" : ""
+                            }>Open Tickets</option>
+                            <option value="resolved" ${
+                              viewState.filter === "resolved" ? "selected" : ""
+                            }>Resolved Tickets</option>
+                        </select>
+                    </div>
+                    <div class="glass-pane rounded-xl overflow-hidden">
+                        <table class="table-pro">
+                            <!-- UPDATED: Header -->
+                            <thead><tr><th>User Details</th><th>Subject</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+                            <tbody id="tickets-table-body"></tbody>
+                        </table>
+                    </div>
+                    <div id="tickets-pagination"></div>
+                </div>
+            `;
+
+        const renderTable = () => {
+          let filteredTickets = firestoreData.supportTickets.filter(
+            (t) => t.status === viewState.filter
+          );
+
+          const totalItems = filteredTickets.length;
+          const startIndex =
+            (viewState.currentPage - 1) * appState.itemsPerPage;
+          const paginatedTickets = filteredTickets.slice(
+            startIndex,
+            startIndex + appState.itemsPerPage
+          );
+
+          const tableBody = container.querySelector("#tickets-table-body");
+          tableBody.innerHTML = paginatedTickets.length
+            ? paginatedTickets
+                .map(
+                  (ticket) => `
+                        <!-- UPDATED: Table Row -->
+                        <tr class="ticket-row cursor-pointer" data-action="view-ticket" data-id="${
+                          ticket.id
+                        }">
+                            <td>
+                                <p class="font-medium text-text-primary">${
+                                  ticket.userName || "Unknown Name"
+                                }</p>
+                                <p class="text-sm text-text-secondary">${
+                                  ticket.userEmail
+                                }</p>
+                                ${
+                                  ticket.userPhone
+                                    ? `<p class="font-mono text-xs text-blue-300">${ticket.userPhone}</p>`
+                                    : ""
+                                }
+                                <p class="font-mono text-xs text-text-secondary/60">${
+                                  ticket.userId
+                                }</p>
+                            </td>
+                            <td class="font-medium">${ticket.subject}</td>
+                            <td>${
+                              ticket.ticketDate
+                                ? new Date(
+                                    ticket.ticketDate.toDate()
+                                  ).toLocaleString()
+                                : "N/A"
+                            }</td>
+                            <td><div class="status-badge ${
+                              ticket.status === "open" ? "trial" : "active"
+                            }">${ticket.status}</div></td>
+                            <td><button data-action="view-ticket" data-id="${
+                              ticket.id
+                            }" class="btn btn-secondary btn-sm">View Details</button></td>
+                        </tr>
+                        <!-- UPDATED: Expanded Row -->
+                        <tr class="ticket-message-row hidden" data-message-for="${
+                          ticket.id
+                        }">
+                            <td colspan="5" class="p-0">
+                                <div class="p-6 bg-bg-primary">
+                                    <div classid="ticket-contact-details" class="pb-4 mb-4 border-b border-border-color space-y-1 text-sm">
+                                        <p><strong>Contact:</strong> ${
+                                          ticket.userName || "N/A"
+                                        }</p>
+                                        <p><strong>Email:</strong> ${
+                                          ticket.userEmail
+                                        }</p>
+                                        ${
+                                          ticket.userPhone
+                                            ? `<p><strong>Phone:</strong> ${ticket.userPhone}</p>`
+                                            : ""
+                                        }
+                                    </div>
+                                    <div class="text-sm">${ticket.message.replace(
+                                      /\n/g,
+                                      "<br>"
+                                    )}</div>
+                                    <!-- This is where the 'Mark as Resolved' button gets added -->
+                                </div>
+                            </td>
+                        </tr>
+                `
+                )
+                .join("")
+            : `<tr><td colspan="5" class="text-center py-12 text-text-secondary">No ${viewState.filter} tickets found.</td></tr>`;
+
+          renderPaginationControls(
+            container.querySelector("#tickets-pagination"),
+            totalItems,
+            viewState.currentPage,
+            appState.itemsPerPage,
+            "support_tickets"
+          );
+        };
+        renderTable();
+        container
+          .querySelector("#tickets-filter")
+          .addEventListener("change", (e) => {
+            viewState.filter = e.target.value;
+            viewState.currentPage = 1;
+            renderTable();
+          });
+      }
+      function renderSettingsView() {
+        destroyCharts();
+        const container = document.getElementById("workspace-content");
+
+        container.innerHTML = `
+                <div class="space-y-8 max-w-4xl">
+                    <div class="glass-pane p-6 rounded-xl">
+                        <h3 class="text-xl font-semibold text-text-primary border-b border-border-color pb-4 mb-4">General Settings</h3>
+                        <form id="settings-form" class="space-y-4">
+                            <div>
+                                <label for="trial-days" class="block text-sm font-medium text-text-secondary mb-1">Default Trial Period (days)</label>
+                                <input type="number" id="trial-days" name="trialDays" class="form-input w-full max-w-xs" value="${appState.settings.defaultTrialDays}">
+                                <p class="text-xs text-text-secondary mt-1">Number of free trial days for new users.</p>
+                            </div>
+                            <div class="text-right">
+                                <button type="submit" class="btn btn-primary">Save General Settings</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="glass-pane p-6 rounded-xl">
+                        <h3 class="text-xl font-semibold text-text-primary border-b border-border-color pb-4 mb-4">Feature Flags</h3>
+                        <p class="text-sm text-text-secondary mb-4">Remotely enable or disable features in the main application.</p>
+                        <div id="feature-flags-container" class="space-y-3"></div>
+                    </div>
+                     <div class="glass-pane p-6 rounded-xl">
+                        <h3 class="text-xl font-semibold text-text-primary border-b border-border-color pb-4 mb-4">Broadcast Message</h3>
+                        <p class="text-sm text-text-secondary mb-4">Send a system-wide notification to all active users.</p>
+                        <form id="broadcast-form" class="space-y-4">
+                            <textarea name="message" class="form-textarea w-full h-24" placeholder="Enter your announcement..."></textarea>
+                             <div class="flex justify-end items-center gap-4">
+                                <select name="type" class="form-select w-48">
+                                    <option value="info">Info (Blue)</option>
+                                    <option value="success">Success (Green)</option>
+                                    <option value="warning">Warning (Yellow)</option>
+                                </select>
+                                <button type="submit" class="btn btn-primary">Send Broadcast</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            `;
+        renderFeatureFlags();
+      }
+      function renderAuditLogView() {
+        destroyCharts();
+        const container = document.getElementById("workspace-content");
+        const viewState = appState.viewStates.audit_log;
+
+        let filteredLogs = firestoreData.auditLog;
+
+        if (viewState.filter !== "all") {
+          filteredLogs = filteredLogs.filter(
+            (log) => log.type === viewState.filter
+          );
+        }
+
+        const totalItems = filteredLogs.length;
+        const startIndex = (viewState.currentPage - 1) * appState.itemsPerPage;
+        const paginatedLogs = filteredLogs.slice(
+          startIndex,
+          startIndex + appState.itemsPerPage
+        );
+
+        const logTypes = [
+          ...new Set(firestoreData.auditLog.map((log) => log.type)),
+        ];
+
+        container.innerHTML = `
+                <div class="space-y-6">
+                    <div class="glass-pane p-4 rounded-xl">
+                        <select id="audit-filter" class="form-select w-64">
+                            <option value="all">All Event Types</option>
+                            ${logTypes
+                              .map(
+                                (type) =>
+                                  `<option value="${type}" ${
+                                    viewState.filter === type ? "selected" : ""
+                                  }>${type
+                                    .replace(/_/g, " ")
+                                    .replace(/\b\w/g, (l) =>
+                                      l.toUpperCase()
+                                    )}</option>`
+                              )
+                              .join("")}
+                        </select>
+                    </div>
+                    <div class="glass-pane rounded-xl overflow-hidden">
+                        <table class="table-pro">
+                            <thead><tr><th>Timestamp</th><th>User</th><th>Event Type</th><th>Details</th></tr></thead>
+                            <tbody id="audit-table-body">
+                                ${
+                                  paginatedLogs.length > 0
+                                    ? paginatedLogs
+                                        .map((log) => {
+                                          const eventTypeFormatted = (
+                                            log.type || "unknown"
+                                          )
+                                            .replace(/_/g, " ")
+                                            .replace(/\b\w/g, (l) =>
+                                              l.toUpperCase()
+                                            );
+                                          return `
+                                <tr>
+                                    <td class="font-mono text-xs">${
+                                      log.timestamp
+                                        ? new Date(
+                                            log.timestamp.toDate()
+                                          ).toLocaleString()
+                                        : "Processing..."
+                                    }</td>
+                                    <td class="font-medium">${
+                                      log.user.name
+                                    } <span class="text-text-secondary text-xs">(${log.user.id.slice(
+                                            0,
+                                            6
+                                          )}...)</span></td>
+                                    <td><span class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-500/20 text-blue-300">${eventTypeFormatted}</span></td>
+                                    <td class="text-sm">${log.details}</td>
+                                </tr>`;
+                                        })
+                                        .join("")
+                                    : `<tr><td colspan="4" class="text-center py-12 text-text-secondary">No logs found.</td></tr>`
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                     <div id="audit-pagination"></div>
+                </div>
+            `;
+
+        renderPaginationControls(
+          container.querySelector("#audit-pagination"),
+          totalItems,
+          viewState.currentPage,
+          appState.itemsPerPage,
+          "audit_log"
+        );
+
+        container
+          .querySelector("#audit-filter")
+          .addEventListener("change", (e) => {
+            viewState.filter = e.target.value;
+            viewState.currentPage = 1;
+            renderAuditLogView();
+          });
+      }
+      async function openUserManagementModal(uid) {
+        const user = firestoreData.users.find((u) => u.id === uid);
+        if (!user) return;
+
+        const userStores = firestoreData.stores.filter(
+          (s) => s.ownerUid === uid
+        );
+        // --- NEW: Get current plan limits from the first store (or use fallback) ---
+        const currentPlanLimits =
+          userStores.length > 0 && userStores[0].planLimits
+            ? userStores[0].planLimits
+            : { products: 1000, staff: 5, ai: "none" }; // Fallback
+        // --- END NEW ---
+
+        const sub = user.subscription || {};
+        const trialEndsDate = sub.trialEndsAt
+          ? sub.trialEndsAt.toDate()
+          : new Date();
+        const trialDateForInput = trialEndsDate.toISOString().split("T")[0];
+
+        const content = `
+                <form id="user-management-form" class="space-y-6">
+                    <div class="space-y-2">
+                        <p><strong>User:</strong> ${
+                          user.displayName || user.name || "Unknown User"
+                        }</p>
+                        <p><strong>Email:</strong> ${
+                          user.email || "Not available"
+                        }</p>
+                        <p><strong>Phone:</strong> ${
+                          user.phone || "Not available"
+                        }</p>
+                        <p><strong>UID:</strong> <span class="font-mono text-sm">${
+                          user.id
+                        }</span></p>
+                        <p class="text-xs text-text-secondary mt-2">This user currently owns ${
+                          userStores.length
+                        } store(s).</p>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 border-t border-border-color pt-4">
+                        <div>
+                            <label for="subscription-status" class="block text-sm font-medium text-text-secondary mb-1">Subscription Status</label>
+                            <select name="status" id="subscription-status" class="form-select w-full">
+                                <option value="trial" ${
+                                  sub.status === "trial" ? "selected" : ""
+                                }>Trial</option>
+                                <option value="active" ${
+                                  sub.status === "active" ? "selected" : ""
+                                }>Active</option>
+                                <option value="expired" ${
+                                  sub.status === "expired" ? "selected" : ""
+                                }>Expired</option>
+                                <option value="disabled" ${
+                                  sub.status === "disabled" ? "selected" : ""
+                                }>Disabled</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="trial-ends" class="block text-sm font-medium text-text-secondary mb-1">Trial Ends At</label>
+                            <input type="date" name="trialEnds" id="trial-ends" class="form-input w-full" value="${trialDateForInput}">
+                        </div>
+                         <div>
+                            <label for="store-limit" class="block text-sm font-medium text-text-secondary mb-1">User Store Limit</label>
+                            <input type="number" name="storeLimit" id="store-limit" class="form-input w-full" min="1" value="${
+                              user.storeLimit || 1
+                            }">
+                        </div>
+                        <!-- --- NEW FIELDS --- -->
+                         <div>
+                            <label for="product-limit" class="block text-sm font-medium text-text-secondary mb-1">Store Product Limit</label>
+                            <input type="number" name="productLimit" id="product-limit" class="form-input w-full" min="1" value="${
+                              currentPlanLimits.products
+                            }">
+                        </div>
+                        <div>
+                            <label for="staff-limit" class="block text-sm font-medium text-text-secondary mb-1">Store Staff Limit</label>
+                            <input type="number" name="staffLimit" id="staff-limit" class="form-input w-full" min="1" value="${
+                              currentPlanLimits.staff
+                            }">
+                        </div>
+                         <div>
+                            <label for="ai-level" class="block text-sm font-medium text-text-secondary mb-1">Store AI Level</label>
+                            <select name="aiLevel" id="ai-level" class="form-select w-full">
+                                <option value="none" ${
+                                  currentPlanLimits.ai === "none"
+                                    ? "selected"
+                                    : ""
+                                }>None</option>
+                                <option value="basic" ${
+                                  currentPlanLimits.ai === "basic"
+                                    ? "selected"
+                                    : ""
+                                }>Basic</option>
+                                <option value="advanced" ${
+                                  currentPlanLimits.ai === "advanced"
+                                    ? "selected"
+                                    : ""
+                                }>Advanced</option>
+                            </select>
+                        </div>
+                        <!-- --- END NEW FIELDS --- -->
+                    </div>
+                </form>
+            `;
+
+        const footer = `
+                <button data-action="close-modal" class="btn btn-secondary">Cancel</button>
+                <button type="submit" form="user-management-form" class="btn btn-primary">Save Changes</button>
+            `;
+
+        const modal = showModal(
+          `Manage User: ${user.displayName || user.id.slice(0, 8)}`,
+          content,
+          footer,
+          { size: "max-w-2xl" }
+        );
+
+        modal
+          .querySelector("#user-management-form")
+          .addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const newStatus = formData.get("status");
+            const newTrialEndDate = new Date(formData.get("trialEnds"));
+            const newStoreLimit = parseInt(formData.get("storeLimit"));
+            // --- NEW: Get new plan limit values ---
+            const newProductLimit = parseInt(formData.get("productLimit"));
+            const newStaffLimit = parseInt(formData.get("staffLimit"));
+            const newAiLevel = formData.get("aiLevel");
+
+            if (isNaN(newStoreLimit) || newStoreLimit < 1) return;
+            if (isNaN(newProductLimit) || newProductLimit < 1) return;
+            if (isNaN(newStaffLimit) || newStaffLimit < 1) return;
+
+            const userUpdateData = {
+              "subscription.status": newStatus,
+              "subscription.trialEndsAt": Timestamp.fromDate(newTrialEndDate),
+              storeLimit: newStoreLimit,
+            };
+            const userRef = doc(db, "users", uid);
+            await updateDoc(userRef, userUpdateData);
+
+            // --- REVISED BATCH LOGIC ---
+            // Update all stores owned by this user with the new plan limits
+            if (userStores.length > 0) {
+              const batch = writeBatch(db);
+              userStores.forEach((store) => {
+                const storeRef = doc(db, "stores", store.id);
+                batch.update(storeRef, {
+                  "planLimits.products": newProductLimit,
+                  "planLimits.staff": newStaffLimit,
+                  "planLimits.ai": newAiLevel,
+                });
+              });
+              await batch.commit();
+            }
+            // --- END REVISED BATCH LOGIC ---
+
+            await addDoc(collection(db, "global_audit_log"), {
+              type: "user_settings_updated",
+              timestamp: serverTimestamp(),
+              details: `Manually updated user ${
+                user.displayName || uid
+              }. Status: ${newStatus}, Store Limit: ${newStoreLimit}, Products: ${newProductLimit}, Staff: ${newStaffLimit}, AI: ${newAiLevel}.`,
+              user: { id: auth.currentUser.uid, name: "Super Admin" },
+            });
+
+            closeModal(modal);
+          });
+      }
+      async function updateGlobalSettings(newSettings) {
+        const settingsRef = doc(db, "global_settings", "app_config");
+        await setDoc(settingsRef, newSettings, { merge: true });
+      }
+      function renderFeatureFlags() {
+        const container = document.getElementById("feature-flags-container");
+        const flags = [
+          {
+            id: "aiAssistantEnabled",
+            name: "Enable Global AI Assistant",
+            description: "Toggles the AI chat button in the main app header.",
+          },
+          {
+            id: "smartSuggestionsEnabled",
+            name: "Enable AI Dashboard Insights",
+            description:
+              "Shows AI-powered suggestions on the main app dashboard.",
+          },
+        ];
+
+        container.innerHTML = flags
+          .map((flag) => {
+            const isEnabled = appState.settings.featureFlags[flag.id] !== false;
+            return `
+                <div class="flex items-center justify-between p-3 bg-bg-tertiary rounded-lg border border-border-color">
+                    <div>
+                        <p class="font-medium text-text-primary">${
+                          flag.name
+                        }</p>
+                        <p class="text-xs text-text-secondary">${
+                          flag.description
+                        }</p>
+                    </div>
+                    <label class="toggle-switch-label">
+                        <input type="checkbox" data-action="toggle-feature-flag" data-flag-id="${
+                          flag.id
+                        }" class="toggle-switch-input" ${
+              isEnabled ? "checked" : ""
+            }>
+                        <div class="toggle-switch-track"><div class="toggle-switch-thumb"></div></div>
+                    </label>
+                </div>
+                `;
+          })
+          .join("");
+      }
+
+      // --- FIREBASE LISTENERS ---
+      const initFirebaseListeners = () => {
+        const settingsRef = doc(db, "global_settings", "app_config");
+        const unsubSettings = onSnapshot(settingsRef, (docSnap) => {
+          if (docSnap.exists()) {
+            appState.settings = { ...appState.settings, ...docSnap.data() };
+          }
+          if (appState.activeView === "settings") renderSettingsView();
+        });
+        activeListeners.push(unsubSettings);
+
+        const storesQuery = query(collection(db, "stores"));
+        const unsubStores = onSnapshot(storesQuery, (snapshot) => {
+          firestoreData.stores = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          if (appState.activeView === "dashboard") renderDashboardView();
+          if (appState.activeView === "users") renderUsersView();
+        });
+        activeListeners.push(unsubStores);
+
+        const auditQuery = query(
+          collection(db, "global_audit_log"),
+          orderBy("timestamp", "desc"),
+          limit(100)
+        );
+        const unsubAudit = onSnapshot(auditQuery, (snapshot) => {
+          firestoreData.auditLog = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          if (appState.activeView === "audit_log") renderAuditLogView();
+        });
+        activeListeners.push(unsubAudit);
+
+        const subsQuery = query(
+          collection(db, "subscription_requests"),
+          orderBy("requestDate", "desc")
+        );
+        const unsubSubs = onSnapshot(subsQuery, (snapshot) => {
+          // Using docChanges() is more reliable for detecting new documents.
+          if (isInitialDataLoaded.subscriptions) {
+            const batch = writeBatch(db);
+            let hasNewNotifications = false;
+
+            snapshot.docChanges().forEach((change) => {
+              if (
+                change.type === "added" &&
+                !processedNotificationIds.has(change.doc.id)
+              ) {
+                processedNotificationIds.add(change.doc.id); // Prevent duplicates
+                const newDoc = change.doc.data();
+                const notifRef = doc(collection(db, "global_notifications"));
+                batch.set(notifRef, {
+                  timestamp: serverTimestamp(),
+                  read: false,
+                  message: `New subscription request from ${newDoc.userEmail}`,
+                  icon: "credit-card",
+                  link: { view: "subscriptions", id: change.doc.id },
+                });
+                hasNewNotifications = true;
+              }
+            });
+
+            if (hasNewNotifications) {
+              batch.commit().catch(console.error);
+            }
+          }
+
+          firestoreData.subscriptionRequests = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          isInitialDataLoaded.subscriptions = true; // Mark as loaded after the first pass
+
+          if (appState.activeView === "dashboard") renderDashboardView();
+          if (appState.activeView === "subscriptions")
+            renderSubscriptionsView();
+        });
+        activeListeners.push(unsubSubs);
+
+        const ticketsQuery = query(
+          collection(db, "support_tickets"),
+          orderBy("ticketDate", "desc")
+        );
+        const unsubTickets = onSnapshot(ticketsQuery, (snapshot) => {
+          if (isInitialDataLoaded.tickets) {
+            const batch = writeBatch(db);
+            let hasNewNotifications = false;
+
+            snapshot.docChanges().forEach((change) => {
+              if (
+                change.type === "added" &&
+                !processedNotificationIds.has(change.doc.id)
+              ) {
+                processedNotificationIds.add(change.doc.id); // Prevent duplicates
+                const newDoc = change.doc.data();
+                const notifRef = doc(collection(db, "global_notifications"));
+                batch.set(notifRef, {
+                  timestamp: serverTimestamp(),
+                  read: false,
+                  message: `New support ticket: "${newDoc.subject}"`,
+                  icon: "life-buoy",
+                  link: { view: "support_tickets", id: change.doc.id },
+                });
+                hasNewNotifications = true;
+              }
+            });
+
+            if (hasNewNotifications) {
+              batch.commit().catch(console.error);
+            }
+          }
+
+          firestoreData.supportTickets = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          isInitialDataLoaded.tickets = true; // Mark as loaded after the first pass
+
+          if (appState.activeView === "dashboard") renderDashboardView();
+          if (appState.activeView === "support_tickets")
+            renderSupportTicketsView();
+        });
+        activeListeners.push(unsubTickets);
+
+        const usersQuery = query(collection(db, "users"));
+        const unsubUsers = onSnapshot(usersQuery, async (snapshot) => {
+          // Handle notification creation for new users
+          if (isInitialDataLoaded.users) {
+            const batch = writeBatch(db);
+            let hasNewNotifications = false;
+
+            snapshot.docChanges().forEach((change) => {
+              if (
+                change.type === "added" &&
+                !processedNotificationIds.has(change.doc.id)
+              ) {
+                processedNotificationIds.add(change.doc.id); // Prevent duplicates
+                const newDoc = change.doc.data();
+
+                // --- MODIFIED LOGIC for notification message ---
+                let message = `New user signed up: ${
+                  newDoc.displayName || "Unknown"
+                }`; // Default
+                let icon = "user-plus"; // Default
+                const userName =
+                  newDoc.displayName || newDoc.email || "Unknown";
+
+                if (newDoc.stores && newDoc.stores.length > 0) {
+                  // User is associated with a store, let's find out their role.
+                  const role = newDoc.stores[0].role || "staff";
+                  const storeId = newDoc.stores[0].id;
+                  const store = firestoreData.stores.find(
+                    (s) => s.id === storeId
+                  );
+                  const storeName = store ? store.name : "an existing store";
+
+                  if (role === "admin") {
+                    message = `New Store Owner registered: <strong>${userName}</strong> (Store: <strong>${storeName}</strong>)`;
+                    icon = "store"; // Use 'store' icon for new owners
+                  } else {
+                    message = `New ${role} (<strong>${userName}</strong>) was added to <strong>${storeName}</strong>.`;
+                    icon = "user-check"; // Use 'user-check' icon for new staff
+                  }
+                } else {
+                  // Fallback for users somehow created without a store link
+                  message = `New user registered: <strong>${userName}</strong>`;
+                  icon = "user-plus";
+                }
+                // --- END MODIFIED LOGIC ---
+
+                const notifRef = doc(collection(db, "global_notifications"));
+                batch.set(notifRef, {
+                  timestamp: serverTimestamp(),
+                  read: false,
+                  message: message, // Use the new dynamic message
+                  icon: icon, // Use the new dynamic icon
+                  link: { view: "users", id: change.doc.id },
+                });
+                hasNewNotifications = true;
+              }
+            });
+
+            if (hasNewNotifications) {
+              batch.commit().catch(console.error);
+            }
+          }
+
+          const newUsersRaw = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+
+          // Enrich user data with details from staff subcollection if they are missing
+          const enrichedUserPromises = newUsersRaw.map(async (user) => {
+            let enrichedUser = { ...user };
+
+            // If subscription is missing, create a default trial
+            if (!enrichedUser.subscription) {
+              const createdAt = enrichedUser.createdAt
+                ? enrichedUser.createdAt.toDate()
+                : new Date();
+              const trialEndsAt = new Date(createdAt);
+              trialEndsAt.setDate(
+                trialEndsAt.getDate() + appState.settings.defaultTrialDays
+              );
+              const defaultSub = {
+                status: "trial",
+                trialEndsAt: Timestamp.fromDate(trialEndsAt),
+              };
+              // Check if doc exists before updating, or just set it
+              const userRef = doc(db, "users", enrichedUser.id);
+              const userSnap = await getDoc(userRef);
+              if (userSnap.exists()) {
+                await updateDoc(userRef, {
+                  subscription: defaultSub,
+                });
+              }
+              enrichedUser.subscription = defaultSub;
+            }
+
+            // If display name is missing, fetch from the staff collection of their first store
+            if (
+              !enrichedUser.displayName &&
+              enrichedUser.stores &&
+              enrichedUser.stores.length > 0
+            ) {
+              try {
+                // Find the user's *current* store, or default to the first one
+                const storeIdToFetch =
+                  enrichedUser.currentStoreId || enrichedUser.stores[0].id;
+                const staffDocRef = doc(
+                  db,
+                  "stores",
+                  storeIdToFetch,
+                  "staff",
+                  enrichedUser.id
+                );
+                const staffDocSnap = await getDoc(staffDocRef);
+                if (staffDocSnap.exists()) {
+                  const staffData = staffDocSnap.data();
+                  enrichedUser.displayName = staffData.name;
+                  enrichedUser.email = staffData.email;
+                  enrichedUser.phone = staffData.phone;
+
+                  // Also back-fill this info to the /users doc
+                  const userRef = doc(db, "users", enrichedUser.id);
+                  await updateDoc(userRef, {
+                    displayName: staffData.name,
+                    email: staffData.email,
+                    phone: staffData.phone || null,
+                  });
+                }
+              } catch (error) {
+                console.error(
+                  `Could not fetch staff details for user ${user.id}`,
+                  error
+                );
+              }
+            }
+            return enrichedUser;
+          });
+
+          const updatedUsers = await Promise.all(enrichedUserPromises);
+
+          // --- *** NEW: AUTO-EXPIRE LOGIC *** ---
+          // Run this check *after* enriching users but *before* saving to state
+          const batch = writeBatch(db);
+          let changesMade = false;
+          const now = new Date();
+          updatedUsers.forEach((user) => {
+            const sub = user.subscription;
+            if (!sub) return; // No subscription
+
+            let needsUpdate = false;
+            let newStatus = sub.status;
+
+            // Check trial expiry
+            if (
+              sub.status === "trial" &&
+              sub.trialEndsAt &&
+              sub.trialEndsAt.toDate() < now
+            ) {
+              newStatus = "expired";
+              needsUpdate = true;
+            }
+
+            // Check active expiry
+            if (
+              sub.status === "active" &&
+              sub.expiresAt &&
+              sub.expiresAt.toDate() < now
+            ) {
+              newStatus = "expired";
+              needsUpdate = true;
+            }
+
+            if (needsUpdate) {
+              const userRef = doc(db, "users", user.id);
+              batch.update(userRef, { "subscription.status": newStatus });
+              changesMade = true;
+              // Manually update the local data so the UI is instant
+              user.subscription.status = newStatus;
+            }
+          });
+
+          if (changesMade) {
+            console.log(
+              "Admin panel: Found and updated expired user subscriptions."
+            );
+            // Don't await this, let it run in the background.
+            // The listener will re-fire anyway.
+            batch.commit().catch(console.error);
+          }
+          // --- *** END: AUTO-EXPIRE LOGIC *** ---
+
+          firestoreData.users = updatedUsers;
+          isInitialDataLoaded.users = true; // Mark as loaded
+          if (appState.activeView === "dashboard") renderDashboardView();
+          if (appState.activeView === "users") renderUsersView();
+        });
+        activeListeners.push(unsubUsers);
+
+        // --- DEFINITIVE REAL-TIME NOTIFICATION LISTENER (SOLVED) ---
+        // This logic compares notification timestamps against the session start time
+        // to prevent alerts for historical notifications on page load.
+        const notificationsQuery = query(
+          collection(db, "global_notifications"),
+          orderBy("timestamp", "desc"),
+          limit(20)
+        );
+        const unsubNotifications = onSnapshot(
+          notificationsQuery,
+          (snapshot) => {
+            // Iterate through changes to find genuinely new notifications.
+            snapshot.docChanges().forEach((change) => {
+              if (change.type === "added") {
+                const newNotifData = change.doc.data();
+
+                // A notification is considered "new" for alerting purposes only if it was created
+                // *after* the current browser session started.
+                if (
+                  newNotifData.timestamp &&
+                  typeof newNotifData.timestamp.toDate === "function"
+                ) {
+                  const notificationDate = newNotifData.timestamp.toDate();
+
+                  if (notificationDate > sessionStartTime) {
+                    // This is a real-time notification, so show an alert.
+                    showToast(
+                      newNotifData.message.replace(/<[^>]*>?/gm, ""),
+                      "info"
+                    );
+                    playNotificationSound();
+                  }
+                }
+              }
+            });
+
+            // Always update the UI with the full, latest list from the snapshot,
+            // regardless of whether alerts were shown.
+            firestoreData.notifications = snapshot.docs.map((doc) => ({
+              id: doc.id,
+              ...doc.data(),
+            }));
+            updateNotificationBadge();
+          },
+          (error) => {
+            console.error("Critical error in notification listener:", error);
+          }
+        );
+        activeListeners.push(unsubNotifications);
+      };
+
+      // --- APP INITIALIZATION & EVENT LISTENERS ---
+      const workspaceContent = document.getElementById("workspace-content");
+      const viewTitle = document.getElementById("view-title");
+
+      const renderActiveView = () => {
+        document.querySelectorAll("#main-nav a").forEach((a) => {
+          a.classList.toggle("active", a.dataset.view === appState.activeView);
+        });
+
+        const viewNameEl = document.querySelector(
+          `#main-nav a[data-view="${appState.activeView}"] .tooltip`
+        );
+        const viewName = viewNameEl ? viewNameEl.textContent : "Dashboard";
+        viewTitle.textContent = viewName;
+
+        switch (appState.activeView) {
+          case "users":
+            renderUsersView();
+            break;
+          case "subscriptions":
+            renderSubscriptionsView();
+            break;
+          case "support_tickets":
+            renderSupportTicketsView();
+            break;
+          case "audit_log":
+            renderAuditLogView();
+            break;
+          case "settings":
+            renderSettingsView();
+            break;
+          case "dashboard":
+          default:
+            renderDashboardView();
+            break;
+        }
+        if (typeof lucide !== "undefined") lucide.createIcons();
+      };
+
+      document.getElementById("main-nav").addEventListener("click", (e) => {
+        const link = e.target.closest("a[data-view]");
+        if (link) {
+          e.preventDefault();
+          appState.activeView = link.dataset.view;
+          renderActiveView();
+        }
+      });
+
+      document.body.addEventListener("click", async (e) => {
+        const target = e.target.closest("[data-action]");
+        if (!target) return;
+
+        const { action, id, uid, flagId, storeId } = target.dataset;
+
+        if (action === "open-notifications") {
+          openNotificationsModal();
+        }
+
+        if (action === "close-modal")
+          closeModal(target.closest(".modal-overlay"));
+        if (action === "manage-user") openUserManagementModal(uid);
+        if (action === "logout") signOut(auth);
+
+        if (action === "toggle-stores") {
+          const userRow = target.closest(".user-row");
+          const storesRow = userRow.nextElementSibling;
+          userRow.classList.toggle("expanded");
+          storesRow.classList.toggle("hidden");
+          const icon = userRow.querySelector("i[data-lucide]");
+          if (icon) {
+            icon.setAttribute(
+              "data-lucide",
+              userRow.classList.contains("expanded")
+                ? "chevron-up"
+                : "chevron-down"
+            );
+            lucide.createIcons();
+          }
+        }
+
+        // --- NEW ACTION: view-store-staff ---
+        if (action === "view-store-staff") {
+          e.stopPropagation(); // Prevent the row from toggling
+          openStoreStaffModal(storeId);
+        }
+
+        if (action === "quick-nav") {
+          appState.activeView = target.dataset.view;
+          renderActiveView();
+        }
+        if (action === "paginate") {
+          const viewType = target.dataset.viewType;
+          const page = parseInt(target.dataset.page);
+          if (appState.viewStates[viewType]) {
+            appState.viewStates[viewType].currentPage = page;
+            renderActiveView();
+          }
+        }
+        if (action === "approve-renewal") {
+          const request = firestoreData.subscriptionRequests.find(
+            (r) => r.id === id
+          );
+          if (!request) return;
+          const modal = showModal(
+            "Approve Subscription",
+            `Are you sure you want to approve the '${request.planName}' for ${request.userEmail}?`,
+            `<button data-action="close-modal" class="btn btn-secondary">Cancel</button><button id="confirm-approve" class="btn btn-primary">Approve</button>`
+          );
+          modal
+            .querySelector("#confirm-approve")
+            .addEventListener("click", async () => {
+              // --- NEW APPROVAL LOGIC ---
+              const button = modal.querySelector("#confirm-approve");
+              button.disabled = true;
+              button.innerHTML = `<span class="loader-sm"></span> Processing...`;
+
+              try {
+                const userRef = doc(db, "users", request.userId);
+                const requestRef = doc(db, "subscription_requests", request.id);
+                const planId = request.planId; // e.g., "basic_monthly"
+                // --- NEW: Clarify ownerId ---
+                const ownerId = request.userId;
+
+                // 1. Determine Plan Limits and Duration
+                let limitsToApply = request.planLimits;
+                let durationString = request.planDuration;
+                let planName = request.planName;
+
+                if (!limitsToApply || !durationString) {
+                  // Fallback: Limits were not on the request, use local object
+                  const fallbackPlan = LOCAL_PLANS_DETAILS[planId];
+                  if (!fallbackPlan) {
+                    throw new Error(`Unknown Plan ID: ${planId}`);
+                  }
+                  limitsToApply = fallbackPlan.limits;
+                  durationString = fallbackPlan.duration;
+                  planName = fallbackPlan.name; // Use fallback name
+                }
+
+                if (!limitsToApply) {
+                  throw new Error("Could not determine plan limits.");
+                }
+
+                const planDurationDays = durationString === "yearly" ? 365 : 30;
+
+                // 2. Calculate new Expiry Date (handles early renewal)
+                const userSnap = await getDoc(userRef);
+                if (!userSnap.exists()) {
+                  throw new Error("User document not found.");
+                }
+                const userData = userSnap.data();
+                const currentSub = userData.subscription || {};
+                const currentExpiry = currentSub.expiresAt
+                  ? currentSub.expiresAt.toDate()
+                  : new Date();
+                const now = new Date();
+
+                // Start new plan from today or from current expiry, whichever is later
+                const startDate = currentExpiry > now ? currentExpiry : now;
+                const newExpiryDate = new Date(startDate);
+                newExpiryDate.setDate(
+                  newExpiryDate.getDate() + planDurationDays
+                );
+
+                // --- NEW STEP: Find all associated staff user IDs ---
+                const userStores = firestoreData.stores.filter(
+                  (s) => s.ownerUid === ownerId
+                );
+
+                const staffUserIds = new Set();
+
+                // We must query Firestore to get the staff for each store
+                for (const store of userStores) {
+                  const staffQuery = query(
+                    collection(db, `stores/${store.id}/staff`)
+                  );
+                  const staffSnapshot = await getDocs(staffQuery);
+                  staffSnapshot.docs.forEach((doc) => {
+                    // The staff doc ID is the same as the user ID
+                    staffUserIds.add(doc.id);
+                  });
+                }
+
+                // Remove the owner's ID from the set, just in case they are listed as staff
+                staffUserIds.delete(ownerId);
+                // --- END NEW STEP ---
+
+                // 3. Create Batch Write
+                const batch = writeBatch(db);
+
+                // 3a. Update User Document (THE OWNER)
+                // --- NEW: Renamed variable for clarity ---
+                const ownerSubscriptionUpdate = {
+                  "subscription.status": "active",
+                  "subscription.planId": planId,
+                  "subscription.planName": planName,
+                  "subscription.expiresAt": Timestamp.fromDate(newExpiryDate),
+                  storeLimit: limitsToApply.stores, // Set user's store creation limit
+                };
+                batch.update(userRef, ownerSubscriptionUpdate);
+
+                // 3b. Update all Stores owned by this User
+                // --- MODIFICATION: Removed userStores definition, as it's now above ---
+                userStores.forEach((store) => {
+                  const storeRef = doc(db, "stores", store.id);
+                  batch.update(storeRef, {
+                    // Store the plan limits directly on the store doc
+                    "planLimits.products": limitsToApply.products,
+                    "planLimits.staff": limitsToApply.staff,
+                    "planLimits.ai": limitsToApply.ai,
+                    planName: planName, // Also add plan name to store
+                  });
+                });
+
+                // --- NEW 3c. Update all Staff User Documents ---
+                const staffSubscriptionUpdate = {
+                  "subscription.status": "active",
+                  "subscription.planId": planId,
+                  "subscription.planName": planName,
+                  "subscription.expiresAt": Timestamp.fromDate(newExpiryDate),
+                  // Note: We don't apply 'storeLimit' to staff
+                };
+                staffUserIds.forEach((staffId) => {
+                  const staffUserRef = doc(db, "users", staffId);
+                  // We apply the same subscription data to the staff
+                  batch.update(staffUserRef, staffSubscriptionUpdate);
+                });
+                // --- END NEW 3c ---
+
+                // 3d. Update Request Document (was 3c)
+                batch.update(requestRef, {
+                  status: "approved",
+                  processedBy: auth.currentUser.email,
+                  processedAt: serverTimestamp(),
+                });
+
+                // 4. Commit Batch
+                await batch.commit();
+
+                // 5. Add Audit Log
+                await addDoc(collection(db, "global_audit_log"), {
+                  type: "subscription_approved",
+                  timestamp: serverTimestamp(),
+                  details: `Approved '${planName}' for ${
+                    request.userEmail
+                  }. New expiry: ${newExpiryDate.toLocaleDateString()}. Applied to owner and ${
+                    staffUserIds.size
+                  } staff members.`, // <-- MODIFIED LOG
+                  user: { id: auth.currentUser.uid, name: "Super Admin" },
+                });
+
+                // 6. Success
+                showToast(
+                  `Subscription approved. Applied to owner and ${staffUserIds.size} staff.`, // <-- MODIFIED TOAST
+                  "success"
+                );
+                closeModal(modal);
+              } catch (error) {
+                console.error("Error approving subscription:", error);
+                showToast(`Approval failed: ${error.message}`, "error");
+                button.disabled = false;
+                button.innerHTML = "Approve";
+              }
+              // --- END NEW LOGIC ---
+            });
+        }
+        if (action === "reject-renewal") {
+          const request = firestoreData.subscriptionRequests.find(
+            (r) => r.id === id
+          );
+          if (!request) return;
+          const modal = showModal(
+            "Reject Subscription",
+            `Are you sure you want to reject this request for ${request.userEmail}?`,
+            `<button data-action="close-modal" class="btn btn-secondary">Cancel</button><button id="confirm-reject" class="btn btn-danger">Reject</button>`
+          );
+          modal
+            .querySelector("#confirm-reject")
+            .addEventListener("click", async () => {
+              await updateDoc(doc(db, "subscription_requests", id), {
+                status: "rejected",
+              });
+              closeModal(modal);
+            });
+        }
+        // --- UPDATED: action="view-ticket" ---
+        if (action === "view-ticket") {
+          const row = target.closest(".ticket-row");
+          const messageRow = row.nextElementSibling;
+          row.classList.toggle("expanded");
+          messageRow.classList.toggle("hidden");
+          if (!messageRow.querySelector("button")) {
+            const ticket = firestoreData.supportTickets.find(
+              (t) => t.id === id
+            );
+            if (ticket.status === "open") {
+              // Select the inner div to append the button
+              const innerDiv = messageRow.querySelector("td > div");
+              if (innerDiv) {
+                innerDiv.innerHTML += `<div class="mt-4 border-t border-border-color pt-4"><button data-action="resolve-ticket" data-id="${id}" class="btn btn-primary">Mark as Resolved</button></div>`;
+              }
+            }
+          }
+        }
+        if (action === "resolve-ticket") {
+          await updateDoc(doc(db, "support_tickets", id), {
+            status: "resolved",
+          });
+        }
+        if (action === "toggle-feature-flag") {
+          const isEnabled = e.target.checked;
+          appState.settings.featureFlags[flagId] = isEnabled;
+          await updateGlobalSettings({
+            featureFlags: appState.settings.featureFlags,
+          });
+        }
+        if (action === "toggle-store-enabled") {
+          e.stopPropagation();
+          const isEnabled = e.target.checked;
+          await updateDoc(doc(db, "stores", storeId), { isEnabled: isEnabled });
+          await addDoc(collection(db, "global_audit_log"), {
+            type: "store_status_changed",
+            timestamp: serverTimestamp(),
+            details: `Store ${storeId} set to ${
+              isEnabled ? "Enabled" : "Disabled"
+            }`,
+            user: { id: auth.currentUser.uid, name: "Super Admin" },
+          });
+        }
+      });
+
+      document.body.addEventListener("submit", async (e) => {
+        const form = e.target;
+        if (form.id === "settings-form") {
+          e.preventDefault();
+          const days = parseInt(form.trialDays.value);
+          if (!isNaN(days)) {
+            await updateGlobalSettings({ defaultTrialDays: days });
+          }
+        }
+        if (form.id === "broadcast-form") {
+          e.preventDefault();
+          const message = form.message.value;
+          const type = form.type.value;
+          if (!message.trim()) return;
+
+          const allStoreIds = firestoreData.stores.map((s) => s.id);
+          const batch = writeBatch(db);
+          allStoreIds.forEach((storeId) => {
+            const newNotifRef = doc(
+              collection(db, `stores/${storeId}/notifications`)
+            );
+            batch.set(newNotifRef, {
+              date: new Date().toISOString(),
+              message: `<strong>[Admin Broadcast]</strong> ${message}`,
+              type: type,
+              read: false,
+              targetRoles: ["admin", "manager", "cashier"],
+            });
+          });
+          await batch.commit();
+
+          await addDoc(collection(db, "global_audit_log"), {
+            type: "broadcast_sent",
+            timestamp: serverTimestamp(),
+            details: `Sent '${type}' broadcast: "${message}"`,
+            user: { id: auth.currentUser.uid, name: "Super Admin" },
+          });
+
+          form.reset();
+        }
+      });
+
+      document
+        .getElementById("global-search-input")
+        .addEventListener("input", (e) => {
+          const query = e.target.value;
+          appState.activeView = "users";
+          appState.viewStates.users.searchQuery = query;
+          appState.viewStates.users.currentPage = 1;
+          renderActiveView();
+
+          const userSearchInput = document.getElementById("user-search");
+          if (userSearchInput) {
+            userSearchInput.value = query;
+          }
+        });
+
+      // --- AUTHENTICATION ---
+      onAuthStateChanged(auth, (user) => {
+        const loginContainer = document.getElementById("login-container");
+        const appContainer = document.getElementById("app-container");
+        const loadingOverlay = document.getElementById("loading-overlay");
+        const sidebar = document.getElementById("app-sidebar");
+        const header = document.getElementById("app-header");
+
+        if (user && user.email === "admin@cashshilpo.com") {
+          loginContainer.style.display = "none";
+          appContainer.style.display = "block";
+          sidebar.classList.add("animated");
+          header.classList.add("animated");
+
+          if (activeListeners.length === 0) initFirebaseListeners();
+
+          if (!clockInterval) {
+            updateClock();
+            clockInterval = setInterval(updateClock, 1000);
+          }
+
+          renderActiveView();
+        } else {
+          if (user) signOut(auth);
+          loginContainer.style.display = "flex";
+          appContainer.style.display = "none";
+          sidebar.classList.remove("animated");
+          header.classList.remove("animated");
+
+          loadingOverlay.style.display = "none";
+
+          if (clockInterval) clearInterval(clockInterval);
+          clockInterval = null;
+
+          activeListeners.forEach((unsub) => unsub());
+          activeListeners = [];
+          processedNotificationIds.clear();
+        }
+      });
+
+      document.getElementById("login-form").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const email = e.target.email.value;
+        const password = e.target.password.value;
+        const errorEl = document.getElementById("auth-error");
+        errorEl.classList.add("hidden");
+
+        signInWithEmailAndPassword(auth, email, password).catch((error) => {
+          errorEl.textContent = error.message.replace("Firebase: ", "");
+          errorEl.classList.remove("hidden");
+        });
+      });
+
+      if (typeof lucide !== "undefined") lucide.createIcons();
+    </script>
+  </body>
+</html>

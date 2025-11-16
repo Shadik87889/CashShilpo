@@ -1,0 +1,2178 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CashShilpo - Modern POS Software</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- NEW: Stupendous Testimonial Font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,400;1,500&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@0.452.0/dist/umd/lucide.js"></script>
+
+    <style>
+      /* Use Inter as the default font */
+      body {
+        font-family: "Inter", sans-serif;
+      }
+
+      /* NEW: Testimonial Font Class */
+      .font-testimonial {
+        font-family: "Cormorant Garamond", serif;
+      }
+      /* END NEW */
+
+      /* Define a vibrant accent color */
+      :root {
+        --accent-color: #39ff14; /* A vibrant lime green */
+      }
+
+      .text-accent {
+        color: var(--accent-color);
+      }
+      .bg-accent {
+        background-color: var(--accent-color);
+      }
+      .border-accent {
+        border-color: var(--accent-color);
+      }
+
+      /* Simple marquee animation */
+      .marquee-container {
+        overflow: hidden;
+        display: flex; /* Use flexbox for robust layout */
+      }
+
+      .marquee-content {
+        flex-shrink: 0; /* Prevent content from shrinking */
+        animation: marquee 50s linear infinite; /* Slower animation */
+      }
+
+      @keyframes marquee {
+        0% {
+          transform: translateX(0%);
+        }
+        100% {
+          transform: translateX(
+            -66.6667%
+          ); /* Move 2/3 of the width, since there are 3 copies */
+        }
+      }
+
+      /* NEW: Logo Marquee Animation */
+      #logo-marquee-content {
+        animation: marquee-logos 40s linear infinite; /* Slowed down animation */
+        display: flex;
+      }
+
+      @keyframes marquee-logos {
+        0% {
+          transform: translateX(0%);
+        }
+        100% {
+          transform: translateX(-100vw); /* Animate one full screen width */
+        }
+      }
+
+      /* Styling for trusted-by logos */
+      .logo-cloud-item {
+        filter: grayscale(1) opacity(60%);
+        transition: all 0.3s ease;
+      }
+      .logo-cloud-item:hover {
+        filter: grayscale(0) opacity(100%);
+      }
+
+      /* Shimmer effect for skeleton */
+      .shimmer {
+        animation: shimmer 1.5s infinite;
+        background: linear-gradient(
+          to right,
+          #3a3a3a 8%,
+          #4a4a4a 18%,
+          #3a3a3a 33%
+        );
+        background-size: 800px 104px; /* Width of the gradient */
+        position: relative;
+      }
+
+      @keyframes shimmer {
+        0% {
+          background-position: -400px 0;
+        }
+        100% {
+          background-position: 400px 0;
+        }
+      }
+
+      /* NEW: Accent Shadow */
+      .shadow-accent-2xl {
+        box-shadow: 0 0px 40px -12px rgba(57, 255, 20, 0.4); /* Use the actual hex for opacity */
+      }
+      /* END NEW */
+
+      /* --- NEW: Scroll Animation System --- */
+
+      /* Base state for all animated elements */
+      .animate-fade-in-up,
+        .animate-fade-in-left,
+        .animate-fade-in-right,
+        .animate-scale-in,
+        .animate-card,
+        .animate-slide-and-scale-left,  /* NEW */
+        .animate-slide-and-scale-right {
+        /* NEW */
+        opacity: 0;
+        transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+      }
+
+      /* Specific start positions */
+      .animate-fade-in-up {
+        transform: translateY(40px);
+      }
+      .animate-fade-in-left {
+        transform: translateX(-40px);
+      }
+      .animate-fade-in-right {
+        transform: translateX(40px);
+      }
+      .animate-scale-in {
+        transform: scale(0.95);
+      }
+      .animate-card {
+        transform: translateY(30px) scale(0.98);
+      }
+
+      /* NEW: "Mind-blowing" animation styles for pillars */
+      .animate-slide-and-scale-left {
+        transition-duration: 0.8s;
+        transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        transform: translateX(-50px) scale(0.9);
+      }
+      .animate-slide-and-scale-right {
+        transition-duration: 0.8s;
+        transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        transform: translateX(50px) scale(0.9);
+      }
+      /* END NEW STYLES */
+
+      /* Visible state */
+      .is-visible {
+        opacity: 1;
+        transform: translateY(0) translateX(0) scale(1);
+      }
+
+      /* Stagger container for card grid */
+      .animate-stagger-children.is-visible .animate-card {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+
+      /* Stagger delay logic for card grid */
+      .animate-stagger-children.is-visible .animate-card:nth-child(1) {
+        transition-delay: 0.1s;
+      }
+      .animate-stagger-children.is-visible .animate-card:nth-child(2) {
+        transition-delay: 0.2s;
+      }
+      .animate-stagger-children.is-visible .animate-card:nth-child(3) {
+        transition-delay: 0.3s;
+      }
+      .animate-stagger-children.is-visible .animate-card:nth-child(4) {
+        transition-delay: 0.4s;
+      }
+      .animate-stagger-children.is-visible .animate-card:nth-child(5) {
+        transition-delay: 0.5s;
+      }
+      .animate-stagger-children.is-visible .animate-card:nth-child(6) {
+        transition-delay: 0.6s;
+      }
+
+      /* Staggering for Hero */
+      .hero-header h1.animate-fade-in-up.is-visible {
+        transition-delay: 0.1s;
+      }
+      .hero-header p.animate-fade-in-up.is-visible {
+        transition-delay: 0.2s;
+      }
+      .hero-header div.animate-fade-in-up.is-visible {
+        transition-delay: 0.3s;
+      }
+
+      /* Staggering for Final CTA */
+      .cta-section h2.animate-fade-in-up.is-visible {
+        transition-delay: 0.1s;
+      }
+      .cta-section p.animate-fade-in-up.is-visible {
+        transition-delay: 0.2s;
+      }
+      .cta-section div.animate-fade-in-up.is-visible {
+        transition-delay: 0.3s;
+      }
+
+      /* --- End Scroll Animation System --- */
+
+      /* NEW: Styling for the background image grid and overlay */
+      .stats-background-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr); /* 4 columns */
+        grid-template-rows: repeat(
+          3,
+          minmax(150px, 1fr)
+        ); /* 3 rows, minimum height for smaller screens - INCREASED min height */
+        gap: 0.5rem; /* Small gap between images */
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden; /* Hide overflow if images don't perfectly fill */
+        pointer-events: none; /* Allow clicks to pass through */
+      }
+
+      .stats-background-grid img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* Cover the grid area */
+        filter: brightness(0.4) saturate(0.8); /* Darken and desaturate images slightly */
+        transition: transform 0.5s ease;
+      }
+
+      /* Optional: Hover effect for background images (if clickable) */
+      .stats-background-grid img:hover {
+        transform: scale(1.05);
+      }
+
+      .stats-overlay {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        background: radial-gradient(
+            circle at center,
+            rgba(255, 255, 255, 0.1),
+            rgba(0, 0, 0, 0.9)
+          ),
+          rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px) saturate(180%);
+        -webkit-backdrop-filter: blur(10px) saturate(180%);
+        mix-blend-mode: multiply;
+      }
+
+      /* 📱 Mobile Optimization */
+      @media (max-width: 768px) {
+        .stats-overlay {
+          background: radial-gradient(
+              circle at center,
+              rgba(255, 255, 255, 0.06),
+              rgba(0, 0, 0, 0.85)
+            ),
+            rgba(255, 255, 255, 0.01);
+          backdrop-filter: blur(1px) saturate(140%);
+          -webkit-backdrop-filter: blur(1px) saturate(140%);
+        }
+      }
+
+      /* REMOVED: Old rule for 7th child */
+      /* .stats-background-grid img:nth-child(7) {
+            grid-row: span 2;
+        } */
+      /* END REMOVED */
+
+      /* --- NEW: Rules to match the screenshot layout --- */
+
+      /* The 6th image ("Online Pharmacy" in screenshot) spans 2 columns */
+      .stats-background-grid img:nth-child(6) {
+        grid-column: span 2;
+      }
+
+      /* The 7th image ("70% OFF" in screenshot) spans 2 rows */
+      .stats-background-grid img:nth-child(7) {
+        grid-row: span 2;
+      }
+      /* --- END NEW --- */
+
+      /* NEW: Testimonial Ticker */
+      .testimonial-ticker-container {
+        overflow: hidden;
+        display: flex;
+        padding: 2rem 0;
+        background: #0a0a0a; /* Slightly different black */
+        border-top: 1px solid #222;
+        border-bottom: 1px solid #222;
+      }
+
+      .testimonial-ticker-content {
+        display: flex;
+        flex-shrink: 0;
+        animation: marquee-testimonials 60s linear infinite;
+      }
+
+      .testimonial-item {
+        flex-shrink: 0;
+        width: 400px; /* Fixed width for each item */
+        margin: 0 1.5rem; /* 3rem gap between items */
+        padding: 1.5rem;
+        background: #111;
+        border: 1px solid #333;
+        border-radius: 1rem;
+        transition: all 0.3s ease;
+      }
+
+      .testimonial-item:hover {
+        border-color: var(--accent-color);
+        transform: scale(1.03) translateY(-4px);
+        background: #1a1a1a;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+      }
+
+      @keyframes marquee-testimonials {
+        0% {
+          transform: translateX(0%);
+        }
+        100% {
+          transform: translateX(
+            -50%
+          ); /* Assuming we duplicate the content once */
+        }
+      }
+      /* --- NEW: Nav Link Hover Effect --- */
+      .nav-link {
+        position: relative;
+        padding-bottom: 8px; /* Add padding to make space for the underline */
+        overflow: hidden; /* Hide overflow for the underline */
+        transition: color 0.3s ease; /* Add transition for color */
+      }
+
+      .nav-link::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 50%; /* Start from the center */
+        transform: translateX(-50%); /* Center the starting point */
+        width: 0%; /* Start with no width */
+        height: 2px;
+        background-color: var(--accent-color);
+        transition: width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Smooth ease */
+      }
+
+      .nav-link:hover::after {
+        width: 100%; /* Expand to full width on hover */
+      }
+
+      .nav-link:hover {
+        color: var(--accent-color); /* Change color on hover */
+      }
+      /* END NEW */
+
+      /* --- START: Styles for "See More" Features --- */
+      .feature-card {
+        /* This re-defines the .animate-card properties to be consistent */
+        opacity: 0;
+        transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+        transform: translateY(30px) scale(0.98);
+      }
+
+      #features-grid .feature-card:nth-child(n + 7) {
+        display: none;
+      }
+
+      #features-grid.is-expanded .feature-card:nth-child(n + 7) {
+        display: block;
+        /* Apply animation for the newly shown items */
+        animation: simpleFadeInUp 0.6s ease-out forwards;
+      }
+
+      @keyframes simpleFadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px) scale(0.98);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+      /* --- END: Styles for "See More" Features --- */
+    </style>
+  </head>
+  <body class="bg-black text-white antialiased">
+    <div class="overflow-x-hidden">
+      <!-- Navigation -->
+      <nav
+        class="container mx-auto px-6 py-6 flex justify-between items-center sticky top-0 z-50 bg-black bg-opacity-80 backdrop-blur-md"
+      >
+        <!-- Logo -->
+        <a
+          href="#"
+          class="flex items-center space-x-2 text-3xl font-extrabold text-white"
+        >
+          <img
+            src="cashshilpo-official-logo.png"
+            alt="CashShilpo Logo"
+            class="w-12 h-12 object-contain"
+          />
+          <span>Cash<span class="text-accent">Shilpo</span>.</span>
+        </a>
+
+        <!-- Desktop Nav -->
+        <div class="hidden md:flex space-x-8 items-center">
+          <a href="#features" class="nav-link text-gray-300">Features</a>
+          <a href="pricing" class="nav-link text-gray-300">Pricing</a>
+          <a href="support" class="nav-link text-gray-300">Support</a>
+          <a
+            href="workplace"
+            class="bg-accent text-black font-semibold px-6 py-3 rounded-full hover:bg-white hover:scale-105 transition-all duration-300 transform"
+          >
+            Get Started
+          </a>
+        </div>
+
+        <!-- Mobile Nav Button -->
+        <button
+          id="mobile-menu-button"
+          class="md:hidden p-2 rounded-md text-gray-300 hover:text-white"
+        >
+          <i data-lucide="menu" class="h-8 w-8"></i>
+        </button>
+      </nav>
+
+      <!-- Mobile Menu (hidden by default) -->
+      <div
+        id="mobile-menu"
+        class="hidden md:hidden bg-gray-900 p-6 absolute top-24 left-0 right-0 z-40 border-b-2 border-accent"
+      >
+        <a href="#features" class="block text-gray-300 hover:text-accent py-2"
+          >Features</a
+        >
+        <a href="pricing" class="block text-gray-300 hover:text-accent py-2"
+          >Pricing</a
+        >
+        <a href="support" class="block text-gray-300 hover:text-accent py-2"
+          >Support</a
+        >
+        <a
+          href="#start"
+          class="mt-4 block bg-accent text-black font-semibold px-6 py-3 rounded-full text-center hover:bg-white transition-all duration-300"
+        >
+          Get Started
+        </a>
+      </div>
+
+      <!-- Hero Section -->
+      <header
+        class="hero-header container mx-auto px-6 pt-24 pb-32 md:pt-32 md:pb-40 text-center"
+      >
+        <h1
+          class="text-5xl sm:text-6xl md:text-8xl font-extrabold leading-tight tracking-tighter animate-fade-in-up"
+        >
+          MANAGE YOUR BUSINESS,
+          <br class="hidden md:block" />
+          SIMPLY & <span class="text-accent">SMARTLY.</span>
+        </h1>
+        <p
+          class="text-lg md:text-xl text-gray-400 mt-8 max-w-3xl mx-auto animate-fade-in-up"
+        >
+          CashShilpo is the all-in-one POS software designed to streamline your
+          operations, manage inventory, and boost your sales. Stop guessing,
+          start growing.
+        </p>
+        <div class="mt-12 animate-fade-in-up">
+          <a
+            href="#start"
+            class="bg-accent text-black font-bold text-lg px-10 py-5 rounded-full hover:bg-white hover:scale-105 transition-all duration-300 transform"
+          >
+            Start Your 7-Day Free Trial
+          </a>
+        </div>
+      </header>
+
+      <!-- Trusted By Section -->
+      <section class="py-16 bg-black">
+        <div class="container mx-auto px-6">
+          <p
+            class="text-center text-gray-500 font-semibold uppercase tracking-widest mb-8 animate-fade-in-up"
+          >
+            Trusted by businesses like yours
+          </p>
+        </div>
+
+        <!-- NEW: Logo Marquee with Fade -->
+        <div class="relative w-full overflow-hidden animate-fade-in-up">
+          <!-- Overlays for fade effect - WIDENED from w-24 to w-48 -->
+          <div
+            class="absolute top-0 left-0 w-48 h-full bg-gradient-to-r from-black to-transparent z-10"
+          ></div>
+          <div
+            class="absolute top-0 right-0 w-48 h-full bg-gradient-to-l from-black to-transparent z-10"
+          ></div>
+
+          <!-- Marquee Content -->
+          <div class="flex" id="logo-marquee-content">
+            <!-- Set 1 (w-screen) -->
+            <div
+              class="flex-shrink-0 flex justify-around items-center w-screen"
+            >
+              <div
+                class="text-center text-2xl font-bold text-gray-400 logo-cloud-item px-12"
+              >
+                BRAND.IO
+              </div>
+              <div
+                class="text-center text-2xl font-bold text-gray-400 logo-cloud-item px-12"
+              >
+                ECOFOODS
+              </div>
+              <div
+                class="text-center text-2xl font-bold text-gray-400 logo-cloud-item px-12"
+              >
+                FUTURA
+              </div>
+              <div
+                class="text-center text-2xl font-bold text-gray-400 logo-cloud-item px-12"
+              >
+                THE HUB
+              </div>
+              <div
+                class="text-center text-2xl font-bold text-gray-400 logo-cloud-item px-12"
+              >
+                LOCAL GEMS
+              </div>
+            </div>
+            <!-- Set 2 (w-screen) - Duplicate -->
+            <div
+              class="flex-shrink-0 flex justify-around items-center w-screen"
+            >
+              <div
+                class="text-center text-2xl font-bold text-gray-400 logo-cloud-item px-12"
+              >
+                BRAND.IO
+              </div>
+              <div
+                class="text-center text-2xl font-bold text-gray-400 logo-cloud-item px-12"
+              >
+                ECOFOODS
+              </div>
+              <div
+                class="text-center text-2xl font-bold text-gray-400 logo-cloud-item px-12"
+              >
+                FUTURA
+              </div>
+              <div
+                class="text-center text-2xl font-bold text-gray-400 logo-cloud-item px-12"
+              >
+                THE HUB
+              </div>
+              <div
+                class="text-center text-2xl font-bold text-gray-400 logo-cloud-item px-12"
+              >
+                LOCAL GEMS
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Main Software Interface Section -->
+      <section class="py-1 md:py-32">
+        <div class="container mx-auto px-6">
+          <div class="text-center max-w-3xl mx-auto mb-16 animate-fade-in-up">
+            <h2 class="text-4xl md:text-6xl font-extrabold mb-4">
+              THIS IS YOUR NEW <span class="text-accent">COMMAND CENTER.</span>
+            </h2>
+            <p class="text-lg text-gray-400">
+              One clean, powerful dashboard to control your entire business.
+              From sales to stock, it's all right here.
+            </p>
+          </div>
+
+          <!-- NEW: Computer Monitor Effect -->
+          <div class="max-w-6xl mx-auto animate-scale-in">
+            <!-- Monitor Frame -->
+            <div
+              class="bg-gray-800 rounded-t-2xl pt-2 sm:pt-4 px-2 sm:px-4 border-b-2 border-gray-900 shadow-2xl"
+            >
+              <!-- Monitor Header Bar -->
+              <div
+                class="flex items-center space-x-1.5 sm:space-x-2 h-6 sm:h-8 mb-2 sm:mb-4 px-2 sm:px-0"
+              >
+                <div
+                  class="w-3 h-3 sm:w-4 sm:h-4 bg-gray-900 rounded-full"
+                ></div>
+                <div
+                  class="w-3 h-3 sm:w-4 sm:h-4 bg-gray-900 rounded-full"
+                ></div>
+                <div
+                  class="w-3 h-3 sm:w-4 sm:h-4 bg-gray-900 rounded-full"
+                ></div>
+              </div>
+
+              <!-- Screen Area (The original skeleton preview) -->
+              <!-- START: Embedded Skeleton Preview -->
+              <div
+                class="flex h-[16rem] md:h-[620px] rounded-t-lg overflow-hidden bg-[#0f0f0f] text-gray-300 border-2 border-black"
+              >
+                <!-- Sidebar Skeleton -->
+                <aside
+                  class="w-64 bg-[#171717] p-4 flex-col justify-between border-r border-gray-800 hidden md:flex"
+                >
+                  <div>
+                    <!-- Logo area -->
+                    <div class="flex items-center space-x-2 mb-8">
+                      <div class="w-8 h-8 rounded-md bg-gray-700 shimmer"></div>
+                      <div
+                        class="h-6 w-32 rounded-md bg-gray-700 shimmer"
+                      ></div>
+                    </div>
+
+                    <!-- Nav items -->
+                    <ul class="space-y-4">
+                      <li
+                        class="flex items-center space-x-3 p-3 rounded-lg bg-gray-800 border border-gray-700"
+                      >
+                        <div
+                          class="w-6 h-6 rounded-md bg-gray-600 shimmer"
+                        ></div>
+                        <div
+                          class="h-4 w-32 rounded-md bg-gray-600 shimmer"
+                        ></div>
+                      </li>
+                      <li class="flex items-center space-x-3 p-3 rounded-lg">
+                        <div
+                          class="w-6 h-6 rounded-md bg-gray-700 shimmer"
+                        ></div>
+                        <div
+                          class="h-4 w-28 rounded-md bg-gray-700 shimmer"
+                        ></div>
+                      </li>
+                      <li class="flex items-center space-x-3 p-3 rounded-lg">
+                        <div
+                          class="w-6 h-6 rounded-md bg-gray-700 shimmer"
+                        ></div>
+                        <div
+                          class="h-4 w-24 rounded-md bg-gray-700 shimmer"
+                        ></div>
+                      </li>
+                      <li class="flex items-center space-x-3 p-3 rounded-lg">
+                        <div
+                          class="w-6 h-6 rounded-md bg-gray-700 shimmer"
+                        ></div>
+                        <div
+                          class="h-4 w-20 rounded-md bg-gray-700 shimmer"
+                        ></div>
+                      </li>
+                    </ul>
+                  </div>
+
+                  <!-- User Profile / Bottom Nav -->
+                  <div
+                    class="flex items-center space-x-3 p-3 rounded-lg mt-8 bg-gray-800 border border-gray-700"
+                  >
+                    <div
+                      class="w-10 h-10 rounded-full bg-gray-600 shimmer"
+                    ></div>
+                    <div class="flex-grow">
+                      <div
+                        class="h-4 w-24 rounded-md bg-gray-600 shimmer mb-2"
+                      ></div>
+                      <div
+                        class="h-3 w-16 rounded-md bg-gray-700 shimmer"
+                      ></div>
+                    </div>
+                  </div>
+                </aside>
+
+                <!-- Main Content Skeleton -->
+                <div class="flex-1 flex flex-col min-w-0">
+                  <!-- Top Nav/Header Skeleton -->
+                  <header
+                    class="h-16 bg-[#171717] px-4 sm:px-6 flex items-center justify-between border-b border-gray-800 flex-shrink-0"
+                  >
+                    <div class="flex items-center space-x-4">
+                      <div
+                        class="w-8 h-8 rounded-md bg-gray-700 shimmer md:hidden"
+                      ></div>
+                      <!-- Mobile Menu Icon -->
+                      <div
+                        class="w-32 sm:w-48 h-10 rounded-md bg-gray-700 shimmer"
+                      ></div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                      <div
+                        class="w-10 h-10 rounded-md bg-gray-700 shimmer hidden sm:block"
+                      ></div>
+                      <div
+                        class="w-10 h-10 rounded-md bg-gray-700 shimmer hidden sm:block"
+                      ></div>
+                      <div
+                        class="w-10 h-10 rounded-full bg-gray-700 shimmer"
+                      ></div>
+                    </div>
+                  </header>
+
+                  <!-- Dashboard Content Area -->
+                  <main
+                    class="flex-1 p-3 md:p-6 overflow-y-auto bg-black min-h-0"
+                  >
+                    <!-- Tabs Skeleton -->
+                    <div
+                      class="flex space-x-4 border-b border-gray-800 pb-4 mb-6"
+                    >
+                      <div
+                        class="h-8 w-24 rounded-md bg-gray-700 shimmer"
+                      ></div>
+                      <div
+                        class="h-8 w-20 rounded-md bg-gray-800 shimmer hidden sm:block"
+                      ></div>
+                      <div
+                        class="h-8 w-28 rounded-md bg-gray-800 shimmer hidden sm:block"
+                      ></div>
+                    </div>
+
+                    <!-- Welcome Back Header -->
+                    <div
+                      class="flex flex-col md:flex-row justify-between md:items-center mb-6"
+                    >
+                      <div class="mb-4 md:mb-0">
+                        <div
+                          class="h-6 w-48 rounded-md bg-gray-700 shimmer mb-2"
+                        ></div>
+                        <div
+                          class="h-4 w-40 rounded-md bg-gray-800 shimmer"
+                        ></div>
+                      </div>
+                      <div class="flex space-x-2">
+                        <div
+                          class="h-10 w-20 rounded-md bg-gray-800 shimmer"
+                        ></div>
+                        <div
+                          class="h-10 w-24 rounded-md bg-gray-700 shimmer"
+                        ></div>
+                      </div>
+                    </div>
+
+                    <!-- Top Metric Cards Skeleton -->
+                    <div
+                      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
+                    >
+                      <div
+                        class="bg-[#171717] p-6 rounded-lg border border-gray-800 shimmer"
+                      >
+                        <div class="h-5 w-32 rounded-md bg-gray-700 mb-4"></div>
+                        <div
+                          class="h-8 w-full max-w-40 rounded-md bg-gray-600 mb-2"
+                        ></div>
+                        <div
+                          class="h-4 w-full max-w-32 rounded-md bg-gray-700"
+                        ></div>
+                      </div>
+                      <div
+                        class="bg-[#171717] p-6 rounded-lg border border-gray-800 shimmer"
+                      >
+                        <div class="h-5 w-32 rounded-md bg-gray-700 mb-4"></div>
+                        <div
+                          class="h-8 w-full max-w-40 rounded-md bg-gray-600 mb-2"
+                        ></div>
+                        <div
+                          class="h-4 w-full max-w-32 rounded-md bg-gray-700"
+                        ></div>
+                      </div>
+                      <div
+                        class="bg-[#171717] p-6 rounded-lg border border-gray-800 shimmer hidden lg:block"
+                      >
+                        <div class="h-5 w-32 rounded-md bg-gray-700 mb-4"></div>
+                        <div
+                          class="h-8 w-full max-w-40 rounded-md bg-gray-600 mb-2"
+                        ></div>
+                        <div
+                          class="h-4 w-full max-w-32 rounded-md bg-gray-700"
+                        ></div>
+                      </div>
+                      <div
+                        class="bg-[#171717] p-6 rounded-lg border border-gray-800 shimmer hidden lg:block"
+                      >
+                        <div class="h-5 w-32 rounded-md bg-gray-700 mb-4"></div>
+                        <div
+                          class="h-8 w-full max-w-40 rounded-md bg-gray-600 mb-2"
+                        ></div>
+                        <div
+                          class="h-4 w-full max-w-32 rounded-md bg-gray-700"
+                        ></div>
+                      </div>
+                    </div>
+
+                    <!-- Revenue Overview & Performance Snapshot -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                      <div
+                        class="lg:col-span-2 bg-[#171717] p-6 rounded-lg border border-gray-800 shimmer"
+                      >
+                        <div class="h-6 w-48 rounded-md bg-gray-700 mb-6"></div>
+                        <div class="w-full h-64 rounded-lg bg-gray-700"></div>
+                        <!-- Placeholder for chart -->
+                      </div>
+                      <div
+                        class="bg-[#171717] p-6 rounded-lg border border-gray-800 shimmer"
+                      >
+                        <div class="h-6 w-48 rounded-md bg-gray-700 mb-6"></div>
+                        <div class="space-y-4">
+                          <div class="flex justify-between items-center">
+                            <div class="h-4 w-32 rounded-md bg-gray-700"></div>
+                            <div class="h-4 w-16 rounded-md bg-gray-700"></div>
+                          </div>
+                          <div class="flex justify-between items-center">
+                            <div
+                              class="h-4 w-2/3 sm:w-48 rounded-md bg-gray-700"
+                            ></div>
+                            <div
+                              class="h-4 w-1/4 sm:w-20 rounded-md bg-gray-700"
+                            ></div>
+                          </div>
+                          <div class="flex justify-between items-center">
+                            <div
+                              class="h-4 w-1/2 sm:w-40 rounded-md bg-gray-700"
+                            ></div>
+                            <div
+                              class="h-4 w-1/4 sm:w-12 rounded-md bg-gray-700"
+                            ></div>
+                          </div>
+                        </div>
+                        <div
+                          class="h-6 w-48 rounded-md bg-gray-700 mt-8 mb-6 hidden lg:block"
+                        ></div>
+                        <div
+                          class="w-40 h-40 rounded-full bg-gray-700 mx-auto hidden lg:block"
+                        ></div>
+                        <!-- Placeholder for pie chart -->
+                      </div>
+                    </div>
+                  </main>
+                </div>
+              </div>
+              <!-- END: Embedded Skeleton Preview -->
+              <!-- End Screen Area -->
+            </div>
+            <!-- Monitor Base -->
+            <div
+              class="h-2 sm:h-6 bg-gray-700 w-full max-w-[14rem] sm:max-w-sm mx-auto rounded-b-md"
+            ></div>
+            <div
+              class="h-1.5 sm:h-3 bg-gray-800 w-full max-w-[16rem] sm:max-w-md mx-auto rounded-b-lg"
+            ></div>
+          </div>
+          <!-- END: Computer Monitor Effect -->
+        </div>
+      </section>
+
+      <!-- Core Pillars Section (Replaces old Features) -->
+      <section
+        id="features"
+        class="container mx-auto px-6 py-32 space-y-32 md:space-y-40"
+      >
+        <!-- NEW: Section Header -->
+        <div
+          class="text-center max-w-3xl mx-auto mb-20 md:mb-32 animate-fade-in-up"
+        >
+          <h2 class="text-4xl md:text-6xl font-extrabold mb-4">
+            FEATURES BUILT FOR <span class="text-accent">YOUR BUSINESS.</span>
+          </h2>
+          <p class="text-lg text-gray-400">
+            CashShilpo is built on three core pillars designed to simplify your
+            workday and accelerate your growth.
+          </p>
+        </div>
+        <!-- END: Section Header -->
+
+        <!-- Pillar 1: Sales -->
+        <div
+          class="grid grid-cols-1 md:grid-cols-5 gap-8 md:gap-16 items-center"
+        >
+          <!-- Image -->
+          <div class="md:col-span-3 animate-slide-and-scale-left">
+            <div
+              class="relative w-full h-auto rounded-2xl border-2 border-gray-800 shadow-lg p-4 sm:p-6 bg-gray-900 md:aspect-[3/2]"
+            >
+              <!-- Checkout Screen Skeleton -->
+              <div class="h-full flex flex-col justify-between">
+                <!-- Header -->
+                <div class="flex justify-between items-center mb-4">
+                  <div
+                    class="w-24 h-6 bg-gradient-to-r from-purple-500 to-pink-500 rounded shimmer"
+                  ></div>
+                  <div class="flex space-x-2">
+                    <div class="w-8 h-8 bg-gray-700 rounded-full shimmer"></div>
+                    <div class="w-8 h-8 bg-gray-700 rounded-full shimmer"></div>
+                  </div>
+                </div>
+                <!-- Products Grid -->
+                <div
+                  class="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4 flex-grow mb-4"
+                >
+                  <div
+                    class="bg-gradient-to-br from-green-400 to-blue-500 rounded-lg p-3 relative overflow-hidden"
+                  >
+                    <div
+                      class="w-full h-12 sm:h-16 bg-white opacity-20 rounded mb-2"
+                    ></div>
+                    <div
+                      class="w-3/4 h-3 sm:h-4 bg-white opacity-20 rounded"
+                    ></div>
+                  </div>
+                  <div
+                    class="bg-gradient-to-br from-yellow-400 to-orange-500 rounded-lg p-3 relative overflow-hidden"
+                  >
+                    <div
+                      class="w-full h-12 sm:h-16 bg-white opacity-20 rounded mb-2"
+                    ></div>
+                    <div
+                      class="w-3/4 h-3 sm:h-4 bg-white opacity-20 rounded"
+                    ></div>
+                  </div>
+                  <div
+                    class="bg-gradient-to-br from-red-400 to-purple-500 rounded-lg p-3 relative overflow-hidden"
+                  >
+                    <div
+                      class="w-full h-12 sm:h-16 bg-white opacity-20 rounded mb-2"
+                    ></div>
+                    <div
+                      class="w-3/4 h-3 sm:h-4 bg-white opacity-20 rounded"
+                    ></div>
+                  </div>
+                  <div
+                    class="bg-gradient-to-br from-blue-400 to-cyan-500 rounded-lg p-3 relative overflow-hidden"
+                  >
+                    <div
+                      class="w-full h-12 sm:h-16 bg-white opacity-20 rounded mb-2"
+                    ></div>
+                    <div
+                      class="w-3/4 h-3 sm:h-4 bg-white opacity-20 rounded"
+                    ></div>
+                  </div>
+                  <div
+                    class="bg-gradient-to-br from-pink-400 to-purple-500 rounded-lg p-3 relative overflow-hidden"
+                  >
+                    <div
+                      class="w-full h-12 sm:h-16 bg-white opacity-20 rounded mb-2"
+                    ></div>
+                    <div
+                      class="w-3/4 h-3 sm:h-4 bg-white opacity-20 rounded"
+                    ></div>
+                  </div>
+                  <div
+                    class="bg-gradient-to-br from-green-300 to-teal-500 rounded-lg p-3 relative overflow-hidden"
+                  >
+                    <div
+                      class="w-full h-12 sm:h-16 bg-white opacity-20 rounded mb-2"
+                    ></div>
+                    <div
+                      class="w-3/4 h-3 sm:h-4 bg-white opacity-20 rounded"
+                    ></div>
+                  </div>
+                </div>
+                <!-- Total & Checkout Button -->
+                <div class="flex justify-between items-center">
+                  <div
+                    class="w-24 sm:w-32 h-8 bg-gray-700 rounded shimmer"
+                  ></div>
+                  <div
+                    class="w-20 sm:w-24 h-10 bg-accent rounded-full shimmer"
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Text Content -->
+          <div
+            class="md:col-span-2 md:-ml-12 lg:-ml-24 relative z-10 animate-slide-and-scale-right"
+          >
+            <span
+              class="absolute -top-12 -left-12 md:-top-16 md:-left-16 text-8xl md:text-9xl font-extrabold text-gray-700 opacity-30 z-20"
+              >01</span
+            >
+            <div
+              class="relative z-10 bg-gray-900 p-8 rounded-2xl border border-gray-800 shadow-2xl"
+            >
+              <span class="text-accent font-semibold text-lg uppercase"
+                >Streamline Sales</span
+              >
+              <h3 class="text-3xl lg:text-4xl font-extrabold mt-2 mb-4">
+                Sell Faster, Sell Smarter.
+              </h3>
+              <p class="text-gray-400 text-lg">
+                A blazingly fast, intuitive, and customizable checkout process.
+                Handle sales, returns, discounts, and split payments with just a
+                few taps.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pillar 2: Inventory (FIXED: Image right, text left) -->
+        <div
+          class="grid grid-cols-1 md:grid-cols-5 gap-8 md:gap-16 items-center"
+        >
+          <!-- Image -->
+          <div
+            class="md:col-span-3 md:order-last animate-slide-and-scale-right"
+          >
+            <div
+              class="relative w-full h-[26rem] md:h-auto rounded-2xl border-2 border-gray-800 shadow-lg p-4 sm:p-6 bg-gray-900 md:aspect-[3/2]"
+            >
+              <!-- NEW Inventory View Skeleton -->
+              <div
+                class="h-full flex flex-col md:flex-row gap-4 overflow-y-auto md:overflow-visible"
+              >
+                <!-- Column 1: Item List -->
+                <div class="flex-1 bg-gray-800 rounded-lg p-4 flex flex-col">
+                  <!-- Header + Search -->
+                  <div class="flex justify-between items-center mb-4">
+                    <div
+                      class="w-2/5 h-6 bg-gradient-to-r from-green-400 to-teal-500 rounded shimmer"
+                    ></div>
+                    <div class="w-1/3 h-8 bg-gray-700 rounded-lg shimmer"></div>
+                  </div>
+                  <!-- Item List -->
+                  <div class="space-y-3 flex-grow overflow-hidden">
+                    <div
+                      class="flex items-center space-x-3 p-2 bg-gray-700 rounded-lg"
+                    >
+                      <div
+                        class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-teal-400 to-green-500 rounded shimmer flex-shrink-0"
+                      ></div>
+                      <div class="flex-grow space-y-2 min-w-0">
+                        <div
+                          class="h-4 w-3/4 bg-gray-600 rounded shimmer"
+                        ></div>
+                        <div
+                          class="h-3 w-1/2 bg-gray-600 rounded shimmer"
+                        ></div>
+                      </div>
+                    </div>
+                    <div class="flex items-center space-x-3 p-2">
+                      <div
+                        class="w-10 h-10 sm:w-12 sm:h-12 bg-gray-700 rounded shimmer flex-shrink-0"
+                      ></div>
+                      <div class="flex-grow space-y-2 min-w-0">
+                        <div
+                          class="h-4 w-3/4 bg-gray-700 rounded shimmer"
+                        ></div>
+                        <div
+                          class="h-3 w-1/2 bg-gray-700 rounded shimmer"
+                        ></div>
+                      </div>
+                    </div>
+                    <div class="flex items-center space-x-3 p-2">
+                      <div
+                        class="w-10 h-10 sm:w-12 sm:h-12 bg-gray-700 rounded shimmer flex-shrink-0"
+                      ></div>
+                      <div class="flex-grow space-y-2 min-w-0">
+                        <div
+                          class="h-4 w-3/4 bg-gray-700 rounded shimmer"
+                        ></div>
+                        <div
+                          class="h-3 w-1/2 bg-gray-700 rounded shimmer"
+                        ></div>
+                      </div>
+                    </div>
+                    <div class="flex items-center space-x-3 p-2 hidden sm:flex">
+                      <div
+                        class="w-12 h-12 bg-gray-700 rounded shimmer flex-shrink-0"
+                      ></div>
+                      <div class="flex-grow space-y-2 min-w-0">
+                        <div
+                          class="h-4 w-3/4 bg-gray-700 rounded shimmer"
+                        ></div>
+                        <div
+                          class="h-3 w-1/2 bg-gray-700 rounded shimmer"
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Column 2: Item Details -->
+                <div class="flex-1 bg-gray-800 rounded-lg p-4 flex flex-col">
+                  <!-- Header -->
+                  <div
+                    class="w-3/4 h-6 bg-gradient-to-r from-blue-400 to-indigo-500 rounded mb-4 shimmer"
+                  ></div>
+
+                  <!-- Image Placeholder -->
+                  <div
+                    class="w-full h-24 sm:h-32 bg-gradient-to-br from-purple-400 to-blue-500 rounded-lg mb-4 shimmer"
+                  ></div>
+
+                  <!-- Details -->
+                  <div class="space-y-3 mb-4">
+                    <div class="h-4 w-full bg-gray-700 rounded shimmer"></div>
+                    <div class="h-4 w-5/6 bg-gray-700 rounded shimmer"></div>
+                    <div class="h-4 w-1/2 bg-gray-700 rounded shimmer"></div>
+                  </div>
+
+                  <!-- Stock Levels -->
+                  <div class="space-y-3">
+                    <div class="flex justify-between">
+                      <div
+                        class="h-4 w-1/2 sm:w-20 bg-gray-700 rounded shimmer"
+                      ></div>
+                      <div
+                        class="h-4 w-1/4 sm:w-12 bg-gray-700 rounded shimmer"
+                      ></div>
+                    </div>
+                    <div
+                      class="w-full h-3 bg-gray-700 rounded-full shimmer"
+                    ></div>
+                    <div class="flex justify-between">
+                      <div
+                        class="h-4 w-2/3 sm:w-24 bg-gray-700 rounded shimmer"
+                      ></div>
+                      <div
+                        class="h-4 w-1/3 sm:w-16 bg-gray-700 rounded shimmer"
+                      ></div>
+                    </div>
+                    <div
+                      class="w-full h-3 bg-gray-700 rounded-full shimmer"
+                    ></div>
+                  </div>
+
+                  <!-- Button -->
+                  <div
+                    class="w-full h-10 bg-accent rounded-full mt-auto shimmer"
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Text Content -->
+          <div
+            class="md:col-span-2 md:order-first md:-mr-12 lg:-mr-24 relative z-10 animate-slide-and-scale-left"
+          >
+            <span
+              class="absolute -top-12 -right-12 md:-top-16 md:-right-16 text-8xl md:text-9xl font-extrabold text-gray-700 opacity-30 z-20"
+              >02</span
+            >
+            <div
+              class="relative z-10 bg-gray-900 p-8 rounded-2xl border border-gray-800 shadow-2xl"
+            >
+              <span class="text-accent font-semibold text-lg uppercase"
+                >Master Your Inventory</span
+              >
+              <h3 class="text-3xl lg:text-4xl font-extrabold mt-2 mb-4">
+                Never Run Out of Stock.
+              </h3>
+              <p class="text-gray-400 text-lg">
+                Real-time stock tracking across all your locations. Get
+                automatic low-stock alerts, create purchase orders, and manage
+                suppliers.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pillar 3: Analytics -->
+        <div
+          class="grid grid-cols-1 md:grid-cols-5 gap-8 md:gap-16 items-center"
+        >
+          <!-- Image -->
+          <div class="md:col-span-3 animate-slide-and-scale-left">
+            <div
+              class="relative w-full h-auto rounded-2xl border-2 border-gray-800 shadow-lg p-4 sm:p-6 bg-gray-900 md:aspect-[3/2]"
+            >
+              <!-- Analytics View Skeleton -->
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 h-full">
+                <!-- Left: Revenue Chart -->
+                <div
+                  class="col-span-1 md:col-span-2 bg-gray-800 rounded-lg p-4 flex flex-col"
+                >
+                  <div
+                    class="w-3/4 h-6 bg-gradient-to-r from-red-400 to-orange-500 rounded mb-4 shimmer"
+                  ></div>
+                  <div
+                    class="flex-grow w-full h-40 bg-gradient-to-br from-yellow-300 to-orange-400 rounded-lg shimmer"
+                  ></div>
+                </div>
+                <!-- Right: Key Metrics -->
+                <div
+                  class="col-span-1 bg-gray-800 rounded-lg p-4 flex flex-col"
+                >
+                  <div
+                    class="w-full h-6 bg-gradient-to-r from-purple-400 to-pink-500 rounded mb-4 shimmer"
+                  ></div>
+                  <div class="space-y-3 flex-grow">
+                    <div
+                      class="h-4 w-4/5 bg-purple-300 opacity-70 rounded shimmer"
+                    ></div>
+                    <div
+                      class="h-4 w-3/4 bg-pink-300 opacity-70 rounded shimmer"
+                    ></div>
+                    <div
+                      class="h-4 w-2/3 bg-red-300 opacity-70 rounded shimmer"
+                    ></div>
+                  </div>
+                  <div
+                    class="w-full h-24 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-lg mt-4 shimmer hidden md:block"
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Text Content -->
+          <div
+            class="md:col-span-2 md:-ml-12 lg:-ml-24 relative z-10 animate-slide-and-scale-right"
+          >
+            <span
+              class="absolute -top-12 -left-12 md:-top-16 md:-left-16 text-8xl md:text-9xl font-extrabold text-gray-700 opacity-30 z-20"
+              >03</span
+            >
+            <div
+              class="relative z-10 bg-gray-900 p-8 rounded-2xl border border-gray-800 shadow-2xl"
+            >
+              <span class="text-accent font-semibold text-lg uppercase"
+                >Grow Your Business</span
+              >
+              <h3 class="text-3xl lg:text-4xl font-extrabold mt-2 mb-4">
+                Understand Your Data.
+              </h3>
+              <p class="text-gray-400 text-lg">
+                Get detailed insights into your sales, top-performing products,
+                and customer behavior to make data-driven decisions.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Marquee Section -->
+      <section
+        class="py-12 bg-gray-900 border-y-2 border-accent transform -rotate-2"
+      >
+        <div class="marquee-container">
+          <div
+            class="marquee-content text-4xl md:text-5xl font-bold space-x-12"
+          >
+            <span class="text-accent">SELL FASTER &bull;</span>
+            <span class="text-white">TRACK INVENTORY &bull;</span>
+            <span class="text-accent">MANAGE CUSTOMERS &bull;</span>
+            <span class="text-white">BOOST YOUR SALES &bull;</span>
+            <!-- Repeat for smooth loop -->
+            <span class="text-accent">SELL FASTER &bull;</span>
+            <span class="text-white">TRACK INVENTORY &bull;</span>
+            <span class="text-accent">MANAGE CUSTOMERS &bull;</span>
+            <span class="text-white">BOOST YOUR SALES &bull;</span>
+            <!-- Repeat again -->
+            <span class="text-accent">SELL FASTER &bull;</span>
+            <span class="text-white">TRACK INVENTORY &bull;</span>
+            <span class="text-accent">MANAGE CUSTOMERS &bull;</span>
+            <span class="text-white">BOOST YOUR SALES &bull;</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- All-in-One Features Grid -->
+      <section class="container mx-auto px-6 py-32">
+        <div class="text-center max-w-3xl mx-auto mb-20 animate-fade-in-up">
+          <h2 class="text-4xl md:text-6xl font-extrabold mb-4">
+            AND EVERYTHING ELSE YOU NEED.
+          </h2>
+          <p class="text-lg text-gray-400">
+            CashShilpo is a complete toolkit. We've thought of everything so you
+            don't have to.
+          </p>
+        </div>
+
+        <div
+          id="features-grid"
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-stagger-children"
+        >
+          <!-- Card 1: Dashboard -->
+          <div
+            class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 animate-card"
+          >
+            <div
+              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center"
+            >
+              <i data-lucide="layout-dashboard" class="h-8 w-8 text-black"></i>
+            </div>
+            <h3 class="text-2xl font-bold mt-6 mb-3">Analytics Dashboard</h3>
+            <p class="text-gray-400">
+              Your complete business overview with sales trends, top products,
+              and profit metrics.
+            </p>
+          </div>
+          <!-- Card 2: POS Terminal -->
+          <div
+            class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 animate-card"
+          >
+            <div
+              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center"
+            >
+              <i data-lucide="scan-line" class="h-8 w-8 text-black"></i>
+            </div>
+            <h3 class="text-2xl font-bold mt-6 mb-3">POS Terminal</h3>
+            <p class="text-gray-400">
+              A blazingly fast and intuitive checkout system with cart
+              management and split payments.
+            </p>
+          </div>
+          <!-- Card 3: Inventory Management -->
+          <div
+            class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 animate-card"
+          >
+            <div
+              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center"
+            >
+              <i data-lucide="boxes" class="h-8 w-8 text-black"></i>
+            </div>
+            <h3 class="text-2xl font-bold mt-6 mb-3">Inventory Management</h3>
+            <p class="text-gray-400">
+              Real-time stock tracking, variant management, serial numbers, and
+              low-stock alerts.
+            </p>
+          </div>
+          <!-- Card 4: Invoice Management -->
+          <div
+            class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 animate-card"
+          >
+            <div
+              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center"
+            >
+              <i data-lucide="file-text" class="h-8 w-8 text-black"></i>
+            </div>
+            <h3 class="text-2xl font-bold mt-6 mb-3">Invoice Management</h3>
+            <p class="text-gray-400">
+              Create, track, and manage all your sales invoices, with support
+              for voiding and returns.
+            </p>
+          </div>
+          <!-- Card 5: Quotation Management -->
+          <div
+            class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 animate-card"
+          >
+            <div
+              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center"
+            >
+              <i data-lucide="clipboard-list" class="h-8 w-8 text-black"></i>
+            </div>
+            <h3 class="text-2xl font-bold mt-6 mb-3">Quotation Management</h3>
+            <p class="text-gray-400">
+              Send professional price quotes to clients and convert them to
+              invoices with one click.
+            </p>
+          </div>
+          <!-- Card 6: Customer Management (CRM) -->
+          <div
+            class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 animate-card"
+          >
+            <div
+              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center"
+            >
+              <i data-lucide="users" class="h-8 w-8 text-black"></i>
+            </div>
+            <h3 class="text-2xl font-bold mt-6 mb-3">
+              Customer Management (CRM)
+            </h3>
+            <p class="text-gray-400">
+              Build customer profiles, track purchase history, manage credit
+              limits, and handle due payments.
+            </p>
+          </div>
+
+          <!-- --- Hidden by default --- -->
+
+          <!-- Card 7: Reports & Analytics -->
+          <div
+            class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2"
+          >
+            <div
+              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center"
+            >
+              <i data-lucide="bar-chart-3" class="h-8 w-8 text-black"></i>
+            </div>
+            <h3 class="text-2xl font-bold mt-6 mb-3">Reports & Analytics</h3>
+            <p class="text-gray-400">
+              Detailed reports on sales, profit & loss, inventory, staff
+              performance, and customer behavior.
+            </p>
+          </div>
+          <!-- Card 8: Purchase Orders (PO) -->
+          <div
+            class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2"
+          >
+            <div
+              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center"
+            >
+              <i data-lucide="shopping-cart" class="h-8 w-8 text-black"></i>
+            </div>
+            <h3 class="text-2xl font-bold mt-6 mb-3">Purchase Orders (PO)</h3>
+            <p class="text-gray-400">
+              Create and manage purchase orders to restock inventory and track
+              incoming stock.
+            </p>
+          </div>
+          <!-- Card 9: Supplier Management -->
+          <div
+            class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2"
+          >
+            <div
+              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center"
+            >
+              <i data-lucide="truck" class="h-8 w-8 text-black"></i>
+            </div>
+            <h3 class="text-2xl font-bold mt-6 mb-3">Supplier Management</h3>
+            <p class="text-gray-400">
+              Manage your supplier database and track purchase history by
+              supplier.
+            </p>
+          </div>
+          <!-- Card 10: Expense Tracking -->
+          <div
+            class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2"
+          >
+            <div
+              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center"
+            >
+              <i data-lucide="wallet" class="h-8 w-8 text-black"></i>
+            </div>
+            <h3 class="text-2xl font-bold mt-6 mb-3">Expense Tracking</h3>
+            <p class="text-gray-400">
+              Log and categorize all your business expenses to keep a clear view
+              of your cash flow.
+            </p>
+          </div>
+          <!-- Card 11: Staff Management -->
+          <div
+            class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2"
+          >
+            <div
+              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center"
+            >
+              <i data-lucide="user-cog" class="h-8 w-8 text-black"></i>
+            </div>
+            <h3 class="text-2xl font-bold mt-6 mb-3">Staff Management</h3>
+            <p class="text-gray-400">
+              Manage staff accounts, invite new members, and track sales
+              performance per employee.
+            </p>
+          </div>
+          <!-- Card 12: User Roles & Permissions -->
+          <div
+            class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2"
+          >
+            <div
+              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center"
+            >
+              <i data-lucide="shield-check" class="h-8 w-8 text-black"></i>
+            </div>
+            <h3 class="text-2xl font-bold mt-6 mb-3">
+              User Roles & Permissions
+            </h3>
+            <p class="text-gray-400">
+              Granular control over what each staff member can see and do, from
+              voiding invoices to viewing profit.
+            </p>
+          </div>
+          <!-- Card 13: Loyalty Program -->
+          <div
+            class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2"
+          >
+            <div
+              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center"
+            >
+              <i data-lucide="award" class="h-8 w-8 text-black"></i>
+            </div>
+            <h3 class="text-2xl font-bold mt-6 mb-3">Loyalty Program</h3>
+            <p class="text-gray-400">
+              Retain customers with a built-in points and rewards system,
+              complete with customizable tiers.
+            </p>
+          </div>
+          <!-- Card 14: Payroll Management -->
+          <div
+            class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2"
+          >
+            <div
+              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center"
+            >
+              <i data-lucide="dollar-sign" class="h-8 w-8 text-black"></i>
+            </div>
+            <h3 class="text-2xl font-bold mt-6 mb-3">Payroll Management</h3>
+            <p class="text-gray-400">
+              Configure pay settings, define rates, and manage staff payroll
+              runs directly within the system.
+            </p>
+          </div>
+          <!-- Card 15: Warranty & Claims -->
+          <div
+            class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2"
+          >
+            <div
+              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center"
+            >
+              <i data-lucide="wrench" class="h-8 w-8 text-black"></i>
+            </div>
+            <h3 class="text-2xl font-bold mt-6 mb-3">Warranty & Claims</h3>
+            <p class="text-gray-400">
+              Track product warranties tied to serial numbers and manage
+              customer service claims.
+            </p>
+          </div>
+          <!-- Card 16: Barcode Generator -->
+          <div
+            class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2"
+          >
+            <div
+              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center"
+            >
+              <i data-lucide="barcode" class="h-8 w-8 text-black"></i>
+            </div>
+            <h3 class="text-2xl font-bold mt-6 mb-3">Barcode Generator</h3>
+            <p class="text-gray-400">
+              Create and print custom barcode labels for your products
+              individually or in bulk.
+            </p>
+          </div>
+          <!-- Card 17: Product Attributes -->
+          <div
+            class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2"
+          >
+            <div
+              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center"
+            >
+              <i data-lucide="tags" class="h-8 w-8 text-black"></i>
+            </div>
+            <h3 class="text-2xl font-bold mt-6 mb-3">Product Attributes</h3>
+            <p class="text-gray-400">
+              Define custom attributes (e.g., Color, Size, Brand) to easily
+              manage product variants.
+            </p>
+          </div>
+          <!-- Card 18: Store Settings -->
+          <div
+            class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2"
+          >
+            <div
+              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center"
+            >
+              <i data-lucide="settings" class="h-8 w-8 text-black"></i>
+            </div>
+            <h3 class="text-2xl font-bold mt-6 mb-3">Advanced Settings</h3>
+            <p class="text-gray-400">
+              Customize currencies, tax rates, receipt templates, and business
+              profiles.
+            </p>
+          </div>
+          <!-- Card 19: AI Assistant -->
+          <div
+            class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2"
+          >
+            <div
+              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center"
+            >
+              <i data-lucide="sparkles" class="h-8 w-8 text-black"></i>
+            </div>
+            <h3 class="text-2xl font-bold mt-6 mb-3">AI Assistant</h3>
+            <p class="text-gray-400">
+              Use natural language to get insights, create products, and perform
+              actions instantly.
+            </p>
+          </div>
+          <!-- Card 20: Multi-Store Management -->
+          <div
+            class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2"
+          >
+            <div
+              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center"
+            >
+              <i data-lucide="store" class="h-8 w-8 text-black"></i>
+            </div>
+            <h3 class="text-2xl font-bold mt-6 mb-3">Multi-Store Management</h3>
+            <p class="text-gray-400">
+              Manage multiple store locations, staff, and inventory from a
+              single admin account.
+            </p>
+          </div>
+          <!-- Card 21: Daybook -->
+          <div
+            class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2"
+          >
+            <div
+              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center"
+            >
+              <i data-lucide="book-open-check" class="h-8 w-8 text-black"></i>
+            </div>
+            <h3 class="text-2xl font-bold mt-6 mb-3">Daybook</h3>
+            <p class="text-gray-400">
+              View a daily summary of all sales, expenses, and cash flow in one
+              place.
+            </p>
+          </div>
+          <!-- Card 22: Subscription -->
+          <div
+            class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2"
+          >
+            <div
+              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center"
+            >
+              <i data-lucide="crown" class="h-8 w-8 text-black"></i>
+            </div>
+            <h3 class="text-2xl font-bold mt-6 mb-3">
+              Subscription Management
+            </h3>
+            <p class="text-gray-400">
+              Easily manage your plan, view usage, and upgrade your
+              subscription.
+            </p>
+          </div>
+        </div>
+
+        <!-- "See More" Button -->
+        <div class="text-center mt-16 animate-fade-in-up">
+          <button
+            id="see-more-features"
+            class="bg-gray-800 text-accent font-semibold px-8 py-4 rounded-full border-2 border-accent hover:bg-accent hover:text-black transition-all duration-300"
+          >
+            See All 22 Features
+          </button>
+        </div>
+      </section>
+
+      <!-- RE-DESIGNED: Advanced Stats Section (Matching Provided Image) -->
+      <section
+        class="relative h-[600px] md:h-[100vh] flex items-center justify-center text-center overflow-hidden"
+      >
+        <!-- START OF CHANGE: Replaced the 'stats-background-grid' div with a single img tag -->
+        <!-- Single Full-Page Background Image -->
+        <img
+          src="our_servieces_overview.png"
+          alt="Background grid"
+          onerror="this.src='https://placehold.co/1920x700/333/888?text=Image+Missing'"
+          class="absolute top-0 left-0 w-full h-full object-cover"
+          style="filter: brightness(0.4) saturate(0.8); z-index: 0;"
+        />
+        <!-- END OF CHANGE -->
+
+        <!-- Overlay for text readability -->
+        <div class="stats-overlay"></div>
+
+        <!-- Content for the Advanced Stats Section -->
+        <div
+          class="relative z-10 flex flex-col items-center justify-center h-full max-w-2xl mx-auto px-4"
+        >
+          <p
+            class="text-lg md:text-xl text-gray-300 mb-2 uppercase tracking-widest animate-fade-in-up"
+          >
+            This past month
+          </p>
+          <h2
+            class="text-4xl sm:text-5xl md:text-6xl font-extrabold leading-tight tracking-tighter mb-8 animate-fade-in-up"
+            style="transition-delay: 0.1s;"
+          >
+            We served <span class="text-accent">100+</span>
+          </h2>
+
+          <div
+            class="bg-blue-600 text-white px-12 py-6 rounded-2xl mb-8 shadow-accent-2xl animate-scale-in"
+            style="transition-delay: 0.2s;"
+          >
+            <h3 class="text-6xl md:text-8xl font-extrabold">
+              Clients
+            </h3>
+          </div>
+
+          <!-- Removed the duplicate "Clients" text -->
+        </div>
+      </section>
+      <!-- Testimonial Section -->
+      <section id="support" class="container mx-auto px-6 py-32">
+        <div
+          class="bg-gray-900 border border-accent rounded-2xl p-12 md:p-16 text-center max-w-4xl mx-auto shadow-xl animate-scale-in"
+        >
+          <p
+            class="text-3xl md:text-4xl font-medium leading-tight font-testimonial italic"
+            style="font-weight: 500;"
+          >
+            "CashShilpo completely changed how we run our cafe. Inventory is no
+            longer a nightmare, and I can check my sales from home. It's the
+            best decision we ever made."
+          </p>
+          <p class="text-accent font-bold mt-8 text-xl">Rina Ahmed</p>
+          <p class="text-gray-500">Owner, The Cozy Corner Cafe</p>
+        </div>
+      </section>
+
+      <!-- NEW: Testimonial Ticker -->
+      <section class="py-16 md:py-24">
+        <div
+          class="text-center max-w-3xl mx-auto mb-12 px-6 animate-fade-in-up"
+        >
+          <h2 class="text-3xl md:text-5xl font-extrabold mb-4">
+            MORE VOICES. <span class="text-accent">MORE SUCCESS.</span>
+          </h2>
+          <p class="text-lg text-gray-400">
+            See what other business owners are saying about CashShilpo.
+          </p>
+        </div>
+
+        <div class="testimonial-ticker-container relative">
+          <!-- Fade overlays -->
+          <div
+            class="absolute top-0 left-0 w-24 md:w-48 h-full bg-gradient-to-r from-black to-transparent z-10"
+          ></div>
+          <div
+            class="absolute top-0 right-0 w-24 md:w-48 h-full bg-gradient-to-l from-black to-transparent z-10"
+          ></div>
+
+          <div class="testimonial-ticker-content z-0">
+            <!-- Set 1 -->
+            <div class="testimonial-item">
+              <p
+                class="text-gray-300 mb-4 font-testimonial text-lg"
+                style="font-style: italic; font-weight: 400;"
+              >
+                "The multi-store sync is a lifesaver. I manage three locations
+                from one dashboard. It's ridiculously simple."
+              </p>
+              <p class="text-accent font-bold">Mike T.</p>
+              <p class="text-gray-500 text-sm">Urban Gear</p>
+            </div>
+            <div class="testimonial-item">
+              <p
+                class="text-gray-300 mb-4 font-testimonial text-lg"
+                style="font-style: italic; font-weight: 400;"
+              >
+                "I love the offline mode. Our internet can be spotty, but we
+                never miss a sale. It just syncs up when we're back."
+              </p>
+              <p class="text-accent font-bold">Sara K.</p>
+              <p class="text-gray-500 text-sm">Beachside Books</p>
+            </div>
+            <div class="testimonial-item">
+              <p
+                class="text-gray-300 mb-4 font-testimonial text-lg"
+                style="font-style: italic; font-weight: 400;"
+              >
+                "The analytics are powerful. I finally understand what my
+                best-selling products are and when my busiest hours hit."
+              </p>
+              <p class="text-accent font-bold">David Chen</p>
+              <p class="text-gray-500 text-sm">EcoFoods</p>
+            </div>
+            <div class="testimonial-item">
+              <p
+                class="text-gray-300 mb-4 font-testimonial text-lg"
+                style="font-style: italic; font-weight: 400;"
+              >
+                "24/7 support actually means 24/7. I had an issue at 2 AM, and
+                someone helped me solve it immediately. Unbelievable."
+              </p>
+              <p class="text-accent font-bold">Fatima Al-Jaber</p>
+              <p class="text-gray-500 text-sm">The Night Owl Bakery</p>
+            </div>
+
+            <!-- Set 2 (Duplicate) -->
+            <div class="testimonial-item">
+              <p
+                class="text-gray-300 mb-4 font-testimonial text-lg"
+                style="font-style: italic; font-weight: 400;"
+              >
+                "The multi-store sync is a lifesaver. I manage three locations
+                from one dashboard. It's ridiculously simple."
+              </p>
+              <p class="text-accent font-bold">Mike T.</p>
+              <p class="text-gray-500 text-sm">Urban Gear</p>
+            </div>
+            <div class="testimonial-item">
+              <p
+                class="text-gray-300 mb-4 font-testimonial text-lg"
+                style="font-style: italic; font-weight: 400;"
+              >
+                "I love the offline mode. Our internet can be spotty, but we
+                never miss a sale. It just syncs up when we're back."
+              </p>
+              <p class="text-accent font-bold">Sara K.</p>
+              <p class="text-gray-500 text-sm">Beachside Books</p>
+            </div>
+            <div class="testimonial-item">
+              <p
+                class="text-gray-300 mb-4 font-testimonial text-lg"
+                style="font-style: italic; font-weight: 400;"
+              >
+                "The analytics are powerful. I finally understand what my
+                best-selling products are and when my busiest hours hit."
+              </p>
+              <p class="text-accent font-bold">David Chen</p>
+              <p class="text-gray-500 text-sm">EcoFoods</p>
+            </div>
+            <div class="testimonial-item">
+              <p
+                class="text-gray-300 mb-4 font-testimonial text-lg"
+                style="font-style: italic; font-weight: 400;"
+              >
+                "24/7 support actually means 24/7. I had an issue at 2 AM, and
+                someone helped me solve it immediately. Unbelievable."
+              </p>
+              <p class="text-accent font-bold">Fatima Al-Jaber</p>
+              <p class="text-gray-500 text-sm">The Night Owl Bakery</p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- END NEW -->
+
+      <!-- Final CTA Section -->
+      <section
+        id="start"
+        class="cta-section container mx-auto px-6 py-32 text-center"
+      >
+        <h2
+          class="text-5xl md:text-7xl font-extrabold leading-tight tracking-tighter animate-fade-in-up"
+        >
+          READY TO <span class="text-accent">GROW</span>
+          <br />
+          YOUR BUSINESS?
+        </h2>
+        <p
+          class="text-lg md:text-xl text-gray-400 mt-8 max-w-2xl mx-auto animate-fade-in-up"
+        >
+          Stop guessing. Start selling smarter with CashShilpo. Get started with
+          a free, no-obligation demo today.
+        </p>
+        <div class="mt-12 animate-fade-in-up">
+          <a
+            href="#"
+            class="bg-accent text-black font-bold text-lg px-10 py-5 rounded-full hover:bg-white hover:scale-105 transition-all duration-300 transform"
+          >
+            Start Your 7-Day Free Trial
+          </a>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="bg-gray-900 border-t border-gray-800 mt-20">
+        <div class="container mx-auto px-6 py-20">
+          <!-- Main Padding -->
+
+          <!-- Top Section: Logo & Links -->
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-12">
+            <!-- Column 1: Logo & Mission -->
+            <div class="md:col-span-12 lg:col-span-5">
+              <a href="#" class="text-3xl font-extrabold text-white">
+                Cash<span class="text-accent">Shilpo</span>.
+              </a>
+              <p class="text-gray-400 mt-6 pr-8 text-lg">
+                Empowering businesses with simple, smart, and powerful POS
+                solutions.
+              </p>
+            </div>
+
+            <!-- Column 2: Links -->
+            <div class="md:col-span-12 lg:col-span-7">
+              <div class="grid grid-cols-2 md:grid-cols-3 gap-8">
+                <!-- Product Links -->
+                <div>
+                  <h4
+                    class="text-white font-bold text-lg mb-6 uppercase tracking-wider"
+                  >
+                    Product
+                  </h4>
+                  <ul class="space-y-4">
+                    <li>
+                      <a
+                        href="#features"
+                        class="text-gray-400 hover:text-accent transition-colors duration-300"
+                        >Features</a
+                      >
+                    </li>
+                    <li>
+                      <a
+                        href="pricing"
+                        class="text-gray-400 hover:text-accent transition-colors duration-300"
+                        >Pricing</a
+                      >
+                    </li>
+                    <li>
+                      <a
+                        href="support"
+                        class="text-gray-400 hover:text-accent transition-colors duration-300"
+                        >Support</a
+                      >
+                    </li>
+                    <li>
+                      <a
+                        href="#start"
+                        class="text-gray-400 hover:text-accent transition-colors duration-300"
+                        >Start Free Trial</a
+                      >
+                    </li>
+                  </ul>
+                </div>
+
+                <!-- Company Links -->
+                <div>
+                  <h4
+                    class="text-white font-bold text-lg mb-6 uppercase tracking-wider"
+                  >
+                    Company
+                  </h4>
+                  <ul class="space-y-4">
+                    <li>
+                      <a
+                        href="#"
+                        class="text-gray-400 hover:text-accent transition-colors duration-300"
+                        >About Us</a
+                      >
+                    </li>
+                    <li>
+                      <a
+                        href="#"
+                        class="text-gray-400 hover:text-accent transition-colors duration-300"
+                        >Blog</a
+                      >
+                    </li>
+                    <li>
+                      <a
+                        href="#"
+                        class="text-gray-400 hover:text-accent transition-colors duration-300"
+                        >Careers</a
+                      >
+                    </li>
+                    <li>
+                      <a
+                        href="#"
+                        class="text-gray-400 hover:text-accent transition-colors duration-300"
+                        >Contact</a
+                      >
+                    </li>
+                  </ul>
+                </div>
+
+                <!-- Legal Links -->
+                <div>
+                  <h4
+                    class="text-white font-bold text-lg mb-6 uppercase tracking-wider"
+                  >
+                    Legal
+                  </h4>
+                  <ul class="space-y-4">
+                    <li>
+                      <a
+                        href="#"
+                        class="text-gray-400 hover:text-accent transition-colors duration-300"
+                        >Privacy Policy</a
+                      >
+                    </li>
+                    <li>
+                      <a
+                        href="#"
+                        class="text-gray-400 hover:text-accent transition-colors duration-3D"
+                        >Terms of Service</a
+                      >
+                    </li>
+                    <li>
+                      <a
+                        href="#"
+                        class="text-gray-400 hover:text-accent transition-colors duration-300"
+                        >Cookie Policy</a
+                      >
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- End Top Section Grid -->
+
+          <!-- Middle Section: Subscribe Form -->
+          <div
+            class="mt-16 pt-16 border-t border-gray-800 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center"
+          >
+            <div>
+              <h3 class="text-2xl md:text-3xl font-bold text-white">
+                Subscribe to our newsletter
+              </h3>
+              <p class="text-gray-400 mt-2 text-lg">
+                Get the latest updates, feature releases, and business tips sent
+                straight to your inbox.
+              </p>
+            </div>
+            <form class="flex flex-col sm:flex-row gap-4 w-full">
+              <label for="email-subscribe" class="sr-only">Email address</label>
+              <input
+                type="email"
+                id="email-subscribe"
+                placeholder="Enter your email"
+                class="flex-grow w-full px-5 py-4 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent"
+                required
+              />
+              <button
+                type="submit"
+                class="bg-accent text-black font-bold text-lg px-8 py-4 rounded-lg hover:bg-white hover:scale-105 transition-all duration-300 transform flex-shrink-0"
+              >
+                Subscribe
+              </button>
+            </form>
+          </div>
+        </div>
+        <!-- End Container -->
+
+        <!-- Bottom Bar: Copyright & Socials -->
+        <div class="bg-black py-8">
+          <div
+            class="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center text-center md:text-left"
+          >
+            <p class="text-gray-500 mb-4 md:mb-0">
+              &copy; 2025 CashShilpo. All rights reserved. A new era of business
+              management.
+            </p>
+
+            <!-- Socials -->
+            <div class="flex space-x-6">
+              <a
+                href="#"
+                class="text-gray-400 hover:text-accent transform hover:scale-125 transition-all duration-300"
+              >
+                <i data-lucide="instagram" class="h-6 w-6"></i>
+              </a>
+              <a
+                href="#"
+                class="text-gray-400 hover:text-accent transform hover:scale-125 transition-all duration-300"
+              >
+                <i data-lucide="twitter" class="h-6 w-6"></i>
+              </a>
+              <a
+                href="#"
+                class="text-gray-400 hover:text-accent transform hover:scale-125 transition-all duration-300"
+              >
+                <i data-lucide="linkedin" class="h-6 w-6"></i>
+              </a>
+              <a
+                href="#"
+                class="text-gray-400 hover:text-accent transform hover:scale-125 transition-all duration-300"
+              >
+                <i data-lucide="facebook" class="h-6 w-6"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script>
+      // Simple mobile menu toggle
+      const menuButton = document.getElementById("mobile-menu-button");
+      const mobileMenu = document.getElementById("mobile-menu");
+
+      menuButton.addEventListener("click", () => {
+        mobileMenu.classList.toggle("hidden");
+      });
+
+      // Simple smooth scroll for nav links
+      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener("click", function (e) {
+          e.preventDefault();
+
+          // Close mobile menu if open
+          if (!mobileMenu.classList.contains("hidden")) {
+            mobileMenu.classList.add("hidden");
+          }
+
+          const targetId = this.getAttribute("href");
+          const targetElement = document.querySelector(targetId);
+
+          if (targetElement) {
+            targetElement.scrollIntoView({
+              behavior: "smooth",
+            });
+          }
+        });
+      });
+
+      // NEW: "See More" Features Toggle
+      const seeMoreBtn = document.getElementById("see-more-features");
+      const featuresGrid = document.getElementById("features-grid");
+
+      if (seeMoreBtn && featuresGrid) {
+        seeMoreBtn.addEventListener("click", () => {
+          const isExpanded = featuresGrid.classList.toggle("is-expanded");
+
+          if (isExpanded) {
+            seeMoreBtn.textContent = "See Less Features";
+            // Apply animation delays to the newly visible cards
+            const hiddenCards = featuresGrid.querySelectorAll(
+              ".feature-card:nth-child(n+7)"
+            );
+            hiddenCards.forEach((card, index) => {
+              card.style.animationDelay = `${index * 0.05}s`;
+            });
+          } else {
+            seeMoreBtn.textContent = "See All 22 Features";
+
+            // --- NEW FIX for scroll jump ---
+            // Find the parent section to scroll to
+            const featureSection = featuresGrid.closest("section");
+            if (featureSection) {
+              featureSection.scrollIntoView({ behavior: "smooth" });
+            }
+            // --- END NEW FIX ---
+          }
+        });
+      }
+
+      // NEW: Intersection Observer for fade-in animations
+      document.addEventListener("DOMContentLoaded", () => {
+        // --- General Scroll Animations ---
+        const animatedElements = document.querySelectorAll(
+          ".animate-fade-in-up, " +
+            ".animate-fade-in-left, " +
+            ".animate-fade-in-right, " +
+            ".animate-scale-in, " +
+            ".animate-stagger-children," +
+            ".animate-slide-and-scale-left, " +
+            ".animate-slide-and-scale-right"
+        );
+
+        const generalObserverOptions = {
+          root: null, // viewport
+          rootMargin: "0px",
+          threshold: 0.15, // 15% of the item must be visible
+        };
+
+        const generalCallback = (entries, observer) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("is-visible");
+              observer.unobserve(entry.target); // Stop observing once it's visible
+            }
+          });
+        };
+
+        const generalObserver = new IntersectionObserver(
+          generalCallback,
+          generalObserverOptions
+        );
+        animatedElements.forEach((item) => {
+          generalObserver.observe(item);
+        });
+
+        // --- Stats Counter Animation ---
+        // This section (stat counter) is removed as per the image provided doesn't have a numerical counter logic.
+      });
+
+      // Initialize Lucide Icons
+      lucide.createIcons();
+    </script>
+  </body>
+</html>

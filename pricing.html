@@ -1,0 +1,1923 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CashShilpo - Pricing Plans</title>
+    <link
+      rel="shortcut icon"
+      href="cashshilpo-official-fav.png"
+      type="image/x-icon"
+    />
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,400;1,500&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@0.452.0/dist/umd/lucide.js"></script>
+
+    <style>
+      /* --- STYLES from index --- */
+      :root {
+        --accent-color: #39ff14; /* A vibrant lime green */
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #000;
+        color: #fff;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      .font-testimonial {
+        font-family: "Cormorant Garamond", serif;
+      }
+
+      .text-accent {
+        color: var(--accent-color);
+      }
+      .bg-accent {
+        background-color: var(--accent-color);
+      }
+      .border-accent {
+        border-color: var(--accent-color);
+      }
+
+      .shadow-accent-2xl {
+        box-shadow: 0 0px 40px -12px rgba(57, 255, 20, 0.4);
+      }
+
+      /* Set scroll padding to offset sticky nav */
+      html {
+        scroll-padding-top: 100px;
+      }
+
+      /* --- Nav Link Hover Effect --- */
+      .nav-link {
+        position: relative;
+        padding-bottom: 8px;
+        overflow: hidden;
+        transition: color 0.3s ease;
+        color: #d1d5db; /* text-gray-300 */
+      }
+      .nav-link:hover {
+        color: var(--accent-color);
+      }
+      .nav-link::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0%;
+        height: 2px;
+        background-color: var(--accent-color);
+        transition: width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      }
+      .nav-link:hover::after {
+        width: 100%;
+      }
+
+      /* --- Scroll Animation System --- */
+      .animate-fade-in-up,
+      .animate-scale-in,
+      .animate-card {
+        opacity: 0;
+        transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+      }
+      .animate-fade-in-up {
+        transform: translateY(40px);
+      }
+      .animate-scale-in {
+        transform: scale(0.95);
+      }
+      .animate-card {
+        transform: translateY(30px) scale(0.98);
+      }
+      .is-visible {
+        opacity: 1;
+        transform: translateY(0) translateX(0) scale(1);
+      }
+      .animate-stagger-children.is-visible .animate-card {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+      .animate-stagger-children.is-visible .animate-card:nth-child(1) {
+        transition-delay: 0.1s;
+      }
+      .animate-stagger-children.is-visible .animate-card:nth-child(2) {
+        transition-delay: 0.2s;
+      }
+      .animate-stagger-children.is-visible .animate-card:nth-child(3) {
+        transition-delay: 0.3s;
+      }
+      .animate-stagger-children.is-visible .animate-card:nth-child(4) {
+        transition-delay: 0.4s;
+      }
+
+      /* FAQ Accordion Styling */
+      details {
+        border-bottom: 1px solid #374151; /* border-gray-700 */
+      }
+      details summary {
+        list-style: none;
+        cursor: pointer;
+        position: relative;
+        padding-right: 2.5rem;
+      }
+      details summary::after {
+        content: "+";
+        font-family: "Inter", sans-serif;
+        font-weight: 300;
+        font-size: 2rem;
+        color: var(--accent-color);
+        position: absolute;
+        right: 0.5rem;
+        top: 50%;
+        transform: translateY(-50%) rotate(0deg);
+        transition: transform 0.3s ease;
+      }
+      details[open] summary::after {
+        content: "−";
+        transform: translateY(-50%) rotate(0deg);
+      }
+      details summary::-webkit-details-marker {
+        display: none;
+      }
+      details div {
+        animation: fadeIn 0.5s ease-out;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Custom checkmark for pricing cards */
+      .check-dim {
+        color: #6b7280; /* text-gray-500 */
+      }
+      .check-accent {
+        color: var(--accent-color);
+      }
+
+      /* --- NEW: Pricing Toggle Switch --- */
+      .toggle-switch-container {
+        position: relative;
+        display: inline-flex;
+        background-color: #1f2937; /* bg-gray-800 */
+        border-radius: 9999px;
+        padding: 4px;
+        border: 1px solid #374151; /* border-gray-700 */
+      }
+      .toggle-switch-label {
+        cursor: pointer;
+        padding: 8px 20px;
+        font-weight: 600;
+        border-radius: 9999px;
+        transition: all 0.3s ease;
+        z-index: 10;
+        /* --- MODIFIED: Added fixed width, position, and text-align --- */
+        position: relative;
+        width: 120px;
+        text-align: center;
+      }
+      .toggle-switch-label.active {
+        color: #000; /* text-black */
+      }
+      .toggle-switch-label.inactive {
+        color: #9ca3af; /* text-gray-400 */
+      }
+      .toggle-switch-slider {
+        position: absolute;
+        top: 4px;
+        bottom: 4px;
+        width: calc(50% - 4px); /* Adjust width based on padding */
+        background-color: var(--accent-color);
+        border-radius: 9999px;
+        transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        transform: translateX(0);
+        z-index: 5;
+      }
+      input[type="checkbox"]:checked + .toggle-switch-slider {
+        transform: translateX(100%);
+      }
+      /* Hide the actual checkbox */
+      .toggle-switch-checkbox {
+        display: none;
+      }
+      /* --- NEW: Badge for save percentage --- */
+      .save-badge {
+        position: absolute;
+        top: -24px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: var(--accent-color);
+        color: #000;
+        padding: 3px 10px;
+        border-radius: 9999px;
+        font-size: 11px;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+      /* --- End Pricing Toggle Switch --- */
+
+      /* --- Subtle radial gradient for feature section --- */
+      .radial-gradient-features {
+        background-image: radial-gradient(
+          circle at 50% 30%,
+          rgba(57, 255, 20, 0.05),
+          rgba(0, 0, 0, 0) 30%
+        );
+      }
+
+      /* --- NEW: Feature Box Hover Effect --- */
+      .feature-box {
+        background-color: rgb(17, 24, 39); /* bg-gray-900 */
+        background-image: none;
+        transition: transform 0.3s ease, background-color 0.3s ease,
+          background-image 0.3s ease;
+      }
+      .feature-box:hover {
+        transform: scale(1.03);
+        background-color: rgba(
+          31,
+          41,
+          55,
+          0.5
+        ); /* bg-gray-800 with 50% opacity */
+        background-image: linear-gradient(
+            rgba(57, 255, 20, 0.05) 1px,
+            transparent 1px
+          ),
+          linear-gradient(
+            to right,
+            rgba(57, 255, 20, 0.05) 1px,
+            transparent 1px
+          );
+        background-size: 20px 20px;
+      }
+    </style>
+  </head>
+  <body class="bg-black text-white antialiased">
+    <div class="overflow-x-hidden">
+      <!-- Navigation -->
+      <nav
+        class="container mx-auto px-6 py-6 flex justify-between items-center sticky top-0 z-50 bg-black bg-opacity-80 backdrop-blur-md border-b border-gray-800"
+      >
+        <!-- Logo -->
+        <a
+          href="index"
+          class="flex items-center space-x-2 text-3xl font-extrabold text-white"
+        >
+          <img
+            src="cashshilpo-official-logo.png"
+            alt="CashShilpo Logo"
+            class="w-12 h-12 object-contain"
+          />
+          <span>Cash<span class="text-accent">Shilpo</span>.</span>
+        </a>
+
+        <!-- Desktop Nav -->
+        <div class="hidden md:flex space-x-8 items-center">
+          <a href="home" class="nav-link">Home</a>
+          <a href="home#features" class="nav-link">Features</a>
+          <a href="support" class="nav-link">Support</a>
+          <a
+            href="workplace"
+            class="bg-accent text-black font-semibold px-6 py-3 rounded-full hover:bg-white hover:scale-105 transition-all duration-300 transform"
+          >
+            Get Started
+          </a>
+        </div>
+
+        <!-- Mobile Nav Button -->
+        <button
+          id="mobile-menu-button"
+          class="md:hidden p-2 rounded-md text-gray-300 hover:text-white"
+        >
+          <i data-lucide="menu" class="h-8 w-8"></i>
+        </button>
+      </nav>
+
+      <!-- Mobile Menu (hidden by default) -->
+      <div
+        id="mobile-menu"
+        class="hidden md:hidden bg-gray-900 p-6 absolute top-24 left-0 right-0 z-40 border-b-2 border-accent"
+      >
+        <a href="index" class="block text-gray-300 hover:text-accent py-2"
+          >Home</a
+        >
+        <a
+          href="index#features"
+          class="block text-gray-300 hover:text-accent py-2"
+          >Features</a
+        >
+        <a
+          href="index#support"
+          class="block text-gray-300 hover:text-accent py-2"
+          >Support</a
+        >
+        <a
+          href="workplace"
+          class="mt-4 block bg-accent text-black font-semibold px-6 py-3 rounded-full text-center hover:bg-white transition-all duration-300"
+        >
+          Get Started
+        </a>
+      </div>
+
+      <!-- Pricing Header Section -->
+      <header
+        class="container mx-auto px-6 pt-24 pb-32 md:pt-32 md:pb-32 text-center"
+      >
+        <h1
+          class="text-5xl sm:text-6xl md:text-8xl font-extrabold leading-tight tracking-tighter animate-fade-in-up text-white"
+        >
+          SIMPLE, TRANSPARENT <span class="text-accent">PRICING.</span>
+        </h1>
+        <p
+          class="text-lg md:text-xl text-gray-400 mt-8 max-w-3xl mx-auto animate-fade-in-up"
+          style="transition-delay: 0.1s;"
+        >
+          Choose the plan that's right for your business. No hidden fees, no
+          contracts. All plans start with a 7-day free trial.
+        </p>
+      </header>
+
+      <!-- MODIFIED: Added margin-top (mt-8) for badge space -->
+      <div
+        class="container mx-auto px-6 flex justify-center items-center mb-16 animate-fade-in-up mt-8"
+        style="transition-delay: 0.2s;"
+      >
+        <div class="toggle-switch-container">
+          <input
+            type="checkbox"
+            id="price-toggle-checkbox"
+            class="toggle-switch-checkbox"
+          />
+          <div class="toggle-switch-slider"></div>
+          <label
+            for="price-toggle-checkbox"
+            id="label-monthly"
+            class="toggle-switch-label active"
+            >Monthly</label
+          >
+          <!-- MODIFIED: Changed label to include the badge span -->
+          <label
+            for="price-toggle-checkbox"
+            id="label-yearly"
+            class="toggle-switch-label inactive"
+          >
+            <!-- MODIFIED: Added ID for dynamic update -->
+            <span class="save-badge" id="toggle-save-badge">Save 16.7%</span>
+            Yearly
+          </label>
+        </div>
+      </div>
+
+      <!-- Pricing Cards Section -->
+      <section class="container mx-auto px-6">
+        <div
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto animate-stagger-children"
+        >
+          <!-- Card 1: Basic -->
+          <!-- MODIFIED: Added data-monthly-price attribute -->
+          <div
+            class="animate-card bg-gray-900 p-8 rounded-2xl border border-gray-800 flex flex-col hover:border-gray-700 transition-all duration-300"
+            data-monthly-price="1499"
+          >
+            <h3 class="text-2xl font-bold text-white">Basic</h3>
+            <p class="text-gray-400 mt-2 mb-6">
+              Perfect for new businesses and single-store owners.
+            </p>
+            <div class="my-4">
+              <!-- Monthly Price -->
+              <div class="price-monthly">
+                <!-- MODIFIED: Added class for dynamic update -->
+                <span
+                  class="text-5xl font-extrabold text-white price-monthly-value"
+                ></span>
+                <span class="text-gray-400 text-lg">/ mo</span>
+              </div>
+              <!-- Yearly Price (hidden by default) -->
+              <div class="price-yearly hidden">
+                <!-- MODIFIED: Added classes for dynamic update -->
+                <span
+                  class="text-2xl font-medium text-gray-500 line-through price-yearly-original"
+                ></span>
+                <span
+                  class="text-5xl font-extrabold text-white price-yearly-discounted"
+                ></span>
+                <span class="text-gray-400 text-lg">/ yr</span>
+                <span
+                  class="block text-sm font-semibold text-accent mt-1 price-yearly-save"
+                ></span>
+              </div>
+            </div>
+
+            <!-- MODIFIED: Updated entire feature list -->
+            <ul class="space-y-4 mt-8 text-gray-300 flex-grow">
+              <!-- Differentiators -->
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="store"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span><b>1</b> Store</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="package"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span><b>1,000</b> Products</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="users"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span><b>5</b> Staff</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i data-lucide="x" class="h-5 w-5 check-dim flex-shrink-0"></i
+                ><span>AI Assistance</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i data-lucide="x" class="h-5 w-5 check-dim flex-shrink-0"></i
+                ><span>Multi-Store Management</span>
+              </li>
+
+              <!-- All Features -->
+              <li
+                class="flex items-center space-x-3 pt-4 border-t border-gray-700 mt-4"
+              >
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Analytics Dashboard</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>POS Terminal</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Inventory Management</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Invoice Management</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Customer Management (CRM)</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Basic Reports</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Daybook</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Barcode Generator</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Quotation Management</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Purchase Orders (PO)</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Supplier Management</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Expense Tracking</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Staff Management</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>User Roles & Permissions</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Loyalty Program</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Payroll Management</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Warranty & Claims</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Advanced Settings</span>
+              </li>
+            </ul>
+            <a
+              href="#feature-breakdown"
+              class="w-full text-center bg-gray-800 text-accent font-semibold px-8 py-3 rounded-full border-2 border-accent hover:bg-accent hover:text-black transition-all duration-300 mt-8"
+            >
+              See All Features
+            </a>
+            <a
+              href="workplace"
+              class="w-full text-center bg-gray-800 text-white font-semibold px-6 py-3 rounded-full hover:bg-gray-700 transition-all duration-300 mt-4"
+            >
+              Start 7-Day Trial
+            </a>
+          </div>
+
+          <!-- Card 2: Standard (Most Popular) -->
+          <!-- MODIFIED: Added data-monthly-price attribute -->
+          <div
+            class="animate-card relative bg-gray-900 p-8 rounded-2xl border-2 border-accent flex flex-col shadow-accent-2xl lg:scale-105"
+            data-monthly-price="2999"
+          >
+            <div
+              class="absolute -top-4 left-1/2 -translate-x-1/2 bg-accent text-black text-sm font-bold uppercase px-4 py-1 rounded-full"
+            >
+              Most Popular
+            </div>
+            <h3 class="text-2xl font-bold text-white">Standard</h3>
+            <p class="text-gray-400 mt-2 mb-6">
+              For growing businesses that need advanced features.
+            </p>
+            <div class="my-4">
+              <!-- Monthly Price -->
+              <div class="price-monthly">
+                <!-- MODIFIED: Added class for dynamic update -->
+                <span
+                  class="text-5xl font-extrabold text-white price-monthly-value"
+                ></span>
+                <span class="text-gray-400 text-lg">/ mo</span>
+              </div>
+              <!-- Yearly Price (hidden by default) -->
+              <div class="price-yearly hidden">
+                <!-- MODIFIED: Added classes for dynamic update -->
+                <span
+                  class="text-2xl font-medium text-gray-500 line-through price-yearly-original"
+                ></span>
+                <span
+                  class="text-5xl font-extrabold text-white price-yearly-discounted"
+                ></span>
+                <span class="text-gray-400 text-lg">/ yr</span>
+                <span
+                  class="block text-sm font-semibold text-accent mt-1 price-yearly-save"
+                ></span>
+              </div>
+            </div>
+
+            <!-- MODIFIED: Updated entire feature list -->
+            <ul class="space-y-4 mt-8 text-gray-300 flex-grow">
+              <!-- Differentiators -->
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="store"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span><b>3</b> Stores</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="package"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span><b>10,000</b> Products</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="users"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span><b>20</b> Staff</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="sparkles"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Basic AI Assistance</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Multi-Store Management</span>
+              </li>
+
+              <!-- All Features -->
+              <li
+                class="flex items-center space-x-3 pt-4 border-t border-gray-700 mt-4"
+              >
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Analytics Dashboard</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>POS Terminal</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Inventory Management</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Invoice Management</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Customer Management (CRM)</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Basic Reports</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Daybook</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Barcode Generator</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Quotation Management</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Purchase Orders (PO)</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Supplier Management</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Expense Tracking</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Staff Management</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>User Roles & Permissions</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Loyalty Program</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Payroll Management</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Warranty & Claims</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Advanced Settings</span>
+              </li>
+            </ul>
+            <a
+              href="#feature-breakdown"
+              class="w-full text-center bg-gray-800 text-accent font-semibold px-8 py-3 rounded-full border-2 border-accent hover:bg-accent hover:text-black transition-all duration-300 mt-8"
+            >
+              See All Features
+            </a>
+            <a
+              href="workplace"
+              class="w-full text-center bg-accent text-black font-semibold px-6 py-3 rounded-full hover:bg-white hover:scale-105 transition-all duration-300 transform mt-4"
+            >
+              Start 7-Day Trial
+            </a>
+          </div>
+
+          <!-- Card 3: Premium -->
+          <!-- MODIFIED: Added data-monthly-price attribute -->
+          <div
+            class="animate-card bg-gray-900 p-8 rounded-2xl border border-gray-800 flex flex-col hover:border-gray-700 transition-all duration-300"
+            data-monthly-price="5999"
+          >
+            <h3 class="text-2xl font-bold text-white">Premium</h3>
+            <p class="text-gray-400 mt-2 mb-6">
+              For established businesses scaling up their operations.
+            </p>
+            <div class="my-4">
+              <!-- Monthly Price -->
+              <div class="price-monthly">
+                <!-- MODIFIED: Added class for dynamic update -->
+                <span
+                  class="text-5xl font-extrabold text-white price-monthly-value"
+                ></span>
+                <span class="text-gray-400 text-lg">/ mo</span>
+              </div>
+              <!-- Yearly Price (hidden by default) -->
+              <div class="price-yearly hidden">
+                <!-- MODIFIED: Added classes for dynamic update -->
+                <span
+                  class="text-2xl font-medium text-gray-500 line-through price-yearly-original"
+                ></span>
+                <span
+                  class="text-5xl font-extrabold text-white price-yearly-discounted"
+                ></span>
+                <span class="text-gray-400 text-lg">/ yr</span>
+                <span
+                  class="block text-sm font-semibold text-accent mt-1 price-yearly-save"
+                ></span>
+              </div>
+            </div>
+
+            <!-- MODIFIED: Updated entire feature list -->
+            <ul class="space-y-4 mt-8 text-gray-300 flex-grow">
+              <!-- Differentiators -->
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="store"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span><b>10</b> Stores</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="package"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span><b>50,000</b> Products</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="users"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span><b>50</b> Staff</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="sparkles"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Advanced AI Assistance</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Multi-Store Management</span>
+              </li>
+
+              <!-- All Features -->
+              <li
+                class="flex items-center space-x-3 pt-4 border-t border-gray-700 mt-4"
+              >
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Analytics Dashboard</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>POS Terminal</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Inventory Management</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Invoice Management</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Customer Management (CRM)</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Basic Reports</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Daybook</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Barcode Generator</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Quotation Management</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Purchase Orders (PO)</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Supplier Management</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Expense Tracking</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Staff Management</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>User Roles & Permissions</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Loyalty Program</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class_H="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Payroll Management</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Warranty & Claims</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Advanced Settings</span>
+              </li>
+            </ul>
+            <a
+              href="#feature-breakdown"
+              class="w-full text-center bg-gray-800 text-accent font-semibold px-8 py-3 rounded-full border-2 border-accent hover:bg-accent hover:text-black transition-all duration-300 mt-8"
+            >
+              See All Features
+            </a>
+            <a
+              href="workplace"
+              class="w-full text-center bg-gray-800 text-white font-semibold px-6 py-3 rounded-full hover:bg-gray-700 transition-all duration-300 mt-4"
+            >
+              Start 7-Day Trial
+            </a>
+          </div>
+
+          <!-- Card 4: Enterprise -->
+          <div
+            class="animate-card bg-gray-900 p-8 rounded-2xl border border-gray-800 flex flex-col hover:border-gray-700 transition-all duration-300"
+          >
+            <h3 class="text-2xl font-bold text-white">Enterprise</h3>
+            <p class="text-gray-400 mt-2 mb-6">
+              For large-scale operations with custom needs.
+            </p>
+            <div class="my-4">
+              <span class="text-5xl font-extrabold text-white">Let's Talk</span>
+            </div>
+
+            <!-- Replaced plain text with a feature list with icons -->
+            <ul class="space-y-4 mt-8 text-gray-300 flex-grow">
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="check-check"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>All Premium Features</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="link"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Custom Integrations</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="shield-alert"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>24/7 Priority Support</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <i
+                  data-lucide="server"
+                  class="h-5 w-5 check-accent flex-shrink-0"
+                ></i
+                ><span>Custom Infrastructure</span>
+              </li>
+            </ul>
+
+            <a
+              href="mailto:sales@cashshilpo.com"
+              class="w-full text-center bg-gray-800 text-white font-semibold px-6 py-3 rounded-full hover:bg-gray-700 transition-all duration-300 mt-8"
+            >
+              যোগাযোগ করুন
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Feature Comparison Section -->
+      <section
+        id="feature-breakdown"
+        class="container mx-auto px-6 py-32 radial-gradient-features"
+      >
+        <div class="text-center max-w-3xl mx-auto mb-20 animate-fade-in-up">
+          <h2 class="text-4xl md:text-6xl font-extrabold mb-4 text-white">
+            COMPLETE <span class="text-accent">FEATURE BREAKDOWN.</span>
+          </h2>
+          <p class="text-lg text-gray-400">
+            See all the powerful tools included in our software. Features vary
+            by plan.
+          </p>
+        </div>
+
+        <!-- Changed to 2-column grid (md:grid-cols-2) and max-w-6xl -->
+        <div
+          class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 animate-scale-in bg-black p-8 md:p-12 rounded-2xl border border-gray-800 shadow-accent-2xl"
+        >
+          <!-- Feature 1 -->
+          <div class="feature-box flex items-start space-x-4 p-4 rounded-lg">
+            <div
+              class="bg-accent/10 h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0"
+            >
+              <i data-lucide="layout-dashboard" class="h-6 w-6 text-accent"></i>
+            </div>
+            <div>
+              <h4 class="text-lg font-bold text-white">Analytics Dashboard</h4>
+              <p class="text-gray-400">
+                Your complete business overview with sales trends, top products,
+                and profit metrics.
+              </p>
+            </div>
+          </div>
+
+          <!-- Feature 2 -->
+          <div class="feature-box flex items-start space-x-4 p-4 rounded-lg">
+            <div
+              class="bg-accent/10 h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0"
+            >
+              <i data-lucide="scan-line" class="h-6 w-6 text-accent"></i>
+            </div>
+            <div>
+              <h4 class="text-lg font-bold text-white">POS Terminal</h4>
+              <p class="text-gray-400">
+                A blazingly fast checkout system with cart management and split
+                payments.
+              </p>
+            </div>
+          </div>
+
+          <!-- Feature 3 -->
+          <div class="feature-box flex items-start space-x-4 p-4 rounded-lg">
+            <div
+              class="bg-accent/10 h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0"
+            >
+              <i data-lucide="boxes" class="h-6 w-6 text-accent"></i>
+            </div>
+            <div>
+              <h4 class="text-lg font-bold text-white">Inventory Management</h4>
+              <p class="text-gray-400">
+                Real-time stock tracking, variant management, and low-stock
+                alerts.
+              </p>
+            </div>
+          </div>
+
+          <!-- Feature 4 -->
+          <div class="feature-box flex items-start space-x-4 p-4 rounded-lg">
+            <div
+              class="bg-accent/10 h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0"
+            >
+              <i data-lucide="file-text" class="h-6 w-6 text-accent"></i>
+            </div>
+            <div>
+              <h4 class="text-lg font-bold text-white">Invoice Management</h4>
+              <p class="text-gray-400">
+                Create, track, and manage all your sales invoices, with support
+                for voiding and returns.
+              </p>
+            </div>
+          </div>
+
+          <!-- Feature 5 -->
+          <div class="feature-box flex items-start space-x-4 p-4 rounded-lg">
+            <div
+              class="bg-accent/10 h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0"
+            >
+              <i data-lucide="clipboard-list" class="h-6 w-6 text-accent"></i>
+            </div>
+            <div>
+              <h4 class="text-lg font-bold text-white">Quotation Management</h4>
+              <p class="text-gray-400">
+                Send professional price quotes to clients and convert them to
+                invoices with one click.
+              </p>
+            </div>
+          </div>
+
+          <!-- Feature 6 -->
+          <div class="feature-box flex items-start space-x-4 p-4 rounded-lg">
+            <div
+              class="bg-accent/10 h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0"
+            >
+              <i data-lucide="users" class="h-6 w-6 text-accent"></i>
+            </div>
+            <div>
+              <h4 class="text-lg font-bold text-white">
+                Customer Management (CRM)
+              </h4>
+              <p class="text-gray-400">
+                Build customer profiles, track purchase history, manage credit,
+                and handle due payments.
+              </p>
+            </div>
+          </div>
+
+          <!-- Feature 7 -->
+          <div class="feature-box flex items-start space-x-4 p-4 rounded-lg">
+            <div
+              class="bg-accent/10 h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0"
+            >
+              <i data-lucide="bar-chart-3" class="h-6 w-6 text-accent"></i>
+            </div>
+            <div>
+              <h4 class="text-lg font-bold text-white">Reports & Analytics</h4>
+              <p class="text-gray-400">
+                Detailed reports on sales, profit & loss, inventory, staff, and
+                customer behavior.
+              </p>
+            </div>
+          </div>
+
+          <!-- Feature 8 -->
+          <div class="feature-box flex items-start space-x-4 p-4 rounded-lg">
+            <div
+              class="bg-accent/10 h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0"
+            >
+              <i data-lucide="shopping-cart" class="h-6 w-6 text-accent"></i>
+            </div>
+            <div>
+              <h4 class="text-lg font-bold text-white">Purchase Orders (PO)</h4>
+              <p class="text-gray-400">
+                Create and manage purchase orders to restock inventory and track
+                incoming stock.
+              </p>
+            </div>
+          </div>
+
+          <!-- Feature 9 -->
+          <div class="feature-box flex items-start space-x-4 p-4 rounded-lg">
+            <div
+              class="bg-accent/10 h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0"
+            >
+              <i data-lucide="truck" class="h-6 w-6 text-accent"></i>
+            </div>
+            <div>
+              <h4 class="text-lg font-bold text-white">Supplier Management</h4>
+              <p class="text-gray-400">
+                Manage your supplier database and track purchase history by
+                supplier.
+              </p>
+            </div>
+          </div>
+
+          <!-- Feature 10 -->
+          <div class="feature-box flex items-start space-x-4 p-4 rounded-lg">
+            <div
+              class="bg-accent/10 h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0"
+            >
+              <i data-lucide="wallet" class="h-6 w-6 text-accent"></i>
+            </div>
+            <div>
+              <h4 class="text-lg font-bold text-white">Expense Tracking</h4>
+              <p class="text-gray-400">
+                Log and categorize all your business expenses to keep a clear
+                view of your cash flow.
+              </p>
+            </div>
+          </div>
+
+          <!-- Feature 11 -->
+          <div class="feature-box flex items-start space-x-4 p-4 rounded-lg">
+            <div
+              class="bg-accent/10 h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0"
+            >
+              <i data-lucide="user-cog" class="h-6 w-6 text-accent"></i>
+            </div>
+            <div>
+              <h4 class="text-lg font-bold text-white">Staff Management</h4>
+              <p class="text-gray-400">
+                Manage staff accounts, invite new members, and track sales
+                performance per employee.
+              </p>
+            </div>
+          </div>
+
+          <!-- Feature 12 -->
+          <div class="feature-box flex items-start space-x-4 p-4 rounded-lg">
+            <div
+              class="bg-accent/10 h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0"
+            >
+              <i data-lucide="shield-check" class="h-6 w-6 text-accent"></i>
+            </div>
+            <div>
+              <h4 class="text-lg font-bold text-white">
+                User Roles & Permissions
+              </h4>
+              <p class="text-gray-400">
+                Granular control over what each staff member can see and do,
+                from voiding invoices to viewing profit.
+              </p>
+            </div>
+          </div>
+
+          <!-- Feature 13 -->
+          <div class="feature-box flex items-start space-x-4 p-4 rounded-lg">
+            <div
+              class="bg-accent/10 h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0"
+            >
+              <i data-lucide="award" class="h-6 w-6 text-accent"></i>
+            </div>
+            <div>
+              <h4 class="text-lg font-bold text-white">Loyalty Program</h4>
+              <p class="text-gray-400">
+                Retain customers with a built-in points and rewards system,
+                complete with customizable tiers.
+              </p>
+            </div>
+          </div>
+
+          <!-- Feature 14 -->
+          <div class="feature-box flex items-start space-x-4 p-4 rounded-lg">
+            <div
+              class="bg-accent/10 h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0"
+            >
+              <i data-lucide="dollar-sign" class="h-6 w-6 text-accent"></i>
+            </div>
+            <div>
+              <h4 class="text-lg font-bold text-white">Payroll Management</h4>
+              <p class="text-gray-400">
+                Configure pay settings, define rates, and manage staff payroll
+                runs directly within the system.
+              </p>
+            </div>
+          </div>
+
+          <!-- Feature 15 -->
+          <div class="feature-box flex items-start space-x-4 p-4 rounded-lg">
+            <div
+              class="bg-accent/10 h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0"
+            >
+              <i data-lucide="wrench" class="h-6 w-6 text-accent"></i>
+            </div>
+            <div>
+              <h4 class="text-lg font-bold text-white">Warranty & Claims</h4>
+              <p class="text-gray-400">
+                Track product warranties tied to serial numbers and manage
+                customer service claims.
+              </p>
+            </div>
+          </div>
+
+          <!-- Feature 16 -->
+          <div class="feature-box flex items-start space-x-4 p-4 rounded-lg">
+            <div
+              class="bg-accent/10 h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0"
+            >
+              <i data-lucide="barcode" class="h-6 w-6 text-accent"></i>
+            </div>
+            <div>
+              <h4 class="text-lg font-bold text-white">Barcode Generator</h4>
+              <p class="text-gray-400">
+                Create and print custom barcode labels for your products
+                individually or in bulk.
+              </p>
+            </div>
+          </div>
+
+          <!-- Feature 17 -->
+          <div class="feature-box flex items-start space-x-4 p-4 rounded-lg">
+            <div
+              class="bg-accent/10 h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0"
+            >
+              <i data-lucide="tags" class="h-6 w-6 text-accent"></i>
+            </div>
+            <div>
+              <h4 class="text-lg font-bold text-white">Product Attributes</h4>
+              <p class="text-gray-400">
+                Define custom attributes (e.g., Color, Size, Brand) to easily
+                manage product variants.
+              </p>
+            </div>
+          </div>
+
+          <!-- Feature 18 -->
+          <div class="feature-box flex items-start space-x-4 p-4 rounded-lg">
+            <div
+              class="bg-accent/10 h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0"
+            >
+              <i data-lucide="settings" class="h-6 w-6 text-accent"></i>
+            </div>
+            <div>
+              <h4 class="text-lg font-bold text-white">Advanced Settings</h4>
+              <p class="text-gray-400">
+                Customize currencies, tax rates, receipt templates, and business
+                profiles.
+              </p>
+            </div>
+          </div>
+
+          <!-- Feature 19 -->
+          <div class="feature-box flex items-start space-x-4 p-4 rounded-lg">
+            <div
+              class="bg-accent/10 h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0"
+            >
+              <i data-lucide="sparkles" class="h-6 w-6 text-accent"></i>
+            </div>
+            <div>
+              <h4 class="text-lg font-bold text-white">AI Assistant</h4>
+              <p class="text-gray-400">
+                Use natural language to get insights, create products, and
+                perform actions instantly.
+              </p>
+            </div>
+          </div>
+
+          <!-- Feature 20 -->
+          <div class="feature-box flex items-start space-x-4 p-4 rounded-lg">
+            <div
+              class="bg-accent/10 h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0"
+            >
+              <i data-lucide="store" class="h-6 w-6 text-accent"></i>
+            </div>
+            <div>
+              <h4 class="text-lg font-bold text-white">
+                Multi-Store Management
+              </h4>
+              <p class="text-gray-400">
+                Manage multiple store locations, staff, and inventory from a
+                single admin account.
+              </p>
+            </div>
+          </div>
+
+          <!-- Feature 21 -->
+          <div class="feature-box flex items-start space-x-4 p-4 rounded-lg">
+            <div
+              class="bg-accent/10 h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0"
+            >
+              <i data-lucide="book-open-check" class="h-6 w-6 text-accent"></i>
+            </div>
+            <div>
+              <h4 class="text-lg font-bold text-white">Daybook</h4>
+              <p class="text-gray-400">
+                View a daily summary of all sales, expenses, and cash flow in
+                one place.
+              </p>
+            </div>
+          </div>
+
+          <!-- Feature 22 -->
+          <div class="feature-box flex items-start space-x-4 p-4 rounded-lg">
+            <div
+              class="bg-accent/10 h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0"
+            >
+              <i data-lucide="crown" class="h-6 w-6 text-accent"></i>
+            </div>
+            <div>
+              <h4 class="text-lg font-bold text-white">
+                Subscription Management
+              </h4>
+              <p class="text-gray-400">
+                Easily manage your plan, view usage, and upgrade your
+                subscription.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FAQ Section -->
+      <section class="container mx-auto px-6 py-32">
+        <div class="text-center max-w-3xl mx-auto mb-20 animate-fade-in-up">
+          <h2 class="text-4xl md:text-6xl font-extrabold mb-4 text-white">
+            FREQUENTLY ASKED <span class="text-accent">QUESTIONS.</span>
+          </h2>
+        </div>
+
+        <div
+          class="max-w-3xl mx-auto space-y-6 animate-fade-in-up"
+          style="transition-delay: 0.1s;"
+        >
+          <details class="bg-gray-900 p-6 rounded-lg border border-gray-800">
+            <summary class="text-xl font-bold text-white"
+              >Can I change my plan later?</summary
+            >
+            <div class="pt-4 text-gray-400">
+              Absolutely! You can upgrade or downgrade your plan at any time
+              from your subscription management settings.
+            </div>
+          </details>
+          <details class="bg-gray-900 p-6 rounded-lg border border-gray-800">
+            <summary class="text-xl font-bold text-white"
+              >Is there a long-term contract?</summary
+            >
+            <div class="pt-4 text-gray-400">
+              No. CashShilpo is a pay-as-you-go service. You can cancel your
+              monthly subscription at any time, no questions asked.
+            </div>
+          </details>
+          <details class="bg-gray-900 p-6 rounded-lg border border-gray-800">
+            <summary class="text-xl font-bold text-white"
+              >What payment methods do you accept?</summary
+            >
+            <div class="pt-4 text-gray-400">
+              We accept all major credit cards (Visa, Mastercard, American
+              Express) as well as bKash, Nagad, and bank transfers. For
+              Enterprise plans, we also support wire transfers.
+            </div>
+          </details>
+          <details class="bg-gray-900 p-6 rounded-lg border border-gray-800">
+            <summary class="text-xl font-bold text-white"
+              >What hardware is compatible?</summary
+            >
+            <div class="pt-4 text-gray-400">
+              CashShilpo works with most standard POS hardware, including
+              barcode scanners, receipt printers, and cash drawers that connect
+              via USB or Bluetooth. You can run the software on any computer,
+              tablet (iOS or Android), or smartphone.
+            </div>
+          </details>
+          <details class="bg-gray-900 p-6 rounded-lg border border-gray-800">
+            <summary class="text-xl font-bold text-white"
+              >What happens at the end of my 7-day trial?</summary
+            >
+            <div class="pt-4 text-gray-400">
+              We will remind you before your trial ends. You can then choose a
+              plan and enter your payment details to continue using CashShilpo.
+              If you choose not to subscribe, your account will be paused, but
+              you won't be charged.
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <!-- Final CTA Section -->
+      <section
+        class="container mx-auto px-6 py-32 text-center animate-fade-in-up"
+      >
+        <h2
+          class="text-5xl md:text-7xl font-extrabold leading-tight tracking-tighter text-white"
+        >
+          READY TO <span class="text-accent">GROW</span>
+          <br />
+          YOUR BUSINESS?
+        </h2>
+        <p class="text-lg md:text-xl text-gray-400 mt-8 max-w-2xl mx-auto">
+          Stop guessing. Start selling smarter with CashShilpo. Get started with
+          a free, no-obligation demo today.
+        </p>
+        <div class="mt-12">
+          <a
+            href="workplace"
+            class="bg-accent text-black font-bold text-lg px-10 py-5 rounded-full hover:bg-white hover:scale-105 transition-all duration-300 transform"
+          >
+            Start Your 7-Day Free Trial
+          </a>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="bg-gray-900 border-t border-gray-800 mt-20">
+        <div class="container mx-auto px-6 py-20">
+          <!-- Main Padding -->
+
+          <!-- Top Section: Logo & Links -->
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-12">
+            <!-- Column 1: Logo & Mission -->
+            <div class="md:col-span-12 lg:col-span-5">
+              <a href="index" class="text-3xl font-extrabold text-white">
+                Cash<span class="text-accent">Shilpo</span>.
+              </a>
+              <p class="text-gray-400 mt-6 pr-8 text-lg">
+                Empowering businesses with simple, smart, and powerful POS
+                solutions.
+              </p>
+            </div>
+
+            <!-- Column 2: Links -->
+            <div class="md:col-span-12 lg:col-span-7">
+              <div class="grid grid-cols-2 md:grid-cols-3 gap-8">
+                <!-- Product Links -->
+                <div>
+                  <h4
+                    class="text-white font-bold text-lg mb-6 uppercase tracking-wider"
+                  >
+                    Product
+                  </h4>
+                  <ul class="space-y-4">
+                    <li>
+                      <a
+                        href="index#features"
+                        class="text-gray-400 hover:text-accent transition-colors duration-300"
+                        >Features</a
+                      >
+                    </li>
+                    <li>
+                      <a
+                        href="pricing"
+                        class="text-gray-400 hover:text-accent transition-colors duration-300"
+                        >Pricing</a
+                      >
+                    </li>
+                    <li>
+                      <a
+                        href="index#support"
+                        class="text-gray-400 hover:text-accent transition-colors duration-300"
+                        >Support</a
+                      >
+                    </li>
+                    <li>
+                      <a
+                        href="workplace"
+                        class="text-gray-400 hover:text-accent transition-colors duration-300"
+                        >Start Free Trial</a
+                      >
+                    </li>
+                  </ul>
+                </div>
+
+                <!-- Company Links -->
+                <div>
+                  <h4
+                    class="text-white font-bold text-lg mb-6 uppercase tracking-wider"
+                  >
+                    Company
+                  </h4>
+                  <ul class="space-y-4">
+                    <li>
+                      <a
+                        href="#"
+                        class="text-gray-400 hover:text-accent transition-colors duration-300"
+                        >About Us</a
+                      >
+                    </li>
+                    <!-- Typo Fix 1: 'duration-3Please 00' to 'duration-300' -->
+                    <li>
+                      <a
+                        href="#"
+                        class="text-gray-400 hover:text-accent transition-colors duration-300"
+                        >Blog</a
+                      >
+                    </li>
+                    <li>
+                      <a
+                        href="#"
+                        class="text-gray-400 hover:text-accent transition-colors duration-300"
+                        >Careers</a
+                      >
+                    </li>
+                    <li>
+                      <a
+                        href="#"
+                        class="text-gray-400 hover:text-accent transition-colors duration-300"
+                        >Contact</a
+                      >
+                    </li>
+                  </ul>
+                </div>
+
+                <!-- Legal Links -->
+                <div>
+                  <h4
+                    class="text-white font-bold text-lg mb-6 uppercase tracking-wider"
+                  >
+                    Legal
+                  </h4>
+                  <ul class="space-y-4">
+                    <li>
+                      <a
+                        href="#"
+                        class="text-gray-400 hover:text-accent transition-colors duration-300"
+                        >Privacy Policy</a
+                      >
+                    </li>
+                    <!-- Typo Fix 2: 'class."text-gray-400' to 'class="text-gray-400' -->
+                    <li>
+                      <a
+                        href="#"
+                        class="text-gray-400 hover:text-accent transition-colors duration-300"
+                        >Terms of Service</a
+                      >
+                    </li>
+                    <li>
+                      <a
+                        href="#"
+                        class="text-gray-400 hover:text-accent transition-colors duration-300"
+                        >Cookie Policy</a
+                      >
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- End Top Section Grid -->
+        </div>
+        <!-- End Container -->
+
+        <!-- Bottom Bar: Copyright & Socials -->
+        <div class="bg-black py-8 border-t border-gray-800">
+          <div
+            class="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center text-center md:text-left"
+          >
+            <p class="text-gray-500 mb-4 md:mb-0">
+              &copy; 2025 CashShilpo. All rights reserved. A new era of business
+              management.
+            </p>
+
+            <!-- Socials -->
+            <div class="flex space-x-6">
+              <a
+                href="#"
+                class="text-gray-400 hover:text-accent transform hover:scale-125 transition-all duration-300"
+              >
+                <i data-lucide="instagram" class="h-6 w-6"></i>
+              </a>
+              <a
+                href="#"
+                class="text-gray-400 hover:text-accent transform hover:scale-125 transition-all duration-300"
+              >
+                <i data-lucide="twitter" class="h-6 w-6"></i>
+              </a>
+              <a
+                href="#"
+                class="text-gray-400 hover:text-accent transform hover:scale-125 transition-all duration-300"
+              >
+                <i data-lucide="linkedin" class="h-6 w-6"></i>
+              </a>
+              <a
+                href="#"
+                class="text-gray-400 hover:text-accent transform hover:scale-125 transition-all duration-300"
+              >
+                <i data-lucide="facebook" class="h-6 w-6"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <!-- FIX: Replaced broken script block with the complete, correct version -->
+    <script>
+      // Simple mobile menu toggle
+      const menuButton = document.getElementById("mobile-menu-button");
+      const mobileMenu = document.getElementById("mobile-menu");
+
+      menuButton.addEventListener("click", () => {
+        mobileMenu.classList.toggle("hidden");
+      });
+
+      // Simple smooth scroll for nav links (for same-page anchor links)
+      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener("click", function (e) {
+          // Check if the link is on the same page
+          if (this.hash !== "") {
+            // Prevent default anchor click behavior
+            e.preventDefault();
+
+            // Close mobile menu if open
+            if (!mobileMenu.classList.contains("hidden")) {
+              mobileMenu.classList.add("hidden");
+            }
+
+            const targetId = this.getAttribute("href");
+            const targetElement = document.querySelector(targetId);
+
+            if (targetElement) {
+              targetElement.scrollIntoView({
+                behavior: "smooth",
+              });
+            }
+          }
+        });
+      });
+
+      // Intersection Observer for fade-in animations
+      document.addEventListener("DOMContentLoaded", () => {
+        // --- NEW: Pricing Calculation Logic ---
+        const YEARLY_DISCOUNT_PERCENT = 20; // <-- CHANGE YOUR DISCOUNT HERE
+
+        function calculateAndDisplayPrices() {
+          const formatter = new Intl.NumberFormat("en-US"); // Use 'en-US' for 1,234 format
+
+          // Update toggle badge
+          const toggleBadge = document.getElementById("toggle-save-badge");
+          if (toggleBadge) {
+            toggleBadge.innerHTML = `Save ${YEARLY_DISCOUNT_PERCENT}%`;
+          }
+
+          // Select all cards that have a price
+          const pricingCards = document.querySelectorAll(
+            "[data-monthly-price]"
+          );
+
+          pricingCards.forEach((card) => {
+            const monthlyPrice = parseFloat(card.dataset.monthlyPrice);
+            if (isNaN(monthlyPrice)) return;
+
+            const originalYearlyPrice = monthlyPrice * 12;
+            const discountedYearlyPrice = Math.round(
+              originalYearlyPrice * (1 - YEARLY_DISCOUNT_PERCENT / 100)
+            );
+
+            // Find elements within the card
+            const monthlyEl = card.querySelector(".price-monthly-value");
+            const yearlyOriginalEl = card.querySelector(
+              ".price-yearly-original"
+            );
+            const yearlyDiscountedEl = card.querySelector(
+              ".price-yearly-discounted"
+            );
+            const yearlySaveEl = card.querySelector(".price-yearly-save");
+
+            // Update text content with '৳' prefix and formatted number
+            if (monthlyEl) {
+              monthlyEl.innerHTML = `৳${formatter.format(monthlyPrice)}`;
+            }
+            if (yearlyOriginalEl) {
+              yearlyOriginalEl.innerHTML = `৳${formatter.format(
+                originalYearlyPrice
+              )}`;
+            }
+            if (yearlyDiscountedEl) {
+              yearlyDiscountedEl.innerHTML = `৳${formatter.format(
+                discountedYearlyPrice
+              )}`;
+            }
+            if (yearlySaveEl) {
+              yearlySaveEl.innerHTML = `Save ${YEARLY_DISCOUNT_PERCENT}%`;
+            }
+          });
+        }
+
+        // Run the calculation on page load
+        calculateAndDisplayPrices();
+        // --- End Pricing Calculation Logic ---
+
+        const animatedElements = document.querySelectorAll(
+          ".animate-fade-in-up, " +
+            ".animate-scale-in, " +
+            ".animate-stagger-children"
+        );
+
+        const generalObserverOptions = {
+          root: null, // viewport
+          rootMargin: "0px",
+          threshold: 0.1, // 10% of the item must be visible
+        };
+
+        const generalCallback = (entries, observer) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("is-visible");
+              observer.unobserve(entry.target); // Stop observing once it's visible
+            }
+          });
+        };
+
+        const generalObserver = new IntersectionObserver(
+          generalCallback,
+          generalObserverOptions
+        );
+        animatedElements.forEach((item) => {
+          generalObserver.observe(item);
+        });
+
+        // --- NEW: Pricing Toggle Logic ---
+        const priceToggle = document.getElementById("price-toggle-checkbox");
+        const monthlyPrices = document.querySelectorAll(".price-monthly");
+        const yearlyPrices = document.querySelectorAll(".price-yearly");
+        const labelMonthly = document.getElementById("label-monthly");
+        const labelYearly = document.getElementById("label-yearly");
+
+        priceToggle.addEventListener("change", () => {
+          if (priceToggle.checked) {
+            // --- Show Yearly ---
+            monthlyPrices.forEach((price) => price.classList.add("hidden"));
+            yearlyPrices.forEach((price) => price.classList.remove("hidden"));
+
+            // Update labels
+            labelMonthly.classList.remove("active");
+            labelMonthly.classList.add("inactive");
+            labelYearly.classList.remove("inactive");
+            labelYearly.classList.add("active");
+          } else {
+            // --- Show Monthly ---
+            monthlyPrices.forEach((price) => price.classList.remove("hidden"));
+            yearlyPrices.forEach((price) => price.classList.add("hidden"));
+
+            // Update labels
+            labelMonthly.classList.remove("inactive");
+            labelMonthly.classList.add("active");
+            labelYearly.classList.remove("active");
+            labelYearly.classList.add("inactive");
+          }
+        });
+        // --- End Pricing Toggle Logic ---
+      });
+
+      // Initialize Lucide Icons
+      lucide.createIcons();
+    </script>
+  </body>
+</html>
