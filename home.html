@@ -7,6 +7,11 @@
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="shortcut icon"
+      href="cashshilpo-official-fav.png"
+      type="image/x-icon"
+    />
 
     <!-- Inter Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -130,12 +135,12 @@
 
       /* Base state for all animated elements */
       .animate-fade-in-up,
-        .animate-fade-in-left,
-        .animate-fade-in-right,
-        .animate-scale-in,
-        .animate-card,
-        .animate-slide-and-scale-left,  /* NEW */
-        .animate-slide-and-scale-right {
+    .animate-fade-in-left,
+    .animate-fade-in-right,
+    .animate-scale-in,
+    .animate-card,
+    .animate-slide-and-scale-left,  /* NEW */
+    .animate-slide-and-scale-right {
         /* NEW */
         opacity: 0;
         transition: opacity 0.7s ease-out, transform 0.7s ease-out;
@@ -268,8 +273,11 @@
             rgba(0, 0, 0, 0.9)
           ),
           rgba(255, 255, 255, 0.05);
-        backdrop-filter: blur(10px) saturate(180%);
-        -webkit-backdrop-filter: blur(10px) saturate(180%);
+
+        /* UPDATED: Removed backdrop-filter to fix unwanted blur in Chrome */
+        /* backdrop-filter: blur(10px) saturate(180%); */
+        /* -webkit-backdrop-filter: blur(10px) saturate(180%); */
+
         mix-blend-mode: multiply;
       }
 
@@ -282,15 +290,17 @@
               rgba(0, 0, 0, 0.85)
             ),
             rgba(255, 255, 255, 0.01);
-          backdrop-filter: blur(1px) saturate(140%);
-          -webkit-backdrop-filter: blur(1px) saturate(140%);
+
+          /* UPDATED: Removed backdrop-filter to fix unwanted blur in Chrome */
+          /* backdrop-filter: blur(1px) saturate(140%); */
+          /* -webkit-backdrop-filter: blur(1px) saturate(140%); */
         }
       }
 
       /* REMOVED: Old rule for 7th child */
       /* .stats-background-grid img:nth-child(7) {
-            grid-row: span 2;
-        } */
+        grid-row: span 2;
+      } */
       /* END REMOVED */
 
       /* --- NEW: Rules to match the screenshot layout --- */
