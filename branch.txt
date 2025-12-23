@@ -1,1114 +1,3 @@
-<!DOCTYPE html>
-<html lang="en" class="dark">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CashShilpo - AI Powered Universal POS</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="shortcut icon" href="cashshilpo-official-fav.png" type="image/x-icon">
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700&family=Source+Code+Pro:wght@400;700&display=swap"
-      rel="stylesheet"
-    />
-    <script src="https://unpkg.com/lucide@0.452.0/dist/umd/lucide.js"></script>
-    <!-- Chart.js for dashboard graphs -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
-
-    <style>
-      :root {
-        --bg-primary: #0a0a0a; /* Near black */
-        --bg-secondary: #121212; /* Darker Gray */
-        --bg-tertiary: #1a1a1a; /* Dark Gray */
-        --glass-bg: rgba(26, 26, 26, 0.6);
-        --border-color: #2a2a2a;
-        --border-color-strong: #444;
-        --text-primary: #f0f0f0;
-        --text-secondary: #a0a0a0;
-        --accent: #007bff; /* A vibrant blue */
-        --accent-hover: #0056b3;
-        --accent-glow: rgba(0, 123, 255, 0.25);
-        --success: #28a745;
-        --danger: #dc3545;
-        --warning: #ffc107;
-      }
-
-      body {
-        font-family: "Inter", sans-serif;
-        background-color: var(--bg-primary);
-        color: var(--text-secondary);
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-        overflow: hidden;
-      }
-
-      /* Custom Scrollbar */
-      ::-webkit-scrollbar {
-        width: 6px;
-        height: 6px;
-      }
-      ::-webkit-scrollbar-track {
-        background: transparent;
-      }
-      ::-webkit-scrollbar-thumb {
-        background: #4a4a4a;
-        border-radius: 10px;
-      }
-      ::-webkit-scrollbar-thumb:hover {
-        background: #6a6a6a;
-      }
-      #dashboard-period-dropdown-menu {
-        background-color: var(--bg-secondary);
-      }
-            /* Hide scrollbar for main nav */
-      #main-nav::-webkit-scrollbar {
-        display: none; /* For Chrome, Safari, and Opera */
-      }
-      #main-nav {
-        -ms-overflow-style: none;  /* IE and Edge */
-        scrollbar-width: none;  /* Firefox */
-      }
-      /* Glassmorphism & Borders */
-      .glass-pane {
-        background-color: var(--glass-bg);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border: 1px solid var(--border-color);
-      }
-
-      .loading-shimmer {
-        background: linear-gradient(
-          110deg,
-          var(--bg-tertiary) 8%,
-          var(--border-color) 18%,
-          var(--bg-tertiary) 33%
-        );
-        background-size: 200% 100%;
-        animation: 1.5s shine linear infinite;
-      }
-      @keyframes shine {
-        to {
-          background-position-x: -200%;
-        }
-      }
-
-      /* General Transitions */
-      * {
-        transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out,
-          border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out,
-          transform 0.2s ease-in-out;
-      }
-
-      /* View Animations */
-      /* .view-pane {
-        animation: fadeIn 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-      } */
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(10px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      /* Modal Animations */
-      .modal-overlay {
-        background: rgba(0, 0, 0, 0.6);
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
-        transition: opacity 0.3s ease;
-      }
-      .modal-content {
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5),
-          0 0 15px var(--accent-glow);
-      }
-
-      /* Toast Animations */
-      @keyframes toast-in-right {
-        from {
-          transform: translateX(100%) scale(0.8);
-          opacity: 0;
-        }
-        to {
-          transform: translateX(0) scale(1);
-          opacity: 1;
-        }
-      }
-      @keyframes toast-out-right {
-        from {
-          transform: translateX(0) scale(1);
-          opacity: 1;
-        }
-        to {
-          transform: translateX(120%) scale(0.8);
-          opacity: 0;
-        }
-      }
-      .toast {
-        animation: toast-in-right 0.5s cubic-bezier(0.21, 1.02, 0.73, 1),
-          toast-out-right 0.5s cubic-bezier(0.21, 1.02, 0.73, 1) 4.5s forwards;
-      }
-
-      /* Form Inputs */
-      .form-input,
-      .form-select,
-      .form-textarea {
-        background-color: var(--bg-secondary);
-        border: 1px solid var(--border-color);
-        border-radius: 0.5rem;
-        color: var(--text-primary);
-        padding: 0.75rem 1rem;
-      }
-      .form-input:focus,
-      .form-select:focus,
-      .form-textarea:focus {
-        outline: none;
-        border-color: var(--accent);
-        box-shadow: 0 0 0 3px var(--accent-glow);
-      }
-
-      /* World-Class Button */
-      .btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        padding: 0.75rem 1.5rem;
-        border-radius: 0.5rem;
-        font-weight: 600;
-        cursor: pointer;
-        user-select: none;
-        border: 1px solid transparent;
-      }
-      .btn[disabled] {
-        cursor: not-allowed;
-        opacity: 0.5;
-        transform: none !important;
-        box-shadow: none !important;
-      }
-      .btn-primary {
-        background: linear-gradient(45deg, var(--accent), var(--accent-hover));
-        color: white;
-        border-color: var(--accent);
-        box-shadow: 0 4px 15px -5px var(--accent-glow),
-          inset 0 1px 1px rgba(255, 255, 255, 0.1);
-      }
-      .btn:hover:not([disabled]) {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 25px -8px var(--accent-glow),
-          inset 0 1px 1px rgba(255, 255, 255, 0.1);
-      }
-      .btn:active:not([disabled]) {
-        transform: translateY(-1px) scale(0.98);
-      }
-      .btn-danger {
-        background-color: var(--danger);
-        color: white;
-        border-color: var(--danger);
-      }
-      .btn-danger:hover {
-        background-color: #b02a37;
-      }
-      .btn-secondary {
-        background-color: var(--bg-tertiary);
-        color: var(--text-primary);
-        border-color: var(--border-color);
-      }
-      .btn-secondary:hover {
-        background-color: var(--border-color);
-        border-color: var(--border-color-strong);
-      }
-
-      /* Professional Table Styling */
-      .table-pro {
-        width: 100%;
-        border-collapse: separate;
-        border-spacing: 0 0.75rem;
-        min-width: 600px;
-      }
-      .table-pro th {
-        color: var(--text-secondary);
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        font-size: 0.75rem;
-        padding: 1rem 1.5rem;
-        text-align: left;
-      }
-      .table-pro tr.table-row {
-        background-color: var(--bg-secondary);
-        border-radius: 0.75rem;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-          0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        transition: transform 0.2s ease, background-color 0.2s ease,
-          border-color 0.2s ease;
-        border: 1px solid var(--border-color);
-      }
-      .table-pro tr.table-row:hover {
-        background-color: var(--border-color);
-        color: var(--text-primary);
-        cursor: pointer;
-      }
-      .table-pro td {
-        padding: 1.25rem 1.5rem;
-        color: var(--text-secondary);
-      }
-      .table-pro tr.table-row:hover td {
-        color: inherit;
-      }
-      .table-pro td:first-child {
-        border-top-left-radius: 0.75rem;
-        border-bottom-left-radius: 0.75rem;
-      }
-      .table-pro td:last-child {
-        border-top-right-radius: 0.75rem;
-        border-bottom-right-radius: 0.75rem;
-        text-align: right;
-      }
-
-      /* Sidebar Nav Link & Smooth Collapse */
-      .nav-link {
-        position: relative;
-      }
-      .nav-link.active-view {
-        background-color: var(--accent-glow);
-        color: var(--text-primary);
-      }
-      .nav-link.active-view::before {
-        content: "";
-        position: absolute;
-        left: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 3px;
-        height: 60%;
-        background-color: var(--accent);
-        border-radius: 3px;
-        transition: all 0.3s ease;
-      }
-
-      #brand-name,
-      .nav-link-text,
-      .user-profile-details {
-        transition: opacity 0.2s ease-out, max-width 0.3s ease-in-out,
-          margin-left 0.3s ease-in-out;
-        white-space: nowrap;
-        overflow: hidden;
-        max-width: 200px;
-      }
-
-      .sidebar-collapsed .nav-link.active-view::before {
-        left: 50%;
-        transform: translate(-50%, -50%);
-        height: 3px;
-        width: 60%;
-        top: 100%;
-      }
-
-      .sidebar-collapsed #brand-name,
-      .sidebar-collapsed .nav-link-text,
-      .sidebar-collapsed .user-profile-details {
-        opacity: 0;
-        max-width: 0;
-        margin-left: 0;
-        pointer-events: none;
-      }
-      .sidebar-collapsed .nav-link {
-        justify-content: center;
-      }
-
-      /* Main Workspace & Form Tabs */
-      .main-tab,
-      .form-tab {
-        border-bottom: 2px solid transparent;
-        position: relative;
-      }
-      .main-tab.active,
-      .form-tab.active {
-        color: var(--text-primary);
-      }
-      .main-tab.active::after,
-      .form-tab.active::after {
-        content: "";
-        position: absolute;
-        bottom: -1px;
-        left: 0;
-        right: 0;
-        height: 2px;
-        background-color: var(--accent);
-        transform-origin: center;
-        animation: scaleX 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-      }
-      @keyframes scaleX {
-        from {
-          transform: scaleX(0);
-        }
-        to {
-          transform: scaleX(1);
-        }
-      }
-
-      /* POS Sub-Tabs */
-      .pos-tab {
-        border-bottom: 2px solid transparent;
-      }
-      .pos-tab.active {
-        color: var(--text-primary);
-        border-bottom-color: var(--accent);
-        background-color: var(--bg-tertiary);
-      }
-      .pos-tab.held {
-        border-bottom-color: var(--warning);
-        color: var(--text-primary);
-      }
-
-      /* Action Menu Dropdown */
-      .action-menu {
-        position: absolute;
-        right: 0;
-        top: 100%;
-        margin-top: 0.5rem;
-        z-index: 30;
-        background-color: var(--bg-tertiary);
-        border: 1px solid var(--border-color-strong);
-        border-radius: 0.75rem;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2),
-          0 4px 6px -2px rgba(0, 0, 0, 0.1);
-        width: 200px;
-        opacity: 0;
-        transform: translateY(10px) scale(0.95);
-        transform-origin: top right;
-        transition: opacity 0.15s ease-out, transform 0.15s ease-out;
-        pointer-events: none;
-        padding: 0.5rem;
-      }
-      .action-menu.open {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-        pointer-events: auto;
-      }
-      .action-menu.open-up {
-        top: auto;
-        bottom: 100%;
-        margin-top: 0;
-        margin-bottom: 0.5rem;
-        transform-origin: bottom right;
-        transform: translateY(-10px) scale(0.95);
-      }
-      .action-menu-item {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        padding: 0.6rem 0.75rem;
-        font-size: 0.875rem;
-        color: var(--text-secondary);
-        cursor: pointer;
-        border-radius: 0.375rem;
-        font-weight: 500;
-      }
-      .action-menu-item:hover {
-        background-color: var(--accent);
-        color: var(--text-primary);
-      }
-      .action-menu-item.danger:hover {
-        background-color: var(--danger);
-        color: white;
-      }
-
-      /* Payment Modal Keypad */
-      .keypad-btn {
-        background-color: var(--bg-tertiary);
-        color: var(--text-primary);
-        border: 1px solid var(--border-color);
-        transition: all 0.1s ease-in-out;
-        font-weight: 500;
-      }
-      .keypad-btn:hover {
-        background-color: var(--border-color);
-        border-color: var(--border-color-strong);
-        transform: scale(1.05);
-      }
-      .keypad-btn:active {
-        background-color: var(--accent);
-        color: white;
-        transform: scale(0.98);
-      }
-      .payment-method-btn.active {
-        background-color: var(--accent);
-        color: white;
-        border-color: var(--accent-hover);
-        box-shadow: 0 0 15px var(--accent-glow);
-      }
-      .payment-split-item {
-        animation: fadeIn 0.3s ease;
-      }
-
-      /* POS Tab Scrolling */
-      #pos-tabs-container {
-        overflow-x: auto;
-        scrollbar-width: none;
-        position: relative;
-      }
-      #pos-tabs-container::-webkit-scrollbar {
-        display: none;
-      }
-      .pos-scroll-btn-left {
-        background: radial-gradient(
-          ellipse 120% 70% at 0% 50%,
-          var(--bg-secondary) 25%,
-          transparent 70%
-        );
-      }
-      .pos-scroll-btn-right {
-        background: radial-gradient(
-          ellipse 120% 70% at 100% 50%,
-          var(--bg-secondary) 25%,
-          transparent 70%
-        );
-      }
-
-      /* Search Result Styling */
-      #pos-search-results {
-        background-color: var(--bg-secondary);
-      }
-      .search-result-item:hover {
-        background-color: var(--border-color);
-      }
-      .search-result-item.active {
-        background-color: var(--accent-hover);
-        color: white;
-      }
-
-      /* Settings Template Selector */
-      .template-selector {
-        border: 2px solid var(--border-color);
-        transition: all 0.2s ease;
-        cursor: pointer;
-      }
-      .template-selector:hover {
-        border-color: var(--accent);
-        transform: translateY(-4px);
-      }
-      .template-selector.active {
-        border-color: var(--accent);
-        box-shadow: 0 0 15px var(--accent-glow);
-      }
-
-      /* Responsive Design */
-      #sidebar-backdrop {
-        transition: opacity 0.3s ease-in-out;
-      }
-
-      /* Form pane transition */
-      .form-pane {
-        display: none;
-        animation: fadeIn 0.3s ease;
-      }
-      .form-pane.active {
-        display: block;
-      }
-
-      @media (max-width: 1023px) {
-        /* Below Tailwind's 'lg' breakpoint */
-        #sidebar {
-          position: fixed;
-          top: 0;
-          bottom: 0;
-          left: 0;
-          z-index: 50;
-          transform: translateX(-100%);
-        }
-        #sidebar.mobile-open {
-          transform: translateX(0);
-        }
-        /* Ensure desktop collapse styles don't affect mobile view */
-        #sidebar.sidebar-collapsed {
-          width: 16rem !important; /* w-64 */
-        }
-        .sidebar-collapsed #brand-name,
-        .sidebar-collapsed .nav-link-text,
-        .sidebar-collapsed .user-profile-details {
-          opacity: 1;
-          max-width: 200px;
-          margin-left: 1rem;
-          pointer-events: auto;
-        }
-        .sidebar-collapsed .nav-link {
-          justify-content: flex-start;
-        }
-        .sidebar-collapsed .nav-link.active-view::before {
-          left: 0;
-          transform: translateY(-50%);
-          height: 60%;
-          width: 3px;
-          top: 50%;
-        }
-
-        /* Adjust header for mobile */
-        header {
-          padding-left: 1rem;
-          padding-right: 1rem;
-        }
-
-        /* Adjust main content for mobile */
-        #workspace-content {
-          padding: 1rem;
-        }
-        #main-tabs-container {
-          padding-left: 0.5rem;
-          padding-right: 0.5rem;
-        }
-      }
-      .login-card {
-        background: rgba(18, 18, 18, 0.6);
-        backdrop-filter: blur(25px);
-        -webkit-backdrop-filter: blur(25px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-      }
-      /* Add this new style block to your existing styles */
-      .role-selector-btn {
-        display: flex;
-        flex-direction: column;
-        width: 100%;
-        padding: 12px 16px;
-        border-radius: 8px;
-        text-align: left;
-        transition: all 0.2s ease;
-        border: 1px solid transparent;
-      }
-      .role-selector-btn:hover {
-        background-color: var(--bg-tertiary);
-        border-color: var(--border-color-strong);
-      }
-      .role-selector-btn.active {
-        background: var(--accent-glow);
-        border-color: var(--accent);
-        color: var(--accent);
-      }
-      .role-selector-btn.active span {
-        color: var(--accent) !important;
-      }
-      .role-selector-btn > span:first-child {
-        color: var(--text-primary);
-      }
-      .role-selector-btn > span:last-child {
-        color: var(--text-secondary);
-      }
-
-      /* Toggle Switch Styles */
-      .toggle-switch-label {
-        position: relative;
-        display: inline-block;
-        width: 44px; /* w-11 */
-        height: 24px; /* h-6 */
-      }
-      .toggle-switch-input {
-        opacity: 0;
-        width: 0;
-        height: 0;
-      }
-      .toggle-switch-track {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: var(--bg-tertiary);
-        border: 1px solid var(--border-color-strong);
-        transition: all 0.3s;
-        border-radius: 9999px;
-      }
-      .toggle-switch-thumb {
-        position: absolute;
-        content: "";
-        height: 18px; /* h-4.5 */
-        width: 18px; /* w-4.5 */
-        left: 2px;
-        bottom: 2px;
-        background-color: white;
-        transition: all 0.3s;
-        border-radius: 9999px;
-      }
-      .toggle-switch-input:checked + .toggle-switch-track {
-        background-color: var(--accent);
-        border-color: var(--accent);
-      }
-      .toggle-switch-input:checked + .toggle-switch-track .toggle-switch-thumb {
-        transform: translateX(20px);
-      }
-      
-    </style>
-  </head>
-  <body class="bg-dots">
-    <div
-      id="login-container"
-      class="fixed inset-0 bg-bg-primary items-center justify-center hidden z-[100]"
-    >
-      <!-- This will be populated by the renderLoginScreen function -->
-    </div>
-    <div class="flex h-screen bg-bg-primary text-text-secondary">
-      <!-- Loading Overlay -->
-      <div
-        id="loading-overlay"
-        class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-gray-900/80 backdrop-blur-sm"
-      >
-        <div
-          class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mb-4"
-        ></div>
-        <h2 class="text-2xl font-semibold text-white">
-          Initializing System...
-        </h2>
-        <p class="text-text-secondary mt-2">Connecting to secure servers.</p>
-        <style>
-          .loader {
-            border-top-color: var(--accent);
-            animation: spin 1s linear infinite;
-          }
-          @keyframes spin {
-            0% {
-              transform: rotate(0deg);
-            }
-            100% {
-              transform: rotate(360deg);
-            }
-          }
-        </style>
-      </div>
-      <!-- Sidebar Navigation -->
-      <aside
-        id="sidebar"
-        class="w-64 bg-[var(--bg-secondary)] flex flex-col transition-all duration-300 border-r border-border-color shrink-0"
-      >
-        <div class="h-24 p-1 border-b border-border-color flex items-center justify-between px-4 shrink-0">
-          <div class="flex items-center overflow-hidden">
-            <!-- <i data-lucide="gem" class="w-10 h-10 text-accent shrink-0"></i> -->
-            <img class="w-14 h-14 text-accent shrink-0" src="cashshilpo-official-logo.png" alt="">
-            <span
-              id="brand-name"
-              class="ml-1 text-2xl font-bold text-text-primary tracking-tighter"
-              >CashShilpo</span
-            >
-          </div>
-        </div>
-
-        <nav id="main-nav" class="overflow-y-scroll flex-1 px-4 py-4 space-y-2">
-          <a
-            href="#"
-            data-view="dashboard"
-            class="nav-link flex items-center p-3 rounded-lg hover:bg-bg-tertiary hover:text-white group"
-          >
-            <i
-              data-lucide="layout-dashboard"
-              class="w-6 h-6 shrink-0 text-gray-400 group-hover:text-accent"
-            ></i>
-
-            <span class="nav-link-text ml-4 font-medium">Dashboard</span>
-          </a>
-
-          <a
-            href="#"
-            data-view="pos"
-            class="nav-link flex items-center p-3 rounded-lg hover:bg-bg-tertiary hover:text-white group"
-          >
-            <i
-              data-lucide="scan-line"
-              class="w-6 h-6 shrink-0 text-gray-400 group-hover:text-accent"
-            ></i>
-
-            <span class="nav-link-text ml-4 font-medium">POS Terminal</span>
-          </a>
-          <a
-            href="#"
-            data-view="barcode-generator"
-            class="nav-link flex items-center p-3 rounded-lg hover:bg-bg-tertiary hover:text-white group"
-
-          >
-            <i
-              data-lucide="barcode"
-              class="w-6 h-6 shrink-0 text-gray-400 group-hover:text-accent"
-            ></i>
-
-            <span class="nav-link-text ml-4 font-medium">Barcode Generator</span>
-          </a>
-
-          <a
-            href="#"
-            data-view="invoices"
-            class="nav-link flex items-center p-3 rounded-lg hover:bg-bg-tertiary hover:text-white group"
-          >
-            <i
-              data-lucide="file-text"
-              class="w-6 h-6 shrink-0 text-gray-400 group-hover:text-accent"
-            ></i>
-
-            <span class="nav-link-text ml-4 font-medium">Invoices</span>
-          </a>
-        <a
-            href="#"
-            data-view="quotations"
-            class="nav-link flex items-center p-3 rounded-lg hover:bg-bg-tertiary hover:text-white group"
-          >
-            <i
-              data-lucide="clipboard-list"
-              class="w-6 h-6 shrink-0 text-gray-400 group-hover:text-accent"
-            ></i>
-
-            <span class="nav-link-text ml-4 font-medium">Quotations</span>
-          </a>
-          <a
-            href="#"
-            data-view="emi-sales"
-            class="nav-link flex items-center p-3 rounded-lg hover:bg-bg-tertiary hover:text-white group"
-            data-permission="canManageEMI"
-          >
-            <i
-              data-lucide="percent"
-              class="w-6 h-6 shrink-0 text-gray-400 group-hover:text-accent"
-            ></i>
-      
-            <span class="nav-link-text ml-4 font-medium">EMI Sales</span>
-          </a>
-
-          <a
-           href="#"
-           data-view="claims"
-           class="nav-link flex items-center p-3 rounded-lg hover:bg-bg-tertiary hover:text-white group"
-           data-permission="canManageWarranties" 
-          >
-          <i
-          data-lucide="wrench"
-          class="w-6 h-6 shrink-0 text-gray-400 group-hover:text-accent"
-          ></i>
-         <span class="nav-link-text ml-4 font-medium">Warranty & Claims</span>
-         </a>
-          <a
-            href="#"
-            data-view="purchase-orders"
-            class="nav-link flex items-center p-3 rounded-lg hover:bg-bg-tertiary hover:text-white group"
-
-          >
-            <i
-              data-lucide="shopping-cart"
-              class="w-6 h-6 shrink-0 text-gray-400 group-hover:text-accent"
-            ></i>
-            <span class="nav-link-text ml-4 font-medium">Purchase Orders</span>
-          </a>
-          <a
-            href="#"
-            data-view="inventory"
-            class="nav-link flex items-center p-3 rounded-lg hover:bg-bg-tertiary hover:text-white group"
-          >
-            <i
-              data-lucide="boxes"
-              class="w-6 h-6 shrink-0 text-gray-400 group-hover:text-accent"
-            ></i>
-
-            <span class="nav-link-text ml-4 font-medium">Inventory</span>
-          </a>
-          
-            <a
-            href="#"
-            data-view="attributes"
-            class="nav-link flex items-center p-3 rounded-lg hover:bg-bg-tertiary hover:text-white group"
-          >
-            <i
-              data-lucide="tags"
-              class="w-6 h-6 shrink-0 text-gray-400 group-hover:text-accent"
-            ></i>
-
-            <span class="nav-link-text ml-4 font-medium">Attribute</span>
-          </a>
-          <a
-            href="#"
-            data-view="reports"
-            class="nav-link flex items-center p-3 rounded-lg hover:bg-bg-tertiary hover:text-white group"
-          >
-            <i
-              data-lucide="bar-chart-3"
-              class="w-6 h-6 shrink-0 text-gray-400 group-hover:text-accent"
-            ></i>
-
-            <span class="nav-link-text ml-4 font-medium">Reports</span>
-          </a>
-
-          <a
-            href="#"
-            data-view="customers"
-            class="nav-link flex items-center p-3 rounded-lg hover:bg-bg-tertiary hover:text-white group"
-          >
-            <i
-              data-lucide="users"
-              class="w-6 h-6 shrink-0 text-gray-400 group-hover:text-accent"
-            ></i>
-
-            <span class="nav-link-text ml-4 font-medium">Customers</span>
-          </a>
-          </a>
-          <a
-            href="#"
-             data-view="suppliers"
-             class="nav-link flex items-center p-3 rounded-lg hover:bg-bg-tertiary hover:text-white group"
-            data-permission="canManageSuppliers"
-
-            >
-          <i
-           data-lucide="package"
-           class="w-6 h-6 shrink-0 text-gray-400 group-hover:text-accent"
-           ></i>
-
-          <span class="nav-link-text ml-4 font-medium">Suppliers</span>
-         </a>
-         </a>
-           
-          <a
-            href="#"
-            data-view="expenses"
-            class="nav-link flex items-center p-3 rounded-lg hover:bg-bg-tertiary hover:text-white group"
-            data-permission="canManageExpenses"
-
-          >
-            <i
-              data-lucide="wallet"
-              class="w-6 h-6 shrink-0 text-gray-400 group-hover:text-accent"
-            ></i>
-
-            <span class="nav-link-text ml-4 font-medium">Expenses</span>
-          </a>
-           <a
-            href="#"
-            data-view="payroll"
-            class="nav-link flex items-center p-3 rounded-lg hover:bg-bg-tertiary hover:text-white group"
-            data-permission="canManagePayroll"
-          >
-            <i
-              data-lucide="dollar-sign"
-              class="w-6 h-6 shrink-0 text-gray-400 group-hover:text-accent"
-            ></i>
-
-            <span class="nav-link-text ml-4 font-medium">Payroll</span>
-          </a>
-          <a
-            href="#"
-            data-view="loyalty"
-            class="nav-link flex items-center p-3 rounded-lg hover:bg-bg-tertiary hover:text-white group"
-            data-permission="canManageLoyalty"
-          >
-            <i
-              data-lucide="award"
-              class="w-6 h-6 shrink-0 text-gray-400 group-hover:text-accent"
-            ></i>
-
-            <span class="nav-link-text ml-4 font-medium">Loyalty Program</span>
-          </a>
-          <a
-            href="#"
-            data-view="staff"
-            class="nav-link flex items-center p-3 rounded-lg hover:bg-bg-tertiary hover:text-white group"
-            data-permission="canManageStaff"
-          >
-            <i
-              data-lucide="user-cog"
-              class="w-6 h-6 shrink-0 text-gray-400 group-hover:text-accent"
-            ></i>
-
-            <span class="nav-link-text ml-4 font-medium">Staff</span>
-          </a>
-          <a
-            href="#"
-            data-view="user-roles"
-            class="nav-link flex items-center p-3 rounded-lg hover:bg-bg-tertiary hover:text-white group"
-            data-permission="canManageRoles"
-          >
-            <i
-              data-lucide="shield-check"
-              class="w-6 h-6 shrink-0 text-gray-400 group-hover:text-accent"
-            ></i>
-            <span class="nav-link-text ml-4 font-medium">User Roles</span>
-          </a>
-          <a
-            href="#"
-            data-view="settings"
-            class="nav-link flex items-center p-3 rounded-lg hover:bg-bg-tertiary hover:text-white group"
-            data-permission="canManageSettings"
-          >
-            <i
-              data-lucide="settings"
-              class="w-6 h-6 shrink-0 text-gray-400 group-hover:text-accent"
-            ></i>
-
-            <span class="nav-link-text ml-4 font-medium">Settings</span>
-          </a>
-          <a
-            href="#"
-            data-view="subscription"
-            class="nav-link flex items-center p-3 rounded-lg hover:bg-bg-tertiary hover:text-white group"
-            data-permission="canManageSubscription"
-          >
-            <i
-              data-lucide="crown"
-              class="w-6 h-6 shrink-0 text-gray-400 group-hover:text-accent"
-            ></i>
-
-            <span class="nav-link-text ml-4 font-medium">Subscription</span>
-          </a>
-        </nav>
-
-        <div class="p-1 border-t border-border-color shrink-0">
-          <div id="user-profile-section" class="relative group">
-            <div
-              class="flex items-center p-3 rounded-lg hover:bg-bg-tertiary cursor-pointer"
-            >
-              <img
-                id="user-avatar"
-                src="https://placehold.co/40x40/1f2937/4b5563?text=?"
-                class="w-10 h-10 rounded-full ring-2 ring-border-color shrink-0"
-                alt="User Avatar"
-              />
-
-              <div class="user-profile-details ml-4 overflow-hidden">
-                <p
-                  id="user-name"
-                  class="font-semibold text-text-primary truncate"
-                >
-                  Not Logged In
-                </p>
-
-                <p
-                  id="user-role"
-                  class="text-xs text-text-secondary capitalize"
-                >
-                  No Role
-                </p>
-              </div>
-
-              <i
-                data-lucide="log-out"
-                class="w-5 h-5 ml-auto text-text-secondary shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
-              ></i>
-            </div>
-
-            <button
-              data-action="logout"
-              title="Sign Out"
-              class="absolute inset-0 w-full h-full"
-            ></button>
-          </div>
-        </div>
-      </aside>
-
-      <!-- Sidebar Backdrop for Mobile -->
-      <div
-        id="sidebar-backdrop"
-        class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden"
-      ></div>
-
-      <!-- Main Content Workspace -->
-      <main class="flex-1 flex flex-col bg-bg-primary overflow-hidden">
-        <header
-    class="h-24 flex items-center justify-between px-8 border-b border-border-color shrink-0 bg-[var(--bg-secondary)]/50"
->
-    <div class="flex items-center gap-4">
-        <button
-            id="sidebar-toggle"
-            class="text-text-secondary hover:text-text-primary p-2 -ml-2 rounded-md"
-        >
-            <i data-lucide="panel-left-close" class="w-6 h-6"></i>
-        </button>
-        <button
-            data-action="open-search"
-            class="flex items-center gap-2 text-text-secondary hover:text-text-primary bg-bg-tertiary px-4 py-2 rounded-lg border border-border-color"
-        >
-            <i data-lucide="search" class="w-5 h-5"></i>
-            <span class="text-sm hidden md:inline">Search...</span>
-            <kbd
-                class="ml-4 text-xs font-sans border border-border-color-strong rounded px-1.5 py-0.5 hidden md:inline"
-                >⌘K</kbd
-            >
-        </button>
-        <!-- NEW DAYBOOK BUTTON START -->
-        <button
-            data-action="open-daybook"
-            title="Open Daybook"
-            class="flex items-center gap-2 text-text-secondary hover:text-text-primary bg-bg-tertiary px-3 py-2 rounded-lg border border-border-color"
-        >
-            <i data-lucide="book-open-check" class="w-5 h-5"></i>
-            <span class="text-sm hidden md:inline">Daybook</span>
-        </button>
-        <!-- NEW DAYBOOK BUTTON END -->
-    </div>
-    <div class="flex items-center gap-2 md:gap-4">
-        <!-- Currency Selector Dropdown -->
-        <div class="relative">
-            <button
-                data-action="toggle-action-menu"
-                class="flex items-center gap-2 text-text-secondary hover:text-text-primary bg-bg-tertiary px-3 py-2 rounded-lg border border-border-color"
-            >
-                <i data-lucide="globe" class="w-5 h-5"></i>
-                <span
-                    id="current-currency-display"
-                    class="text-sm font-semibold"
-                    >USD</span
-                >
-                <i
-                    data-lucide="chevron-down"
-                    class="w-4 h-4 text-text-secondary"
-                ></i>
-            </button>
-            <div id="currency-menu" class="action-menu w-40">
-                <!-- Currency options will be injected here -->
-            </div>
-        </div>
-        <button
-            data-action="show-shortcuts"
-            class="text-text-secondary hover:text-text-primary p-2 rounded-full hover:bg-bg-tertiary"
-        >
-            <i data-lucide="help-circle" class="w-6 h-6"></i>
-        </button>
-        <button
-            data-action="open-notifications"
-            class="text-text-secondary hover:text-text-primary relative p-2"
-        >
-            <i data-lucide="bell" class="w-6 h-6"></i>
-        </button>
-        <button
-            id="ai-assistant-btn"
-            class="hidden bg-accent text-white rounded-full p-2 hover:bg-accent-hover transition-all transform hover:scale-110 shadow-lg shadow-accent-glow"
-        >
-            <i data-lucide="sparkles" class="w-6 h-6"></i>
-        </button>
-    </div>
-</header>
-
-
-        <div
-          id="main-tabs-container"
-          class="flex-shrink-0 flex items-center border-b border-border-color px-4 bg-[var(--bg-secondary)]/50"
-        ></div>
-        <div id="workspace-content" class="flex-1 p-4 md:p-8 overflow-y-auto">
-          <!-- Dynamic content will be loaded here -->
-        </div>
-      </main>
-    </div>
-
-    <!-- Modals Container -->
-    <div id="modals-container"></div>
-
-    <!-- Toasts Container -->
-    <div
-      id="toasts-container"
-      class="fixed bottom-6 right-6 z-[100] space-y-3 w-full max-w-sm md:max-w-md"
-    ></div>
-    <!-- Inside index.html -->
-    <script src="cashshilpo-bn-lan.js"></script>
-    <script src="cashshilpo-theme.js"></script>
-    <script src="cashshilpo-visuals.js"></script>
-    <script src="cashshilpo-settings-tab.js"></script>
-    <script src="cashshilpo-tooltips.js"></script>
-    <!-- <script src="cashshilpo-button-animation.js"></script> -->
 <script type="module">
         // --- FIREBASE SDK IMPORTS ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -1417,6 +306,19 @@
         let isAppLocked = false;
         let lockScreenInterval = null;
 
+        // --- NEW HELPER: Batch Chunking for Large Transfers ---
+        const writeInBatches = async (db, items, collectionRef, idField = 'id') => {
+            const chunkSize = 450; // Firestore limit is 500, leave buffer
+            for (let i = 0; i < items.length; i += chunkSize) {
+                const chunk = items.slice(i, i + chunkSize);
+                const batch = writeBatch(db);
+                chunk.forEach(item => {
+                    const docRef = doc(collectionRef, item[idField]);
+                    batch.set(docRef, item);
+                });
+                await batch.commit();
+            }
+        };
 
         // --- UPDATED: CENTRALIZED SUBSCRIPTION STATUS CHECKER (Now takes userData) ---
         const checkSubscriptionStatus = (userData) => {
@@ -1569,7 +471,7 @@
                 selectedReceiptTemplate: 'modern',
                 posLayout: 'classic', // To switch between POS layouts
                 businessType: 'general',
-                defaultCurrency: 'BDT',
+                defaultCurrency: 'USD',
                 taxRate: 10,
                 defaultUnit: 'pcs',
                 voidLockoutDays: 30,
@@ -2157,85 +1059,198 @@ const defaultStoreInfo = {
             return newStoreId; // Return the new store ID
         };
 
-        // --- NEW: Function to add a new store to an existing user ---
-        const addNewStoreToExistingUser = async (user, businessName) => {
-            console.log(`Adding new store '${businessName}' for existing user ${user.uid}`);
+        // --- UPDATED: Advanced Store Creation (Independent vs Branch) ---
+        const addNewStoreToExistingUser = async (user, businessName, type = 'independent', sourceStoreId = null) => {
+            console.log(`Adding new store '${businessName}' (${type}) for user ${user.uid}`);
+            showToast("Initializing store environment...", "info");
             
-            // --- STEP 1: Create the new Store document ---
+            // 1. Prepare Base Data
+            let settingsToUse = {
+                selectedReceiptTemplate: 'modern', businessType: 'general', defaultCurrency: 'USD', taxRate: 10, defaultUnit: 'pcs',
+                voidLockoutDays: 30,
+                receiptFooterText: 'Thank you for your business!',
+                automations: { dynamicPricing: { enabled: false }, fraudDetection: { enabled: true }, inventoryOptimization: { enabled: true }, endOfDayReports: { enabled: true } },
+                permissions: JSON.parse(JSON.stringify(userRoles)),
+                productCategories: ['Default Category', 'Seasonal'],
+                productBrands: ['Default Brand'],
+            };
+            let customProfilesToUse = {};
+            let currencyConfigToUse = { 
+                baseCurrency: 'USD', 
+                defaultDisplayCurrency: 'USD',
+                currencies: { 'USD': { name: 'US Dollar', symbol: '$', rate: 1 } } // Default fallback
+            };
+            let loyaltyToUse = { enabled: true, pointsPerDollar: 1, rewardThreshold: 100, rewardValue: 5, rewardType: 'fixed_discount' };
+            let uomsToUse = [
+                { id: 'pcs', name: 'Piece(s)', allowsDecimal: false }, { id: 'kg', name: 'Kilogram', allowsDecimal: true }
+            ];
+            
+            // Arrays to hold data for cloning
+            let productsToClone = [];
+            let customersToClone = [];
+            let suppliersToClone = [];
+            
+            if (type === 'branch' && sourceStoreId) {
+                showToast("Cloning system data, customers, and suppliers...", "info");
+                try {
+                    const sourceStoreRef = doc(db, 'stores', sourceStoreId);
+                    const sourceSnap = await getDoc(sourceStoreRef);
+                    
+                    if (sourceSnap.exists()) {
+                        const sData = sourceSnap.data();
+                        
+                        // Inherit System Settings
+                        settingsToUse = { ...sData.settings };
+                        customProfilesToUse = sData.customProfiles || {};
+                        currencyConfigToUse = {
+                            baseCurrency: sData.baseCurrency,
+                            defaultDisplayCurrency: sData.defaultDisplayCurrency,
+                            currencies: sData.currencies
+                        };
+
+                        // 1. Fetch & Clone Products (Sanitized)
+                        const productsSnap = await getDocs(collection(sourceStoreRef, 'products'));
+                        productsToClone = productsSnap.docs.map(d => {
+                            const p = d.data();
+                            return {
+                                ...p,
+                                id: d.id, // IMPORTANT: Maintain ID for consistency
+                                stock: 0, // RESET STOCK: New branch starts empty
+                                sales: 0, // RESET SALES HISTORY
+                                serials: [], 
+                                batches: [],
+                                createdAt: new Date().toISOString()
+                            };
+                        });
+
+                        // 2. Fetch & Clone Customers (Preserve Status)
+                        const customersSnap = await getDocs(collection(sourceStoreRef, 'customers'));
+                        customersToClone = customersSnap.docs.map(d => {
+                            const c = d.data();
+                            return {
+                                ...c,
+                                id: d.id,
+                                // IMPORTANT: Reset Store-Specific Financials
+                                currentDue: 0, // Debt is usually specific to the store ledger
+                                // IMPORTANT: Keep Loyalty Status
+                                loyaltyPoints: c.loyaltyPoints || 0, 
+                                loyaltyTierId: c.loyaltyTierId || null,
+                                staffDiscountPercent: c.staffDiscountPercent || 0,
+                                lifetimeDiscountPercent: c.lifetimeDiscountPercent || 0,
+                                // Keep join date to honor "Member Since"
+                                joinDate: c.joinDate || new Date().toISOString()
+                            };
+                        });
+
+                        // 3. Fetch & Clone Suppliers
+                        const suppliersSnap = await getDocs(collection(sourceStoreRef, 'suppliers'));
+                        suppliersToClone = suppliersSnap.docs.map(d => ({ ...d.data(), id: d.id }));
+
+                        // 4. Fetch UOMs
+                        const uomSnap = await getDocs(collection(sourceStoreRef, 'unitsOfMeasurement'));
+                        if (!uomSnap.empty) {
+                            uomsToUse = uomSnap.docs.map(d => ({ ...d.data(), id: d.id }));
+                        }
+
+                        // 5. Fetch Loyalty Config
+                        const loyaltySnap = await getDoc(doc(collection(sourceStoreRef, 'loyalty'), 'config'));
+                        if (loyaltySnap.exists()) {
+                            loyaltyToUse = loyaltySnap.data();
+                        }
+                    }
+                } catch (err) {
+                    console.error("Error fetching source store data:", err);
+                    showToast("Warning: Could not fully clone branch data. Using defaults.", "warning");
+                }
+            }
+
+            // 3. Create New Store Document
             const newStoreRef = doc(collection(db, 'stores'));
             const newStoreId = newStoreRef.id;
 
             const newStoreData = {
                 name: businessName,
-                ownerUid: user.uid, // The user creating it is the owner
+                ownerUid: user.uid,
                 createdAt: new Date().toISOString(),
                 logoUrl: `https://placehold.co/100x100/007BFF/FFFFFF?text=${encodeURIComponent(businessName.charAt(0).toUpperCase())}`,
-                address: "123 Commerce St, Business City, 12345",
-                contact: "555-0101",
-                website: "example.com",
-                taxId: "BIN-123456789",
-                socials: "@yourbusiness",
-                baseCurrency: 'USD',
-                defaultDisplayCurrency: 'USD',
-                currencies: { 'USD': { name: 'US Dollar', symbol: '$', rate: 1 }, 'BDT': { name: 'Bangladeshi Taka', symbol: '৳', rate: 117.50 }, 'EUR': { name: 'Euro', symbol: '€', rate: 0.92 }, 'GBP': { name: 'British Pound', symbol: '£', rate: 0.79 }, 'JPY': { name: 'Japanese Yen', symbol: '¥', rate: 157.25 }, 'INR': { name: 'Indian Rupee', symbol: '₹', rate: 83.50 } },
-                settings: {
-                    selectedReceiptTemplate: 'modern', businessType: 'general', defaultCurrency: 'USD', taxRate: 10, defaultUnit: 'pcs',
-                    voidLockoutDays: 30,
-                    receiptFooterText: 'Get 15% OFF your next purchase with code: WELCOME15\n30-day return/exchange policy on most items.', // MODIFIED: Added customizable receipt text
-                    automations: { dynamicPricing: { enabled: false, strategy: 'balanced' }, fraudDetection: { enabled: true, sensitivity: 'high' }, inventoryOptimization: { enabled: true, analysisFrequency: 'weekly' }, endOfDayReports: { enabled: true, deliveryTime: '22:00' } },
-                    permissions: JSON.parse(JSON.stringify(userRoles)),
-                    // NEW: Default dynamic categories
-                    productCategories: ['Default Category', 'Seasonal'],
-                    productBrands: ['Default Brand'],
-                },
-                customProfiles: {},
+                address: "", // Blank for new location
+                contact: "",
+                website: "",
+                ...currencyConfigToUse, // Inherit currency config
+                settings: settingsToUse, // Inherit settings
+                customProfiles: customProfilesToUse,
             };
+            
             await setDoc(newStoreRef, newStoreData);
 
-            // --- STEP 2: Create subcollections for the new store ---
+            // 4. Batch Write Subcollections
             const subcollectionBatch = writeBatch(db);
-            const newUomRef = collection(newStoreRef, 'unitsOfMeasurement');
-            const defaultUnits = [
-                { id: 'pcs', name: 'Piece(s)', allowsDecimal: false }, { id: 'kg', name: 'Kilogram', allowsDecimal: true }, { id: 'g', name: 'Gram', allowsDecimal: true },
-                { id: 'ltr', name: 'Liter', allowsDecimal: true }, { id: 'ml', name: 'Milliliter', allowsDecimal: true }, { id: 'box', name: 'Box', allowsDecimal: false }, { id: 'pack', name: 'Pack', allowsDecimal: false },
-            ];
-            defaultUnits.forEach(unit => subcollectionBatch.set(doc(newUomRef, unit.id), unit));
 
-            const newNotificationsRef = collection(newStoreRef, 'notifications');
-            const welcomeNotification = {
-                date: new Date().toISOString(), message: `Welcome to your new store, ${businessName}!`,
-                type: 'info', read: false, targetRoles: ['admin', 'manager']
-            };
-            subcollectionBatch.set(doc(newNotificationsRef), welcomeNotification);
-
-            // Add the user as the admin for this new store
+            // Setup Admin
             const newStaffRef = doc(collection(newStoreRef, 'staff'), user.uid);
             subcollectionBatch.set(newStaffRef, {
                 name: user.displayName || user.email, email: user.email, role: 'admin', status: 'active',
                 joinDate: new Date().toISOString()
             });
-            const defaultLoyaltySettings = { // Same defaults as above
-              enabled: true, pointsPerDollar: 1, rewardThreshold: 100, rewardValue: 5,
-              rewardType: 'fixed_discount', earnOnTax: false, redeemLimitPerOrder: 1
-            };
-            subcollectionBatch.set(doc(collection(newStoreRef, 'loyalty'), 'config'), defaultLoyaltySettings);
+
+            // Setup Notification
+            const newNotificationsRef = collection(newStoreRef, 'notifications');
+            subcollectionBatch.set(doc(newNotificationsRef), {
+                date: new Date().toISOString(), 
+                message: type === 'branch' 
+                    ? `Branch setup complete! Cloned ${productsToClone.length} products, ${customersToClone.length} customers, and settings.` 
+                    : `Welcome to ${businessName}! Store setup complete.`,
+                type: 'info', read: false, targetRoles: ['admin', 'manager']
+            });
+
+            // Setup Loyalty
+            subcollectionBatch.set(doc(collection(newStoreRef, 'loyalty'), 'config'), loyaltyToUse);
+
             await subcollectionBatch.commit();
+
+            // 5. Massive Data Writes (Batched)
             
-            // --- STEP 3: Update the user's profile ---
-            // We use a transaction to safely read and update the user's stores array.
+            // Write UOMs
+            await writeInBatches(db, uomsToUse, collection(newStoreRef, 'unitsOfMeasurement'), 'id');
+
+            // Write Products
+            if (productsToClone.length > 0) {
+                showToast(`Transferring ${productsToClone.length} products...`, "info");
+                await writeInBatches(db, productsToClone, collection(newStoreRef, 'products'), 'id');
+            }
+
+            // Write Customers (New Step for Branch Mode)
+            if (customersToClone.length > 0) {
+                showToast(`Transferring ${customersToClone.length} customer profiles...`, "info");
+                await writeInBatches(db, customersToClone, collection(newStoreRef, 'customers'), 'id');
+            }
+
+            // Write Suppliers (New Step for Branch Mode)
+            if (suppliersToClone.length > 0) {
+                showToast(`Transferring ${suppliersToClone.length} suppliers...`, "info");
+                await writeInBatches(db, suppliersToClone, collection(newStoreRef, 'suppliers'), 'id');
+            }
+
+            if (type === 'independent') {
+                // Default UOMs for independent stores if not copied
+                 const defaultUoms = [
+                    { id: 'pcs', name: 'Piece(s)', allowsDecimal: false }, { id: 'kg', name: 'Kilogram', allowsDecimal: true }
+                ];
+                await writeInBatches(db, defaultUoms, collection(newStoreRef, 'unitsOfMeasurement'), 'id');
+            }
+            
+            // 6. Update User Profile
             const userProfileRef = doc(db, 'users', user.uid);
             await runTransaction(db, async (transaction) => {
                 const userDoc = await transaction.get(userProfileRef);
-                if (!userDoc.exists()) {
-                    throw "User document does not exist!";
-                }
+                if (!userDoc.exists()) throw "User document does not exist!";
+                
                 const currentStores = userDoc.data().stores || [];
                 const newStores = [...currentStores, { id: newStoreId, name: businessName }];
-                // Atomically update the stores array and set the current store to the new one
                 transaction.update(userProfileRef, { stores: newStores, currentStoreId: newStoreId });
             });
             
-            console.log(`Successfully added and switched to new store ${newStoreId}`);
+            console.log(`Successfully created ${type} store: ${newStoreId}`);
             return newStoreId;
         };
 
@@ -10489,7 +9504,7 @@ function openPaymentModal() {
                                     <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-text-secondary"></i>
                                     <input type="text" id="inventory-search" placeholder="Search by name, SKU, category..." class="form-input w-full pl-11" value="${viewState.searchQuery}">
                                 </div>
-                                <select id="inventory-category-filter" class="form-select flex-shrink-0 md:w-48">${categories.map(c => `<option value="${c}" ${viewState.filters.category === c ? 'selected' : ''}>${c === 'all' ? `All ${term.category}` : c}</option>`).join('')}</select>
+                                <select id="inventory-category-filter" class="form-select flex-shrink-0 md:w-48">${categories.map(c => `<option value="${c}" ${viewState.filters.category === c ? 'selected' : ''}>${c === 'all' ? `All ${term.category}s` : c}</option>`).join('')}</select>
                                 <select id="inventory-stock-filter" class="form-select flex-shrink-0 md:w-48">
                                     <option value="all">All Stock Status</option>
                                     <option value="in_stock" ${viewState.filters.stockStatus === 'in_stock' ? 'selected' : ''}>In Stock</option>
@@ -19146,47 +18161,106 @@ async function openReceivePaymentModal(customerId) {
                 if (action === 'add-new-store') {
                     e.stopPropagation();
                     
-                    // --- NEW: Store Limit Check ---
+                    // --- Store Limit Check ---
                     const storeLimit = appState.session.userProfileData?.storeLimit || 1;
                     const storeCount = appState.session.availableStores.length;
                     if (storeCount >= storeLimit) {
                         showToast(`You have reached your limit of ${storeLimit} store(s). Contact support to upgrade.`, 'error');
                         return;
                     }
-                    // --- END NEW ---
 
                     document.querySelectorAll('.action-menu.open').forEach(m => m.classList.remove('open', 'open-up'));
+                    
+                    // Generate Source Store Options
+                    const sourceStoreOptions = appState.session.availableStores.map(s => 
+                        `<option value="${s.id}">${s.name}</option>`
+                    ).join('');
+
                     const content = `
-                        <form id="add-new-store-form" class="space-y-4">
-                            <p class="text-sm text-text-secondary">You are creating a new, separate business. This will not affect your existing stores.</p>
+                        <form id="add-new-store-form" class="space-y-6">
                             <div>
-                                <label class="block text-sm font-medium mb-1">New Business Name</label>
-                                <input type="text" name="name" class="form-input w-full" required>
+                                <label class="block text-sm font-medium mb-1">New Store Name</label>
+                                <input type="text" name="name" class="form-input w-full" placeholder="e.g. Downtown Branch" required>
+                            </div>
+                            
+                            <div class="space-y-3">
+                                <label class="block text-sm font-medium text-text-secondary">Setup Mode</label>
+                                
+                                <label class="flex items-start p-3 border border-border-color rounded-lg cursor-pointer hover:bg-bg-tertiary transition-colors">
+                                    <input type="radio" name="storeType" value="independent" class="mt-1 form-radio text-accent focus:ring-accent" checked>
+                                    <div class="ml-3">
+                                        <span class="block text-sm font-medium text-text-primary">Independent Store</span>
+                                        <span class="block text-xs text-text-secondary">Fresh start. Default settings, empty catalog. Best for a completely new business line.</span>
+                                    </div>
+                                </label>
+
+                                <label class="flex items-start p-3 border border-border-color rounded-lg cursor-pointer hover:bg-bg-tertiary transition-colors">
+                                    <input type="radio" name="storeType" value="branch" class="mt-1 form-radio text-accent focus:ring-accent" ${appState.session.availableStores.length === 0 ? 'disabled' : ''}>
+                                    <div class="ml-3">
+                                        <span class="block text-sm font-medium text-text-primary">Branch Expansion</span>
+                                        <span class="block text-xs text-text-secondary">Clone system data (Products, Categories, Settings) from an existing store. Inventory starts at 0.</span>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div id="source-store-select-wrapper" class="hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                                <label class="block text-sm font-medium mb-1 text-accent">Select Source Store to Clone</label>
+                                <select name="sourceStoreId" class="form-select w-full">
+                                    ${sourceStoreOptions}
+                                </select>
+                                <p class="text-xs text-text-secondary mt-2 flex items-center">
+                                    <i data-lucide="info" class="w-3 h-3 mr-1"></i>
+                                    Will transfer: Products, UoM, Taxes, Receipt Templates, Automation Settings.
+                                </p>
                             </div>
                         </form>
                     `;
                     const footer = `<button data-action="close-modal" class="btn btn-secondary">Cancel</button><button type="submit" form="add-new-store-form" class="btn btn-primary">Create Store</button>`;
-                    const modal = showModal('Create New Store', content, footer);
+                    const modal = showModal('Launch New Store', content, footer);
+                    lucide.createIcons();
+
+                    const form = modal.querySelector('#add-new-store-form');
+                    const sourceWrapper = modal.querySelector('#source-store-select-wrapper');
+                    const typeRadios = form.querySelectorAll('input[name="storeType"]');
+
+                    typeRadios.forEach(radio => {
+                        radio.addEventListener('change', (e) => {
+                            if (e.target.value === 'branch') {
+                                sourceWrapper.classList.remove('hidden');
+                            } else {
+                                sourceWrapper.classList.add('hidden');
+                            }
+                        });
+                    });
                     
-                    modal.querySelector('#add-new-store-form').addEventListener('submit', async (ev) => {
+                    form.addEventListener('submit', async (ev) => {
                         ev.preventDefault();
-                        const storeName = ev.target.name.value;
+                        const formData = new FormData(ev.target);
+                        const storeName = formData.get('name');
+                        const type = formData.get('storeType');
+                        const sourceStoreId = formData.get('sourceStoreId');
+
                         if (!storeName.trim()) {
                             showToast('Please enter a valid business name.', 'error');
                             return;
                         }
                         
-                        closeModal(modal);
-                        showToast(`Creating your new store: ${storeName}...`, 'info');
+                        // Disable button to prevent double submit
+                        const submitBtn = modal.querySelector('button[type="submit"]');
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML = `<div class="loader-sm"></div> Creating...`;
                         
                         try {
                             // The function will create the store and set it as current
-                            await addNewStoreToExistingUser(auth.currentUser, storeName);
+                            await addNewStoreToExistingUser(auth.currentUser, storeName, type, sourceStoreId);
+                            closeModal(modal);
                             // Then reload the page to reflect the change
                             window.location.reload();
                         } catch (error) {
                             console.error('Failed to create new store:', error);
                             showToast('There was an error creating your new store.', 'error');
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = 'Create Store';
                         }
                     });
                 }
@@ -27912,44 +26986,3 @@ async function openReturnModal(invoiceId) {
     window.addEventListener('resize', checkScreenSize);
 });
 </script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  </body>
-</html>

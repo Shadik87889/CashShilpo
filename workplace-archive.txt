@@ -760,20 +760,6 @@
             <span class="nav-link-text ml-4 font-medium">Quotations</span>
           </a>
           <a
-            href="#"
-            data-view="emi-sales"
-            class="nav-link flex items-center p-3 rounded-lg hover:bg-bg-tertiary hover:text-white group"
-            data-permission="canManageEMI"
-          >
-            <i
-              data-lucide="percent"
-              class="w-6 h-6 shrink-0 text-gray-400 group-hover:text-accent"
-            ></i>
-      
-            <span class="nav-link-text ml-4 font-medium">EMI Sales</span>
-          </a>
-
-          <a
            href="#"
            data-view="claims"
            class="nav-link flex items-center p-3 rounded-lg hover:bg-bg-tertiary hover:text-white group"
@@ -1102,20 +1088,13 @@
       id="toasts-container"
       class="fixed bottom-6 right-6 z-[100] space-y-3 w-full max-w-sm md:max-w-md"
     ></div>
-    <!-- Inside index.html -->
-    <script src="cashshilpo-bn-lan.js"></script>
-    <script src="cashshilpo-theme.js"></script>
-    <script src="cashshilpo-visuals.js"></script>
-    <script src="cashshilpo-settings-tab.js"></script>
-    <script src="cashshilpo-tooltips.js"></script>
-    <!-- <script src="cashshilpo-button-animation.js"></script> -->
 <script type="module">
         // --- FIREBASE SDK IMPORTS ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { 
             getFirestore, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, onSnapshot, 
-            collection, query, where, writeBatch, runTransaction, getDocs, limit, increment
+            collection, query, where, writeBatch, runTransaction, getDocs, limit
         } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         // --- SESSION START TIME ---
@@ -1290,8 +1269,6 @@
                     canManagePayroll: { value: true, description: 'Can manage staff pay settings, run payroll, and view history.' },
                     canManageLoyalty: { value: true, description: 'Can configure and manage the loyalty program.' },
                     canProcessReturns: { value: true, description: 'Can process returns and issue credit.' }, 
-                    canManageEMI: { value: true, description: 'Can manage EMI sales, schedules, and collections.' },
-
                 }
             },
             manager: {
@@ -1336,8 +1313,7 @@
                     canManagePayroll: { value: false, description: 'Cannot manage payroll.' },
                     canManageLoyalty: { value: true, description: 'Can configure and manage the loyalty program.' },
                     canProcessReturns: { value: true, description: 'Can process returns and issue credit.' }, // <-- ADD THIS
-                    canManageEMI: { value: true, description: 'Can manage EMI sales, schedules, and collections.' },
-
+                    
                 }
             },
             cashier: {
@@ -1379,8 +1355,7 @@
                      canManagePayroll: { value: false, description: 'Cannot manage payroll.' },
                      canManageLoyalty: { value: false, description: 'Can configure and manage the loyalty program.' },
                      canProcessReturns: { value: false, description: 'Cannot process returns.' }, // <-- ADD THIS
-                     canManageEMI: { value: false, description: 'Cannot manage EMI sales.' }, // Or true if you want them to collect payments
-
+                    
                 }
             }
         };
@@ -1407,7 +1382,6 @@
             loyaltySettings: {},
             loyaltyTiers: [], 
             loyaltyHistory: [],
-            emiSchedules: [],
         };
 
         // --- NEW: To manage Firestore listeners ---
@@ -1569,7 +1543,7 @@
                 selectedReceiptTemplate: 'modern',
                 posLayout: 'classic', // To switch between POS layouts
                 businessType: 'general',
-                defaultCurrency: 'BDT',
+                defaultCurrency: 'USD',
                 taxRate: 10,
                 defaultUnit: 'pcs',
                 voidLockoutDays: 30,
@@ -1629,12 +1603,6 @@
                 // --- NEWLY ADDED PALETTES ---
                 red: ['#f87171', '#fca5a5', '#fecaca', '#fee2e2', '#fff5f5'], // Based on Tailwind red 400-50
                 yellow: ['#fbbf24', '#fcd34d', '#fde68a', '#fef3c7', '#fffbeb'], // Based on Tailwind amber 400-50
-                // --- FIX: Add missing palettes referenced in reports ---
-                blue: ['#38bdf8', '#7dd3fc', '#bae6fd', '#e0f2fe', '#f0f9ff'],
-                green: ['#4ade80', '#86efac', '#bbf7d0', '#dcfce7', '#f0fdf4'],
-                indigo: ['#818cf8', '#a5b4fc', '#c7d2fe', '#e0e7ff', '#eef2ff'], // Fixed undefined error
-                purple: ['#a78bfa', '#c4b5fd', '#ddd6fe', '#ede9fe', '#f5f3ff'],
-                teal:   ['#2dd4bf', '#5eead4', '#99f6e4', '#ccfbf1', '#f0fdfa'],
             },
             createGradient(ctx, color) {
                 if (!ctx || !ctx.canvas) return color;
@@ -1976,7 +1944,7 @@
 
 
         // --- FIREBASE REFERENCES ---
-             let storeRef, productsRef, customersRef, invoicesRef, uomRef, notificationsRef, staffRef, usersRef, auditLogRef, expensesRef, suppliersRef, purchaseOrdersRef, warrantiesRef, claimsRef, quotationsRef,  payrollSettingsRef, payrollRunsRef, payslipsRef, loyaltySettingsRef, loyaltyHistoryRef, emiSchedulesRef; // MODIFIED
+             let storeRef, productsRef, customersRef, invoicesRef, uomRef, notificationsRef, staffRef, usersRef, auditLogRef, expensesRef, suppliersRef, purchaseOrdersRef, warrantiesRef, claimsRef, quotationsRef,  payrollSettingsRef, payrollRunsRef, payslipsRef, loyaltySettingsRef, loyaltyHistoryRef; // MODIFIED
 
         const setupFirebaseRefs = (storeId) => {
             if (!storeId) {
@@ -2009,7 +1977,6 @@
             const loyaltyCollectionRef = collection(storeRef, 'loyalty');
             loyaltySettingsRef = doc(loyaltyCollectionRef, 'config'); // <-- ADD
             loyaltyHistoryRef = collection(storeRef, 'loyaltyHistory');
-            emiSchedulesRef = collection(storeRef, 'emiSchedules'); 
         };
 
         // --- NEW: Function to detach all active Firestore listeners ---
@@ -2392,14 +2359,12 @@ const currencyUtils = {
         const currencyInfo = this.get(toCurrencyCode);
         const convertedAmount = this.convert(amountInBase, toCurrencyCode);
         
-        // --- UPDATED: Removed automatic compact notation (1M) ---
-        // Previously, this code converted >1,000,000 to "1M". 
-        // This block is now removed to show full numbers or ellipsis as requested.
-        /* if (options.notation === undefined && Math.abs(convertedAmount) >= 1000000) {
+        // --- NEW: Automatically use compact notation for large numbers (over 1 million in the display currency) ---
+        // This is applied unless a specific notation is passed in the options.
+        if (options.notation === undefined && Math.abs(convertedAmount) >= 1000000) {
             options.notation = 'compact';
             options.maximumFractionDigits = 2; // e.g., 1.44M
-        } 
-        */
+        }
         
         const formattedWithCode = new Intl.NumberFormat(undefined, {
             style: 'currency',
@@ -2507,7 +2472,7 @@ async function openDaybookModal(dateString = null) {
                         <div id="daybook-payments-by-method" class="daybook-section">Loading...</div>
                     </div>
                     <div>
-                        <h4 class="font-semibold text-text-primary mb-2">Due Collected & EMI Payments</h4>
+                        <h4 class="font-semibold text-text-primary mb-2">Due Collections</h4>
                         <div id="daybook-due-collections" class="daybook-section">Loading...</div>
                     </div>
                 </div>` : ''}
@@ -2524,7 +2489,7 @@ async function openDaybookModal(dateString = null) {
                  ${canSeeAllData ? `
                 <div id="tab-due-discounts" class="daybook-tab-pane hidden space-y-4">
                     <div>
-                        <h4 class="font-semibold text-text-primary mb-2">New Due Amounts Added (Credit & EMI Loans)</h4>
+                        <h4 class="font-semibold text-text-primary mb-2">New Due Amounts Added</h4>
                         <div id="daybook-new-due" class="daybook-section">Loading...</div>
                     </div>
                     <div>
@@ -2651,37 +2616,12 @@ async function openDaybookModal(dateString = null) {
             const openingBalance = paymentsBeforeToday.reduce((sum, p) => sum + currencyUtils.convertToBase(p.amount, p.currency || appState.currentCurrency), 0)
                                  - expensesBeforeToday.reduce((sum, exp) => sum + exp.amountInBase, 0);
             const closingBalance = openingBalance + netCashMovement;
-            
-            // --- UPDATED: Due Collected (includes EMI installments & settlements) ---
             const totalDueCollected = dailyPayments
-                .filter(p => (p.isDuePayment === true || p.isEMIPayment === true || p.isEMISettlement === true) && p.method !== 'Add to Due')
+                .filter(p => p.isDuePayment === true && p.method !== 'Add to Due')
                 .reduce((sum, p) => sum + currencyUtils.convertToBase(p.amount, p.currency || appState.currentCurrency), 0);
-                
-            // --- UPDATED: New Due Added (includes Principal + Interest of EMI loans) ---
-            // Fix: Previously only calculated Principal. Now adds Interest to match Dashboard "Receivables".
-            const newDueAdded = dailyInvoices.reduce((acc, inv) => {
-                 const paymentsOnCreation = (inv.paymentDetails || [])
-                    .filter(p => {
-                         // Check if payment was made on the same day (roughly)
-                         const pDate = new Date(p.date).toDateString();
-                         const iDate = new Date(inv.date).toDateString();
-                         return pDate === iDate && p.method !== 'Add to Due';
-                    })
-                    .reduce((pSum, p) => pSum + currencyUtils.convertToBase(p.amount, inv.currency || appState.currentCurrency), 0);
-                 
-                 let dueFromInvoice = Math.max(0, inv.totalInBaseCurrency - paymentsOnCreation);
-
-                 // --- FIX: Add Interest for EMI Invoices ---
-                 if (inv.isEMI) {
-                     const schedule = firestoreData.emiSchedules.find(s => s.invoiceId === inv.id);
-                     if (schedule) {
-                         dueFromInvoice += (schedule.totalInterest || 0);
-                     }
-                 }
-                 
-                 return acc + dueFromInvoice;
-            }, 0);
-
+            const newDueAdded = dailyPayments
+                .filter(p => p.method === 'Add to Due')
+                .reduce((sum, p) => sum + currencyUtils.convertToBase(p.amount, p.currency || appState.currentCurrency), 0);
             const totalDiscounts = dailyInvoices
                 .reduce((sum, inv) => sum + (inv.discountInBaseCurrency || 0), 0);
 
@@ -2691,8 +2631,8 @@ async function openDaybookModal(dateString = null) {
                 ${renderKpiCard('Total Sales', currencyUtils.format(totalSales), 'text-green-400')}
                 ${renderKpiCard('Total Expenses', currencyUtils.format(totalExpenses), 'text-red-400')}
                 ${renderKpiCard('Payments Received', currencyUtils.format(totalPaymentsReceived), 'text-green-400')}
-                ${renderKpiCard('Due / EMI Collected', currencyUtils.format(totalDueCollected), 'text-emerald-400')}
-                ${renderKpiCard('New Due / Loan Given', currencyUtils.format(newDueAdded), 'text-orange-400')}
+                ${renderKpiCard('Due Collected', currencyUtils.format(totalDueCollected), 'text-emerald-400')}
+                ${renderKpiCard('New Due Added', currencyUtils.format(newDueAdded), 'text-orange-400')}
                 ${renderKpiCard('Total Discounts', currencyUtils.format(totalDiscounts), 'text-yellow-400')}
                 ${renderKpiCard('Net Cash Movement', currencyUtils.format(netCashMovement), netCashMovement >= 0 ? 'text-blue-400' : 'text-orange-400', netCashMovement >= 0 ? '+' : '')}
                 ${renderKpiCard('Closing Balance', currencyUtils.format(closingBalance), 'text-blue-400')}
@@ -2773,23 +2713,14 @@ async function openDaybookModal(dateString = null) {
                         </span>`,
                 'No payments received or due added.'
             );
-            
-            // --- UPDATED: Collections List includes EMI ---
-            const dueCollectionsList = dailyPayments.filter(p => (p.isDuePayment === true || p.isEMIPayment === true || p.isEMISettlement === true) && p.method !== 'Add to Due');
-            
+
+            const dueCollectionsList = dailyPayments.filter(p => p.isDuePayment === true && p.method !== 'Add to Due');
             renderSimpleList(
                 '#daybook-due-collections',
                 dueCollectionsList,
-                p => {
-                    let typeLabel = 'Due Collection';
-                    let colorClass = 'text-emerald-400';
-                    if (p.isEMIPayment) { typeLabel = 'EMI Installment'; colorClass = 'text-blue-400'; }
-                    if (p.isEMISettlement) { typeLabel = 'EMI Settlement'; colorClass = 'text-purple-400'; }
-                    
-                    return `<span>${typeLabel} <span class="font-mono text-xs text-text-secondary">(${p.customerName || 'Unknown'})</span></span>
-                      <span class="font-mono ${colorClass}">${currencyUtils.format(currencyUtils.convertToBase(p.amount, p.currency || appState.currentCurrency))}</span>`
-                },
-                'No due or EMI collections recorded.'
+                p => `<span>From Invoice <span class="font-mono text-xs">${p.invoiceId.slice(-6)}</span> (${p.customerName})</span>
+                      <span class="font-mono text-emerald-400">${currencyUtils.format(currencyUtils.convertToBase(p.amount, p.currency || appState.currentCurrency))}</span>`,
+                'No due collections recorded.'
             );
         }
 
@@ -2809,46 +2740,12 @@ async function openDaybookModal(dateString = null) {
 
         // --- Render Due & Discounts Tab (Conditional) ---
         if (canSeeAllData) {
-            // --- UPDATED: Filter logic for new due ---
-            // We list invoices where Total > Payments made on creation date
-            const newDueInvoicesList = dailyInvoices.filter(inv => {
-                 const paymentsOnCreation = (inv.paymentDetails || [])
-                    .filter(p => {
-                         const pDate = new Date(p.date).toDateString();
-                         const iDate = new Date(inv.date).toDateString();
-                         return pDate === iDate && p.method !== 'Add to Due';
-                    })
-                    .reduce((pSum, p) => pSum + currencyUtils.convertToBase(p.amount, inv.currency || appState.currentCurrency), 0);
-                 return (inv.totalInBaseCurrency - paymentsOnCreation) > 0.01;
-            });
-
+            const newDueInvoicesList = dailyPayments.filter(p => p.method === 'Add to Due');
             renderSimpleList(
                 '#daybook-new-due',
                 newDueInvoicesList,
-                inv => {
-                     const paymentsOnCreation = (inv.paymentDetails || [])
-                        .filter(p => {
-                             const pDate = new Date(p.date).toDateString();
-                             const iDate = new Date(inv.date).toDateString();
-                             return pDate === iDate && p.method !== 'Add to Due';
-                        })
-                        .reduce((pSum, p) => pSum + currencyUtils.convertToBase(p.amount, inv.currency || appState.currentCurrency), 0);
-                     
-                     let newDueAmount = Math.max(0, inv.totalInBaseCurrency - paymentsOnCreation);
-                     
-                     // Fix list item display to include interest
-                     let emiInterest = 0;
-                     if (inv.isEMI) {
-                         const schedule = firestoreData.emiSchedules.find(s => s.invoiceId === inv.id);
-                         if (schedule) {
-                             emiInterest = schedule.totalInterest || 0;
-                             newDueAmount += emiInterest;
-                         }
-                     }
-                     
-                     return `<span>${inv.isEMI ? 'EMI Loan' : 'Invoice'} <span class="font-mono text-xs">${inv.id.slice(-6)}</span> (${inv.customerName})</span>
-                      <span class="font-mono text-orange-400">${currencyUtils.format(newDueAmount)}</span>`;
-                },
+                p => `<span>Invoice <span class="font-mono text-xs">${p.invoiceId.slice(-6)}</span> (${p.customerName})</span>
+                      <span class="font-mono text-orange-400">${currencyUtils.format(currencyUtils.convertToBase(p.amount, p.currency || appState.currentCurrency))}</span>`,
                 'No new due amounts added.'
             );
 
@@ -3759,7 +3656,6 @@ function handleCustomerExport() {
                 'loyalty': 'canManageLoyalty',
                 'expense': 'canManageExpenses',
                 'pnl': 'canViewProfitAndLoss',
-                'emi-sales': 'canManageEMI',
             };
 
             const handlePermissionChange = () => {
@@ -5422,7 +5318,6 @@ function handleCustomerExport() {
             'subscription': initSubscription,
             'payroll': initPayroll, 
             'loyalty': initLoyalty,
-            'emi-sales': initEMI,
         };
         
         function getViewContent(viewType) {
@@ -6637,19 +6532,7 @@ if (checkPermission('canManageLoyalty')) { // Ensure only authorized users liste
         activeListeners.push(unsubClaims);
     }
     // --- FIX END ---
-    // Add this inside initFirebaseListeners, preferably near the Invoice listener
-    if (checkPermission('canManageEMI')) {
-        const unsubEMI = onSnapshot(query(emiSchedulesRef), (snapshot) => {
-            firestoreData.emiSchedules = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
-            if(appState.firebaseReady) {
-                 const activeTab = appState.tabs.find(t => t.id === appState.activeTabId);
-                 if (activeTab?.viewType === 'emi-sales') {
-                     renderApp();
-                 }
-            }
-        });
-        activeListeners.push(unsubEMI);
-    }
+
     // NEW: Audit Log listener, only for users who can see reports
     if (checkPermission('canAccessReports')) {
         const unsubAudit = onSnapshot(query(auditLogRef), (snapshot) => {
@@ -8011,47 +7894,19 @@ function initBarcodeGenerator(pane) {
                             return invDate >= start && invDate <= end && inv.status !== 'Void';
                         });
 
-                        // --- UPDATED: Revenue Calculation (Includes EMI Interest) ---
-                        const totalRevenue = relevantInvoices.reduce((sum, inv) => {
-                            let val = inv.totalInBaseCurrency; // This is Principal + Tax - Discount
-                            if (inv.isEMI) {
-                                // For EMI, revenue is defined as the Total Value (Principal + Interest)
-                                const schedule = firestoreData.emiSchedules.find(s => s.invoiceId === inv.id);
-                                if (schedule) {
-                                    val += (schedule.totalInterest || 0);
-                                }
-                            }
-                            return sum + val;
-                        }, 0);
-                        // --- END UPDATED ---
-
+                        const totalRevenue = relevantInvoices.reduce((sum, inv) => sum + inv.totalInBaseCurrency, 0);
                         const totalSales = relevantInvoices.length;
-
-                        // --- UPDATED: Gross Profit Calculation (Real World) ---
                         const grossProfit = relevantInvoices.reduce((profit, inv) => {
-                            // 1. Calculate basic margin (Selling Price - Cost Price)
-                            const invoiceBaseMargin = inv.items.reduce((itemProfit, item) => {
+                            const invoiceProfit = inv.items.reduce((itemProfit, item) => {
+                                // --- FIX START: Use the historical costPrice from the invoice item ---
+                                // The 'item' object in the invoice is a snapshot of the product at the time of sale.
+                                // We must use item.costPrice to get the correct historical profit.
                                 const cost = item.costPrice !== undefined ? item.costPrice : 0;
                                 return itemProfit + ((item.price - cost) * (item.qty || 1));
+                                // --- FIX END ---
                             }, 0);
-                            
-                            // 2. Subtract Discounts (Profit = Margin - Discounts)
-                            // Note: item.price usually includes the price *before* invoice-level discount
-                            const persistentDiscount = inv.persistentDiscountDetails?.amount || 0;
-                            const manualDiscount = inv.manualDiscountInBase || 0;
-                            const totalInvoiceDiscount = persistentDiscount + manualDiscount;
-
-                            // 3. Add Interest (Interest is 100% profit)
-                            let interestProfit = 0;
-                            if (inv.isEMI) {
-                                const schedule = firestoreData.emiSchedules.find(s => s.invoiceId === inv.id);
-                                if (schedule) interestProfit = schedule.totalInterest || 0;
-                            }
-                            
-                            return profit + (invoiceBaseMargin - totalInvoiceDiscount + interestProfit);
+                            return profit + invoiceProfit;
                         }, 0);
-                        // --- END UPDATED ---
-
                         const avgTransactionValue = totalSales > 0 ? totalRevenue / totalSales : 0;
                         return { totalRevenue, totalSales, grossProfit, avgTransactionValue, relevantInvoices };
                     };
@@ -8144,14 +7999,6 @@ function initBarcodeGenerator(pane) {
                                 .filter(i => i.taxable)
                                 .reduce((sum, i) => sum + (i.price * (i.qty || 1)), 0);
 
-                            // --- UPDATED: Get EMI Interest for distribution ---
-                            let totalInterest = 0;
-                            if (inv.isEMI) {
-                                const schedule = firestoreData.emiSchedules.find(s => s.invoiceId === inv.id);
-                                if (schedule) totalInterest = schedule.totalInterest || 0;
-                            }
-                            // --- END UPDATED ---
-
                             if (subtotal > 0) {
                                 inv.items.forEach(item => {
                                     const itemBaseValue = item.price * (item.qty || 1);
@@ -8163,11 +8010,7 @@ function initBarcodeGenerator(pane) {
                                         itemTax = (inv.taxInBaseCurrency || 0) * (itemBaseValue / taxableSubtotal);
                                     }
                                     
-                                    // --- UPDATED: Distribute Interest proportionally to items ---
-                                    const itemInterest = totalInterest * (itemBaseValue / subtotal);
-                                    
-                                    const totalItemRevenue = (itemBaseValue - itemDiscount) + itemTax + itemInterest;
-                                    // --- END UPDATED ---
+                                    const totalItemRevenue = (itemBaseValue - itemDiscount) + itemTax;
                                     
                                     salesByProduct[item.id] = (salesByProduct[item.id] || 0) + totalItemRevenue;
                                 });
@@ -8189,14 +8032,7 @@ function initBarcodeGenerator(pane) {
                     // --- NEW: Top Customers List ---
                     const customerSpending = currentMetrics.relevantInvoices.reduce((acc, inv) => {
                         if (inv.customerId) {
-                            // --- UPDATED: Include Interest in Customer Spending as well ---
-                            let val = inv.totalInBaseCurrency;
-                            if (inv.isEMI) {
-                                const schedule = firestoreData.emiSchedules.find(s => s.invoiceId === inv.id);
-                                if (schedule) val += (schedule.totalInterest || 0);
-                            }
-                            acc[inv.customerId] = (acc[inv.customerId] || 0) + val;
-                            // --- END UPDATED ---
+                            acc[inv.customerId] = (acc[inv.customerId] || 0) + inv.totalInBaseCurrency;
                         }
                         return acc;
                     }, {});
@@ -8336,26 +8172,12 @@ function initBarcodeGenerator(pane) {
                         salesData = Array(24).fill(0);
                         chartInvoices.forEach(inv => {
                             const hour = new Date(inv.date).getHours();
-                            // --- UPDATED: Use full value including interest for chart data ---
-                            let val = inv.totalInBaseCurrency;
-                            if (inv.isEMI) {
-                                const schedule = firestoreData.emiSchedules.find(s => s.invoiceId === inv.id);
-                                if (schedule) val += (schedule.totalInterest || 0);
-                            }
-                            salesData[hour] += val;
-                            // --- END UPDATED ---
+                            salesData[hour] += inv.totalInBaseCurrency;
                         });
                     } else { 
                         const salesByDay = chartInvoices.reduce((acc, inv) => {
                             const day = new Date(inv.date).toLocaleDateString([], { month: 'short', day: 'numeric'});
-                            // --- UPDATED: Use full value including interest for chart data ---
-                            let val = inv.totalInBaseCurrency;
-                            if (inv.isEMI) {
-                                const schedule = firestoreData.emiSchedules.find(s => s.invoiceId === inv.id);
-                                if (schedule) val += (schedule.totalInterest || 0);
-                            }
-                            acc[day] = (acc[day] || 0) + val;
-                            // --- END UPDATED ---
+                            acc[day] = (acc[day] || 0) + inv.totalInBaseCurrency;
                             return acc;
                         }, {});
                         salesLabels = Object.keys(salesByDay);
@@ -8500,14 +8322,7 @@ function initBarcodeGenerator(pane) {
                     const hourlySalesData = Array(24).fill(0);
                     currentMetrics.relevantInvoices.forEach(inv => {
                         const hour = new Date(inv.date).getHours();
-                        // --- UPDATED: Use full value including interest for chart data ---
-                        let val = inv.totalInBaseCurrency;
-                        if (inv.isEMI) {
-                            const schedule = firestoreData.emiSchedules.find(s => s.invoiceId === inv.id);
-                            if (schedule) val += (schedule.totalInterest || 0);
-                        }
-                        hourlySalesData[hour] += val;
-                        // --- END UPDATED ---
+                        hourlySalesData[hour] += inv.totalInBaseCurrency;
                     });
 
                     if (hourlySalesChart) hourlySalesChart.destroy();
@@ -10251,12 +10066,9 @@ function openPaymentModal() {
         // --- END ADDED ---
         
         try {
-            // Define customer variable in scope so it's available for the receipt later
-            const customer = activeSale.customer ? firestoreData.customers.find(c => c.id === activeSale.customer.id) : null;
-
             await runTransaction(db, async (transaction) => {
                 // --- READS ---
-                // const customer = activeSale.customer ? firestoreData.customers.find(c => c.id === activeSale.customer.id) : null; // Moved up
+                const customer = activeSale.customer ? firestoreData.customers.find(c => c.id === activeSale.customer.id) : null;
                 const actualPaidAmountCurrent = paymentState.payments.filter(p => p.method !== 'Add to Due').reduce((sum, p) => sum + p.amount, 0);
                 const remainingAmountCurrent = totalCurrent - actualPaidAmountCurrent;
                 const remainingAmountBase = remainingAmountCurrent > 0.001 ? currencyUtils.convertToBase(remainingAmountCurrent) : 0;
@@ -10406,14 +10218,6 @@ function openPaymentModal() {
             const newInvoiceId = newInvoiceRef.id; // <-- ADDED THIS LINE
             const finalInvoice = {id: newInvoiceId, ...await getDoc(doc(invoicesRef, newInvoiceId)).then(d => d.data())};
 
-            // --- FIX: Attach customer object for receipt display ---
-            // If we have a customer object in scope, attach it to the invoice data
-            // so the receipt template can read properties like loyaltyId or address.
-            if (customer) {
-                finalInvoice.customer = customer;
-            }
-            // --- END FIX ---
-
             closeModal(modal);
             showReceipt(finalInvoice, paymentState);
 
@@ -10489,7 +10293,7 @@ function openPaymentModal() {
                                     <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-text-secondary"></i>
                                     <input type="text" id="inventory-search" placeholder="Search by name, SKU, category..." class="form-input w-full pl-11" value="${viewState.searchQuery}">
                                 </div>
-                                <select id="inventory-category-filter" class="form-select flex-shrink-0 md:w-48">${categories.map(c => `<option value="${c}" ${viewState.filters.category === c ? 'selected' : ''}>${c === 'all' ? `All ${term.category}` : c}</option>`).join('')}</select>
+                                <select id="inventory-category-filter" class="form-select flex-shrink-0 md:w-48">${categories.map(c => `<option value="${c}" ${viewState.filters.category === c ? 'selected' : ''}>${c === 'all' ? `All ${term.category}s` : c}</option>`).join('')}</select>
                                 <select id="inventory-stock-filter" class="form-select flex-shrink-0 md:w-48">
                                     <option value="all">All Stock Status</option>
                                     <option value="in_stock" ${viewState.filters.stockStatus === 'in_stock' ? 'selected' : ''}>In Stock</option>
@@ -12583,6 +12387,9 @@ function openPurchaseOrderModal(poId = null) {
         }
     });
     
+    // ########################################################################
+    // ############### THIS IS THE MAIN MODIFIED LOGIC ########################
+    // ########################################################################
     modal.querySelector('#po-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         if (!poData.supplierId) { showToast('Please select a supplier.', 'error'); return; }
@@ -12596,14 +12403,14 @@ function openPurchaseOrderModal(poId = null) {
             const processReceivedPO = async () => {
                 
                 // --- NEW: Call the new hybrid modal ---
-                // This modal asks for quantities, serials, selling price AND BARCODE.
+                // This modal asks for quantities, serials, AND selling price.
                 const receiveData = await openInitialReceiveModal(poData);
                 if (!receiveData) { // User cancelled the 'Receive' modal
                     showToast('PO creation cancelled.', 'info');
                     return; // Stop the process
                 }
                 
-                const { receivedItems, priceUpdates, barcodeUpdates } = receiveData;
+                const { receivedItems, priceUpdates } = receiveData;
                 
                 if (receivedItems.length === 0) {
                     showToast('No items were marked as received. PO created as "Ordered" instead.', 'info');
@@ -12643,7 +12450,7 @@ function openPurchaseOrderModal(poId = null) {
                             // 2a. Save the PO document
                             transaction.set(newDocRef, { ...poData, id: newDocRef.id });
 
-                            // 2b. Update stock, prices, and barcodes for each product.
+                            // 2b. Update stock and prices for each product.
                             for (const item of receivedItems) { // Loop over what was ACTUALLY received
                                 const productData = productDataMap.get(item.productId);
                                 // productData is guaranteed to exist from the read step
@@ -12666,11 +12473,6 @@ function openPurchaseOrderModal(poId = null) {
                                 // Apply new selling price if it was provided
                                 if (priceUpdates[item.productId] !== undefined) {
                                     updatePayload.price = priceUpdates[item.productId];
-                                }
-
-                                // Apply new barcode if it was provided and changed
-                                if (barcodeUpdates[item.productId]) {
-                                    updatePayload.barcode = barcodeUpdates[item.productId];
                                 }
                                 
                                 // Update stock/serials
@@ -12932,13 +12734,12 @@ function openInitialReceiveModal(poData) {
     return new Promise((resolve) => {
         const content = `
             <form id="initial-receive-form" class="space-y-4">
-                <p class="text-sm">You are creating a new PO with status "Received". Please confirm the items, quantities, selling prices, and barcodes you are adding to your inventory.</p>
+                <p class="text-sm">You are creating a new PO with status "Received". Please confirm the items, quantities, and selling prices you are adding to your inventory.</p>
                 <div class="max-h-[60vh] overflow-y-auto -mx-6">
                     <table class="w-full text-sm">
                         <thead class="sticky top-0 bg-bg-secondary z-10">
                             <tr class="text-left text-text-secondary uppercase text-xs">
                                 <th class="px-6 py-3 font-medium">Product</th>
-                                <th class="px-6 py-3 font-medium w-48">Barcode</th>
                                 <th class="px-6 py-3 font-medium text-center">Ordered Qty</th>
                                 <th class="px-6 py-3 font-medium text-center w-64">Receiving Now</th>
                                 <th class="px-6 py-3 font-medium text-right w-40">New Selling Price (${appState.currentCurrency})</th>
@@ -12954,7 +12755,6 @@ function openInitialReceiveModal(poData) {
                             const isSerialized = product?.isSerialized;
                             const currentPriceInBase = product?.price || 0;
                             const currentPriceInDisplay = currencyUtils.convert(currentPriceInBase).toFixed(2);
-                            const currentBarcode = product?.barcode || '';
                             
                             let receivingInputHTML = '';
                             if (isSerialized) {
@@ -12973,9 +12773,6 @@ function openInitialReceiveModal(poData) {
                                     <p class="font-medium text-text-primary">${product?.name || 'Unknown'}</p>
                                     <p class="text-xs text-text-secondary font-mono">${item.productId}</p>
                                 </td>
-                                <td class="px-6 py-3">
-                                    <input type="text" name="barcode_${item.productId}" value="${currentBarcode}" class="form-input w-32 text-xs font-mono" placeholder="Scan/Type Barcode">
-                                </td>
                                 <td class="px-6 py-3 text-center font-mono">${item.quantity}</td>
                                 <td class="px-6 py-3">
                                     ${receivingInputHTML}
@@ -12992,7 +12789,7 @@ function openInitialReceiveModal(poData) {
             </form>
         `;
         const footer = `<button data-action="close-modal" class="btn btn-secondary">Cancel</button><button type="submit" form="initial-receive-form" class="btn btn-primary">Confirm & Create PO</button>`;
-        const modal = showModal('Confirm Received Stock', content, footer, { size: 'max-w-5xl', customClasses: 'p-0' }); // Increased size for extra column
+        const modal = showModal('Confirm Received Stock', content, footer, { size: 'max-w-3xl', customClasses: 'p-0' });
 
         modal.addEventListener('input', e => {
             const target = e.target.closest('[data-action="count-serials"]');
@@ -13012,7 +12809,6 @@ function openInitialReceiveModal(poData) {
             const formData = new FormData(e.target);
             const receivedItems = []; // This will store the received quantities/serials
             const priceUpdates = {};
-            const barcodeUpdates = {}; // Store barcode updates
             let validationError = null;
 
             for (const item of poData.items) {
@@ -13020,19 +12816,12 @@ function openInitialReceiveModal(poData) {
                 // MODIFICATION: 'requiredQty' is the total ordered qty
                 const requiredQty = item.quantity;
                 
-                // Get Price Update
                 const newPriceInDisplayStr = formData.get(`price_${item.productId}`);
                 if (newPriceInDisplayStr !== null) {
                     const newPriceInDisplay = parseFloat(newPriceInDisplayStr);
                     if (!isNaN(newPriceInDisplay) && newPriceInDisplay >= 0) {
                         priceUpdates[item.productId] = currencyUtils.convertToBase(newPriceInDisplay);
                     }
-                }
-
-                // Get Barcode Update
-                const newBarcode = formData.get(`barcode_${item.productId}`)?.trim();
-                if (newBarcode !== undefined) {
-                    barcodeUpdates[item.productId] = newBarcode;
                 }
                 
                 if (product?.isSerialized) {
@@ -13067,7 +12856,7 @@ function openInitialReceiveModal(poData) {
             
             closeModal(modal);
             // MODIFICATION: Resolve with the collected data
-            resolve({ receivedItems, priceUpdates, barcodeUpdates });
+            resolve({ receivedItems, priceUpdates });
         });
         
         modal.querySelector('[data-action="close-modal"]').addEventListener('click', () => {
@@ -13092,7 +12881,6 @@ function openReceivePOStockModal(poId) {
                     <thead class="sticky top-0 bg-bg-secondary z-10">
                         <tr class="text-left text-text-secondary uppercase text-xs">
                             <th class="px-6 py-3 font-medium">Product</th>
-                            <th class="px-6 py-3 font-medium w-32">Barcode</th>
                             <th class="px-6 py-3 font-medium text-center">Remaining</th>
                             <th class="px-6 py-3 font-medium text-center w-64">Receiving Now</th>
                             <th class="px-6 py-3 font-medium text-right w-40">New Selling Price (${appState.currentCurrency})</th>
@@ -13105,9 +12893,10 @@ function openReceivePOStockModal(poId) {
                         if (remaining <= 0) return ''; 
 
                         const isSerialized = product?.isSerialized;
+                        // --- NEW: Get current selling price ---
                         const currentPriceInBase = product?.price || 0;
                         const currentPriceInDisplay = currencyUtils.convert(currentPriceInBase).toFixed(2);
-                        const currentBarcode = product?.barcode || '';
+                        // --- END NEW ---
 
                         let receivingInputHTML = '';
                         if (isSerialized) {
@@ -13125,9 +12914,6 @@ function openReceivePOStockModal(poId) {
                                 <p class="font-medium text-text-primary">${product?.name || 'Unknown'}</p>
                                 <p class="text-xs text-text-secondary font-mono">${item.productId}</p>
                             </td>
-                            <td class="px-6 py-3">
-                                <input type="text" name="barcode_${item.productId}" value="${currentBarcode}" class="form-input w-full text-xs font-mono" placeholder="Scan/Type Barcode">
-                            </td>
                             <td class="px-6 py-3 text-center font-mono">${remaining}</td>
                             <td class="px-6 py-3">
                                 ${receivingInputHTML}
@@ -13144,7 +12930,7 @@ function openReceivePOStockModal(poId) {
         </form>
     `;
     const footer = `<button data-action="close-modal" class="btn btn-secondary">Cancel</button><button type="submit" form="receive-po-stock-form" class="btn btn-primary">Receive Items</button>`;
-    const modal = showModal('Receive Stock', content, footer, { size: 'max-w-5xl', customClasses: 'p-0' });
+    const modal = showModal('Receive Stock', content, footer, { size: 'max-w-3xl', customClasses: 'p-0' });
 
     modal.addEventListener('input', e => {
         const target = e.target.closest('[data-action="count-serials"]');
@@ -13163,8 +12949,7 @@ function openReceivePOStockModal(poId) {
         const formData = new FormData(e.target);
         const receivedQuantities = {};
         const receivedSerials = {};
-        const priceUpdates = {}; // To store price changes
-        const barcodeUpdates = {}; // To store barcode changes
+        const priceUpdates = {}; // --- NEW: To store price changes ---
         let hasReceivedItems = false;
         let validationError = null;
 
@@ -13180,12 +12965,7 @@ function openReceivePOStockModal(poId) {
                     priceUpdates[item.productId] = currencyUtils.convertToBase(newPriceInDisplay);
                 }
             }
-
-            // --- NEW: Read barcode from form ---
-            const newBarcode = formData.get(`barcode_${item.productId}`)?.trim();
-            if (newBarcode !== undefined) {
-                barcodeUpdates[item.productId] = newBarcode;
-            }
+            // --- END NEW ---
             
             if (product?.isSerialized) {
                 const serials = (formData.get(`serials_${item.productId}`) || '').split('\n').map(s => s.trim()).filter(Boolean);
@@ -13276,11 +13056,7 @@ function openReceivePOStockModal(poId) {
                             updatePayload.price = newPriceBase;
                         }
                     }
-
-                    // --- NEW: Add barcode to payload if changed ---
-                    if (barcodeUpdates[productId] && barcodeUpdates[productId] !== (productData.barcode || '')) {
-                        updatePayload.barcode = barcodeUpdates[productId];
-                    }
+                    // --- END NEW ---
                     
                     // Update stock/serials
                     if (productData.isSerialized) {
@@ -14772,7 +14548,8 @@ function initReports(pane) {
     };
 
     // --- END NEW/REFACTORED SECTION ---
-            // --- *** ADVANCED SALES REPORT *** ---
+
+    // --- *** ADVANCED SALES REPORT *** ---
     const renderSalesReport = (startDate, endDate, prevStartDate, prevEndDate) => {
         destroyCharts();
         
@@ -14789,42 +14566,20 @@ function initReports(pane) {
                 }
             }
 
-            // --- UPDATED: Gross Revenue includes EMI Interest ---
-            const grossRevenue = invoices.reduce((sum, inv) => {
-                let val = inv.totalInBaseCurrency;
-                // Only add interest from schedule if it's NOT already part of the invoice total (Legacy Support)
-                if (inv.isEMI && typeof inv.emiInterest === 'undefined') {
-                    const schedule = firestoreData.emiSchedules.find(s => s.invoiceId === inv.id);
-                    if (schedule) {
-                        val += (schedule.totalInterest || 0);
-                    }
-                }
-                return sum + val;
-            }, 0);
-            // --- END UPDATED ---
+            const grossRevenue = invoices.reduce((sum, inv) => sum + inv.totalInBaseCurrency, 0);
             
             // --- UPDATED: Use new discount fields for accurate calcs ---
             const totalPersistentDiscount = invoices.reduce((sum, inv) => sum + (inv.persistentDiscountDetails?.amount || 0), 0);
             const totalManualDiscount = invoices.reduce((sum, inv) => sum + (inv.manualDiscountInBase || 0), 0);
             const totalDiscounts = totalPersistentDiscount + totalManualDiscount;
-            
-            // Net Revenue = Gross (Inc. Interest) - Discounts
-            const netRevenue = invoices.reduce((sum, inv) => {
-                let val = inv.subtotalInBaseCurrency;
-                if (inv.isEMI && typeof inv.emiInterest === 'undefined') {
-                    const schedule = firestoreData.emiSchedules.find(s => s.invoiceId === inv.id);
-                    if (schedule) {
-                        val += (schedule.totalInterest || 0);
-                    }
-                }
-                return sum + val;
-            }, 0) - totalDiscounts;
+            const netRevenue = invoices.reduce((sum, inv) => sum + inv.subtotalInBaseCurrency, 0) - totalDiscounts;
             // --- END UPDATED ---
 
             const grossProfit = invoices.reduce((profit, inv) => {
                 const invoiceProfit = inv.items.reduce((itemProfit, item) => {
                     const cost = item.costPrice !== undefined ? item.costPrice : 0;
                     // --- UPDATED: Calculate profit based on *actual* price paid for item ---
+                    // This is a proportional calculation.
                     let itemRevenue = item.price * (item.qty || 1);
                     if (inv.subtotalInBaseCurrency > 0) {
                         const itemProportion = (item.price * (item.qty || 1)) / inv.subtotalInBaseCurrency;
@@ -14833,13 +14588,7 @@ function initReports(pane) {
                     }
                     return itemProfit + (itemRevenue - (cost * (item.qty || 1)));
                 }, 0);
-                // For EMI, Interest is essentially 100% profit on top of the goods
-                let interestProfit = inv.emiInterest || 0;
-                if (inv.isEMI && typeof inv.emiInterest === 'undefined') {
-                    const schedule = firestoreData.emiSchedules.find(s => s.invoiceId === inv.id);
-                    if (schedule) interestProfit = schedule.totalInterest || 0;
-                }
-                return profit + invoiceProfit + interestProfit;
+                return profit + invoiceProfit;
             }, 0);
 
             // --- NEW: Calculate COGS ---
@@ -14936,53 +14685,6 @@ function initReports(pane) {
         const timeDiffDays = (endDate - startDate) / (1000 * 3600 * 24);
         const chartInvoices = currentMetrics.invoices;
 
-        // Helper to get full invoice value including interest
-        const getFullInvoiceValue = (inv) => {
-            let val = inv.totalInBaseCurrency;
-            if (inv.isEMI && typeof inv.emiInterest === 'undefined') {
-                const s = firestoreData.emiSchedules.find(sch => sch.invoiceId === inv.id);
-                if (s) val += (s.totalInterest || 0);
-            }
-            return val;
-        };
-
-        // Helper to get net revenue including interest
-        const getNetInvoiceValue = (inv) => {
-            let val = inv.subtotalInBaseCurrency;
-            if (inv.isEMI && typeof inv.emiInterest === 'undefined') {
-                const s = firestoreData.emiSchedules.find(sch => sch.invoiceId === inv.id);
-                if (s) val += (s.totalInterest || 0);
-            }
-             const persistentDiscount = inv.persistentDiscountDetails?.amount || 0;
-             const manualDiscount = inv.manualDiscountInBase || 0;
-             return val - persistentDiscount - manualDiscount;
-        };
-
-        // Helper to get profit including interest
-        const getInvoiceProfit = (inv) => {
-             const persistentDiscount = inv.persistentDiscountDetails?.amount || 0;
-             const manualDiscount = inv.manualDiscountInBase || 0;
-             
-             const baseProfit = inv.items.reduce((itemProfit, item) => {
-                const cost = item.costPrice !== undefined ? item.costPrice : 0;
-                let itemRevenue = item.price * (item.qty || 1);
-                if (inv.subtotalInBaseCurrency > 0) {
-                    const itemProportion = (item.price * (item.qty || 1)) / inv.subtotalInBaseCurrency;
-                    itemRevenue -= persistentDiscount * itemProportion;
-                    itemRevenue -= manualDiscount * itemProportion;
-                }
-                return itemProfit + (itemRevenue - (cost * (item.qty || 1)));
-            }, 0);
-            
-            let interestProfit = inv.emiInterest || 0;
-            if (inv.isEMI && typeof inv.emiInterest === 'undefined') {
-                const schedule = firestoreData.emiSchedules.find(s => s.invoiceId === inv.id);
-                if (schedule) interestProfit = schedule.totalInterest || 0;
-            }
-            return baseProfit + interestProfit;
-        }
-
-
         if (timeDiffDays <= 2) { // Today, Yesterday
             salesLabels = Array.from({ length: 24 }, (_, i) => { const h = i % 12 === 0 ? 12 : i % 12; const ampm = i < 12 ? 'AM' : 'PM'; return `${h} ${ampm}`; });
             revenueData = Array(24).fill(0);
@@ -14991,17 +14693,45 @@ function initReports(pane) {
             
             chartInvoices.forEach(inv => {
                 const hour = new Date(inv.date).getHours();
-                revenueData[hour] += getFullInvoiceValue(inv);
-                netRevenueData[hour] += getNetInvoiceValue(inv);
-                profitData[hour] += getInvoiceProfit(inv);
+                revenueData[hour] += inv.totalInBaseCurrency;
+                
+                const persistentDiscount = inv.persistentDiscountDetails?.amount || 0;
+                const manualDiscount = inv.manualDiscountInBase || 0;
+                netRevenueData[hour] += (inv.subtotalInBaseCurrency - persistentDiscount - manualDiscount);
+
+                const invoiceProfit = inv.items.reduce((itemProfit, item) => {
+                    const cost = item.costPrice !== undefined ? item.costPrice : 0;
+                    let itemRevenue = item.price * (item.qty || 1);
+                    if (inv.subtotalInBaseCurrency > 0) {
+                        const itemProportion = (item.price * (item.qty || 1)) / inv.subtotalInBaseCurrency;
+                        itemRevenue -= persistentDiscount * itemProportion;
+                        itemRevenue -= manualDiscount * itemProportion;
+                    }
+                    return itemProfit + (itemRevenue - (cost * (item.qty || 1)));
+                }, 0);
+                profitData[hour] += invoiceProfit;
             });
         } else { // Week, Month, Year, Custom
             const salesByDay = chartInvoices.reduce((acc, inv) => {
                 const day = new Date(inv.date).toLocaleDateString([], { month: 'short', day: 'numeric'});
                 acc[day] = acc[day] || { revenue: 0, profit: 0, netRevenue: 0 };
-                acc[day].revenue += getFullInvoiceValue(inv);
-                acc[day].netRevenue += getNetInvoiceValue(inv);
-                acc[day].profit += getInvoiceProfit(inv);
+                acc[day].revenue += inv.totalInBaseCurrency;
+
+                const persistentDiscount = inv.persistentDiscountDetails?.amount || 0;
+                const manualDiscount = inv.manualDiscountInBase || 0;
+                acc[day].netRevenue += (inv.subtotalInBaseCurrency - persistentDiscount - manualDiscount);
+
+                 const invoiceProfit = inv.items.reduce((itemProfit, item) => {
+                    const cost = item.costPrice !== undefined ? item.costPrice : 0;
+                    let itemRevenue = item.price * (item.qty || 1);
+                    if (inv.subtotalInBaseCurrency > 0) {
+                        const itemProportion = (item.price * (item.qty || 1)) / inv.subtotalInBaseCurrency;
+                        itemRevenue -= persistentDiscount * itemProportion;
+                        itemRevenue -= manualDiscount * itemProportion;
+                    }
+                    return itemProfit + (itemRevenue - (cost * (item.qty || 1)));
+                }, 0);
+                acc[day].profit += invoiceProfit;
                 return acc;
             }, {});
             salesLabels = Object.keys(salesByDay);
@@ -15038,7 +14768,7 @@ function initReports(pane) {
             });
         }
         
-        // Top Products Chart (Remains Product-Based)
+        // Top Products Chart
         const productSales = {};
         currentMetrics.invoices.forEach(inv => {
             const subtotal = inv.subtotalInBaseCurrency || 0;
@@ -15115,8 +14845,7 @@ function initReports(pane) {
         const hourlySales = Array(24).fill(0);
         currentMetrics.invoices.forEach(inv => {
             const hour = new Date(inv.date).getHours();
-            // UPDATED: Use full value including interest
-            hourlySales[hour] += getFullInvoiceValue(inv);
+            hourlySales[hour] += inv.totalInBaseCurrency;
         });
         const salesHourCanvas = document.getElementById('sales-hour-chart');
         if(salesHourCanvas) {
@@ -15145,8 +14874,7 @@ function initReports(pane) {
         // --- NEW: Sales by Cashier Chart ---
         const salesByCashier = currentMetrics.invoices.reduce((acc, inv) => {
             const name = inv.cashierName || 'Unknown';
-            // UPDATED: Use full value including interest
-            acc[name] = (acc[name] || 0) + getFullInvoiceValue(inv);
+            acc[name] = (acc[name] || 0) + inv.totalInBaseCurrency;
             return acc;
         }, {});
         const sortedCashiers = Object.entries(salesByCashier).sort(([,a],[,b]) => b-a);
@@ -15172,35 +14900,13 @@ function initReports(pane) {
             });
         }
 
-        // --- UPDATED: Payment Methods Chart (Includes Due/EMI) ---
-        const paymentMethodsData = currentMetrics.invoices.reduce((acc, inv) => {
-            // 1. Add actual payments made
-            (inv.paymentDetails || []).forEach(p => {
-                const amount = currencyUtils.convertToBase(p.amount, inv.currency);
-                acc[p.method] = (acc[p.method] || 0) + amount;
-            });
-
-            // 2. Add Outstanding Due. For EMI, this needs to include the interest.
-            // Note: Payment details capture principal-only payments usually on the invoice record for EMI unless we sync interest payments.
-            // But `dueAmount` on the invoice tracks principal.
-            
-            let dueAmt = inv.dueAmount;
-            if (inv.isEMI && typeof inv.emiInterest === 'undefined') {
-                // To balance the "Gross Revenue" which now includes Interest, we must include remaining Interest in the "Due" slice.
-                 const schedule = firestoreData.emiSchedules.find(s => s.invoiceId === inv.id);
-                 if (schedule) {
-                     dueAmt += (schedule.remainingInterest || 0);
-                 }
-            }
-
-            if (dueAmt > 0.001) {
-                const label = inv.isEMI ? 'EMI (Due)' : 'Credit (Due)';
-                acc[label] = (acc[label] || 0) + dueAmt;
-            }
-            
+        // --- NEW: Payment Methods Chart ---
+        const paymentMethodsData = currentMetrics.invoices.flatMap(inv => 
+            (inv.paymentDetails || []).map(p => ({...p, currency: inv.currency}))
+        ).reduce((acc, payment) => {
+            acc[payment.method] = (acc[payment.method] || 0) + currencyUtils.convertToBase(payment.amount, payment.currency);
             return acc;
         }, {});
-
         const salesPaymentCanvas = document.getElementById('sales-payment-chart');
         if (salesPaymentCanvas && Object.keys(paymentMethodsData).length > 0) {
             const salesPaymentCtx = salesPaymentCanvas.getContext('2d');
@@ -15210,11 +14916,7 @@ function initReports(pane) {
                     labels: Object.keys(paymentMethodsData),
                     datasets: [{
                         data: Object.values(paymentMethodsData),
-                        backgroundColor: [
-                            ...chartStyles.palettes.coolSlate,
-                            chartStyles.palettes.indigo[2], // Extra colors for new types
-                            chartStyles.palettes.yellow[2]
-                        ],
+                        backgroundColor: chartStyles.palettes.coolSlate,
                         borderColor: 'var(--bg-primary)',
                         borderWidth: 3, hoverOffset: 8,
                     }]
@@ -15237,19 +14939,16 @@ function initReports(pane) {
         const paginatedInvoices = currentMetrics.invoices.sort((a,b) => new Date(b.date) - new Date(a.date)).slice(startIndex, endIndex);
 
         reportsContainer.querySelector('tbody').innerHTML = paginatedInvoices.map(inv => {
-            // Calculate profit including interest for EMI
-            const profit = getInvoiceProfit(inv);
-            
-            // Get total including interest
-            const displayTotal = getFullInvoiceValue(inv);
-
-            // --- UPDATED: Status Badge Logic ---
-            let statusBadgeClass = 'bg-gray-500/20 text-gray-300'; // Default
-            if (inv.status === 'Paid') statusBadgeClass = 'bg-green-500/20 text-green-300';
-            else if (inv.status === 'EMI') statusBadgeClass = 'bg-purple-500/20 text-purple-300';
-            else if (inv.status === 'Due' || inv.status === 'Partial') statusBadgeClass = 'bg-yellow-500/20 text-yellow-300';
-            else if (inv.status === 'Void') statusBadgeClass = 'bg-red-900/40 text-red-400 border border-red-500/50';
-            else if (inv.status === 'Return') statusBadgeClass = 'bg-blue-500/20 text-blue-300';
+            const profit = inv.items.reduce((itemProfit, item) => {
+                const cost = item.costPrice !== undefined ? item.costPrice : 0;
+                let itemRevenue = item.price * (item.qty || 1);
+                if (inv.subtotalInBaseCurrency > 0) {
+                    const itemProportion = itemRevenue / inv.subtotalInBaseCurrency;
+                    itemRevenue -= (inv.persistentDiscountDetails?.amount || 0) * itemProportion;
+                    itemRevenue -= (inv.manualDiscountInBase || 0) * itemProportion;
+                }
+                return itemProfit + (itemRevenue - (cost * (item.qty || 1)));
+            }, 0);
 
             return `
             <tr class="table-row">
@@ -15257,9 +14956,9 @@ function initReports(pane) {
                 <td class="text-text-primary font-medium">${inv.customerName}</td>
                 <td>${new Date(inv.date).toLocaleDateString()}</td>
                 <td class="text-center">${inv.items.reduce((sum, i) => sum + (i.qty || 1), 0)}</td>
-                <td class="font-mono">${currencyUtils.format(displayTotal)}</td>
+                <td class="font-mono">${currencyUtils.format(inv.totalInBaseCurrency)}</td>
                 ${checkPermission('canViewProfitAndLoss') ? `<td class="font-mono ${profit >= 0 ? 'text-green-400' : 'text-red-400'}">${currencyUtils.format(profit)}</td>` : ''}
-                <td><span class="px-2 py-1 text-xs font-semibold rounded-full ${statusBadgeClass}">${inv.status}</span></td>
+                <td><span class="px-2 py-1 text-xs font-semibold rounded-full ${inv.status === 'Paid' ? 'bg-green-500/20 text-green-300' : 'bg-yellow-500/20 text-yellow-300'}">${inv.status}</span></td>
             </tr>`
         }).join('');
         
@@ -15835,46 +15534,21 @@ function initReports(pane) {
                 return expenseDate >= start && expenseDate <= end;
             });
             
-            // 1. Calculate Base Product Revenue (Price * Qty)
-            const productRevenue = invoices.reduce((sum, inv) => sum + (inv.subtotalInBaseCurrency || 0), 0);
-
-            // 2. Calculate EMI Interest Revenue
-            const interestRevenue = invoices.reduce((sum, inv) => {
-                let interest = 0;
-                if (inv.isEMI) {
-                    // Use stored interest, or fallback to schedule lookup if legacy data
-                    if (typeof inv.emiInterest !== 'undefined') {
-                        interest = inv.emiInterest;
-                    } else {
-                        const schedule = firestoreData.emiSchedules.find(s => s.invoiceId === inv.id);
-                        if (schedule) interest = schedule.totalInterest;
-                    }
-                }
-                return sum + interest;
-            }, 0);
-
-            // 3. Gross Revenue = Products + Interest
-            const grossRevenue = productRevenue + interestRevenue;
-
-            // 4. Discounts
+            const grossRevenue = invoices.reduce((sum, inv) => sum + inv.subtotalInBaseCurrency, 0);
             const totalDiscounts = invoices.reduce((sum, inv) => sum + (inv.persistentDiscountDetails?.amount || 0) + (inv.manualDiscountInBase || 0), 0);
-            
-            // 5. Net Revenue
             const netRevenue = grossRevenue - totalDiscounts;
 
-            // 6. Cost of Goods Sold (COGS)
             const cogs = invoices.reduce((sum, inv) => {
                 return sum + inv.items.reduce((itemSum, item) => {
                     return itemSum + ((item.costPrice || 0) * (item.qty || 1));
                 }, 0);
             }, 0);
             
-            // 7. Profits
             const grossProfit = netRevenue - cogs;
             const totalExpenses = expenses.reduce((sum, e) => sum + e.amountInBase, 0);
             const netProfit = grossProfit - totalExpenses;
             
-            return { productRevenue, interestRevenue, grossRevenue, totalDiscounts, netRevenue, cogs, grossProfit, totalExpenses, netProfit };
+            return { grossRevenue, totalDiscounts, netRevenue, cogs, grossProfit, totalExpenses, netProfit };
         };
 
         const currentMetrics = getPnlMetrics(startDate, endDate);
@@ -15882,9 +15556,9 @@ function initReports(pane) {
 
         const kpis = [
             { icon: 'trending-up', label: 'Net Revenue', value: currentMetrics.netRevenue, isCurrency: true, color: 'blue', change: calculateChange(currentMetrics.netRevenue, previousMetrics.netRevenue) },
-            { icon: 'percent', label: 'Interest Income', value: currentMetrics.interestRevenue, isCurrency: true, color: 'indigo', change: calculateChange(currentMetrics.interestRevenue, previousMetrics.interestRevenue) }, // Added Interest KPI
+            { icon: 'package', label: 'COGS', value: currentMetrics.cogs, isCurrency: true, color: 'yellow', change: calculateChange(currentMetrics.cogs, previousMetrics.cogs) },
             { icon: 'wallet', label: 'Gross Profit', value: currentMetrics.grossProfit, isCurrency: true, color: 'green', change: calculateChange(currentMetrics.grossProfit, previousMetrics.grossProfit) },
-            { icon: 'credit-card', label: 'Op. Expenses', value: currentMetrics.totalExpenses, isCurrency: true, color: 'red', change: calculateChange(currentMetrics.totalExpenses, previousMetrics.totalExpenses) },
+            { icon: 'credit-card', label: 'Operating Expenses', value: currentMetrics.totalExpenses, isCurrency: true, color: 'red', change: calculateChange(currentMetrics.totalExpenses, previousMetrics.totalExpenses) },
         ];
         
         const netProfitChange = calculateChange(currentMetrics.netProfit, previousMetrics.netProfit);
@@ -15909,17 +15583,15 @@ function initReports(pane) {
                     </div>`).join('')}
             </div>
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="glass-pane p-6 rounded-xl h-auto flex flex-col"><h3 class="text-xl font-semibold text-text-primary mb-4">Income vs. Expense</h3><div class="flex-grow min-h-[300px]"><canvas id="pnl-bar-chart"></canvas></div></div>
-                <div class="glass-pane p-6 rounded-xl h-auto flex flex-col"><h3 class="text-xl font-semibold text-text-primary mb-4">Financial Summary</h3>
+                <div class="glass-pane p-6 rounded-xl h-96 flex flex-col"><h3 class="text-xl font-semibold text-text-primary mb-4">Income vs. Expense</h3><div class="flex-grow"><canvas id="pnl-bar-chart"></canvas></div></div>
+                <div class="glass-pane p-6 rounded-xl h-96 flex flex-col"><h3 class="text-xl font-semibold text-text-primary mb-4">Summary</h3>
                     <div class="space-y-3 text-lg py-4">
-                        <div class="flex justify-between"><span>Product Sales</span><span class="font-mono">${currencyUtils.format(currentMetrics.productRevenue)}</span></div>
-                        ${currentMetrics.interestRevenue > 0 ? `<div class="flex justify-between text-indigo-400"><span>+ Interest Income (EMI)</span><span class="font-mono">${currencyUtils.format(currentMetrics.interestRevenue)}</span></div>` : ''}
-                        <div class="flex justify-between font-bold border-t border-border-color pt-2"><span>Gross Revenue</span><span class="font-mono">${currencyUtils.format(currentMetrics.grossRevenue)}</span></div>
-                        <div class="flex justify-between text-sm pl-4 text-text-secondary"><span>- Total Discounts</span><span class="font-mono text-red-400">(${currencyUtils.format(currentMetrics.totalDiscounts)})</span></div>
+                        <div class="flex justify-between"><span>Gross Revenue</span><span class="font-mono">${currencyUtils.format(currentMetrics.grossRevenue)}</span></div>
+                        <div class="flex justify-between text-sm pl-4"><span>- Total Discounts</span><span class="font-mono text-red-400">(${currencyUtils.format(currentMetrics.totalDiscounts)})</span></div>
                         <div class="flex justify-between font-bold border-t border-border-color pt-2"><span>Net Revenue</span><span class="font-mono">${currencyUtils.format(currentMetrics.netRevenue)}</span></div>
-                        <div class="flex justify-between text-sm pl-4 text-text-secondary"><span>- Cost of Goods Sold (COGS)</span><span class="font-mono text-red-400">(${currencyUtils.format(currentMetrics.cogs)})</span></div>
+                        <div class="flex justify-between text-sm pl-4"><span>- Cost of Goods Sold (COGS)</span><span class="font-mono text-red-400">(${currencyUtils.format(currentMetrics.cogs)})</span></div>
                         <div class="flex justify-between font-bold border-t border-border-color pt-2"><span>Gross Profit</span><span class="font-mono">${currencyUtils.format(currentMetrics.grossProfit)}</span></div>
-                        <div class="flex justify-between text-sm pl-4 text-text-secondary"><span>- Operating Expenses</span><span class="font-mono text-red-400">(${currencyUtils.format(currentMetrics.totalExpenses)})</span></div>
+                        <div class="flex justify-between text-sm pl-4"><span>- Operating Expenses</span><span class="font-mono text-red-400">(${currencyUtils.format(currentMetrics.totalExpenses)})</span></div>
                         <div class="flex justify-between font-bold text-2xl border-t-2 border-accent pt-3 mt-3"><span>Net Profit</span><span class="font-mono ${netProfitColor}">${currencyUtils.format(currentMetrics.netProfit)}</span></div>
                     </div>
                 </div>
@@ -15932,17 +15604,16 @@ function initReports(pane) {
             chartInstances.pnlBar = new Chart(pnlBarCtx, {
                 type: 'bar',
                 data: {
-                    labels: ['Revenue', 'Costs & Expenses', 'Profit'],
+                    labels: ['Income', 'Expenses', 'Profit'],
                     datasets: [
-                        { label: 'Product Sales', data: [currentMetrics.productRevenue, 0, 0], backgroundColor: chartStyles.palettes.blue[0], stack: 'Stack 0' },
-                        { label: 'Interest Income', data: [currentMetrics.interestRevenue, 0, 0], backgroundColor: chartStyles.palettes.indigo[0], stack: 'Stack 0' },
-                        { label: 'COGS', data: [0, currentMetrics.cogs, 0], backgroundColor: chartStyles.palettes.yellow[0], stack: 'Stack 1' },
-                        { label: 'Op. Expenses', data: [0, currentMetrics.totalExpenses, 0], backgroundColor: chartStyles.palettes.red[0], stack: 'Stack 1' },
-                        { label: 'Net Profit', data: [0, 0, currentMetrics.netProfit], backgroundColor: chartStyles.palettes.green[0], stack: 'Stack 2' },
+                        { label: 'Net Revenue', data: [currentMetrics.netRevenue, 0, 0], backgroundColor: chartStyles.palettes.gentleOcean[0] },
+                        { label: 'Gross Profit', data: [0, 0, currentMetrics.grossProfit], backgroundColor: chartStyles.palettes.softMeadow[0] },
+                        { label: 'Expenses', data: [0, currentMetrics.totalExpenses, 0], backgroundColor: chartStyles.palettes.red[0] },
+                        { label: 'COGS', data: [0, currentMetrics.cogs, 0], backgroundColor: chartStyles.palettes.yellow[0] },
                     ]
                 },
                 options: commonChartOptions(true, {
-                    plugins: { legend: { position: 'bottom' }, tooltip: { mode: 'index', intersect: false } },
+                    plugins: { legend: { position: 'bottom' } },
                     scales: { x: { stacked: true, grid: { display: false } }, y: { stacked: true } }
                 })
             });
@@ -15951,172 +15622,6 @@ function initReports(pane) {
         reportsContainer.querySelector('#reports-pagination').innerHTML = ''; // No table for this view
         lucide.createIcons();
     };
-
-    // --- *** NEW EMI REPORT *** ---
-    const renderEMIReport = (startDate, endDate, prevStartDate, prevEndDate) => {
-        destroyCharts();
-
-        const getEMIMetrics = (start, end) => {
-            // 1. Loans Originated (Created) in Period
-            const schedules = firestoreData.emiSchedules.filter(s => {
-                const date = new Date(s.createdAt);
-                return date >= start && date <= end;
-            });
-            
-            const totalPrincipal = schedules.reduce((sum, s) => sum + (s.totalPrincipal || 0), 0);
-            const totalInterest = schedules.reduce((sum, s) => sum + (s.totalInterest || 0), 0);
-            const count = schedules.length;
-            
-            // 2. Collections in Period
-            // Look at all invoices' payment details. 
-            // Valid collections are: Down Payments on EMI invoices, Installments, and Settlements.
-            let totalCollections = 0;
-            const collectionsByDate = {};
-
-            firestoreData.invoices.forEach(inv => {
-                if (inv.paymentDetails) {
-                    inv.paymentDetails.forEach(p => {
-                        const pDate = new Date(p.date);
-                        if (pDate >= start && pDate <= end) {
-                            if (p.isEMIPayment || p.isEMISettlement || (inv.isEMI && p.isDownPayment)) {
-                                const amountBase = currencyUtils.convertToBase(p.amount, inv.currency);
-                                totalCollections += amountBase;
-                                
-                                const day = pDate.toLocaleDateString();
-                                collectionsByDate[day] = (collectionsByDate[day] || 0) + amountBase;
-                            }
-                        }
-                    });
-                }
-            });
-
-            return { schedules, totalPrincipal, totalInterest, count, totalCollections, collectionsByDate };
-        };
-
-        const current = getEMIMetrics(startDate, endDate);
-        const previous = getEMIMetrics(prevStartDate, prevEndDate);
-
-        const kpis = [
-            { icon: 'banknote', label: 'Loans Disbursed', value: current.totalPrincipal, isCurrency: true, color: 'blue', change: calculateChange(current.totalPrincipal, previous.totalPrincipal) },
-            { icon: 'percent', label: 'Projected Interest', value: current.totalInterest, isCurrency: true, color: 'indigo', change: calculateChange(current.totalInterest, previous.totalInterest) },
-            { icon: 'download', label: 'EMI Collections', value: current.totalCollections, isCurrency: true, color: 'green', change: calculateChange(current.totalCollections, previous.totalCollections) },
-            { icon: 'file-plus-2', label: 'New Loan Accounts', value: current.count, isCurrency: false, color: 'yellow', change: calculateChange(current.count, previous.count) },
-        ];
-
-        reportsContainer.innerHTML = `
-            <!-- KPIs -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                ${kpis.map(kpi => `
-                    <div class="kpi-card glass-pane p-5 rounded-xl flex items-center gap-4">
-                        <div class="w-12 h-12 rounded-full flex items-center justify-center ${colorClasses[kpi.color].bg} shrink-0">
-                            <i data-lucide="${kpi.icon}" class="w-6 h-6 ${colorClasses[kpi.color].text}"></i>
-                        </div>
-                        <div class="overflow-hidden">
-                            <p class="text-sm font-medium text-text-secondary">${kpi.label}</p>
-                            <div class="flex items-baseline gap-2">
-                                <p class="text-2xl font-bold text-text-primary">${formatAndTruncate(kpi.label, kpi.value, kpi.isCurrency)}</p>
-                                ${formatChange(kpi.change)}
-                            </div>
-                        </div>
-                    </div>
-                `).join('')}
-            </div>
-            
-            <!-- Charts -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="glass-pane p-6 rounded-xl h-96 flex flex-col"><h3 class="text-xl font-semibold text-text-primary mb-4">Disbursals vs Collections (Daily)</h3><div class="flex-grow"><canvas id="emi-trend-chart"></canvas></div></div>
-                <div class="glass-pane p-6 rounded-xl h-96 flex flex-col"><h3 class="text-xl font-semibold text-text-primary mb-4">Loan Status (All Time)</h3><div class="flex-grow flex items-center justify-center"><canvas id="emi-status-chart"></canvas></div></div>
-            </div>
-
-            <!-- Table -->
-            <div class="glass-pane p-6 rounded-xl">
-                <h3 class="text-xl font-semibold text-text-primary mb-4">Loans Originated in Period</h3>
-                <div class="overflow-x-auto">
-                    <table class="table-pro">
-                        <thead><tr><th>Schedule ID</th><th>Customer</th><th>Date</th><th>Principal</th><th>Interest</th><th>Tenure</th><th>Status</th></tr></thead>
-                        <tbody id="emi-report-table-body"></tbody>
-                    </table>
-                </div>
-            </div>
-             <div id="reports-pagination" class="mt-4"></div>
-        `;
-
-        // Pagination & Table Population
-        const totalItems = current.schedules.length;
-        const startIndex = (viewState.currentPage - 1) * appState.itemsPerPage;
-        const endIndex = startIndex + appState.itemsPerPage;
-        const paginated = current.schedules.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(startIndex, endIndex);
-
-        const tableBody = reportsContainer.querySelector('#emi-report-table-body');
-        if (tableBody) {
-            tableBody.innerHTML = paginated.length ? paginated.map(s => `
-                <tr class="table-row">
-                    <td class="font-mono text-xs">${s.id}</td>
-                    <td>${s.customerName}</td>
-                    <td>${new Date(s.createdAt).toLocaleDateString()}</td>
-                    <td class="font-mono">${currencyUtils.format(s.totalPrincipal)}</td>
-                    <td class="font-mono text-green-400">${currencyUtils.format(s.totalInterest)}</td>
-                    <td>${s.tenureMonths} Months</td>
-                    <td><span class="px-2 py-1 text-xs font-semibold rounded-full ${s.status === 'Active' ? 'bg-blue-500/20 text-blue-300' : 'bg-green-500/20 text-green-300'}">${s.status}</span></td>
-                </tr>
-            `).join('') : `<tr><td colspan="7" class="text-center p-8 text-text-secondary">No loans originated in this period.</td></tr>`;
-        }
-        
-        renderPaginationControls(reportsContainer.querySelector('#reports-pagination'), totalItems, viewState.currentPage, appState.itemsPerPage, 'reports');
-
-        // Charts
-        
-        // 1. Trend Chart Data Preparation
-        const disbursalData = current.schedules.reduce((acc, s) => {
-             const d = new Date(s.createdAt).toLocaleDateString();
-             acc[d] = (acc[d] || 0) + s.totalPrincipal;
-             return acc;
-        }, {});
-        const collectionData = current.collectionsByDate;
-        
-        // Combine all dates from both sets
-        const allDates = [...new Set([...Object.keys(disbursalData), ...Object.keys(collectionData)])].sort((a,b) => new Date(a) - new Date(b));
-
-        const trendCtx = document.getElementById('emi-trend-chart')?.getContext('2d');
-        if (trendCtx) {
-             chartInstances.emiTrend = new Chart(trendCtx, {
-                type: 'bar',
-                data: {
-                    labels: allDates,
-                    datasets: [
-                        { label: 'Disbursed', data: allDates.map(d => disbursalData[d] || 0), backgroundColor: chartStyles.palettes.blue[0], borderRadius: 4 },
-                        { label: 'Collected', data: allDates.map(d => collectionData[d] || 0), backgroundColor: chartStyles.palettes.green[0], borderRadius: 4 }
-                    ]
-                },
-                options: commonChartOptions(true)
-            });
-        }
-        
-        // 2. Status Distribution (Snapshot of ALL loans for context)
-        const statusCounts = firestoreData.emiSchedules.reduce((acc, s) => {
-            acc[s.status] = (acc[s.status] || 0) + 1;
-            return acc;
-        }, {});
-        
-        const statusCtx = document.getElementById('emi-status-chart')?.getContext('2d');
-         if (statusCtx) {
-             chartInstances.emiStatus = new Chart(statusCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: Object.keys(statusCounts),
-                    datasets: [{
-                        data: Object.values(statusCounts),
-                        backgroundColor: [chartStyles.palettes.blue[0], chartStyles.palettes.green[0], chartStyles.palettes.red[0], chartStyles.palettes.yellow[0]],
-                        borderWidth: 0
-                    }]
-                },
-                options: commonChartOptions(false, { plugins: { legend: { position: 'right' } } })
-            });
-        }
-
-        lucide.createIcons();
-    };
-
 
     // --- *** MAIN RENDER LOGIC *** ---
     const renderCurrentReport = () => {
@@ -16198,9 +15703,10 @@ function initReports(pane) {
             case 'inventory': renderInventoryReport(startDate, endDate, prevStartDate, prevEndDate); break;
             case 'customer': renderCustomerReport(startDate, endDate, prevStartDate, prevEndDate); break;
             case 'activity': renderActivityReport(startDate, endDate); break;
+            // --- NEW CASES ---
             case 'expense': renderExpenseReport(startDate, endDate, prevStartDate, prevEndDate); break;
             case 'pnl': renderPnlReport(startDate, endDate, prevStartDate, prevEndDate); break;
-            case 'emi': renderEMIReport(startDate, endDate, prevStartDate, prevEndDate); break; // --- NEW CASE ---
+            // --- END NEW ---
             case 'sales': default: renderSalesReport(startDate, endDate, prevStartDate, prevEndDate); break;
         }
         
@@ -16220,7 +15726,6 @@ function initReports(pane) {
             <button data-action="set-report-type" data-type="inventory" class="report-type-btn px-3 py-1.5 text-sm font-semibold rounded-md flex items-center gap-2"><i data-lucide="boxes" class="w-4 h-4"></i>${term.inventory}</button>
             <button data-action="set-report-type" data-type="customer" class="report-type-btn px-3 py-1.5 text-sm font-semibold rounded-md flex items-center gap-2"><i data-lucide="users" class="w-4 h-4"></i>Customer</button>
             <button data-action="set-report-type" data-type="expense" class="report-type-btn px-3 py-1.5 text-sm font-semibold rounded-md flex items-center gap-2"><i data-lucide="credit-card" class="w-4 h-4"></i>Expense</button>
-            ${checkPermission('canManageEMI') ? `<button data-action="set-report-type" data-type="emi" class="report-type-btn px-3 py-1.5 text-sm font-semibold rounded-md flex items-center gap-2"><i data-lucide="banknote" class="w-4 h-4"></i>EMI</button>` : ''}
             ${checkPermission('canViewProfitAndLoss') ? `<button data-action="set-report-type" data-type="pnl" class="report-type-btn px-3 py-1.5 text-sm font-semibold rounded-md flex items-center gap-2"><i data-lucide="file-spreadsheet" class="w-4 h-4"></i>P&L</button>` : ''}
             <button data-action="set-report-type" data-type="activity" class="report-type-btn px-3 py-1.5 text-sm font-semibold rounded-md flex items-center gap-2"><i data-lucide="history" class="w-4 h-4"></i>Activity</button>
         ` : '';
@@ -16971,51 +16476,72 @@ function initReports(pane) {
                 }
 
                 const renderPosLayoutSelector = () => {
-                    if (!posLayoutSelectorContainer) return;
+                    if (!posLayoutSelectorContainer) return; // Add this check
                     const layouts = {
                         classic: {
                             name: 'Classic List View',
                             preview: `<div class="w-full h-full border border-slate-700/50 rounded-sm p-1.5 flex flex-col gap-1.5 bg-gradient-to-br from-slate-800 to-slate-900 shadow-inner">
+                                          <!-- Header -->
                                           <div class="h-3 w-full bg-slate-700/50 rounded-sm flex items-center px-1 gap-1">
                                               <div class="w-1/4 h-1.5 bg-sky-500/70 rounded-full"></div>
                                               <div class="w-1/3 h-1.5 bg-slate-600/50 rounded-full"></div>
                                           </div>
                                           <div class="flex-grow flex gap-1.5">
+                                              <!-- Main content (list view) -->
                                               <div class="w-7/12 bg-slate-700/30 rounded-sm p-1 space-y-1">
-                                                  <div class="h-2.5 w-full bg-slate-600/50 rounded-sm"></div>
+                                                  <div class="h-2.5 w-full bg-slate-600/50 rounded-sm"></div> <!-- Search bar -->
+                                                  <!-- Cart items list -->
                                                   <div class="h-3.5 w-full bg-slate-600/20 rounded-sm flex items-center gap-1 p-0.5"><div class="w-2.5 h-2.5 bg-slate-500/50 rounded-sm shrink-0"></div><div class="h-1 flex-grow bg-slate-500/50 rounded-full"></div></div>
                                                   <div class="h-3.5 w-full bg-slate-600/20 rounded-sm flex items-center gap-1 p-0.5"><div class="w-2.5 h-2.5 bg-slate-500/50 rounded-sm shrink-0"></div><div class="h-1 flex-grow bg-slate-500/50 rounded-full"></div></div>
+                                                  <div class="h-3.5 w-4/5 bg-slate-600/20 rounded-sm flex items-center gap-1 p-0.5"><div class="w-2.5 h-2.5 bg-slate-500/50 rounded-sm shrink-0"></div><div class="h-1 flex-grow bg-slate-500/50 rounded-full"></div></div>
                                               </div>
-                                              <div class="w-5/12 bg-slate-700/30 rounded-sm p-1 flex flex-col justify-between">
-                                                  <div class="space-y-1">
-                                                      <div class="h-2 w-full bg-slate-600/50 rounded-full"></div>
-                                                      <div class="h-2 w-2/3 bg-slate-600/50 rounded-full"></div>
-                                                  </div>
-                                                  <div class="h-4 w-full bg-sky-500/70 rounded-sm"></div>
+                                              <!-- Sidebar (cart summary) -->
+                                              <div class="w-5/12 bg-slate-700/30 rounded-sm p-1 flex flex-col justify-end">
+                                                  <div class="h-1 w-full bg-slate-500/50 rounded-full mb-1"></div>
+                                                  <div class="h-1 w-4/5 bg-slate-500/50 rounded-full mb-2"></div>
+                                                  <div class="h-3.5 w-full bg-sky-500/80 rounded-md shadow-sm shadow-sky-500/20"></div> <!-- Pay button -->
                                               </div>
                                           </div>
                                       </div>`
                         },
                         modern: {
                             name: 'Modern Grid View',
-                            preview: `<div class="w-full h-full border border-slate-700/50 rounded-sm flex overflow-hidden bg-gradient-to-br from-slate-800 to-slate-900 shadow-inner">
-                                          <div class="w-1/4 border-r border-slate-700/50 bg-slate-800/50 p-1 flex flex-col gap-1">
-                                              <div class="h-2 w-full bg-slate-600/50 rounded-full"></div>
-                                              <div class="h-2 w-2/3 bg-slate-600/50 rounded-full"></div>
-                                          </div>
-                                          <div class="w-1/2 p-1 grid grid-cols-2 gap-1">
-                                              <div class="bg-slate-700/30 rounded-sm h-8"></div>
-                                              <div class="bg-slate-700/30 rounded-sm h-8"></div>
-                                              <div class="bg-slate-700/30 rounded-sm h-8"></div>
-                                              <div class="bg-slate-700/30 rounded-sm h-8"></div>
-                                          </div>
-                                          <div class="w-1/4 bg-slate-700/30 border-l border-slate-700/50 p-1 flex flex-col justify-end">
-                                               <div class="h-4 w-full bg-sky-500/70 rounded-sm"></div>
-                                          </div>
-                                      </div>`
+                            preview: `<div class="w-full h-full border border-slate-700/50 rounded-sm p-1.5 flex flex-col gap-1.5 bg-gradient-to-br from-slate-800 to-slate-900 shadow-inner">
+                                         <!-- Header -->
+                                        <div class="h-3 w-full bg-slate-700/50 rounded-sm flex items-center px-1 gap-1">
+                                            <div class="w-1/4 h-1.5 bg-sky-500/70 rounded-full"></div>
+                                            <div class="w-1/3 h-1.5 bg-slate-600/50 rounded-full"></div>
+                                        </div>
+                                        <div class="flex-grow flex gap-1.5">
+                                            <!-- Main content (grid view) -->
+                                            <div class="w-7/12 bg-slate-700/30 rounded-sm p-1 flex gap-1">
+                                                <!-- Category sidebar -->
+                                                <div class="w-1/3 bg-slate-600/20 rounded-sm p-0.5 space-y-1">
+                                                    <div class="h-2 w-full bg-sky-500/50 rounded-sm"></div>
+                                                    <div class="h-1.5 w-full bg-slate-500/50 rounded-full"></div>
+                                                    <div class="h-1.5 w-full bg-slate-500/50 rounded-full"></div>
+                                                    <div class="h-1.5 w-full bg-slate-500/50 rounded-full"></div>
+                                                </div>
+                                                <!-- Product grid -->
+                                                <div class="w-2/3 grid grid-cols-2 gap-1">
+                                                    <div class="bg-slate-600/20 rounded p-0.5 space-y-0.5"><div class="aspect-square w-full bg-slate-500/50 rounded-sm"></div><div class="h-1 w-full bg-slate-500/50 rounded-full"></div></div>
+                                                    <div class="bg-slate-600/20 rounded p-0.5 space-y-0.5"><div class="aspect-square w-full bg-slate-500/50 rounded-sm"></div><div class="h-1 w-full bg-slate-500/50 rounded-full"></div></div>
+                                                    <div class="bg-slate-600/20 rounded p-0.5 space-y-0.5"><div class="aspect-square w-full bg-slate-500/50 rounded-sm"></div><div class="h-1 w-full bg-slate-500/50 rounded-full"></div></div>
+                                                    <div class="bg-slate-600/20 rounded p-0.5 space-y-0.5"><div class="aspect-square w-full bg-slate-500/50 rounded-sm"></div><div class="h-1 w-full bg-slate-500/50 rounded-full"></div></div>
+                                                </div>
+                                            </div>
+                                            <!-- Cart -->
+                                            <div class="w-5/12 bg-slate-700/30 rounded-sm p-1 flex flex-col justify-between">
+                                                <div>
+                                                     <div class="h-1 w-full bg-slate-500/50 rounded-full mb-1"></div>
+                                                     <div class="h-1 w-4/5 bg-slate-500/50 rounded-full mb-1"></div>
+                                                </div>
+                                                <div class="h-3.5 w-full bg-sky-500/80 rounded-md shadow-sm shadow-sky-500/20"></div> <!-- Pay button -->
+                                            </div>
+                                        </div>
+                                    </div>`
                         }
                     };
-
                     posLayoutSelectorContainer.innerHTML = `
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                             ${Object.entries(layouts).map(([key, layout]) => `
@@ -17045,7 +16571,7 @@ function initReports(pane) {
                 }
 
                 const renderBusinessTypeSelector = () => {
-                    if (!businessTypeSelectorContainer) return;
+                    if (!businessTypeSelectorContainer) return; // Add this check
                     let profilesHTML = Object.entries(businessProfiles).map(([id, type]) => `
                         <div data-action="select-business-type" data-type-id="${id}" class="relative group template-selector rounded-lg p-4 bg-bg-secondary flex flex-col items-center justify-center text-center h-28 ${appState.settings.businessType === id ? 'active' : ''}">
                              <div class="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -17132,7 +16658,7 @@ function initReports(pane) {
                 }
 
                 const renderReceiptSelector = () => {
-                    if (!receiptSelectorContainer) return;
+                    if (!receiptSelectorContainer) return; // Add this check
                     receiptSelectorContainer.innerHTML = `
                         <p class="text-sm text-text-secondary mb-4">Choose the default design for printed and digital receipts.</p>
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -22517,7 +22043,7 @@ const receiptTemplates = {
             const symbol = currencyUtils.get(currency).symbol;
             // --- NEW: Handle Return Logic ---
             const isReturn = invoice.invoiceType === 'return';
-            const title = isReturn ? 'Return Receipt' : (invoice.isEMI ? 'EMI Invoice' : 'Receipt');
+            const title = isReturn ? 'Return Receipt' : 'Receipt';
             const totalLabel = isReturn ? 'Total Credited' : 'Grand Total';
             const totalColor = isReturn ? 'text-blue-600' : 'text-gray-900';
             const thankYouMessage = isReturn ? 'Your return has been processed.' : `Thank you, ${invoice.customerName.split(' ')[0]}!`;
@@ -22552,37 +22078,8 @@ const receiptTemplates = {
             let warrantyInfo = '';
              const electronicItems = invoice.items.filter(p => p.category === 'Electronics'); if (electronicItems.length > 0) { warrantyInfo = `<div class="mt-4 p-3 bg-gray-100 rounded-lg text-xs"><h4 class="font-bold text-gray-700 mb-1">Warranty Information</h4>${electronicItems.map(p => `<p><span class="font-medium">${p.name}:</span> 2-Year Limited Warranty</p>`).join('')}</div>`; }
 
-            // --- EMI SECTION ---
-            let emiDetailsHTML = '';
-            if (invoice.isEMI) {
-                const schedule = firestoreData.emiSchedules.find(s => s.invoiceId === invoice.id);
-                if (schedule) {
-                    const nextPayment = schedule.schedule.find(p => p.status === 'Pending' || p.status === 'Partial');
-                    const nextDueText = nextPayment ? new Date(nextPayment.dueDate).toLocaleDateString() : 'Paid';
-                    emiDetailsHTML = `
-                    <div class="mt-4 border-t border-gray-200 pt-4">
-                        <h4 class="font-bold text-gray-700 mb-2 text-xs uppercase tracking-wide flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-banknote"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>
-                            EMI Loan Details
-                        </h4>
-                        <div class="bg-gray-50 p-3 rounded-lg text-xs space-y-1">
-                            <div class="flex justify-between text-gray-600"><span>Loan Principal:</span> <span class="font-mono">${currencyUtils.format(schedule.totalPrincipal, currency)}</span></div>
-                            <div class="flex justify-between text-gray-600"><span>Down Payment:</span> <span class="font-mono">${currencyUtils.format(schedule.downPayment, currency)}</span></div>
-                            <div class="flex justify-between text-gray-600"><span>Interest Rate:</span> <span>${schedule.interestRate}% p.a.</span></div>
-                            <div class="flex justify-between text-gray-600"><span>Tenure:</span> <span>${schedule.tenureMonths} Months</span></div>
-                            <div class="h-px bg-gray-200 my-1"></div>
-                            <div class="flex justify-between font-bold text-gray-800 text-sm">
-                                <span>Monthly EMI:</span> <span class="font-mono">${currencyUtils.format(schedule.emiAmount, currency)}</span>
-                            </div>
-                            <div class="flex justify-between text-gray-500 mt-1">
-                                <span>Next Due Date:</span> <span>${nextDueText}</span>
-                            </div>
-                        </div>
-                    </div>`;
-                }
-            }
 
-            return `<div class="bg-white text-gray-800 font-sans p-8" id="receipt-content" style="font-family: 'Inter', sans-serif;">
+                            return `<div class="bg-white text-gray-800 font-sans p-8" id="receipt-content" style="font-family: 'Inter', sans-serif;">
                     <header class="flex justify-between items-start pb-4 border-b border-gray-300">
                         <div>
                             <h1 class="text-2xl font-bold text-gray-900 flex items-center gap-3"><img src="${storeInfo.logoUrl}" class="w-8 h-8 rounded-full" alt="logo"/> ${storeInfo.name}</h1>
@@ -22638,7 +22135,6 @@ const receiptTemplates = {
                             ${!isReturn && invoice.status === 'Paid' && amountDueBase < 0.001 && changeDueCurrent < 0.001 ? `<div class="flex justify-between mt-2 pt-2 border-t border-gray-300 font-bold text-green-600"><span>Status:</span><span>Paid in Full</span></div>` : ''}
                         </div>
                     </section>
-                    ${emiDetailsHTML}
                     <section class="mt-6 text-center text-xs text-gray-600 p-3 bg-gray-100 rounded-lg">
                         ${isReturn ? `<p class="font-bold text-gray-900">Return Reason: ${invoice.notes || 'N/A'}</p>` : `<p>You earned <span class="font-bold text-gray-900">${invoice.pointsEarned || 0}</span> points on this purchase!</p>`}
                         <p class="mt-1">${(storeInfo.settings.receiptFooterText || '').replace(/\n/g, '<br>')}</p>
@@ -22665,7 +22161,7 @@ const receiptTemplates = {
             const symbol = currencyUtils.get(currency).symbol;
             // --- NEW: Handle Return Logic ---
             const isReturn = invoice.invoiceType === 'return';
-            const title = isReturn ? 'RETURN RECEIPT' : (invoice.isEMI ? 'EMI LOAN INVOICE' : 'SALES RECEIPT');
+            const title = isReturn ? 'RETURN RECEIPT' : 'SALES RECEIPT';
             const totalLabel = isReturn ? 'TOTAL CREDIT' : 'TOTAL';
             const thankYouMessage = isReturn ? 'Your return is complete.' : 'Thank you for your business!';
             // --- END NEW ---
@@ -22693,26 +22189,6 @@ const receiptTemplates = {
             const amountDueBase = invoice.dueAmount || 0;
 
             const formatThermal = (amountInBase) => { const converted = currencyUtils.convert(amountInBase, currency); return `${symbol}${converted.toFixed(2)}`; };
-
-            // --- EMI SECTION ---
-            let emiDetailsHTML = '';
-            if (invoice.isEMI) {
-                const schedule = firestoreData.emiSchedules.find(s => s.invoiceId === invoice.id);
-                if (schedule) {
-                    emiDetailsHTML = `
-                    <div style="border-top: 1px dashed #000; margin: 10px 0;"></div>
-                    <section style="font-size: 11px;">
-                        <p style="font-weight: bold; text-align: center; margin-bottom: 5px;">EMI LOAN DETAILS</p>
-                        <table style="width: 100%;">
-                            <tr><td>Principal:</td><td style="text-align: right;">${formatThermal(schedule.totalPrincipal)}</td></tr>
-                            <tr><td>Down Pmt:</td><td style="text-align: right;">${formatThermal(schedule.downPayment)}</td></tr>
-                            <tr><td>Rate:</td><td style="text-align: right;">${schedule.interestRate}%</td></tr>
-                            <tr><td>Tenure:</td><td style="text-align: right;">${schedule.tenureMonths} Months</td></tr>
-                            <tr style="font-weight: bold;"><td>Monthly EMI:</td><td style="text-align: right;">${formatThermal(schedule.emiAmount)}</td></tr>
-                        </table>
-                    </section>`;
-                }
-            }
 
             return `
                     <div id="receipt-content" style="width: 302px; margin: 0 auto; background: #fff; color: #000; font-family: 'Courier New', monospace; font-size: 12px; padding: 20px;">
@@ -22761,7 +22237,6 @@ const receiptTemplates = {
                                 </tbody>
                             </table>
                         </section>
-                        ${emiDetailsHTML}
                         <div style="border-top: 1px dashed #000; margin: 10px 0;"></div>
                         <footer style="text-align: center; font-size: 11px;">
                             <p style="margin-bottom: 5px;">${thankYouMessage}</p>
@@ -22776,7 +22251,6 @@ const receiptTemplates = {
         },
     payment: { 
         name: 'Payment Receipt',
-        // ... existing payment receipt code ...
         preview: `<div class="bg-green-900/50 p-4 font-sans text-[8px] leading-tight text-white"><div class="flex justify-between items-center"><div class="w-8 h-8 bg-green-400 rounded-full flex items-center justify-center"><i data-lucide="check" class="w-4 h-4 text-white"></i></div><p class="font-bold text-green-300 text-[10px]">PAYMENT</p></div><div class="mt-4 text-[10px]"><p>RECEIVED: ${currencyUtils.format(100)}</p></div><div class="mt-2 h-px bg-green-400/50"></div><p class="text-right text-green-300 font-bold text-[10px] mt-2">NEW BALANCE: ${currencyUtils.format(50)}</p></div>`,
         getBody: (receiptData) => {
              const { storeInfo } = firestoreData;
@@ -26973,945 +26447,11 @@ async function openReturnModal(invoiceId) {
             showToast(`Error processing return: ${error.message}`, 'error');
         }
     }
-    // --- EMI SALES FEATURE LOGIC ---
-
-    function initEMI(container) {
-        if (!container) return;
-        
-        // Cleanup old listeners
-        const newContainer = container.cloneNode(false);
-        if (container.parentNode) {
-            container.parentNode.replaceChild(newContainer, container);
-        }
-        container = newContainer;
-
-        const viewState = appState.viewStates.emi || { activeTab: 'dashboard' };
-        appState.viewStates.emi = viewState;
-
-        // --- KPIs Calculation ---
-        const allSchedules = firestoreData.emiSchedules || [];
-        const activeSchedules = allSchedules.filter(s => s.status === 'Active');
-        const totalReceivablePrincipal = activeSchedules.reduce((sum, s) => sum + (s.remainingPrincipal || 0), 0);
-        const totalReceivableInterest = activeSchedules.reduce((sum, s) => sum + (s.remainingInterest || 0), 0);
-        
-        // Check for defaulters (missed payment date)
-        const today = new Date();
-        today.setHours(0,0,0,0);
-        const defaulters = activeSchedules.filter(s => {
-            const nextPayment = s.schedule.find(p => p.status === 'Pending' || p.status === 'Partial');
-            return nextPayment && new Date(nextPayment.dueDate) < today;
+             window.addEventListener('resize', checkScreenSize);
         });
-
-        container.innerHTML = `
-            <div class="space-y-6">
-                <div class="flex flex-col md:flex-row justify-between md:items-center gap-4">
-                    <div>
-                        <h1 class="text-3xl font-bold text-text-primary">EMI Sales</h1>
-                        <p class="text-text-secondary">Manage installments, create loan schedules, and track collections.</p>
-                    </div>
-                    <button data-action="create-new-emi" class="btn btn-primary">
-                        <i data-lucide="plus-circle" class="w-5 h-5 mr-2"></i> New EMI Sale
-                    </button>
-                </div>
-
-                <!-- KPIs -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div class="glass-pane p-4 rounded-xl border-l-4 border-blue-500">
-                        <p class="text-xs text-text-secondary uppercase font-semibold">Total Active Loans</p>
-                        <p class="text-2xl font-bold text-text-primary mt-1">${activeSchedules.length}</p>
-                    </div>
-                    <div class="glass-pane p-4 rounded-xl border-l-4 border-green-500">
-                        <p class="text-xs text-text-secondary uppercase font-semibold">Principal Receivable</p>
-                        <p class="text-2xl font-bold text-text-primary mt-1 font-mono">${currencyUtils.format(totalReceivablePrincipal)}</p>
-                    </div>
-                    <div class="glass-pane p-4 rounded-xl border-l-4 border-indigo-500">
-                        <p class="text-xs text-text-secondary uppercase font-semibold">Interest Earning</p>
-                        <p class="text-2xl font-bold text-text-primary mt-1 font-mono">${currencyUtils.format(totalReceivableInterest)}</p>
-                    </div>
-                    <div class="glass-pane p-4 rounded-xl border-l-4 border-red-500">
-                        <p class="text-xs text-text-secondary uppercase font-semibold">Overdue Accounts</p>
-                        <p class="text-2xl font-bold text-red-400 mt-1">${defaulters.length}</p>
-                    </div>
-                </div>
-
-                <!-- Active EMIs Table -->
-                <div class="glass-pane p-6 rounded-xl">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-semibold text-text-primary">Active Schedules</h3>
-                        <div class="relative">
-                            <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary"></i>
-                            <input type="text" id="emi-search" placeholder="Search customer or ID..." class="form-input pl-9 py-1.5 text-sm w-64">
-                        </div>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="table-pro">
-                            <thead>
-                                <tr>
-                                    <th>Schedule ID</th>
-                                    <th>Customer</th>
-                                    <th>Next Due</th>
-                                    <th>Amount Due</th>
-                                    <th>Progress</th>
-                                    <th>Status</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="emi-list-body"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        const renderEMIList = () => {
-            const tbody = container.querySelector('#emi-list-body');
-            const query = (container.querySelector('#emi-search').value || '').toLowerCase();
-            
-            let filtered = allSchedules.filter(s => 
-                s.customerName.toLowerCase().includes(query) || 
-                s.id.toLowerCase().includes(query) ||
-                s.productSummary.toLowerCase().includes(query)
-            );
-
-            // Sort by status (Active first) then date
-            filtered.sort((a,b) => {
-                if (a.status === 'Active' && b.status !== 'Active') return -1;
-                if (a.status !== 'Active' && b.status === 'Active') return 1;
-                return new Date(b.createdAt) - new Date(a.createdAt);
-            });
-
-            tbody.innerHTML = filtered.length ? filtered.map(s => {
-                const nextPayment = s.schedule.find(p => p.status === 'Pending' || p.status === 'Partial');
-                const isOverdue = nextPayment && new Date(nextPayment.dueDate) < today;
-                
-                // Calculate progress based on principal paid vs total principal
-                const paidPrincipal = s.totalPrincipal - s.remainingPrincipal;
-                const progress = Math.round((paidPrincipal / s.totalPrincipal) * 100) || 0;
-                
-                return `
-                <tr class="table-row ${isOverdue ? 'bg-red-500/5' : ''}">
-                    <td class="font-mono text-xs">
-                        <div>${s.id}</div>
-                        <div class="text-text-secondary/70 truncate max-w-[150px]">${s.productSummary}</div>
-                    </td>
-                    <td class="font-medium text-text-primary">${s.customerName}</td>
-                    <td class="${isOverdue ? 'text-red-400 font-bold' : ''}">
-                        ${nextPayment ? new Date(nextPayment.dueDate).toLocaleDateString() : '<span class="text-green-400">Completed</span>'}
-                        ${isOverdue ? '<i data-lucide="alert-circle" class="inline w-3 h-3 ml-1"></i>' : ''}
-                    </td>
-                    <td class="font-mono">
-                        ${nextPayment 
-                            ? currencyUtils.format(nextPayment.amount - (nextPayment.paidAmount || 0)) 
-                            : currencyUtils.format(0)}
-                    </td>
-                    <td>
-                        <div class="flex items-center gap-2">
-                            <div class="w-16 bg-bg-tertiary h-1.5 rounded-full overflow-hidden">
-                                <div class="bg-accent h-full" style="width: ${progress}%"></div>
-                            </div>
-                            <span class="text-xs">${progress}%</span>
-                        </div>
-                    </td>
-                    <td>
-                        <span class="px-2 py-0.5 rounded text-[10px] uppercase font-bold 
-                            ${s.status === 'Active' ? (isOverdue ? 'bg-red-500/20 text-red-300' : 'bg-blue-500/20 text-blue-300') : 'bg-green-500/20 text-green-300'}">
-                            ${isOverdue ? 'Overdue' : s.status}
-                        </span>
-                    </td>
-                    <td>
-                        <button data-action="view-emi-details" data-id="${s.id}" class="btn btn-secondary btn-sm">Manage</button>
-                    </td>
-                </tr>
-                `;
-            }).join('') : `<tr><td colspan="7" class="text-center p-8 text-text-secondary">No EMI schedules found.</td></tr>`;
-            lucide.createIcons();
-        };
-
-        renderEMIList();
-
-        // Listeners
-        container.querySelector('#emi-search').addEventListener('input', renderEMIList);
-        
-        container.addEventListener('click', e => {
-            const target = e.target.closest('[data-action]');
-            if(!target) return;
-            const action = target.dataset.action;
-            const id = target.dataset.id;
-
-            if (action === 'create-new-emi') {
-                openCreateEMIModal();
-            }
-            if (action === 'view-emi-details') {
-                openEMIDetailsModal(id);
-            }
-        });
-        
-        lucide.createIcons();
-    }
-
-    function openCreateEMIModal() {
-        // ... (This function is mostly unchanged until the calculation logic)
-        let emiCart = [];
-        let selectedCustomer = null;
-        
-        // --- NEW: Get symbol for UI labels ---
-        const currencySymbol = currencyUtils.get(appState.currentCurrency).symbol;
-
-        const content = `
-            <div class="flex flex-col h-[75vh]">
-                <!-- Top: Customer & Product Selection -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 border-b border-border-color pb-4 mb-4 flex-shrink-0">
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Customer</label>
-                        <div id="emi-customer-selector" class="flex gap-2"></div>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Add Product</label>
-                        <div class="relative">
-                            <input type="text" id="emi-product-search" placeholder="Scan or search..." class="form-input w-full">
-                            <div id="emi-product-results" class="absolute top-full left-0 right-0 bg-bg-secondary border border-border-color z-20 hidden max-h-48 overflow-y-auto rounded-lg shadow-xl"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Middle: Cart & Calculation -->
-                <div class="flex-grow grid grid-cols-1 md:grid-cols-3 gap-6 overflow-hidden">
-                    <!-- Cart List -->
-                    <div class="md:col-span-2 flex flex-col overflow-hidden bg-bg-tertiary/30 rounded-lg border border-border-color">
-                        <div class="p-3 bg-bg-secondary border-b border-border-color font-semibold text-sm">Selected Products</div>
-                        <div id="emi-cart-list" class="flex-grow overflow-y-auto p-2 space-y-2">
-                            <p class="text-center text-text-secondary p-4 text-sm">No items added.</p>
-                        </div>
-                        <div class="p-3 bg-bg-secondary border-t border-border-color flex justify-between font-bold">
-                            <span>Total Product Value:</span>
-                            <span id="emi-cart-total" class="font-mono text-accent">$0.00</span>
-                        </div>
-                    </div>
-
-                    <!-- Calculator -->
-                    <div class="flex flex-col bg-bg-secondary p-4 rounded-lg border border-border-color overflow-y-auto">
-                        <h3 class="font-bold text-text-primary mb-4 flex items-center gap-2"><i data-lucide="calculator" class="w-4 h-4"></i> Loan Calculator</h3>
-                        
-                        <div class="space-y-3 text-sm">
-                            <div>
-                                <label class="block text-xs text-text-secondary mb-1">Down Payment (${appState.currentCurrency})</label>
-                                <div class="flex gap-2">
-                                    <input type="number" id="emi-down-payment" value="0" class="form-input w-full font-mono">
-                                    <select id="emi-dp-method" class="form-select w-24 text-xs">
-                                        <option value="Cash">Cash</option>
-                                        <option value="Card">Card</option>
-                                        <option value="Mobile Banking">M-Bank</option>
-                                    </select>
-                                </div>
-                            </div>
-                            
-                            <div class="grid grid-cols-2 gap-2">
-                                <div>
-                                    <label class="block text-xs text-text-secondary mb-1">Interest Rate (% p.a.)</label>
-                                    <input type="number" id="emi-interest-rate" value="12" class="form-input w-full font-mono">
-                                </div>
-                                <div>
-                                    <label class="block text-xs text-text-secondary mb-1">Tenure (Months)</label>
-                                    <input type="number" id="emi-tenure" value="6" class="form-input w-full font-mono">
-                                </div>
-                            </div>
-
-                            <div>
-                                <label class="block text-xs text-text-secondary mb-1">Processing Fee (Flat ${appState.currentCurrency})</label>
-                                <input type="number" id="emi-proc-fee" value="0" class="form-input w-full font-mono">
-                            </div>
-                            
-                            <div>
-                                <label class="block text-xs text-text-secondary mb-1">First EMI Date</label>
-                                <input type="date" id="emi-start-date" class="form-input w-full" value="${new Date().toISOString().slice(0,10)}">
-                            </div>
-
-                            <div class="h-px bg-border-color my-2"></div>
-
-                            <div class="space-y-1 text-right">
-                                <div class="flex justify-between text-text-secondary"><span>Principal Loan:</span> <span id="calc-principal" class="font-mono">0.00</span></div>
-                                <div class="flex justify-between text-text-secondary"><span>Total Interest:</span> <span id="calc-interest" class="font-mono">0.00</span></div>
-                                <div class="flex justify-between font-bold text-lg text-accent border-t border-border-color pt-2 mt-2">
-                                    <span>Monthly EMI:</span> <span id="calc-emi-amount" class="font-mono">0.00</span>
-                                </div>
-                                <div class="flex justify-between text-xs text-text-secondary mt-1">
-                                    <span>Total Payable:</span> <span id="calc-total-payable" class="font-mono">0.00</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        const footer = `<button data-action="close-modal" class="btn btn-secondary">Cancel</button><button id="confirm-create-emi" class="btn btn-primary" disabled>Confirm & Create Sale</button>`;
-        
-        const modal = showModal('Create EMI Sale', content, footer, { size: 'max-w-5xl' });
-        
-        // --- Helper Logic for Modal ---
-        
-        const updateCalculator = () => {
-            const cartTotal = emiCart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-            
-            // --- UPDATED: Convert inputs from Display Currency to Base Currency ---
-            const downPaymentDisplay = parseFloat(modal.querySelector('#emi-down-payment').value) || 0;
-            const downPayment = currencyUtils.convertToBase(downPaymentDisplay, appState.currentCurrency);
-            
-            const procFeeDisplay = parseFloat(modal.querySelector('#emi-proc-fee').value) || 0;
-            const procFee = currencyUtils.convertToBase(procFeeDisplay, appState.currentCurrency);
-            // --- END UPDATED ---
-
-            const rate = parseFloat(modal.querySelector('#emi-interest-rate').value) || 0;
-            const tenure = parseFloat(modal.querySelector('#emi-tenure').value) || 0;
-
-            const principal = Math.max(0, cartTotal - downPayment);
-            
-            // EMI Calculation: P * r * (1+r)^n / ((1+r)^n - 1)
-            let emi = 0;
-            let totalInterest = 0;
-
-            if (principal > 0 && tenure > 0) {
-                if (rate > 0) {
-                    const monthlyRate = rate / 12 / 100;
-                    emi = (principal * monthlyRate * Math.pow(1 + monthlyRate, tenure)) / (Math.pow(1 + monthlyRate, tenure) - 1);
-                    totalInterest = (emi * tenure) - principal;
-                } else {
-                    emi = principal / tenure;
-                }
-            }
-
-            const totalPayable = (emi * tenure) + downPayment + procFee;
-
-            modal.querySelector('#emi-cart-total').textContent = currencyUtils.format(cartTotal);
-            modal.querySelector('#calc-principal').textContent = currencyUtils.format(principal);
-            modal.querySelector('#calc-interest').textContent = currencyUtils.format(totalInterest);
-            modal.querySelector('#calc-emi-amount').textContent = currencyUtils.format(emi);
-            modal.querySelector('#calc-total-payable').textContent = currencyUtils.format(totalPayable);
-
-            const confirmBtn = modal.querySelector('#confirm-create-emi');
-            confirmBtn.disabled = !(emiCart.length > 0 && selectedCustomer && principal > 0);
-        };
-
-        // --- Search & Cart Logic ---
-        const searchInput = modal.querySelector('#emi-product-search');
-        const resultsDiv = modal.querySelector('#emi-product-results');
-        
-        searchInput.addEventListener('input', (e) => {
-            const query = e.target.value.toLowerCase();
-            if(query.length < 2) { resultsDiv.classList.add('hidden'); return; }
-            
-            const hits = firestoreData.products.filter(p => !p.parentSKU && (p.name.toLowerCase().includes(query) || p.id.toLowerCase().includes(query))).slice(0, 5);
-            resultsDiv.innerHTML = hits.map(p => `
-                <div class="p-2 hover:bg-bg-tertiary cursor-pointer text-sm" data-add-id="${p.id}">
-                    <div class="font-bold">${p.name}</div>
-                    <div class="flex justify-between text-xs text-text-secondary">
-                        <span>${p.id}</span>
-                        <span>${currencyUtils.format(p.price)}</span>
-                    </div>
-                </div>
-            `).join('');
-            resultsDiv.classList.remove('hidden');
-        });
-
-        resultsDiv.addEventListener('click', e => {
-            const itemDiv = e.target.closest('[data-add-id]');
-            if(itemDiv) {
-                const product = firestoreData.products.find(p => p.id === itemDiv.dataset.addId);
-                if(product) {
-                    const existing = emiCart.find(i => i.id === product.id);
-                    if(existing) existing.qty++;
-                    else emiCart.push({ ...product, qty: 1 });
-                    renderCart();
-                    searchInput.value = '';
-                    resultsDiv.classList.add('hidden');
-                }
-            }
-        });
-
-        const renderCart = () => {
-            const cartListContainer = modal.querySelector('#emi-cart-list');
-            if(emiCart.length === 0) {
-                cartListContainer.innerHTML = '<p class="text-center text-text-secondary p-4 text-sm">No items added.</p>';
-            } else {
-                cartListContainer.innerHTML = emiCart.map((item, idx) => `
-                    <div class="flex justify-between items-center bg-bg-primary p-2 rounded border border-border-color text-sm">
-                        <div>
-                            <div class="font-medium">${item.name}</div>
-                            <div class="text-xs text-text-secondary">${item.qty} x ${currencyUtils.format(item.price)}</div>
-                        </div>
-                        <button data-remove-idx="${idx}" class="text-red-400 hover:text-red-300 p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                    </div>
-                `).join('');
-            }
-            lucide.createIcons();
-            updateCalculator();
-        };
-
-        modal.querySelector('#emi-cart-list').addEventListener('click', e => {
-            const btn = e.target.closest('[data-remove-idx]');
-            if(btn) {
-                emiCart.splice(parseInt(btn.dataset.removeIdx), 1);
-                renderCart();
-            }
-        });
-
-        // --- Customer Selector ---
-        const customerDiv = modal.querySelector('#emi-customer-selector');
-        
-        const renderCustomerSelect = () => {
-            customerDiv.innerHTML = `
-                <select id="emi-customer-select" class="form-select w-full">
-                    <option value="">Select Customer...</option>
-                    ${firestoreData.customers.map(c => `<option value="${c.id}" ${selectedCustomer?.id === c.id ? 'selected' : ''}>${c.name} (${c.phone})</option>`).join('')}
-                </select>
-                <button id="add-new-customer-emi" class="btn btn-secondary p-2 shrink-0" title="Add Customer"><i data-lucide="plus" class="w-4 h-4 pointer-events-none"></i></button>
-            `;
-            lucide.createIcons();
-        };
-        renderCustomerSelect();
-
-        customerDiv.addEventListener('change', (e) => {
-            if (e.target.id === 'emi-customer-select') {
-                selectedCustomer = firestoreData.customers.find(c => c.id === e.target.value);
-                updateCalculator();
-            }
-        });
-
-        customerDiv.addEventListener('click', (e) => {
-            const btn = e.target.closest('#add-new-customer-emi');
-            if (btn) {
-                openCustomerModal(null, (newCustomer) => {
-                    if (!firestoreData.customers.find(c => c.id === newCustomer.id)) {
-                        firestoreData.customers.push(newCustomer);
-                    }
-                    selectedCustomer = newCustomer;
-                    renderCustomerSelect();
-                    updateCalculator();
-                });
-            }
-        });
-
-        ['emi-down-payment', 'emi-interest-rate', 'emi-tenure', 'emi-proc-fee'].forEach(id => {
-            modal.querySelector(`#${id}`).addEventListener('input', updateCalculator);
-        });
-
-        // --- Final Submission ---
-        modal.querySelector('#confirm-create-emi').addEventListener('click', async () => {
-            if(!selectedCustomer || emiCart.length === 0) return;
-            
-            const btn = modal.querySelector('#confirm-create-emi');
-            btn.disabled = true;
-            btn.innerHTML = `<div class="loader-sm"></div> Creating...`;
-
-            try {
-                await runTransaction(db, async (transaction) => {
-                    const cartTotal = emiCart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-                    
-                    // --- UPDATED: Convert inputs to Base Currency for Storage ---
-                    const downPaymentDisplay = parseFloat(modal.querySelector('#emi-down-payment').value) || 0;
-                    const downPayment = currencyUtils.convertToBase(downPaymentDisplay, appState.currentCurrency);
-                    
-                    const procFeeDisplay = parseFloat(modal.querySelector('#emi-proc-fee').value) || 0;
-                    const procFee = currencyUtils.convertToBase(procFeeDisplay, appState.currentCurrency);
-                    // --- END UPDATED ---
-
-                    const dpMethod = modal.querySelector('#emi-dp-method').value;
-                    const rate = parseFloat(modal.querySelector('#emi-interest-rate').value) || 0;
-                    const tenure = parseFloat(modal.querySelector('#emi-tenure').value) || 0;
-                    const startDateStr = modal.querySelector('#emi-start-date').value;
-                    const principal = cartTotal - downPayment;
-
-                    // --- NEW: Read Customer First ---
-                    const customerRef = doc(customersRef, selectedCustomer.id);
-                    const customerDoc = await transaction.get(customerRef);
-                    if (!customerDoc.exists()) throw "Customer not found";
-                    const currentCustomerDue = customerDoc.data().currentDue || 0;
-
-                    // 2. Generate Schedule & Calculate Total Interest (Moved up to calculate totals for invoice)
-                    const schedule = [];
-                    const monthlyRate = rate / 12 / 100;
-                    const emiAmount = (principal * monthlyRate * Math.pow(1 + monthlyRate, tenure)) / (Math.pow(1 + monthlyRate, tenure) - 1);
-                    
-                    let currentDate = new Date(startDateStr);
-                    let balance = principal;
-                    let totalScheduleInterest = 0;
-                    
-                    for(let i=1; i<=tenure; i++) {
-                        const interestPart = balance * monthlyRate;
-                        const principalPart = emiAmount - interestPart;
-                        balance -= principalPart;
-                        totalScheduleInterest += interestPart;
-                        
-                        schedule.push({
-                            installmentNo: i,
-                            dueDate: currentDate.toISOString(),
-                            amount: emiAmount,
-                            interestComponent: interestPart,
-                            principalComponent: principalPart,
-                            status: 'Pending',
-                            paidAmount: 0 
-                        });
-                        currentDate.setMonth(currentDate.getMonth() + 1);
-                    }
-
-                    // 1. Create Invoice (Revenue = Principal + Interest)
-                    // FIX: Total Invoice Amount should reflect total debt created (Principal + Interest)
-                    const invoiceTotal = cartTotal + totalScheduleInterest;
-                    const invoiceDue = principal + totalScheduleInterest;
-
-                    const invoiceRef = doc(invoicesRef);
-                    const invoiceData = {
-                        customerId: selectedCustomer.id,
-                        customerName: selectedCustomer.name,
-                        date: new Date().toISOString(),
-                        items: emiCart,
-                        totalInBaseCurrency: invoiceTotal, 
-                        subtotalInBaseCurrency: cartTotal,
-                        taxInBaseCurrency: 0, 
-                        discountInBaseCurrency: 0,
-                        dueAmount: invoiceDue, 
-                        status: 'EMI',
-                        cashierId: appState.session.currentUser.uid,
-                        cashierName: appState.session.currentUser.name,
-                        storeId: appState.session.storeId,
-                        currency: appState.currentCurrency,
-                        exchangeRate: currencyUtils.get().rate,
-                        isEMI: true,
-                        emiInterest: totalScheduleInterest, // Explicitly store interest for reports
-                        paymentDetails: downPayment > 0 ? [{
-                            amount: currencyUtils.convert(downPayment, appState.currentCurrency),
-                            date: new Date().toISOString(),
-                            method: dpMethod,
-                            notes: 'EMI Down Payment',
-                            isDownPayment: true
-                        }] : []
-                    };
-                    transaction.set(invoiceRef, invoiceData);
-
-
-                    // 3. Create EMI Schedule Doc
-                    const scheduleRef = doc(emiSchedulesRef);
-                    const scheduleData = {
-                        invoiceId: invoiceRef.id,
-                        customerId: selectedCustomer.id,
-                        customerName: selectedCustomer.name,
-                        productSummary: emiCart.map(i => i.name).join(', '),
-                        totalPrincipal: principal,
-                        totalInterest: totalScheduleInterest,
-                        interestRate: rate,
-                        tenureMonths: tenure,
-                        downPayment: downPayment,
-                        processingFee: procFee,
-                        emiAmount: emiAmount,
-                        remainingPrincipal: principal,
-                        remainingInterest: totalScheduleInterest,
-                        startDate: startDateStr,
-                        schedule: schedule,
-                        status: 'Active',
-                        createdAt: new Date().toISOString()
-                    };
-                    transaction.set(scheduleRef, scheduleData);
-
-                    // 4. Inventory
-                    emiCart.forEach(item => {
-                        if (item.productType === 'physical') {
-                            const productRef = doc(productsRef, item.id);
-                            transaction.update(productRef, { 
-                                stock: increment(-item.qty),
-                                sales: increment(item.qty)
-                            });
-                        }
-                    });
-                    
-                    // 5. Audit
-                    const logRef = doc(auditLogRef);
-                    transaction.set(logRef, {
-                        type: 'emi_creation',
-                        timestamp: new Date().toISOString(),
-                        details: `Created EMI for ${selectedCustomer.name}. Loan: ${currencyUtils.format(principal)}. DP: ${currencyUtils.format(downPayment)}`,
-                        user: { id: appState.session.currentUser.uid, name: appState.session.currentUser.name }
-                    });
-
-                    // --- CORRECT LOGIC: Dashboard "Receivables" must include Interest ---
-                    // Revenue (Invoice) = 6000
-                    // Customer Due = 6000 (Principal) + 211.74 (Interest) = 6211.74
-                    const totalLoanPayable = principal + totalScheduleInterest;
-                    transaction.update(customerRef, {
-                        currentDue: currentCustomerDue + totalLoanPayable
-                    });
-                });
-
-                showToast('EMI Sale created successfully!', 'success');
-                closeModal(modal);
-                const activeTab = appState.tabs.find(t => t.id === appState.activeTabId);
-                if(activeTab?.viewType === 'emi-sales') initEMI(document.querySelector('.view-pane'));
-
-            } catch (error) {
-                console.error("EMI Creation Failed:", error);
-                showToast(`Failed to create EMI: ${error.message}`, 'error');
-                btn.disabled = false;
-                btn.textContent = 'Confirm & Create Sale';
-            }
-        });
-    }
-
-    function openEMIDetailsModal(scheduleId) {
-        // ... (This function remains unchanged)
-        const schedule = firestoreData.emiSchedules.find(s => s.id === scheduleId);
-        if(!schedule) return;
-
-        // Calc Helpers
-        const paidInstallments = schedule.schedule.filter(s => s.status === 'Paid').length;
-        const nextDue = schedule.schedule.find(s => s.status === 'Pending' || s.status === 'Partial');
-
-        const content = `
-            <div class="space-y-6">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <h2 class="text-2xl font-bold text-text-primary">EMI Details</h2>
-                        <p class="text-sm text-text-secondary font-mono">${schedule.id}</p>
-                    </div>
-                    <div class="flex flex-col items-end gap-2">
-                        <span class="px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 font-bold text-sm uppercase">${schedule.status}</span>
-                        ${schedule.status === 'Active' ? `<button id="settle-loan-btn" class="text-xs text-accent hover:underline">Settle Loan Early</button>` : ''}
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div class="p-3 bg-bg-tertiary rounded-lg">
-                        <p class="text-xs text-text-secondary">Customer</p>
-                        <p class="font-medium">${schedule.customerName}</p>
-                    </div>
-                    <div class="p-3 bg-bg-tertiary rounded-lg">
-                        <p class="text-xs text-text-secondary">Monthly Amount</p>
-                        <p class="font-mono font-bold text-accent">${currencyUtils.format(schedule.emiAmount)}</p>
-                    </div>
-                    <div class="p-3 bg-bg-tertiary rounded-lg">
-                        <p class="text-xs text-text-secondary">Progress</p>
-                        <p class="font-medium">${paidInstallments} / ${schedule.tenureMonths}</p>
-                    </div>
-                    <div class="p-3 bg-bg-tertiary rounded-lg">
-                        <p class="text-xs text-text-secondary">Remaining Principal</p>
-                        <p class="font-mono font-bold text-text-primary">${currencyUtils.format(schedule.remainingPrincipal)}</p>
-                    </div>
-                </div>
-
-                <div class="border border-border-color rounded-xl overflow-hidden">
-                    <table class="table-pro">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Due Date</th>
-                                <th>Amount</th>
-                                <th>Paid</th>
-                                <th>Status</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody class="text-sm">
-                            ${schedule.schedule.map((p, idx) => {
-                                const isPaid = p.status === 'Paid';
-                                const isPartial = p.status === 'Partial';
-                                return `
-                                <tr class="${isPaid ? 'bg-green-500/5' : ''}">
-                                    <td>${p.installmentNo}</td>
-                                    <td>${new Date(p.dueDate).toLocaleDateString()}</td>
-                                    <td class="font-mono">${currencyUtils.format(p.amount)}</td>
-                                    <td class="font-mono ${isPartial ? 'text-yellow-400 font-bold' : ''}">
-                                        ${currencyUtils.format(p.paidAmount || 0)}
-                                    </td>
-                                    <td>
-                                        <span class="${isPaid ? 'text-green-400' : (new Date(p.dueDate) < new Date() && !isPaid ? 'text-red-400 font-bold' : (isPartial ? 'text-yellow-400' : 'text-text-secondary'))}">
-                                            ${p.status}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        ${!isPaid && schedule.status === 'Active' ? `
-                                            <button data-action="pay-installment-modal" data-schedule-id="${schedule.id}" data-index="${idx}" class="btn btn-primary btn-xs">
-                                                Pay
-                                            </button>` 
-                                        : (p.paidDate ? `<span class="text-xs text-text-secondary">Pd: ${new Date(p.paidDate).toLocaleDateString()}</span>` : '-')}
-                                        <button data-action="add-note" data-index="${idx}" class="text-text-secondary hover:text-accent ml-2" title="Add Note/Penalty"><i data-lucide="message-square" class="w-3 h-3"></i></button>
-                                    </td>
-                                </tr>
-                            `;
-                            }).join('')}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        `;
-
-        const footer = `<button data-action="close-modal" class="btn btn-secondary">Close</button>`;
-        const modal = showModal('Manage EMI', content, footer, { size: 'max-w-4xl' });
-
-        // --- Handle Settle Loan ---
-        const settleBtn = modal.querySelector('#settle-loan-btn');
-        if(settleBtn) {
-            settleBtn.addEventListener('click', () => {
-                const amountToPay = schedule.remainingPrincipal;
-                const settleModal = showModal(
-                    'Settle Loan Early',
-                    `<p>Foreclosing loan for <strong>${schedule.customerName}</strong>.</p>
-                     <p class="mt-2">Pay Remaining Principal: <strong class="text-xl text-accent font-mono">${currencyUtils.format(amountToPay)}</strong></p>
-                     <p class="text-sm text-text-secondary">Future interest will be waived.</p>
-                     <div class="mt-4">
-                        <label class="block text-sm mb-1">Payment Method</label>
-                        <select id="settle-method" class="form-select w-full">
-                            <option value="Cash">Cash</option>
-                            <option value="Card">Card</option>
-                            <option value="Mobile Banking">M-Bank</option>
-                        </select>
-                     </div>
-                    `,
-                    `<button data-action="close-modal" class="btn btn-secondary">Cancel</button>
-                     <button id="confirm-settle" class="btn btn-success text-white">Confirm Payment & Close Loan</button>`
-                );
-                
-                settleModal.querySelector('#confirm-settle').addEventListener('click', async () => {
-                    // Logic to update Invoice (add payment), set schedule to Completed, set remaining installments to Waived
-                    closeModal(settleModal);
-                    closeModal(modal);
-                    await processSettlement(schedule, amountToPay, settleModal.querySelector('#settle-method').value);
-                });
-            });
-        }
-
-        // --- Handle Installment Payment Click ---
-        modal.addEventListener('click', async e => {
-            const btn = e.target.closest('[data-action="pay-installment-modal"]');
-            if(btn) {
-                const index = parseInt(btn.dataset.index);
-                const installment = schedule.schedule[index];
-                const dueBase = installment.amount - (installment.paidAmount || 0); // This is in Base Currency
-
-                // --- NEW: Convert Due to Display Currency ---
-                const dueDisplay = currencyUtils.convert(dueBase, appState.currentCurrency);
-                // --- END NEW ---
-
-                const payModal = showModal(
-                    'Receive Installment',
-                    `<p>Installment #${installment.installmentNo}</p>
-                     <div class="my-4 p-3 bg-bg-tertiary rounded border border-border-color">
-                        <div class="flex justify-between text-sm"><span>Total Installment:</span> <span class="font-mono">${currencyUtils.format(installment.amount)}</span></div>
-                        <div class="flex justify-between text-sm"><span>Already Paid:</span> <span class="font-mono text-yellow-400">${currencyUtils.format(installment.paidAmount || 0)}</span></div>
-                        <div class="flex justify-between font-bold text-lg mt-2 pt-2 border-t border-border-color"><span>Due Now:</span> <span class="font-mono text-accent">${currencyUtils.format(dueBase)}</span></div>
-                     </div>
-                     <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm mb-1">Amount Paying (${appState.currentCurrency})</label>
-                            <!-- UPDATED: Pre-fill with formatted display currency value -->
-                            <input type="number" id="pay-amount" value="${dueDisplay.toFixed(2)}" class="form-input w-full font-mono">
-                        </div>
-                        <div>
-                            <label class="block text-sm mb-1">Method</label>
-                            <select id="pay-method" class="form-select w-full">
-                                <option value="Cash">Cash</option>
-                                <option value="Card">Card</option>
-                                <option value="Mobile Banking">M-Bank</option>
-                            </select>
-                        </div>
-                     </div>`,
-                    `<button data-action="close-modal" class="btn btn-secondary">Cancel</button>
-                     <button id="confirm-pay-installment" class="btn btn-primary">Receive Payment</button>`
-                );
-
-                payModal.querySelector('#confirm-pay-installment').addEventListener('click', async () => {
-                    // --- NEW: Read input in Display Currency and convert to Base ---
-                    const payAmtDisplay = parseFloat(payModal.querySelector('#pay-amount').value);
-                    const payAmtBase = currencyUtils.convertToBase(payAmtDisplay, appState.currentCurrency);
-                    // --- END NEW ---
-
-                    const method = payModal.querySelector('#pay-method').value;
-                    
-                    if(isNaN(payAmtBase) || payAmtBase <= 0) { showToast('Invalid Amount', 'error'); return; }
-                    if(payAmtBase > dueBase + 0.01) { showToast('Amount exceeds due value.', 'error'); return; }
-
-                    closeModal(payModal);
-                    closeModal(modal);
-                    await processInstallmentPayment(schedule, index, payAmtBase, method);
-                });
-            }
-            
-            // Note logic placeholder
-            if (e.target.closest('[data-action="add-note"]')) {
-                showToast("Note feature coming in next update.", "info");
-            }
-        });
-    }
-
-    // --- Helper: Process Installment ---
-    async function processInstallmentPayment(schedule, index, amount, method) {
-        showToast('Processing payment...', 'info');
-        try {
-            await runTransaction(db, async (transaction) => {
-                // 1. Read fresh schedule
-                const schedRef = doc(emiSchedulesRef, schedule.id);
-                const schedDoc = await transaction.get(schedRef);
-                if (!schedDoc.exists()) throw "Schedule not found";
-                const freshSched = schedDoc.data();
-                
-                // 2. Read Invoice
-                const invoiceRef = doc(invoicesRef, freshSched.invoiceId);
-                const invoiceDoc = await transaction.get(invoiceRef);
-                if (!invoiceDoc.exists()) throw "Linked Invoice not found";
-                const invoiceData = invoiceDoc.data();
-
-                // --- NEW: Read Customer ---
-                const customerRef = doc(customersRef, freshSched.customerId);
-                const customerDoc = await transaction.get(customerRef);
-                if (!customerDoc.exists()) throw "Customer not found";
-                const customerData = customerDoc.data();
-
-                // 3. Update Schedule Logic
-                const install = freshSched.schedule[index];
-                const newPaidAmount = (install.paidAmount || 0) + amount;
-                
-                // Determine Status
-                let newStatus = 'Partial';
-                if (Math.abs(newPaidAmount - install.amount) < 0.01) newStatus = 'Paid';
-                
-                install.paidAmount = newPaidAmount;
-                install.status = newStatus;
-                if(newStatus === 'Paid') install.paidDate = new Date().toISOString();
-
-                // Check if all paid
-                const allPaid = freshSched.schedule.every(s => s.status === 'Paid');
-                if (allPaid) freshSched.status = 'Completed';
-
-                let interestCovered = Math.min(amount, Math.max(0, install.interestComponent)); 
-                let principalCovered = Math.max(0, amount - interestCovered);
-                
-                freshSched.remainingPrincipal = Math.max(0, freshSched.remainingPrincipal - principalCovered);
-                freshSched.remainingInterest = Math.max(0, freshSched.remainingInterest - interestCovered);
-                
-                freshSched.lastPaymentDate = new Date().toISOString();
-
-                transaction.update(schedRef, freshSched);
-
-                // 4. Update Invoice (Financial Integrity)
-                // Append to paymentDetails
-                const newPayment = {
-                    amount: currencyUtils.convert(amount, appState.currentCurrency),
-                    date: new Date().toISOString(),
-                    method: method,
-                    notes: `EMI Installment #${install.installmentNo} (${newStatus})`,
-                    isEMIPayment: true,
-                    scheduleId: schedule.id
-                };
-                
-                // Invoice Due only tracks Principal
-                const newInvoiceDue = Math.max(0, invoiceData.dueAmount - principalCovered); 
-                
-                transaction.update(invoiceRef, {
-                    dueAmount: newInvoiceDue,
-                    paymentDetails: [...(invoiceData.paymentDetails || []), newPayment],
-                    status: newInvoiceDue < 0.01 ? 'Paid' : 'EMI'
-                });
-
-                // --- CRITICAL FIX: Update Customer Due ---
-                // Since we added (Principal + Interest) to Due on creation,
-                // we simply subtract the *full payment amount* here.
-                const newCustomerDue = Math.max(0, (customerData.currentDue || 0) - amount);
-                transaction.update(customerRef, { currentDue: newCustomerDue });
-
-                // 5. Audit
-                const logRef = doc(auditLogRef);
-                transaction.set(logRef, {
-                    type: 'emi_payment',
-                    timestamp: new Date().toISOString(),
-                    details: `Received ${currencyUtils.format(amount)} for EMI ${schedule.id} #${install.installmentNo}`,
-                    user: { id: appState.session.currentUser.uid, name: appState.session.currentUser.name }
-                });
-            });
-            showToast('Payment received successfully!', 'success');
-            // Refresh
-            const activeTab = appState.tabs.find(t => t.id === appState.activeTabId);
-            if(activeTab?.viewType === 'emi-sales') initEMI(document.querySelector('.view-pane'));
-        } catch (err) {
-            console.error(err);
-            showToast('Transaction failed.', 'error');
-        }
-    }
-
-    // --- Helper: Process Settlement ---
-    async function processSettlement(schedule, amount, method) {
-        showToast('Settling loan...', 'info');
-        try {
-            await runTransaction(db, async (transaction) => {
-                const schedRef = doc(emiSchedulesRef, schedule.id);
-                const invoiceRef = doc(invoicesRef, schedule.invoiceId);
-                const invoiceDoc = await transaction.get(invoiceRef);
-                const invoiceData = invoiceDoc.data();
-
-                // --- NEW: Read Customer ---
-                const customerRef = doc(customersRef, schedule.customerId);
-                const customerDoc = await transaction.get(customerRef);
-                if (!customerDoc.exists()) throw "Customer not found";
-                const customerData = customerDoc.data();
-
-                // Update Schedule
-                const updatedScheduleArr = schedule.schedule.map(s => {
-                    if(s.status !== 'Paid') return { ...s, status: 'Waived', notes: 'Loan Settled Early' };
-                    return s;
-                });
-
-                transaction.update(schedRef, {
-                    schedule: updatedScheduleArr,
-                    status: 'Settled',
-                    remainingPrincipal: 0,
-                    remainingInterest: 0,
-                    settledDate: new Date().toISOString()
-                });
-
-                // Update Invoice
-                const newPayment = {
-                    amount: currencyUtils.convert(amount, appState.currentCurrency),
-                    date: new Date().toISOString(),
-                    method: method,
-                    notes: `Early Settlement for EMI ${schedule.id}`,
-                    isEMISettlement: true
-                };
-                
-                // When settling, we assume the invoice due amount becomes 0
-                transaction.update(invoiceRef, {
-                    dueAmount: 0,
-                    paymentDetails: [...(invoiceData.paymentDetails || []), newPayment],
-                    status: 'Paid',
-                    notes: (invoiceData.notes || '') + '\n[Loan Settled Early]'
-                });
-
-                // --- CRITICAL FIX: Update Customer Due ---
-                // We reduce the customer due by the (Amount Paid + Interest Waived).
-                // 'amount' is the Principal being paid.
-                // 'schedule.remainingInterest' is the interest being waived.
-                // This clears the full outstanding balance for this loan from the customer profile.
-                const totalReduction = amount + (schedule.remainingInterest || 0);
-                const newCustomerDue = Math.max(0, (customerData.currentDue || 0) - totalReduction);
-                
-                transaction.update(customerRef, { currentDue: newCustomerDue });
-                
-                // Audit
-                const logRef = doc(auditLogRef);
-                transaction.set(logRef, {
-                    type: 'emi_settlement',
-                    timestamp: new Date().toISOString(),
-                    details: `Settled loan ${schedule.id} for ${currencyUtils.format(amount)}. Waived interest: ${currencyUtils.format(schedule.remainingInterest)}`,
-                    user: { id: appState.session.currentUser.uid, name: appState.session.currentUser.name }
-                });
-            });
-            showToast('Loan settled successfully.', 'success');
-            const activeTab = appState.tabs.find(t => t.id === appState.activeTabId);
-            if(activeTab?.viewType === 'emi-sales') initEMI(document.querySelector('.view-pane'));
-        } catch(err) {
-            console.error(err);
-            showToast('Settlement failed.', 'error');
-        }
-    }
-
-    window.addEventListener('resize', checkScreenSize);
-});
 </script>
+
+
 
 
 
