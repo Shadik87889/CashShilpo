@@ -80,13 +80,13 @@
       "আপনার মতো হাজারো সফল উদ্যোক্তার আস্থার প্রতীক",
 
     // Command Center
-    "THIS IS YOUR NEW": "এটিই আপনার ব্যবসার ",
+    "THIS IS YOUR NEW": "এটিই আপনার ব্যবসার",
     "COMMAND CENTER.": "ডিজিটাল পাওয়ারহাউজ।",
     "One clean, powerful dashboard to control your entire business. From sales to stock, it's all right here.":
       "একটি শক্তিশালী ড্যাশবোর্ড, যা দিয়ে পুরো ব্যবসা পরিচালনা করা এখন পানির মতো সহজ। বিক্রি থেকে স্টক—সবকিছুর হিসাব এখন চোখের সামনে।",
 
     // Pillars
-    "FEATURES BUILT FOR": "আপনার ব্যবসার অগ্রগতির জন্য ",
+    "FEATURES BUILT FOR": "আপনার ব্যবসার অগ্রগতির জন্য",
     "YOUR BUSINESS.": "তৈরি বিশেষ ফিচারসমূহ।",
     "CashShilpo is built on three core pillars designed to simplify your workday and accelerate your growth.":
       "ক্যাশশিল্পো এমনভাবে তৈরি করা হয়েছে যা আপনার প্রতিদিনের কাজকে করবে সহজ এবং ব্যবসার গতি বাড়াবে বহুগুণ।",
@@ -233,7 +233,8 @@
   };
 
   // --- State ---
-  let currentLang = localStorage.getItem(CONFIG.storageKey) || "en";
+  // MODIFIED: Changed default fallback from "en" to "bn"
+  let currentLang = localStorage.getItem(CONFIG.storageKey) || "bn";
   let observer = null;
 
   // --- 0. NEW: Inject Missing Features ---
