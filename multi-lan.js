@@ -199,10 +199,10 @@
     "This past month": "গত এক মাসে",
     "We served": "আমরা সেবা দিয়েছি",
     Clients: "সন্তুষ্ট ক্লায়েন্ট ",
-    "100+": "১০০+",
+    "100+": " ১০০+",
 
     // Testimonials
-    "MORE VOICES.": "গ্রাহকদের মতামত।",
+    "MORE VOICES.": "গ্রাহকদের মতামত। ",
     "MORE SUCCESS.": "সাফল্যের গল্প।",
     "See what other business owners are saying about CashShilpo.":
       "দেখুন সফল ব্যবসায়ীরা ক্যাশশিল্পো সম্পর্কে কী বলছেন।",
@@ -211,15 +211,13 @@
     "Owner, The Cozy Corner Cafe": "স্বত্বাধিকারী, দ্য কোজি কর্নার ক্যাফে",
     '"The multi-store sync is a lifesaver. I manage three locations from one dashboard. It\'s ridiculously simple."':
       '"মাল্টি-স্টোর ফিচারটা আমার জীবন সহজ করে দিয়েছে। এক ড্যাশবোর্ড থেকেই আমি তিনটি শোরুম চালাই। অবিশ্বাস্য রকম সহজ!"',
-    '"I love the offline mode. Our internet can be spotty, but we never miss a sale. It just syncs up when we\'re back."':
-      '"অফলাইন মোডটা দারুণ! ইন্টারনেট না থাকলেও আমাদের বিক্রি থামে না। নেট আসার সাথে সাথেই সব অটোমেটিক সিঙ্ক হয়ে যায়।"',
     '"The analytics are powerful. I finally understand what my best-selling products are and when my busiest hours hit."':
       '"এর রিপোর্টগুলো খুব কাজের। আমি এখন জানি আমার কোন পণ্যটি হট কেকের মতো বিক্রি হচ্ছে এবং কখন কাস্টমারের চাপ বেশি থাকে।"',
     '"24/7 support actually means 24/7. I had an issue at 2 AM, and someone helped me solve it immediately. Unbelievable."':
       '"২৪/৭ সাপোর্ট মানে সত্যিই ২৪/৭। রাত ২টায় সমস্যায় পড়েছিলাম এবং তারা সাথে সাথেই সমাধান করে দিয়েছে। অকল্পনীয় সার্ভিস!"',
 
     // Final CTA
-    "READY TO": "প্রস্তুত আপনার",
+    "READY TO": "প্রস্তুত আপনার ",
     GROW: "ব্যবসা",
     "YOUR BUSINESS?": "বড় করতে?",
     "Stop guessing. Start selling smarter with CashShilpo. Get started with a free, no-obligation demo today.":
