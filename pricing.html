@@ -24,6 +24,11 @@
       href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,400;1,500&display=swap"
       rel="stylesheet"
     />
+    <!-- Bangla Font for Translation -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
 
     <!-- Lucide Icons CDN -->
     <script src="https://unpkg.com/lucide@0.452.0/dist/umd/lucide.js"></script>
@@ -40,6 +45,12 @@
         color: #fff;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
+      }
+
+      /* Bangla Font Override */
+      body.lang-bn,
+      body.lang-bn * {
+        font-family: "Hind Siliguri", sans-serif !important;
       }
 
       .font-testimonial {
@@ -275,6 +286,49 @@
           );
         background-size: 20px 20px;
       }
+
+      /* Floating Toggle Button */
+      #lang-toggle-btn {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 9999;
+        background: #000;
+        color: var(--accent-color);
+        border: 2px solid var(--accent-color);
+        padding: 10px 20px;
+        border-radius: 50px;
+        font-family: "Inter", sans-serif;
+        font-weight: 700;
+        font-size: 14px;
+        cursor: pointer;
+        box-shadow: 0 4px 20px rgba(57, 255, 20, 0.3);
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      #lang-toggle-btn:hover {
+        background: var(--accent-color);
+        color: #000;
+        transform: scale(1.05);
+      }
+
+      /* New Feature Animation from JS */
+      .injected-feature {
+        animation: fadeInUp 0.5s ease-out forwards;
+      }
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
     </style>
   </head>
   <body class="bg-black text-white antialiased">
@@ -290,6 +344,7 @@
         >
           <img
             src="cashshilpo-official-logo.png"
+            onerror="this.src='https://lucide.dev/logo.svg'; this.style.filter='invert(1) sepia(1) saturate(5) hue-rotate(80deg)';"
             alt="CashShilpo Logo"
             class="w-12 h-12 object-contain"
           />
@@ -1483,6 +1538,106 @@
               </p>
             </div>
           </div>
+
+          <!-- Feature 23: System Language -->
+          <div class="feature-box flex items-start space-x-4 p-4 rounded-lg">
+            <div
+              class="bg-accent/10 h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0"
+            >
+              <i data-lucide="languages" class="h-6 w-6 text-accent"></i>
+            </div>
+            <div>
+              <h4 class="text-lg font-bold text-white">System Language</h4>
+              <p class="text-gray-400">
+                Toggle between English and Bengali interface.
+              </p>
+            </div>
+          </div>
+
+          <!-- Feature 24: Interface Theme -->
+          <div class="feature-box flex items-start space-x-4 p-4 rounded-lg">
+            <div
+              class="bg-accent/10 h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0"
+            >
+              <i data-lucide="palette" class="h-6 w-6 text-accent"></i>
+            </div>
+            <div>
+              <h4 class="text-lg font-bold text-white">Interface Theme</h4>
+              <p class="text-gray-400">
+                Select a look and feel for your workspace.
+              </p>
+            </div>
+          </div>
+
+          <!-- Feature 25: Visual Command Center -->
+          <div class="feature-box flex items-start space-x-4 p-4 rounded-lg">
+            <div
+              class="bg-accent/10 h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0"
+            >
+              <i data-lucide="app-window" class="h-6 w-6 text-accent"></i>
+            </div>
+            <div>
+              <h4 class="text-lg font-bold text-white">
+                Visual Command Center
+              </h4>
+              <p class="text-gray-400">
+                Personalize your CashShilpo experience.
+              </p>
+            </div>
+          </div>
+
+          <!-- Feature 26: POS Layout -->
+          <div class="feature-box flex items-start space-x-4 p-4 rounded-lg">
+            <div
+              class="bg-accent/10 h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0"
+            >
+              <i
+                data-lucide="layout-panel-left"
+                class="h-6 w-6 text-accent"
+              ></i>
+            </div>
+            <div>
+              <h4 class="text-lg font-bold text-white">POS Layout</h4>
+              <p class="text-gray-400">
+                Customize your point of sale screen for maximum speed and
+                comfort.
+              </p>
+            </div>
+          </div>
+
+          <!-- Feature 27: Advanced EMI System -->
+          <div class="feature-box flex items-start space-x-4 p-4 rounded-lg">
+            <div
+              class="bg-accent/10 h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0"
+            >
+              <i data-lucide="banknote" class="h-6 w-6 text-accent"></i>
+            </div>
+            <div>
+              <h4 class="text-lg font-bold text-white">Advanced EMI System</h4>
+              <p class="text-gray-400">
+                Offer flexible installment plans to customers and track EMI
+                payments automatically.
+              </p>
+            </div>
+          </div>
+
+          <!-- Feature 28: Smart Actions & Automation -->
+          <div class="feature-box flex items-start space-x-4 p-4 rounded-lg">
+            <div
+              class="bg-accent/10 h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0"
+            >
+              <i data-lucide="bot" class="h-6 w-6 text-accent"></i>
+            </div>
+            <div>
+              <h4 class="text-lg font-bold text-white">
+                Smart Actions & Automation
+              </h4>
+              <p class="text-gray-400">
+                Let AI handle the routine tasks. Enable smart automations to
+                boost efficiency and drive sales.
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -1918,6 +2073,372 @@
 
       // Initialize Lucide Icons
       lucide.createIcons();
+
+      /**
+       * CashShilpo Multi-Language & Feature Injection Engine
+       * * Features:
+       * 1. Injects 6 new premium features into the pricing comparison grid automatically.
+       * 2. Provides high-conversion, enthusiastic translations (English <-> Bangla).
+       * 3. Handles language toggling and persistence.
+       * 4. Normalizes text whitespace to ensure multi-line HTML paragraphs translate correctly.
+       */
+
+      (function () {
+        // --- Configuration ---
+        const CONFIG = {
+          storageKey: "cashshilpo_lang_pref",
+          accentColor: "#39ff14",
+        };
+
+        // --- Dictionary (English -> Bangla) ---
+        // Persuasive, marketing-focused translations.
+        const DICTIONARY = {
+          // --- PRICING PAGE SPECIFIC ---
+          "SIMPLE, TRANSPARENT": "সহজ, স্বচ্ছ এবং ",
+          "PRICING.": "সাশ্রয়ী প্রাইসিং।",
+          "Choose the plan that's right for your business. No hidden fees, no contracts. All plans start with a 7-day free trial.":
+            "আপনার ব্যবসার জন্য সেরা প্ল্যানটি বেছে নিন। কোনো গোপন চার্জ নেই, নেই কোনো জটিল শর্ত। ৭ দিনের ফ্রি ট্রায়াল দিয়ে শুরু করুন আজই।",
+          Monthly: "মাসিক",
+          Yearly: "বাৎসরিক",
+          "/ mo": "/ মাস",
+          "/ yr": "/ বছর",
+          Save: "সাশ্রয়",
+          Basic: "বেসিক",
+          "Perfect for new businesses and single-store owners.":
+            "নতুন ব্যবসা এবং একক দোকানের জন্য আদর্শ।",
+          Standard: "স্ট্যান্ডার্ড",
+          "Most Popular": "জনপ্রিয়",
+          "For growing businesses that need advanced features.":
+            "ক্রমবর্ধমান ব্যবসার জন্য, যেখানে প্রয়োজন অ্যাডভান্সড ফিচার।",
+          Premium: "প্রিমিয়াম",
+          "For established businesses scaling up their operations.":
+            "বড় পরিসরের ব্যবসার জন্য, যারা কার্যক্রম আরও বাড়াতে চান।",
+          Enterprise: "এন্টারপ্রাইজ",
+          "For large-scale operations with custom needs.":
+            "বৃহৎ প্রতিষ্ঠানের জন্য, যাদের প্রয়োজন কাস্টম সলিউশন।",
+          "Let's Talk": "কথা বলুন",
+          "Start 7-Day Trial": "৭ দিনের ফ্রি ট্রায়াল শুরু করুন",
+          "Start Your 7-Day Free Trial": "৭ দিনের জন্য ফ্রি ব্যবহার করুন",
+          "See All Features": "সব ফিচার দেখুন",
+          COMPLETE: "সম্পূর্ণ ",
+          "FEATURE BREAKDOWN.": "ফিচার তালিকা।",
+          "See all the powerful tools included in our software. Features vary by plan.":
+            "আমাদের সফটওয়্যারের শক্তিশালী টুলগুলো একনজরে দেখুন। প্ল্যান অনুযায়ী ফিচার ভিন্ন হতে পারে।",
+          "FREQUENTLY ASKED": "সচরাচর জিজ্ঞাসিত ",
+          "QUESTIONS.": "প্রশ্নসমূহ।",
+          "READY TO": "প্রস্তুত আপনার ",
+          GROW: "ব্যবসা",
+          "YOUR BUSINESS?": "বড় করতে?",
+          "Stop guessing. Start selling smarter with CashShilpo. Get started with a free, no-obligation demo today.":
+            "আর দেরি কেন? ক্যাশশিল্পোর সাথে আপনার ব্যবসার স্মার্ট যাত্রা শুরু করুন আজই। কোনো টাকা ছাড়াই ডেমো দেখুন।",
+
+          // --- PRICING FAQ ---
+          "Can I change my plan later?":
+            "আমি কি পরে প্ল্যান পরিবর্তন করতে পারবো?",
+          "Absolutely! You can upgrade or downgrade your plan at any time from your subscription management settings.":
+            "অবশ্যই! আপনি যেকোনো সময় সেটিংস থেকে প্ল্যান আপগ্রেড বা ডাউনগ্রেড করতে পারবেন।",
+          "Is there a long-term contract?": "কোনো দীর্ঘমেয়াদী চুক্তি আছে কি?",
+          "No. CashShilpo is a pay-as-you-go service. You can cancel your monthly subscription at any time, no questions asked.":
+            "না। ক্যাশশিল্পো একটি মাসিক সেবা। আপনি যেকোনো সময় সাবস্ক্রিপশন বাতিল করতে পারেন, কোনো প্রশ্ন করা হবে না।",
+          "What payment methods do you accept?":
+            "আপনারা কী কী পেমেন্ট মেথড গ্রহণ করেন?",
+          "We accept all major credit cards (Visa, Mastercard, American Express) as well as bKash, Nagad, and bank transfers. For Enterprise plans, we also support wire transfers.":
+            "আমরা বিকাশ, নগদ, ব্যাংক ট্রান্সফার এবং সব ধরণের ক্রেডিট কার্ড গ্রহণ করি।",
+          "What hardware is compatible?": "কী ধরণের হার্ডওয়্যার সাপোর্ট করে?",
+          "CashShilpo works with most standard POS hardware, including barcode scanners, receipt printers, and cash drawers that connect via USB or Bluetooth. You can run the software on any computer, tablet (iOS or Android), or smartphone.":
+            "ক্যাশশিল্পো সাধারণ যেকোনো বারকোড স্ক্যানার, প্রিন্টার এবং ক্যাশ ড্রয়ারের সাথে কাজ করে। এটি কম্পিউটার, ল্যাপটপ বা মোবাইলেও চালানো যায়।",
+          "What happens at the end of my 7-day trial?":
+            "৭ দিনের ট্রায়াল শেষ হলে কী হবে?",
+          "We will remind you before your trial ends. You can then choose a plan and enter your payment details to continue using CashShilpo. If you choose not to subscribe, your account will be paused, but you won't be charged.":
+            "ট্রায়াল শেষের আগে আমরা আপনাকে মনে করিয়ে দেব। এরপর পেমেন্ট করে সেবাটি চালিয়ে যেতে পারবেন। সাবস্ক্রাইব না করলে অ্যাকাউন্টটি পজ থাকবে, কোনো টাকা কাটা হবে না।",
+
+          // --- FEATURES (Pricing Breakdown) ---
+          "Analytics Dashboard": "অ্যানালিটিক্স ড্যাশবোর্ড",
+          "Your complete business overview with sales trends, top products, and profit metrics.":
+            "এক নজরে পুরো ব্যবসার হালচাল, লাভ-ক্ষতি এবং সেরা পণ্যের রিপোর্ট।",
+          "POS Terminal": "আধুনিক পজ টার্মিনাল",
+          "A blazingly fast checkout system with cart management and split payments.":
+            "দ্রুততম চেকআউট সিস্টেম, যা কাস্টমারের অপেক্ষার সময় কমিয়ে আনে শূন্যের কোঠায়।",
+          "Inventory Management": "ইনভেন্টরি ম্যানেজমেন্ট",
+          "Real-time stock tracking, variant management, and low-stock alerts.":
+            "স্টক চুরি বা হারিয়ে যাওয়া রোধ করুন রিয়েল-টাইম ট্র্যাকিং ও সিরিয়াল নম্বরের মাধ্যমে।",
+          "Invoice Management": "ইনভয়েস ম্যানেজমেন্ট",
+          "Create, track, and manage all your sales invoices, with support for voiding and returns.":
+            "প্রফেশনাল ইনভয়েস তৈরি করুন এবং রিটার্ন বা ভয়েড করুন কোনো ঝামেলা ছাড়াই।",
+          "Quotation Management": "কোটেশন ম্যানেজমেন্ট",
+          "Send professional price quotes to clients and convert them to invoices with one click.":
+            "ক্লায়েন্টদের প্রফেশনাল কোটেশন পাঠান এবং এক ক্লিকেই তা বিক্রয়ে রূপান্তর করুন।",
+          "Customer Management (CRM)": "কাস্টমার ম্যানেজমেন্ট (CRM)",
+          "Build customer profiles, track purchase history, manage credit, and handle due payments.":
+            "কাস্টমারের কেনাকাটার ইতিহাস ও বকেয়া বা বাকি খাতার হিসাব রাখুন খুব সহজে।",
+          "Reports & Analytics": "রিপোর্ট ও অ্যানালিটিক্স",
+          "Detailed reports on sales, profit & loss, inventory, staff, and customer behavior.":
+            "দিনশেষে বা মাসশেষে লাভের সঠিক হিসাব এবং কর্মীদের কাজের মূল্যায়ন রিপোর্ট।",
+          "Purchase Orders (PO)": "পারচেজ অর্ডার (PO)",
+          "Create and manage purchase orders to restock inventory and track incoming stock.":
+            "দোকানের মাল ফুরিয়ে যাওয়ার আগেই সাপ্লায়ারকে অর্ডার দিন এবং ইনকামিং স্টক ট্র্যাক করুন।",
+          "Supplier Management": "সাপ্লায়ার ম্যানেজমেন্ট",
+          "Manage your supplier database and track purchase history by supplier.":
+            "সকল সাপ্লায়ারের তালিকা ও তাদের সাথে লেনদেনের সঠিক ইতিহাস সংরক্ষণ করুন।",
+          "Expense Tracking": "খরচের হিসাব (Expense)",
+          "Log and categorize all your business expenses to keep a clear view of your cash flow.":
+            "দোকান ভাড়া থেকে চা-নাস্তা—ব্যবসায়ের প্রতিটি পয়সার খরচের হিসাব রাখুন স্বচ্ছভাবে।",
+          "Staff Management": "স্টাফ ম্যানেজমেন্ট",
+          "Manage staff accounts, invite new members, and track sales performance per employee.":
+            "কর্মীদের জন্য আলাদা একাউন্ট তৈরি করুন এবং কে কেমন বিক্রি করছে তা মনিটর করুন।",
+          "User Roles & Permissions": "নিরাপত্তা ও পারমিশন",
+          "Granular control over what each staff member can see and do, from voiding invoices to viewing profit.":
+            "কোন কর্মী কী দেখতে পারবে বা করতে পারবে, তার পূর্ণ নিয়ন্ত্রণ রাখুন নিজের হাতে।",
+          "Loyalty Program": "লয়ালটি প্রোগ্রাম",
+          "Retain customers with a built-in points and rewards system, complete with customizable tiers.":
+            "পয়েন্ট এবং রিওয়ার্ড দিয়ে কাস্টমারকে বারবার আপনার দোকানে ফিরিয়ে আনুন।",
+          "Payroll Management": "বেতন ও হাজিরা",
+          "Configure pay settings, define rates, and manage staff payroll runs directly within the system.":
+            "সিস্টেম থেকেই কর্মীদের বেতন, বোনাস এবং ওভারটাইমের হিসাব করুন নির্ভুলভাবে।",
+          "Warranty & Claims": "ওয়ারেন্টি ও ক্লেইম",
+          "Track product warranties tied to serial numbers and manage customer service claims.":
+            "ওয়ারেন্টি কার্ড হারানোর ভয় নেই; সিরিয়াল নম্বর দিয়েই ওয়ারেন্টি ট্র্যাক করুন।",
+          "Barcode Generator": "বারকোড জেনারেটর",
+          "Create and print custom barcode labels for your products individually or in bulk.":
+            "নিজের দোকানের নামে পণ্যের বারকোড তৈরি এবং প্রিন্ট করুন খুব সহজেই।",
+          "Product Attributes": "প্রোডাক্ট ভেরিয়েন্ট",
+          "Define custom attributes (e.g., Color, Size, Brand) to easily manage product variants.":
+            "রঙ, সাইজ বা ব্র্যান্ড অনুযায়ী পণ্যের ভেরিয়েন্ট সাজান এবং খুঁজে বের করুন।",
+          "Advanced Settings": "অ্যাডভান্সড সেটিংস",
+          "Customize currencies, tax rates, receipt templates, and business profiles.":
+            "আপনার পছন্দমতো ভ্যাট, কারেন্সি এবং রিসিটের ডিজাইন কাস্টমাইজ করুন।",
+          "AI Assistant": "স্মার্ট AI অ্যাসিস্ট্যান্ট",
+          "Use natural language to get insights, create products, and perform actions instantly.":
+            "মুখে বা লিখে কমান্ড দিন, AI আপনার হয়ে রিপোর্ট তৈরি বা কাজ করে দেবে মুহূর্তেই।",
+          "Multi-Store Management": "মাল্টি-স্টোর ম্যানেজমেন্ট",
+          "Manage multiple store locations, staff, and inventory from a single admin account.":
+            "এক জায়গায় বসেই দেশের যেকোনো প্রান্তে থাকা আপনার একাধিক শোরুম নিয়ন্ত্রণ করুন।",
+          Daybook: "দৈনিক খতিয়ান (Daybook)",
+          "View a daily summary of all sales, expenses, and cash flow in one place.":
+            "দিনশেষে ক্যাশ বক্সে কত টাকা থাকার কথা, তা এক ক্লিকেই মিলিয়ে নিন।",
+          "Subscription Management": "সাবস্ক্রিপশন ম্যানেজমেন্ট",
+          "Easily manage your plan, view usage, and upgrade your subscription.":
+            "আপনার প্যাকেজ বা প্ল্যান ম্যানেজ করুন এবং প্রয়োজন অনুযায়ী আপগ্রেড করুন।",
+
+          // --- NEW INJECTED FEATURES ---
+          "System Language": "সিস্টেম ল্যাঙ্গুয়েজ",
+          "Toggle between English and Bengali interface.":
+            "যখন খুশি ইংরেজি থেকে বাংলায় সুইচ করুন। আপনার ব্যবসার ভাষা হোক আপনার নিজের ভাষায়।",
+          "Interface Theme": "ইন্টারফেস থিম",
+          "Select a look and feel for your workspace.":
+            "আপনার পছন্দমতো ডার্ক বা লাইট থিম বেছে নিন। কাজের পরিবেশ হোক চোখের জন্য আরামদায়ক।",
+          "Visual Command Center": "ভিজুয়াল কমান্ড সেন্টার",
+          "Personalize your CashShilpo experience.":
+            "ক্যাশশিল্পোকে সাজিয়ে নিন একদম আপনার মনের মতো করে। এটি শুধু সফটওয়্যার নয়, আপনার পার্সোনাল অ্যাসিস্ট্যান্ট।",
+          "POS Layout": "POS লেআউট কাস্টমাইজেশন",
+          "Customize your point of sale screen for maximum speed and comfort.":
+            "বিক্রয় স্ক্রিনটি সাজান এমনভাবে, যেন কাস্টমার হ্যান্ডেল করা যায় চোখের পলকে।",
+          "Advanced EMI System": "অ্যাডভান্সড কিস্তি (EMI) সুবিধা",
+          "Offer flexible installment plans to customers and track EMI payments automatically.":
+            "কাস্টমারকে দিন সহজ কিস্তিতে পণ্য কেনার সুযোগ। সফটওয়্যারই রাখবে কিস্তির পাই-টু-পাই হিসাব।",
+          "Smart Actions & Automation": "স্মার্ট অটোমেশন ও AI",
+          "Let AI handle the routine tasks. Enable smart automations to boost efficiency and drive sales.":
+            "রুটিন কাজগুলো ছেড়ে দিন AI-এর হাতে। সময় বাঁচান, বিক্রি বাড়ান এবং ব্যবসায় আনুন আধুনিকতার ছোঁয়া।",
+
+          // --- GENERAL ---
+          Features: "ফিচারসমূহ",
+          Pricing: "প্যাকেজসমূহ",
+          Support: "হেল্পলাইন",
+          "Get Started": "যাত্রা শুরু করুন",
+          Company: "প্রতিষ্ঠান",
+          Legal: "আইনি তথ্যাদি",
+          Product: "প্রোডাক্ট",
+          "About Us": "আমাদের গল্প",
+          Blog: "ব্লগ",
+          Careers: "ক্যারিয়ার",
+          Contact: "যোগাযোগ করুন",
+          "Privacy Policy": "গোপনীয়তা নীতি",
+          "Terms of Service": "শর্তাবলী",
+          "Cookie Policy": "কুকি পলিসি",
+          "All rights reserved.": "সর্বস্বত্ব সংরক্ষিত।",
+          "Empowering businesses with simple, smart, and powerful POS solutions.":
+            "সহজ ও শক্তিশালী প্রযুক্তির ছোঁয়ায় আমরা বদলে দিচ্ছি ব্যবসার ধরণ।",
+        };
+
+        // --- State ---
+        let currentLang = localStorage.getItem(CONFIG.storageKey) || "en";
+        let observer = null;
+
+        // --- 0. REMOVED: Feature Injection (Now Hardcoded in HTML) ---
+
+        // --- 1. Load Resources (Handled in HTML Head now, but function kept for structure) ---
+        function loadResources() {
+          // Font and Styles already in head
+        }
+
+        // --- 2. Create UI ---
+        function createLanguageToggle() {
+          const btn = document.createElement("button");
+          btn.id = "lang-toggle-btn";
+          btn.innerHTML = getButtonContent(currentLang);
+
+          btn.addEventListener("click", () => {
+            toggleLanguage();
+          });
+
+          document.body.appendChild(btn);
+        }
+
+        function getButtonContent(lang) {
+          const globeIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-globe"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>`;
+          return lang === "en" ? `${globeIcon} বাং` : `${globeIcon} EN`;
+        }
+
+        // --- 3. Translation Engine ---
+        function escapeRegExp(string) {
+          return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        }
+
+        function translatePage(targetLang) {
+          const body = document.body;
+
+          if (targetLang === "bn") {
+            body.classList.add("lang-bn");
+            walkAndTranslate(body, "toBangla");
+          } else {
+            body.classList.remove("lang-bn");
+            walkAndTranslate(body, "toEnglish");
+          }
+
+          const btn = document.getElementById("lang-toggle-btn");
+          if (btn) btn.innerHTML = getButtonContent(targetLang);
+
+          localStorage.setItem(CONFIG.storageKey, targetLang);
+          currentLang = targetLang;
+        }
+
+        function walkAndTranslate(node, direction) {
+          if (node.nodeType === 3) {
+            // Text Node
+            handleTextNode(node, direction);
+            return;
+          }
+
+          if (
+            ["SCRIPT", "STYLE", "NOSCRIPT", "TEXTAREA"].includes(
+              node.tagName
+            ) ||
+            node.id === "lang-toggle-btn" ||
+            (node.classList && node.classList.contains("lucide"))
+          ) {
+            return;
+          }
+
+          if (node.tagName === "INPUT" || node.tagName === "TEXTAREA") {
+            handleAttribute(node, "placeholder", direction);
+          }
+
+          node.childNodes.forEach((child) =>
+            walkAndTranslate(child, direction)
+          );
+        }
+
+        function handleTextNode(node, direction) {
+          const rawText = node.nodeValue;
+          // Normalize text to match dictionary keys (collapses extra spaces/newlines)
+          const cleanKey = rawText.replace(/\s+/g, " ").trim();
+
+          if (!cleanKey) return;
+
+          if (direction === "toBangla") {
+            // Check for exact match first
+            if (DICTIONARY[cleanKey]) {
+              if (!node._originalText) node._originalText = rawText;
+              node.nodeValue = DICTIONARY[cleanKey];
+            }
+            // Handle Save Badge Dynamic Text (e.g. "Save 16.7%")
+            else if (cleanKey.startsWith("Save") && cleanKey.endsWith("%")) {
+              if (!node._originalText) node._originalText = rawText;
+              // "Save 20%" -> "সাশ্রয় ২০%"
+              // Simple replacement logic for this specific pattern
+              node.nodeValue = rawText.replace("Save", "সাশ্রয়");
+            }
+          } else {
+            if (node._originalText) {
+              node.nodeValue = node._originalText;
+              delete node._originalText;
+            }
+          }
+        }
+
+        function handleAttribute(element, attr, direction) {
+          const val = element.getAttribute(attr);
+          if (!val) return;
+          const cleanVal = val.trim();
+
+          if (direction === "toBangla") {
+            if (DICTIONARY[cleanVal]) {
+              if (!element[`_original_${attr}`])
+                element[`_original_${attr}`] = val;
+              element.setAttribute(attr, DICTIONARY[cleanVal]);
+            }
+          } else {
+            if (element[`_original_${attr}`]) {
+              element.setAttribute(attr, element[`_original_${attr}`]);
+              delete element[`_original_${attr}`];
+            }
+          }
+        }
+
+        function toggleLanguage() {
+          const newLang = currentLang === "en" ? "bn" : "en";
+          translatePage(newLang);
+        }
+
+        // --- 4. Dynamic Content Observer ---
+        function initObserver() {
+          observer = new MutationObserver((mutations) => {
+            if (currentLang === "en") return;
+
+            let shouldTranslate = false;
+            mutations.forEach((mutation) => {
+              if (
+                mutation.type === "childList" &&
+                mutation.addedNodes.length > 0
+              ) {
+                // Ignore if it's the language toggle itself
+                if (mutation.target.id !== "lang-toggle-btn") {
+                  shouldTranslate = true;
+                }
+              }
+              // Detect text changes (e.g. Price updates)
+              if (mutation.type === "characterData") {
+                // We need to be careful not to infinite loop here
+                // Usually characterData doesn't bubble like this
+              }
+            });
+
+            if (shouldTranslate) {
+              // Debounce slightly to avoid rapid reflows
+              if (observer.timer) clearTimeout(observer.timer);
+              observer.timer = setTimeout(() => {
+                walkAndTranslate(document.body, "toBangla");
+              }, 50);
+            }
+          });
+
+          observer.observe(document.body, { childList: true, subtree: true });
+        }
+
+        // --- Init ---
+        window.addEventListener("DOMContentLoaded", () => {
+          // injectNewFeatures(); // <-- REMOVED (Features are now static)
+          createLanguageToggle();
+
+          // Translate after injection if needed
+          if (currentLang === "bn") {
+            setTimeout(() => {
+              translatePage("bn");
+            }, 100);
+          }
+          initObserver();
+        });
+      })();
     </script>
   </body>
 </html>

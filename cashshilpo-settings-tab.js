@@ -1,18 +1,18 @@
 /**
  * CashShilpo Settings Tab Manager
  * Organizes the monolithic settings page into a clean tabbed interface.
- * Handles dynamic content from external modules (Theme, Visuals, Language).
+ * Now features the HyperVoice OS tab.
  */
 
 (function () {
   console.log("CashShilpo Settings Tabs: Module Loaded");
 
-  // Configuration for tabs
+  // Configuration for tabs - Permissions REMOVED, Voice OS ADDED
   const TABS = [
     { id: "general", label: "General", icon: "settings" },
     { id: "appearance", label: "Appearance", icon: "palette" },
+    { id: "voice", label: "Voice OS", icon: "mic-activity" }, // The new advanced tab
     { id: "automation", label: "Automation", icon: "zap" },
-    { id: "permissions", label: "Permissions", icon: "shield" },
   ];
 
   let currentTab = "general";
@@ -22,13 +22,13 @@
     const navContainer = document.createElement("div");
     navContainer.id = "settings-tab-nav";
     navContainer.className =
-      "flex border-b border-border-color mb-6 overflow-x-auto";
+      "flex border-b border-border-color mb-6 overflow-x-auto scrollbar-hide";
 
     TABS.forEach((tab) => {
       const btn = document.createElement("button");
-      btn.className = `px-6 py-3 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 whitespace-nowrap ${
+      btn.className = `px-6 py-3 text-sm font-medium border-b-2 transition-all duration-200 flex items-center gap-2 whitespace-nowrap ${
         currentTab === tab.id
-          ? "border-accent text-text-primary"
+          ? "border-accent text-text-primary bg-accent/5"
           : "border-transparent text-text-secondary hover:text-text-primary hover:bg-bg-tertiary/50"
       }`;
       btn.dataset.tabId = tab.id;
@@ -78,13 +78,12 @@
     if (!nav) return;
 
     Array.from(nav.children).forEach((btn) => {
-      if (btn.dataset.tabId === tabId) {
-        btn.className =
-          "px-6 py-3 text-sm font-medium border-b-2 border-accent text-text-primary flex items-center gap-2 whitespace-nowrap transition-colors";
-      } else {
-        btn.className =
-          "px-6 py-3 text-sm font-medium border-b-2 border-transparent text-text-secondary hover:text-text-primary hover:bg-bg-tertiary/50 flex items-center gap-2 whitespace-nowrap transition-colors";
-      }
+      const isActive = btn.dataset.tabId === tabId;
+      btn.className = `px-6 py-3 text-sm font-medium border-b-2 transition-all duration-200 flex items-center gap-2 whitespace-nowrap ${
+        isActive
+          ? "border-accent text-text-primary bg-accent/5"
+          : "border-transparent text-text-secondary hover:text-text-primary hover:bg-bg-tertiary/50"
+      }`;
     });
 
     // Update Content
@@ -109,7 +108,7 @@
 
     // 1. Create Layout Structure
     const header = settingsForm.querySelector("h1");
-    const containerDiv = settingsForm.querySelector(".space-y-8.max-w-4xl"); // The main content container from initSettings
+    const containerDiv = settingsForm.querySelector(".space-y-8.max-w-4xl");
 
     if (!header || !containerDiv) return;
 
@@ -122,10 +121,6 @@
     // Insert Content Wrapper
     header.parentNode.insertBefore(tabsContent, containerDiv);
 
-    // We will move elements OUT of containerDiv and into our tab containers
-    // We need to continuously monitor containerDiv because standard elements are there,
-    // but external scripts (themes/visuals) inject elements differently.
-
     // 2. Define Sorting Rules based on content text or IDs
     const sortElement = (element) => {
       // -- External Module IDs --
@@ -133,14 +128,12 @@
       if (element.id === "theme-selector-card") return "appearance";
       if (element.id === "visual-engine-panel") return "appearance";
 
-      // -- Content Based Sorting (looking at H2 text) --
+      // -- NEW: Route the Voice OS module --
+      if (element.id === "hyper-voice-os-panel") return "voice";
+
+      // -- Content Based Sorting --
       const title = element.querySelector("h2")?.innerText?.toLowerCase() || "";
 
-      if (
-        element.id === "permissions-container" ||
-        title.includes("role permissions")
-      )
-        return "permissions";
       if (
         element.id === "automations-container" ||
         title.includes("automation")
@@ -154,27 +147,37 @@
       return "general";
     };
 
-    // 3. Move Existing Elements (Standard Settings)
-    // Convert NodeList to Array to avoid live collection issues during iteration
+    // 3. Move Existing Elements
     Array.from(containerDiv.children).forEach((child) => {
-      // Preserve the Save button at the bottom of General, or create a global footer
-      // For now, we move the save button row to 'general' usually, but let's check
+      // Keep save button in General
       if (
         child.classList.contains("flex") &&
         child.querySelector('button[data-action="save-settings"]')
       ) {
-        // This is the save button row. Let's append it to General for now, or keep it visible?
-        // Better UX: Clone it or move it to a fixed footer?
-        // Simple approach: Move to General as it contains most inputs.
         document.getElementById("tab-content-general").appendChild(child);
         return;
       }
 
+      // If it was the old permissions container, we skip it (effectively removing it)
+      if (
+        child.id === "permissions-container" ||
+        child
+          .querySelector("h2")
+          ?.innerText?.toLowerCase()
+          .includes("role permissions")
+      ) {
+        // Do not append to any tab. This removes it from view.
+        return;
+      }
+
       const targetTab = sortElement(child);
-      document.getElementById(`tab-content-${targetTab}`).appendChild(child);
+      const targetContainer = document.getElementById(
+        `tab-content-${targetTab}`
+      );
+      if (targetContainer) targetContainer.appendChild(child);
     });
 
-    // 4. Hide the original container now that it's empty/processed
+    // 4. Hide the original container
     containerDiv.style.display = "none";
 
     // 5. Initial Icon Render
@@ -191,58 +194,47 @@
   }
 
   // --- CONTINUOUS MONITORING ---
-  // Because Theme/Visuals/Lang scripts inject elements asynchronously or on mutation,
-  // we need to catch them and move them to the correct tab immediately.
-
   const observer = new MutationObserver((mutations) => {
     const settingsForm = document.getElementById("settings-form");
 
-    // If settings view is not active, do nothing
     if (!settingsForm) return;
 
-    // 1. Initialize Tabs if not present
     if (!document.getElementById("settings-tab-nav")) {
       organizeContent(settingsForm);
     }
 
-    // 2. Watch for stray elements injected by other scripts into the main form
-    // These scripts typically append to settingsForm or insert after H1
-    const strayElements = [];
-
-    // Check direct children of settings-form that are NOT our tab structure
+    // Watch for injected elements
     Array.from(settingsForm.children).forEach((child) => {
-      if (child.tagName === "H1") return; // Header
-      if (child.id === "settings-tab-nav") return; // Our Nav
-      if (child.id === "settings-tab-content-wrapper") return; // Our Content
+      if (child.tagName === "H1" || child.tagName === "SCRIPT") return;
+      if (child.id === "settings-tab-nav") return;
+      if (child.id === "settings-tab-content-wrapper") return;
 
-      // If it's the original container (now hidden), ignore
       if (
         child.classList.contains("space-y-8") &&
         child.classList.contains("max-w-4xl")
       )
         return;
 
-      // Anything else is likely an injected module (Theme, Lang, Visuals)
-      strayElements.push(child);
-    });
-
-    strayElements.forEach((el) => {
       // Determine where it goes
-      let targetTab = "general"; // Default
+      let targetTab = "general";
 
       if (
-        el.id === "lang-toggle-card" ||
-        el.id === "theme-selector-card" ||
-        el.id === "visual-engine-panel"
+        child.id === "lang-toggle-card" ||
+        child.id === "theme-selector-card" ||
+        child.id === "visual-engine-panel"
       ) {
         targetTab = "appearance";
+      }
+
+      // Route Voice OS
+      if (child.id === "hyper-voice-os-panel") {
+        targetTab = "voice";
       }
 
       // Move it
       const container = document.getElementById(`tab-content-${targetTab}`);
       if (container) {
-        container.prepend(el); // Prepend to show at top of tab
-        // Ensure the tab is visible if content is added
+        container.prepend(child);
         const btn = document.querySelector(
           `button[data-tab-id="${targetTab}"]`
         );
@@ -251,13 +243,11 @@
     });
   });
 
-  // Start Observing
   observer.observe(document.body, {
     childList: true,
     subtree: true,
   });
 
-  // Handle initial load if settings is already open
   const initialSettings = document.getElementById("settings-form");
   if (initialSettings) {
     organizeContent(initialSettings);
