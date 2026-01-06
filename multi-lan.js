@@ -198,7 +198,7 @@
     // Stats Overlay
     "This past month": "গত এক মাসে",
     "We served": "আমরা সেবা দিয়েছি",
-    Clients: "সন্তুষ্ট ক্লায়েন্ট",
+    Clients: "সন্তুষ্ট ক্লায়েন্ট ",
     "100+": "১০০+",
 
     // Testimonials
