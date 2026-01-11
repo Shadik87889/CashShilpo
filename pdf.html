@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CashShilpo Premium Digital Card - Print Ready</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Oswald:wght@400;500;600&family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Rajdhani:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Inter", "sans-serif"],
+              display: ["Oswald", "sans-serif"],
+              tech: ["Rajdhani", "sans-serif"],
+              bengali: ["Hind Siliguri", "sans-serif"],
+              serif: ["Playfair Display", "serif"],
+            },
+            colors: {
+              gold: {
+                100: "#F9F1D8",
+                200: "#F0DEAA",
+                300: "#D4AF37",
+                400: "#C5A028",
+                500: "#B48E1D",
+                600: "#8A6D1B",
+                900: "#423205",
+              },
+              obsidian: "#0a0a0a",
+              charcoal: "#121212",
+            },
+            backgroundImage: {
+              "gold-gradient":
+                "linear-gradient(135deg, #D4AF37 0%, #F9F1D8 50%, #B48E1D 100%)",
+              "dark-metal": "linear-gradient(145deg, #1a1a1a, #0a0a0a)",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      body {
+        background-color: #1a1a1a;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+        padding: 40px;
+      }
+
+      /* Button Style */
+      .download-btn {
+        padding: 12px 24px;
+        background: linear-gradient(135deg, #d4af37, #b48e1d);
+        color: #000;
+        font-family: "Oswald", sans-serif;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+        transition: transform 0.2s, box-shadow 0.2s;
+        z-index: 100;
+      }
+      .download-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(212, 175, 55, 0.6);
+      }
+
+      /* Static Card Base */
+      .card {
+        width: 600px;
+        height: 350px; /* Standard Business Card Aspect Ratio roughly */
+        position: relative;
+        border-radius: 24px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5),
+          0 0 0 1px rgba(0, 0, 0, 1), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+        flex-shrink: 0;
+        /* Ensure background prints correctly */
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
+      .card-front {
+        background-color: #050505;
+      }
+      .card-front-bg {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 70%;
+        height: 100%;
+        /* Placeholder URL for demo purposes - replace with your local file */
+        background-image: url("ChatGPT Image Jan 10, 2026, 10_45_03 PM.png");
+        background-size: cover;
+        background-position: center;
+        -webkit-mask-image: linear-gradient(
+          to right,
+          transparent 0%,
+          black 60%
+        );
+        mask-image: linear-gradient(to right, transparent 0%, black 60%);
+        opacity: 0.6;
+        mix-blend-mode: luminosity;
+      }
+
+      .card-back {
+        background: #080808;
+      }
+      .back-image-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 50%;
+        height: 100%;
+        /* Placeholder URL - replace with your local file */
+        background-image: url("POS name.png");
+        background-size: cover;
+        background-position: center;
+        opacity: 0.4;
+        mask-image: linear-gradient(to right, black 50%, transparent 100%);
+        -webkit-mask-image: linear-gradient(
+          to right,
+          black 20%,
+          transparent 100%
+        );
+      }
+
+      .text-gold-foil {
+        color: transparent;
+        background: linear-gradient(
+          to bottom,
+          #cfc09f 22%,
+          #634f2c 24%,
+          #cfc09f 26%,
+          #cfc09f 27%,
+          #ffecb3 40%,
+          #3a2c0f 78%
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+        text-shadow: 0px 1px 0px rgba(255, 255, 255, 0.1);
+      }
+      .holo-logo {
+        filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.3));
+      }
+
+      .print-layout {
+        display: flex;
+        flex-direction: column; /* Stacked for PDF usually works better, or row */
+        gap: 40px;
+        align-items: center;
+        background: #1a1a1a; /* Needed for canvas capture to look right */
+        padding: 20px;
+      }
+
+      /* Print Specifics for Ctrl+P Fallback */
+      @media print {
+        body {
+          background-color: white;
+          padding: 0;
+        }
+        .download-btn {
+          display: none;
+        }
+        .print-layout {
+          gap: 10px;
+          padding: 0;
+          background: white;
+        }
+        .card {
+          box-shadow: none;
+          border: 1px solid #ccc;
+          margin-bottom: 20px;
+          page-break-inside: avoid;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <button onclick="generatePDF()" class="download-btn">
+      Download / Print PDF
+    </button>
+    <p style="color: #666; font-size: 12px; font-family: sans-serif;">
+      Note: For images to render, use a local server (VS Code Live Server) or
+      ensure images are public URLs.
+    </p>
+
+    <div class="print-layout" id="card-content">
+      <div class="card card-front relative p-10 flex flex-col justify-between">
+        <div class="card-front-bg"></div>
+        <div
+          class="absolute inset-0 bg-gradient-to-r from-black via-[#0a0a0a] to-transparent opacity-90"
+        ></div>
+        <div
+          class="absolute inset-0 opacity-[0.03] pointer-events-none"
+          style="
+            background-image: url('https://grainy-gradients.vercel.app/noise.svg');
+          "
+        ></div>
+
+        <div class="flex justify-between items-start relative z-20">
+          <div class="flex flex-col justify-center">
+            <p
+              class="text-[10px] font-bold text-gold-400 tracking-[0.2em] uppercase mb-1"
+            >
+              Modern POS
+            </p>
+            <div class="h-[2px] w-8 bg-gold-500"></div>
+          </div>
+          <div
+            class="w-12 h-12 rounded-lg bg-gradient-to-br from-gold-300 to-gold-600 p-[2px] shadow-lg shadow-gold-500/20 holo-logo"
+          >
+            <div
+              class="w-full h-full p-[1px] bg-obsidian rounded-lg flex items-center justify-center relative overflow-hidden"
+            >
+              <div class="absolute inset-0 bg-gold-400/10"></div>
+              <img
+                src="https://via.placeholder.com/50/D4AF37/000000?text=C"
+                alt="Logo"
+                class="w-8 h-8 object-contain"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="text-left mt-4 relative z-20">
+          <p
+            class="text-gray-400 text-xs tracking-wider font-medium mb-1 uppercase"
+          >
+            Business Management Software
+          </p>
+          <h1
+            class="text-5xl font-black tracking-tight text-white mb-2 font-display uppercase leading-none"
+          >
+            Cash<span class="text-gold-300 text-gold-foil">Shilpo</span>
+          </h1>
+          <p
+            class="text-lg font-bengali text-white tracking-wide font-light max-w-sm leading-relaxed mt-2"
+          >
+            আপনার ব্যবসার
+            <span class="text-gold-300 font-semibold">ডিজিটাল পার্টনার</span>
+          </p>
+        </div>
+
+        <div class="flex justify-between items-end relative z-20">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <div class="w-1.5 h-1.5 bg-gold-500 rounded-full"></div>
+              <p
+                class="text-[10px] text-gray-400 font-mono tracking-widest uppercase"
+              >
+                Visit Website
+              </p>
+            </div>
+            <p class="text-xl text-white font-tech tracking-wider">
+              www.cashshilpo.com
+            </p>
+          </div>
+          <div class="text-right">
+            <div
+              class="text-[10px] text-gray-500 uppercase tracking-widest mb-1"
+            >
+              Category
+            </div>
+            <div
+              class="text-gold-200 font-display font-bold text-lg tracking-wide"
+            >
+              BUSINESS SOLUTION
+            </div>
+          </div>
+        </div>
+        <div
+          class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-gold-900 via-gold-400 to-transparent opacity-50"
+        ></div>
+      </div>
+
+      <div class="card card-back relative flex overflow-hidden">
+        <div class="back-image-overlay"></div>
+        <div
+          class="absolute inset-0 bg-gradient-to-r from-black/60 via-black/90 to-[#080808] z-0"
+        ></div>
+
+        <div class="relative z-10 w-full h-full flex p-8">
+          <div class="w-5/12 flex flex-col justify-end">
+            <div class="mb-4">
+              <div
+                class="inline-flex items-center gap-2 px-3 py-1 bg-gold-900/40 border border-gold-500/30 rounded-full mb-3 backdrop-blur-sm"
+              >
+                <div
+                  class="w-2 h-2 rounded-full bg-green-500 animate-pulse"
+                ></div>
+                <span
+                  class="text-[10px] text-gold-200 uppercase tracking-wider font-bold"
+                  >POS Ready</span
+                >
+              </div>
+              <h4 class="text-white font-bengali text-xl leading-snug">
+                খাতা কলমের<br />ঝামেলা শেষ
+              </h4>
+            </div>
+          </div>
+
+          <div
+            class="w-7/12 flex flex-col justify-between pl-6 border-l border-white/10"
+          >
+            <div class="text-right">
+              <h3
+                class="text-xl font-bold text-white font-display tracking-wide"
+              >
+                Cash<span class="text-gold-400">Shilpo</span>
+              </h3>
+              <p class="text-[9px] text-gray-400 uppercase tracking-widest">
+                Digital Manager
+              </p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 my-2">
+              <div
+                class="bg-white/5 p-2 rounded border border-white/10 flex items-center gap-2"
+              >
+                <div class="p-1.5 bg-gold-500/20 rounded text-gold-400">
+                  <svg
+                    class="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 7h6m0 36v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                    ></path>
+                  </svg>
+                </div>
+                <div>
+                  <p class="text-[10px] text-gray-400 uppercase">হিসাব</p>
+                  <p class="text-xs text-white font-bold">Accounting</p>
+                </div>
+              </div>
+              <div
+                class="bg-white/5 p-2 rounded border border-white/10 flex items-center gap-2"
+              >
+                <div class="p-1.5 bg-gold-500/20 rounded text-gold-400">
+                  <svg
+                    class="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+                    ></path>
+                  </svg>
+                </div>
+                <div>
+                  <p class="text-[10px] text-gray-400 uppercase">স্টক</p>
+                  <p class="text-xs text-white font-bold">Stock</p>
+                </div>
+              </div>
+              <div
+                class="bg-white/5 p-2 rounded border border-white/10 flex items-center gap-2 col-span-2"
+              >
+                <div class="p-1.5 bg-gold-500/20 rounded text-gold-400">
+                  <svg
+                    class="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    ></path>
+                  </svg>
+                </div>
+                <div>
+                  <p class="text-[10px] text-gray-400 uppercase">বেচাকেনা</p>
+                  <p class="text-xs text-white font-bold">Sales & Profit</p>
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="pt-3 border-t border-white/10 flex justify-between items-center"
+            >
+              <div>
+                <p class="text-[8px] text-gold-400 uppercase tracking-wider">
+                  Hotline
+                </p>
+                <p class="text-sm text-white font-tech tracking-wider">
+                  01938-529096
+                </p>
+              </div>
+              <img
+                src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=www.cashshilpo.com&color=000000&bgcolor=FFFFFF"
+                alt="QR"
+                class="w-10 h-10 rounded bg-white p-0.5 object-cover"
+              />
+            </div>
+          </div>
+        </div>
+        <div
+          class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-gold-900 via-gold-400 to-gold-900 opacity-50"
+        ></div>
+      </div>
+    </div>
+
+    <script>
+      function generatePDF() {
+        const element = document.getElementById("card-content");
+
+        // Options for the PDF generation
+        const opt = {
+          margin: 0.2,
+          filename: "CashShilpo-Card-Print.pdf",
+          image: { type: "jpeg", quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true, backgroundColor: "#1a1a1a" },
+          jsPDF: { unit: "in", format: "letter", orientation: "landscape" },
+        };
+
+        // Execute
+        html2pdf().set(opt).from(element).save();
+      }
+    </script>
+  </body>
+</html>

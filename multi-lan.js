@@ -80,13 +80,13 @@
       "আপনার মতো হাজারো সফল উদ্যোক্তার আস্থার প্রতীক",
 
     // Command Center
-    "THIS IS YOUR NEW": "এটিই আপনার ব্যবসার",
+    "THIS IS YOUR NEW": "এটিই আপনার ব্যবসার ",
     "COMMAND CENTER.": "ডিজিটাল পাওয়ারহাউজ।",
     "One clean, powerful dashboard to control your entire business. From sales to stock, it's all right here.":
       "একটি শক্তিশালী ড্যাশবোর্ড, যা দিয়ে পুরো ব্যবসা পরিচালনা করা এখন পানির মতো সহজ। বিক্রি থেকে স্টক—সবকিছুর হিসাব এখন চোখের সামনে।",
 
     // Pillars
-    "FEATURES BUILT FOR": "আপনার ব্যবসার অগ্রগতির জন্য",
+    "FEATURES BUILT FOR": "আপনার ব্যবসার অগ্রগতির জন্য ",
     "YOUR BUSINESS.": "তৈরি বিশেষ ফিচারসমূহ।",
     "CashShilpo is built on three core pillars designed to simplify your workday and accelerate your growth.":
       "ক্যাশশিল্পো এমনভাবে তৈরি করা হয়েছে যা আপনার প্রতিদিনের কাজকে করবে সহজ এবং ব্যবসার গতি বাড়াবে বহুগুণ।",
@@ -141,7 +141,6 @@
     "Build customer profiles, track purchase history, manage credit limits, and handle due payments.":
       "কাস্টমারের কেনাকাটার ইতিহাস ও বকেয়া বা বাকি খাতার হিসাব রাখুন খুব সহজে।",
 
-    // Hidden Features (See More)
     "Reports & Analytics": "রিপোর্ট ও অ্যানালিটিক্স",
     "Detailed reports on sales, profit & loss, inventory, staff performance, and customer behavior.":
       "দিনশেষে বা মাসশেষে লাভের সঠিক হিসাব এবং কর্মীদের কাজের মূল্যায়ন রিপোর্ট।",
@@ -192,13 +191,13 @@
       "আপনার প্যাকেজ বা প্ল্যান ম্যানেজ করুন এবং প্রয়োজন অনুযায়ী আপগ্রেড করুন।",
 
     // Buttons
-    "See All 22 Features": "সবগুলো ফিচার দেখুন",
+    "See All 28 Features": "সবগুলো ফিচার দেখুন",
     "See Less Features": "ফিচারগুলো লুকান",
 
     // Stats Overlay
     "This past month": "গত এক মাসে",
-    "We served": "আমরা সেবা দিয়েছি",
-    Clients: "সন্তুষ্ট ক্লায়েন্ট ",
+    "We served": "আমরা সেবা দিয়েছি ",
+    Clients: "সন্তুষ্ট ক্লায়েন্ট",
     "100+": " ১০০+",
 
     // Testimonials

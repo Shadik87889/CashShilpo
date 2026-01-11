@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ultimate ID Card</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Share+Tech+Mono&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --neon-green: #39ff14;
+        --dark-bg: #050505;
+        --card-bg: #111111;
+      }
+
+      body {
+        background-color: var(--dark-bg);
+        overflow: hidden;
+        font-family: "Share Tech Mono", monospace;
+        cursor: crosshair;
+      }
+
+      .font-header {
+        font-family: "Orbitron", sans-serif;
+      }
+
+      /* 3D Scene Setup */
+      .scene {
+        perspective: 1200px;
+        transform-style: preserve-3d;
+      }
+
+      .card-container {
+        transform-style: preserve-3d;
+        will-change: transform;
+      }
+
+      /* Parallax Layers */
+      .layer {
+        transform-style: preserve-3d;
+      }
+
+      .layer-1 {
+        transform: translateZ(0px);
+      }
+      .layer-2 {
+        transform: translateZ(15px);
+      }
+      .layer-3 {
+        transform: translateZ(30px);
+      }
+      .layer-4 {
+        transform: translateZ(45px);
+      }
+
+      /* Complex Gradients & Textures */
+      .carbon-fiber {
+        background: linear-gradient(27deg, #151515 5px, transparent 5px) 0 5px,
+          linear-gradient(207deg, #151515 5px, transparent 5px) 10px 0px,
+          linear-gradient(27deg, #222 5px, transparent 5px) 0px 10px,
+          linear-gradient(207deg, #222 5px, transparent 5px) 10px 5px,
+          linear-gradient(90deg, #1b1b1b 10px, transparent 10px),
+          linear-gradient(
+            #1d1d1d 25%,
+            #1a1a1a 25%,
+            #1a1a1a 50%,
+            transparent 50%,
+            transparent 75%,
+            #242424 75%,
+            #242424
+          );
+        background-color: #131313;
+        background-size: 20px 20px;
+      }
+
+      .glass-panel {
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(5px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+      }
+
+      /* Neon Glows */
+      .text-neon {
+        color: var(--neon-green);
+        text-shadow: 0 0 10px rgba(57, 255, 20, 0.5),
+          0 0 20px rgba(57, 255, 20, 0.3);
+      }
+
+      .border-neon {
+        border-color: var(--neon-green);
+        box-shadow: 0 0 15px rgba(57, 255, 20, 0.2);
+      }
+
+      .neon-box-shadow {
+        box-shadow: 0 0 25px rgba(57, 255, 20, 0.15),
+          inset 0 0 10px rgba(57, 255, 20, 0.05);
+      }
+
+      /* Animations */
+      @keyframes scan {
+        0% {
+          top: 0%;
+          opacity: 0;
+        }
+        10% {
+          opacity: 1;
+        }
+        90% {
+          opacity: 1;
+        }
+        100% {
+          top: 100%;
+          opacity: 0;
+        }
+      }
+
+      /* .scanner-line {
+        background: linear-gradient(
+          to right,
+          transparent,
+          var(--neon-green),
+          transparent
+        );
+        height: 2px;
+        width: 100%;
+        position: absolute;
+        animation: scan 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        box-shadow: 0 0 10px var(--neon-green);
+      } */
+      /* 
+      @keyframes pulse {
+        0% {
+          opacity: 0.5;
+        }
+        50% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0.5;
+        }
+      } */
+
+      /* .pulse-dot {
+        animation: pulse 1.5s infinite;
+      } */
+
+      /* Holographic Shine */
+      .holo-sheen {
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0) 0%,
+          rgba(255, 255, 255, 0) 40%,
+          rgba(255, 255, 255, 0.2) 50%,
+          rgba(255, 255, 255, 0) 60%,
+          rgba(255, 255, 255, 0) 100%
+        );
+        mix-blend-mode: overlay;
+        pointer-events: none;
+        z-index: 100;
+      }
+
+      /* Glare effect */
+      .glare {
+        background: radial-gradient(
+          circle at 50% 50%,
+          rgba(255, 255, 255, 0.3) 0%,
+          rgba(255, 255, 255, 0) 60%
+        );
+        mix-blend-mode: soft-light;
+        pointer-events: none;
+      }
+
+      /* Micro-text texture */
+      .micro-text {
+        font-size: 6px;
+        opacity: 0.3;
+        line-height: 8px;
+        pointer-events: none;
+        white-space: nowrap;
+        overflow: hidden;
+      }
+
+      canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: -1;
+      }
+    </style>
+  </head>
+  <body
+    class="h-screen w-screen flex items-center justify-center overflow-hidden"
+  >
+    <!-- Background Particle System -->
+    <canvas id="bgCanvas"></canvas>
+
+    <!-- Main Scene -->
+    <div
+      class="scene w-full max-w-[500px] h-[300px] sm:h-[320px] relative px-4"
+    >
+      <!-- The Card Object -->
+      <div
+        id="card"
+        class="card-container w-full h-full relative rounded-2xl transition-transform duration-75 ease-out"
+      >
+        <!-- Card Body / Base -->
+        <div
+          class="absolute inset-0 bg-[#0f0f0f] rounded-2xl overflow-hidden shadow-2xl neon-box-shadow border border-gray-800"
+        >
+          <!-- Dynamic Glare Layer (Controlled by JS) -->
+          <div
+            id="glare"
+            class="glare absolute inset-[-100%] w-[300%] h-[300%] z-50 opacity-0 transition-opacity duration-300"
+          ></div>
+
+          <!-- Background Texture -->
+          <div class="absolute inset-0 carbon-fiber opacity-40 z-0"></div>
+          <div
+            class="absolute inset-0 bg-gradient-to-br from-gray-900 via-transparent to-black z-0"
+          ></div>
+
+          <!-- Decor Elements -->
+          <div
+            class="absolute top-0 right-0 w-[200px] h-[200px] bg-gradient-to-bl from-[rgba(57,255,20,0.1)] to-transparent rounded-bl-full z-0 pointer-events-none"
+          ></div>
+
+          <!-- Lanyard Slot Punch -->
+          <!-- <div
+            class="absolute top-2 left-1/2 -translate-x-1/2 w-16 h-3 bg-[#050505] rounded-full border border-gray-800 shadow-[inset_0_2px_4px_rgba(0,0,0,1)] z-40 flex items-center justify-center"
+          >
+            <div class="w-12 h-1 bg-black rounded-full opacity-50"></div>
+          </div> -->
+
+          <!-- CONTENT CONTAINER -->
+          <div
+            class="relative z-10 w-full h-full p-6 flex flex-col justify-between pt-8"
+          >
+            <!-- Header -->
+            <div class="flex justify-between items-start layer layer-2">
+              <div class="flex items-center gap-3">
+                <!-- Logo Icon -->
+                <div
+                  class="w-10 h-10 border border-[#39FF14] flex items-center justify-center relative overflow-hidden group"
+                >
+                  <div class="absolute inset-0 bg-[#39FF14] opacity-10"></div>
+                  <img src="cashshilpo-official-logo.png" alt="" />
+                  <!-- Corner ticks -->
+                  <div
+                    class="absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 border-[#39FF14]"
+                  ></div>
+                  <div
+                    class="absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 border-[#39FF14]"
+                  ></div>
+                </div>
+                <div>
+                  <h2
+                    class="text-white text-[10px] tracking-[0.2em] opacity-60 font-header"
+                  >
+                    MEMBER
+                  </h2>
+                  <h1
+                    class="text-white text-lg font-bold font-header tracking-wider"
+                  >
+                    CASHSHILPO
+                  </h1>
+                </div>
+              </div>
+              <div class="text-right">
+                <div
+                  class="bg-[#39FF14] text-black text-[10px] font-bold px-2 py-0.5 mb-1 inline-block"
+                >
+                  VERIFIED
+                </div>
+                <div class="text-[9px] text-[#39FF14]">
+                  SYSTEM ACTIVE
+                </div>
+              </div>
+            </div>
+
+            <!-- Main Content Area -->
+            <div class="flex gap-6 items-center mt-1">
+              <!-- Photo Frame -->
+              <div class="relative w-24 h-32 flex-shrink-0 layer layer-3">
+                <!-- Photo Container -->
+                <div
+                  class="w-full h-full border-2 border-gray-700 bg-gray-900 relative overflow-hidden group"
+                >
+                  <img
+                    src="cashshilpo-founder-mirror.jpg"
+                    alt="Shadik"
+                    class="w-full h-full object-cover"
+                  />
+
+                  <!-- Scanner Effect -->
+                  <div class="scanner-line z-20"></div>
+
+                  <!-- Grid Overlay -->
+                  <!-- <div
+                    class="absolute inset-0 bg-[url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAIklEQVQIW2NkQAKrVq36zwjjgzhhYWGMYAEYB8RmROaABADeOQ8CXl/xfgAAAABJRU5ErkJggg==')] opacity-30 z-10 pointer-events-none"
+                  ></div> -->
+
+                  <!-- Corner Accents -->
+                  <div
+                    class="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-[#39FF14] z-20"
+                  ></div>
+                  <div
+                    class="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-[#39FF14] z-20"
+                  ></div>
+                </div>
+
+                <!-- Status Indicators under photo -->
+                <div class="flex justify-between mt-2 w-full">
+                  <div
+                    class="w-1.5 h-1.5 rounded-full bg-[#39FF14] pulse-dot"
+                  ></div>
+                  <div
+                    class="w-1.5 h-1.5 rounded-full bg-[#39FF14] pulse-dot"
+                    style="animation-delay: 0.2s;"
+                  ></div>
+                  <div
+                    class="w-1.5 h-1.5 rounded-full bg-[#39FF14] pulse-dot"
+                    style="animation-delay: 0.4s;"
+                  ></div>
+                  <div class="w-1.5 h-1.5 rounded-full bg-gray-700"></div>
+                </div>
+              </div>
+
+              <!-- Data Fields -->
+              <div class="flex-grow space-y-2 layer layer-2">
+                <div>
+                  <label
+                    class="text-[9px] uppercase tracking-widest text-gray-500 block mb-0.5"
+                    >Name</label
+                  >
+                  <div
+                    class="text-white text-2xl font-header tracking-wider drop-shadow-md"
+                  >
+                    SHADIK
+                  </div>
+                </div>
+
+                <div>
+                  <label
+                    class="text-[9px] uppercase tracking-widest text-gray-500 block mb-0.5"
+                    >Specialization</label
+                  >
+                  <div
+                    class="text-[#39FF14] text-xs font-bold uppercase tracking-wide"
+                  >
+                    Founder, CEO & Chief Software Architect
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 gap-2 mt-1">
+                  <div>
+                    <label
+                      class="text-[8px] uppercase tracking-widest text-gray-500 block"
+                      >Comms / Mobile</label
+                    >
+                    <div class="text-gray-300 text-sm font-mono tracking-wide">
+                      +880 1750-087889
+                    </div>
+                  </div>
+                  <div>
+                    <label
+                      class="text-[8px] uppercase tracking-widest text-gray-500 block"
+                      >Net / Email</label
+                    >
+                    <div
+                      class="text-gray-300 text-[10px] font-mono tracking-wide"
+                    >
+                      shadikworld@gmail.com
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Footer -->
+            <div
+              class="mt-3 border-t border-gray-800 pt-2 flex justify-between items-end layer layer-4"
+            >
+              <div class="flex flex-col gap-1">
+                <!-- Barcode graphic -->
+                <div
+                  class="h-4 w-24 bg-contain bg-no-repeat opacity-60"
+                  style="
+                    background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMjAiPjxwYXRoIGZpbGw9IiMzOUZGMTQiIGQ9Ik0wIDBoMnYyMEgwem00IDBoMXYyMEg0em0zIDBoNHYyMEg3em02IDBoMnYyMEgxM3ptNCAwaDF2MjBIMTd6bTMgMGgzdjIwSDIwem01IDBoMXYyMEgyNXptMyAwaDJ2MjBIMjh6bTQgMGgxdjIwSDMyem0zIDBoMnYyMEgzNXptNCAwaDF2MjBIMzl6bTMgMGg1djIwSDQyem03IDBoMXYyMEg0OXptMyAwaTJ2MjBINTJ6bTQgMGgxdjIwSDU2em0zIDBoNHYyMEg1OXptNiAwaDJ2MjBINjV6bTQgMGgxdjIwSDY5em0zIDBoM3YyMEg3MnptNSAwaDF2MjBINzd6bTMgMGgydjIwSDgwem00IDBoMXYyMEg4NHptMyAwaDJ2MjhIODd6bTQgMGgxdjIwSDkxeiIvPjwvc3ZnPg==');
+                  "
+                ></div>
+                <div class="text-[8px] text-gray-600 tracking-[0.3em]">
+                  CASH_SHILPO
+                </div>
+              </div>
+
+              <!-- Web Address -->
+              <div class="text-right group">
+                <label
+                  class="text-[7px] uppercase tracking-[0.2em] text-gray-500 block mb-0.5"
+                  >SECURE_LINK</label
+                >
+                <a
+                  href="https://cashshilpo.com"
+                  target="_blank"
+                  class="text-[#39FF14] text-[10px] font-mono tracking-wide hover:text-white transition-colors cursor-pointer decoration-none border-b border-[#39FF14]/30 pb-0.5 block"
+                >
+                  www.cashshilpo.com
+                </a>
+              </div>
+            </div>
+
+            <!-- Decorative Background Text -->
+            <div
+              class="absolute bottom-2 right-2 text-[80px] font-black text-white opacity-[0.03] leading-none pointer-events-none select-none z-0 layer layer-1"
+            >
+              CS
+            </div>
+          </div>
+        </div>
+
+        <!-- Holographic Sheen Layer (Moves Opposite) -->
+        <div
+          id="holo"
+          class="holo-sheen absolute inset-0 rounded-2xl z-[60] opacity-0 transition-opacity duration-300"
+        ></div>
+      </div>
+    </div>
+
+    <!-- UI Overlay Controls -->
+    <div
+      class="fixed bottom-6 left-6 text-white/30 text-[10px] pointer-events-none font-mono"
+    >
+      <div>PHYSICS ENGINE: ACTIVE</div>
+      <div>GYROSCOPE: SIMULATED</div>
+      <div id="debug-coords">X: 0 | Y: 0</div>
+    </div>
+
+    <script>
+      // --- 1. Physics Engine for Card Tilt ---
+
+      const card = document.getElementById("card");
+      const glare = document.getElementById("glare");
+      const holo = document.getElementById("holo");
+      const debugCoords = document.getElementById("debug-coords");
+
+      // Physics variables
+      let mouseX = 0;
+      let mouseY = 0;
+      let cardX = 0; // Current tilt value
+      let cardY = 0;
+      let targetX = 0; // Target tilt value
+      let targetY = 0;
+      let velX = 0;
+      let velY = 0;
+
+      // Config
+      const STIFFNESS = 0.07; // Spring stiffness (higher = snaps back faster)
+      const DAMPING = 0.88; // Friction (lower = more slide)
+      const MAX_TILT = 20; // Max rotation degrees
+
+      document.addEventListener("mousemove", (e) => {
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+
+        // Normalize mouse position -1 to 1
+        mouseX = (e.clientX - w / 2) / (w / 2);
+        mouseY = (e.clientY - h / 2) / (h / 2);
+
+        // Set target rotation
+        targetX = mouseY * -MAX_TILT; // Inverted Y for intuitive tilt
+        targetY = mouseX * MAX_TILT;
+
+        // Glare/Holo Positioning
+        const rotX = (mouseY * -100).toFixed(2);
+        const rotY = (mouseX * 100).toFixed(2);
+
+        glare.style.opacity = "1";
+        glare.style.transform = `translate(${rotY}px, ${rotX}px)`;
+
+        holo.style.opacity = "0.5";
+        holo.style.backgroundPosition = `${50 + mouseX * 40}% ${
+          50 + mouseY * 40
+        }%`;
+      });
+
+      document.addEventListener("mouseleave", () => {
+        targetX = 0;
+        targetY = 0;
+        glare.style.opacity = "0";
+        holo.style.opacity = "0";
+      });
+
+      // Animation Loop
+      function animatePhysics() {
+        // Spring physics logic
+        const forceX = (targetX - cardX) * STIFFNESS;
+        const forceY = (targetY - cardY) * STIFFNESS;
+
+        velX += forceX;
+        velY += forceY;
+
+        velX *= DAMPING;
+        velY *= DAMPING;
+
+        cardX += velX;
+        cardY += velY;
+
+        // Apply Transform
+        card.style.transform = `rotateX(${cardX}deg) rotateY(${cardY}deg)`;
+
+        // Debug
+        debugCoords.innerText = `X: ${cardX.toFixed(1)} | Y: ${cardY.toFixed(
+          1
+        )}`;
+
+        requestAnimationFrame(animatePhysics);
+      }
+
+      // animatePhysics();
+
+      // --- 2. Background Particle System ---
+
+      const canvas = document.getElementById("bgCanvas");
+      const ctx = canvas.getContext("2d");
+
+      let width, height;
+      let particles = [];
+
+      function resize() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+      }
+
+      window.addEventListener("resize", resize);
+      resize();
+
+      class Particle {
+        constructor() {
+          this.reset();
+        }
+
+        reset() {
+          this.x = Math.random() * width;
+          this.y = Math.random() * height;
+          this.z = Math.random() * 2 + 0.5; // Depth factor
+          this.size = Math.random() * 1.5;
+          this.speedX = (Math.random() - 0.5) * 0.5;
+          this.speedY = (Math.random() - 0.5) * 0.5;
+          this.opacity = Math.random() * 0.5 + 0.1;
+          this.color = Math.random() > 0.9 ? "#39FF14" : "#ffffff"; // Occasional neon green particle
+        }
+
+        update() {
+          // Parallax movement based on mouse
+          const moveX = mouseX * 2 * this.z;
+          const moveY = mouseY * 2 * this.z;
+
+          this.x += this.speedX - moveX * 0.05;
+          this.y += this.speedY - moveY * 0.05;
+
+          // Wrap around screen
+          if (this.x > width) this.x = 0;
+          if (this.x < 0) this.x = width;
+          if (this.y > height) this.y = 0;
+          if (this.y < 0) this.y = height;
+        }
+
+        draw() {
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          ctx.fillStyle = this.color;
+          ctx.globalAlpha = this.opacity;
+          ctx.fill();
+        }
+      }
+
+      // Grid lines
+      function drawGrid() {
+        ctx.strokeStyle = "#39FF14";
+        ctx.lineWidth = 0.5;
+        ctx.globalAlpha = 0.03;
+
+        const gridSize = 50;
+        const offsetX = mouseX * 20; // Move grid with mouse
+        const offsetY = mouseY * 20;
+
+        for (let x = offsetX % gridSize; x < width; x += gridSize) {
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, height);
+          ctx.stroke();
+        }
+
+        for (let y = offsetY % gridSize; y < height; y += gridSize) {
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(width, y);
+          ctx.stroke();
+        }
+      }
+
+      // Init particles
+      for (let i = 0; i < 150; i++) {
+        particles.push(new Particle());
+      }
+
+      function animateCanvas() {
+        ctx.clearRect(0, 0, width, height);
+
+        drawGrid();
+
+        particles.forEach((p) => {
+          p.update();
+          p.draw();
+        });
+
+        // Connection lines for nearby particles
+        ctx.strokeStyle = "#39FF14";
+        ctx.globalAlpha = 0.05;
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist < 80) {
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.stroke();
+            }
+          }
+        }
+
+        requestAnimationFrame(animateCanvas);
+      }
+
+      animateCanvas();
+    </script>
+  </body>
+</html>
