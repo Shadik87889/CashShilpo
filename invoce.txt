@@ -1,0 +1,899 @@
+/**
+ * CashShilpo Premium Invoice Templates Library
+ * v2.1 - Fixes ReferenceError & Dynamic Data
+ * * Features:
+ * - 100% Light/Print-Friendly Themes
+ * - Full parity with 'Futuristic' logic (EMI, Returns, AI Recs, Warranty)
+ * - Dynamic Shop Details & Logos
+ */
+
+(function() {
+    console.log("Initializing Premium Light-Theme Templates...");
+
+    // --- Helpers ---
+    const formatCurrency = (amount, currencyCode = 'USD') => {
+        if (typeof window.currencyUtils !== 'undefined' && window.currencyUtils.format) {
+            return window.currencyUtils.format(amount, currencyCode);
+        }
+        return new Intl.NumberFormat('en-US', { style: 'currency', currency: currencyCode }).format(amount);
+    };
+
+    const formatDate = (dateString) => {
+        if (!dateString) return '';
+        return new Date(dateString).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+    };
+
+    // --- CSS Print Overrides for High Fidelity ---
+    const printStyleFix = document.createElement('style');
+    printStyleFix.innerHTML = `
+        @media print {
+            @page { margin: 0; size: auto; }
+            body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; background-color: white !important; }
+            #receipt-content { width: 100% !important; margin: 0 !important; box-shadow: none !important; border: none !important; }
+            /* Force background colors to print */
+            *[class*="bg-"] { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+        }
+    `;
+    document.head.appendChild(printStyleFix);
+
+    // --- Shared Data Extractor ---
+    // Extracts common detailed data for all templates to use
+    const extractInvoiceData = (invoice, paymentState) => {
+        const { storeInfo, products } = window.firestoreData || { storeInfo: {}, products: [] };
+        const { appState } = window;
+        const taxRate = (appState?.settings?.taxRate ?? 0);
+        const currency = invoice.currency || appState?.currentCurrency || 'USD';
+        
+        // Return Logic
+        const isReturn = invoice.invoiceType === 'return';
+        const title = isReturn ? 'CREDIT NOTE' : (invoice.isEMI ? 'EMI INVOICE' : 'TAX INVOICE');
+        const totalLabel = isReturn ? 'Credited Amount' : 'Grand Total';
+        
+        // Financials
+        const subtotal = invoice.subtotalInBaseCurrency;
+        const tax = invoice.taxInBaseCurrency;
+        const total = invoice.totalInBaseCurrency;
+        const due = invoice.dueAmount || 0;
+        
+        // Discounts - FIX APPLIED HERE
+        const discountDetails = invoice.persistentDiscountDetails || {};
+        const manualDiscount = invoice.manualDiscountInBase || 0;
+        
+        let discountLabel = 'Discount';
+        let discountAmount = discountDetails.amount || 0; // Fixed variable name from persistentDiscount to discountDetails
+        
+        if (discountAmount > 0 && discountDetails.best) {
+             if (discountDetails.best === discountDetails.staff) discountLabel = `Staff Disc (${discountDetails.staff}%)`;
+             else if (discountDetails.best === discountDetails.tier) discountLabel = `Tier Disc (${discountDetails.tier}%)`;
+        }
+
+        // Payments
+        const payments = paymentState ? paymentState.payments : invoice.paymentDetails || [];
+        const paidAmount = payments.reduce((sum, p) => sum + p.amount, 0);
+        const changeDue = paymentState ? paidAmount - paymentState.total : 0;
+
+        // Recommendations (AI)
+        let recommendations = '';
+        const purchasedIds = new Set(invoice.items.map(i => i.id));
+        const recs = products.filter(p => !p.parentSKU && (p.status || 'active') === 'active' && !purchasedIds.has(p.id))
+                             .sort((a, b) => (b.sales || 0) - (a.sales || 0)).slice(0, 1);
+        if (recs.length) recommendations = recs[0].name;
+
+        // EMI
+        let emiData = null;
+        if (invoice.isEMI && window.firestoreData.emiSchedules) {
+            emiData = window.firestoreData.emiSchedules.find(s => s.invoiceId === invoice.id);
+        }
+
+        return {
+            store: storeInfo,
+            currency,
+            isReturn,
+            title,
+            totalLabel,
+            subtotal,
+            tax,
+            total,
+            due,
+            discountLabel,
+            discountAmount,
+            manualDiscount,
+            payments,
+            paidAmount,
+            changeDue,
+            recommendations,
+            emiData,
+            taxRate
+        };
+    };
+
+    // --- TEMPLATES ---
+    const newTemplates = {
+        'modern': {
+            name: 'Futuristic (Default)',
+            preview: `<div class="p-2 bg-white border flex flex-col gap-1"><div class="h-2 w-1/3 bg-slate-800 rounded"></div><div class="h-1 w-full bg-slate-100"></div><div class="mt-auto h-4 w-full bg-slate-50 border-t border-slate-200"></div></div>`,
+            getBody: (invoice, paymentState) => {
+                const d = extractInvoiceData(invoice, paymentState);
+                
+                return `
+                <div id="receipt-content" class="bg-white text-slate-800 font-sans p-8 max-w-2xl mx-auto relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-500 to-cyan-400"></div>
+                    
+                    <!-- Header -->
+                    <div class="flex justify-between items-start mb-8 mt-4">
+                        <div>
+                            <div class="flex items-center gap-3 mb-2">
+                                <img src="${d.store.logoUrl}" class="w-10 h-10 rounded-lg object-cover bg-slate-50" alt="logo"/>
+                                <h1 class="text-2xl font-bold tracking-tight text-slate-900">${d.store.name}</h1>
+                            </div>
+                            <div class="text-xs text-slate-500 space-y-0.5">
+                                <p>${d.store.address}</p>
+                                <p>${d.store.contact} &bull; ${d.store.website}</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="inline-block px-3 py-1 bg-slate-100 rounded-full text-xs font-bold tracking-wider uppercase text-slate-600 mb-2">${d.title}</div>
+                            <p class="font-mono text-sm text-slate-400">#${invoice.id.slice(-8)}</p>
+                            <p class="text-xs text-slate-400 mt-1">${formatDate(invoice.date)}</p>
+                        </div>
+                    </div>
+
+                    <!-- Customer & Details -->
+                    <div class="flex justify-between p-4 bg-slate-50 rounded-xl mb-8 border border-slate-100">
+                        <div>
+                            <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-1">Billed To</p>
+                            <p class="font-semibold text-slate-900">${invoice.customerName}</p>
+                            ${invoice.customer ? `<p class="text-xs text-slate-500">${invoice.customer.phone || ''}</p>` : ''}
+                        </div>
+                        <div class="text-right">
+                             <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-1">Served By</p>
+                             <p class="font-medium text-slate-700 text-sm">${invoice.cashierName}</p>
+                        </div>
+                    </div>
+
+                    <!-- Items -->
+                    <table class="w-full text-sm mb-6">
+                        <thead class="text-xs text-slate-400 font-medium uppercase border-b border-slate-200">
+                            <tr><th class="py-2 text-left w-1/2">Item</th><th class="py-2 text-center">Qty</th><th class="py-2 text-right">Total</th></tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            ${invoice.items.map(item => `
+                            <tr>
+                                <td class="py-3">
+                                    <p class="font-semibold text-slate-700">${item.name}</p>
+                                    ${item.isSerialized ? `<span class="text-[10px] bg-amber-50 text-amber-600 px-1.5 py-0.5 rounded border border-amber-100">SN: ${item.serialNumber}</span>` : ''}
+                                </td>
+                                <td class="py-3 text-center text-slate-500">${item.qty}</td>
+                                <td class="py-3 text-right font-mono text-slate-700">${formatCurrency(item.price * item.qty, d.currency)}</td>
+                            </tr>`).join('')}
+                        </tbody>
+                    </table>
+
+                    <!-- Financials -->
+                    <div class="flex flex-col items-end gap-1 text-sm border-t border-slate-200 pt-4">
+                        <div class="flex justify-between w-48 text-slate-500"><span>Subtotal</span> <span>${formatCurrency(d.subtotal, d.currency)}</span></div>
+                        ${d.discountAmount > 0 ? `<div class="flex justify-between w-48 text-emerald-600"><span>${d.discountLabel}</span> <span>-${formatCurrency(d.discountAmount, d.currency)}</span></div>` : ''}
+                        ${d.manualDiscount > 0 ? `<div class="flex justify-between w-48 text-emerald-600"><span>Extra Disc</span> <span>-${formatCurrency(d.manualDiscount, d.currency)}</span></div>` : ''}
+                        <div class="flex justify-between w-48 text-slate-500"><span>Tax (${d.taxRate}%)</span> <span>${formatCurrency(d.tax, d.currency)}</span></div>
+                        <div class="flex justify-between w-48 text-lg font-bold text-slate-900 mt-2 pt-2 border-t border-slate-200">
+                            <span>${d.totalLabel}</span> <span>${formatCurrency(d.total, d.currency)}</span>
+                        </div>
+                    </div>
+
+                    <!-- EMI Section -->
+                    ${d.emiData ? `
+                    <div class="mt-6 border border-blue-100 bg-blue-50/50 rounded-lg p-3">
+                        <div class="flex items-center gap-2 mb-2 text-blue-700 font-bold text-xs uppercase tracking-wide">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22v-9"/><path d="M12 8V2"/><circle cx="12" cy="12" r="10"/><path d="m9 15 3 3 3-3"/></svg>
+                            EMI Schedule Active
+                        </div>
+                        <div class="flex justify-between text-xs text-blue-900">
+                            <span>Principal: ${formatCurrency(d.emiData.totalPrincipal, d.currency)}</span>
+                            <span><b>${formatCurrency(d.emiData.emiAmount, d.currency)}</b> / month</span>
+                        </div>
+                        <div class="text-[10px] text-blue-400 mt-1">Next due: ${new Date(d.emiData.startDate).toLocaleDateString()}</div>
+                    </div>` : ''}
+
+                    <!-- Footer -->
+                    <div class="mt-8 pt-4 border-t-2 border-dashed border-slate-200 text-center">
+                        ${d.recommendations ? `<p class="text-xs text-slate-500 mb-2">You might also like: <strong>${d.recommendations}</strong></p>` : ''}
+                        <p class="font-medium text-slate-800 text-sm">${d.isReturn ? 'Return Processed.' : 'Thank you for shopping with us!'}</p>
+                        <p class="text-[10px] text-slate-400 mt-1">${(d.store.settings?.receiptFooterText || 'Please keep this receipt for warranty purposes.').replace(/\n/g, '<br>')}</p>
+                    </div>
+                </div>`;
+            }
+        },
+
+        'bold_light': {
+            name: 'Bold Air',
+            preview: `<div class="p-2 bg-white border border-black flex flex-col justify-between h-full"><div class="text-2xl font-black text-black">INVOICE</div><div class="border-b-4 border-black mb-2"></div><div class="text-right font-bold text-xs">TOTAL $0.00</div></div>`,
+            getBody: (invoice, paymentState) => {
+                const d = extractInvoiceData(invoice, paymentState);
+                return `
+                <div id="receipt-content" class="bg-white text-black font-sans p-10 max-w-2xl mx-auto border-4 border-black">
+                    <div class="flex justify-between items-end mb-6">
+                        <h1 class="text-6xl font-black tracking-tighter uppercase leading-none">${d.title.split(' ')[0]}<br>${d.title.split(' ')[1] || ''}</h1>
+                        <div class="text-right">
+                            <p class="font-bold text-lg">${d.store.name}</p>
+                            <p class="text-xs font-mono mt-1">${formatDate(invoice.date)}</p>
+                            <p class="text-xs font-mono">ID: ${invoice.id.slice(-6)}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="border-t-4 border-black mb-8"></div>
+
+                    <div class="mb-8">
+                        <p class="font-bold text-xs uppercase mb-1">Client</p>
+                        <p class="text-xl font-bold">${invoice.customerName}</p>
+                    </div>
+
+                    <table class="w-full text-sm mb-8">
+                        <thead class="border-b-2 border-black">
+                            <tr>
+                                <th class="py-2 text-left font-black uppercase">Item</th>
+                                <th class="py-2 text-right font-black uppercase">Amt</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${invoice.items.map(item => `
+                            <tr class="border-b border-gray-200">
+                                <td class="py-3">
+                                    <span class="font-bold block">${item.name}</span>
+                                    <span class="text-xs text-gray-500">${item.qty} x ${formatCurrency(item.price, d.currency)}</span>
+                                    ${item.isSerialized ? `<span class="text-[10px] block font-mono mt-0.5">SN:${item.serialNumber}</span>` : ''}
+                                </td>
+                                <td class="py-3 text-right font-mono font-medium">${formatCurrency(item.price * item.qty, d.currency)}</td>
+                            </tr>`).join('')}
+                        </tbody>
+                    </table>
+
+                    <div class="flex justify-end">
+                        <div class="w-1/2">
+                            <div class="flex justify-between py-1 text-sm border-b border-gray-200"><span>Subtotal</span> <span class="font-mono">${formatCurrency(d.subtotal, d.currency)}</span></div>
+                            ${d.discountAmount > 0 ? `<div class="flex justify-between py-1 text-sm border-b border-gray-200"><span>Disc</span> <span class="font-mono">-${formatCurrency(d.discountAmount, d.currency)}</span></div>` : ''}
+                            <div class="flex justify-between py-1 text-sm border-b border-gray-200"><span>Tax</span> <span class="font-mono">${formatCurrency(d.tax, d.currency)}</span></div>
+                            <div class="flex justify-between py-3 text-2xl font-black bg-black text-white px-2 mt-2">
+                                <span>TOTAL</span> <span>${formatCurrency(d.total, d.currency)}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    ${d.emiData ? `<div class="mt-6 p-4 border-2 border-black font-mono text-xs text-center"><p class="font-bold">EMI ACTIVE</p><p>Monthly: ${formatCurrency(d.emiData.emiAmount, d.currency)}</p></div>` : ''}
+                    
+                    <div class="mt-12 text-center text-xs font-bold uppercase tracking-widest">
+                        Thank you for your business
+                    </div>
+                </div>`;
+            }
+        },
+
+        'tech_lab': {
+            name: 'Tech Lab',
+            preview: `<div class="p-2 bg-white border border-gray-300 font-mono text-[6px] text-gray-600"><div class="border-b border-gray-200 pb-1">SYS: ONLINE</div><div class="py-1">DATA: RECEIPT</div></div>`,
+            getBody: (invoice, paymentState) => {
+                const d = extractInvoiceData(invoice, paymentState);
+                
+                return `
+                <div id="receipt-content" class="bg-white text-slate-600 font-mono p-8 max-w-2xl mx-auto border border-slate-200 relative">
+                    <!-- Tech decorations -->
+                    <div class="absolute top-0 left-0 w-3 h-3 border-l-2 border-t-2 border-sky-500"></div>
+                    <div class="absolute top-0 right-0 w-3 h-3 border-r-2 border-t-2 border-sky-500"></div>
+                    <div class="absolute bottom-0 left-0 w-3 h-3 border-l-2 border-b-2 border-sky-500"></div>
+                    <div class="absolute bottom-0 right-0 w-3 h-3 border-r-2 border-b-2 border-sky-500"></div>
+
+                    <div class="flex justify-between items-center mb-6 pb-4 border-b border-dashed border-slate-300">
+                        <div>
+                            <p class="text-sky-500 text-xs font-bold tracking-widest">:: SYSTEM_INVOICE ::</p>
+                            <h1 class="text-xl font-bold text-slate-800 mt-1">${d.store.name}</h1>
+                        </div>
+                        <div class="text-right text-xs">
+                            <p>REF: <span class="text-slate-900">${invoice.id}</span></p>
+                            <p>DATE: ${new Date(invoice.date).toISOString().split('T')[0]}</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 mb-6 text-xs">
+                        <div class="p-2 bg-slate-50 border border-slate-100">
+                            <p class="text-sky-600 font-bold mb-1">> CUSTOMER_DATA</p>
+                            <p class="font-bold text-slate-800">${invoice.customerName}</p>
+                            <p>${invoice.customer?.email || 'No Email'}</p>
+                        </div>
+                         <div class="p-2 bg-slate-50 border border-slate-100">
+                            <p class="text-sky-600 font-bold mb-1">> TRANSACTION_META</p>
+                            <p>Agent: ${invoice.cashierName}</p>
+                            <p>Status: ${invoice.status.toUpperCase()}</p>
+                        </div>
+                    </div>
+
+                    <table class="w-full text-xs mb-6">
+                        <thead>
+                            <tr class="text-slate-400 border-b border-slate-200">
+                                <th class="text-left py-2 pl-2">ITEM_DESC</th>
+                                <th class="text-center py-2">QTY</th>
+                                <th class="text-right py-2 pr-2">VAL</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${invoice.items.map(item => `
+                            <tr class="hover:bg-slate-50">
+                                <td class="py-2 pl-2 border-l-2 border-transparent hover:border-sky-400 transition-colors">
+                                    <span class="block text-slate-800 font-bold">${item.name}</span>
+                                    ${item.isSerialized ? `<span class="text-[10px] text-slate-400">[SN: ${item.serialNumber}]</span>` : ''}
+                                </td>
+                                <td class="text-center py-2">${item.qty}</td>
+                                <td class="text-right py-2 pr-2">${formatCurrency(item.price * item.qty, d.currency)}</td>
+                            </tr>`).join('')}
+                        </tbody>
+                    </table>
+
+                    <div class="flex justify-end mb-6">
+                        <div class="w-64 bg-slate-50 p-3 border border-slate-200 text-xs">
+                            <div class="flex justify-between mb-1"><span>NET_VAL</span><span>${formatCurrency(d.subtotal, d.currency)}</span></div>
+                            <div class="flex justify-between mb-1"><span>TAX_CALC</span><span>${formatCurrency(d.tax, d.currency)}</span></div>
+                            ${d.discountAmount > 0 ? `<div class="flex justify-between mb-1 text-sky-600"><span>DISCOUNT</span><span>-${formatCurrency(d.discountAmount, d.currency)}</span></div>` : ''}
+                            <div class="border-t border-dashed border-slate-300 my-2"></div>
+                            <div class="flex justify-between font-bold text-base text-slate-900"><span>FINAL</span><span>${formatCurrency(d.total, d.currency)}</span></div>
+                        </div>
+                    </div>
+                    
+                    ${d.emiData ? `<div class="mb-4 text-xs text-center border border-dashed border-sky-300 bg-sky-50 p-2 text-sky-700">EMI SCHEDULE INITIALIZED. MONTHLY: ${formatCurrency(d.emiData.emiAmount, d.currency)}</div>` : ''}
+
+                    <div class="text-center text-[10px] text-slate-400 pt-4 border-t border-slate-200">
+                        <p>${(d.store.settings?.receiptFooterText || 'END OF TRANSMISSION').replace(/\n/g, '<br>')}</p>
+                        <p class="mt-1 font-mono">${d.recommendations ? `rec: ${d.recommendations}` : ''}</p>
+                    </div>
+                </div>`;
+            }
+        },
+
+        'corporate_blue': {
+            name: 'Corporate Blue',
+            preview: `<div class="w-full h-full bg-white border border-gray-200 flex flex-col"><div class="h-4 bg-blue-900 w-full"></div><div class="p-2 text-[8px] text-blue-900">INVOICE</div></div>`,
+            getBody: (invoice, paymentState) => {
+                const d = extractInvoiceData(invoice, paymentState);
+                return `
+                <div id="receipt-content" class="bg-white text-gray-700 font-sans p-0 max-w-3xl mx-auto shadow-lg relative">
+                    <!-- Top Bar -->
+                    <div class="h-6 bg-blue-900 w-full"></div>
+                    
+                    <div class="p-10">
+                        <div class="flex justify-between items-start mb-10">
+                            <div>
+                                <img src="${d.store.logoUrl}" class="h-12 w-auto mb-4" alt="logo"/>
+                                <h2 class="text-lg font-bold text-blue-900">${d.store.name}</h2>
+                                <p class="text-sm text-gray-500 w-48">${d.store.address}</p>
+                            </div>
+                            <div class="text-right">
+                                <h1 class="text-4xl font-bold text-gray-200 uppercase tracking-widest">${d.title}</h1>
+                                <p class="text-blue-900 font-medium text-lg mt-1">#${invoice.id}</p>
+                                <p class="text-sm text-gray-500">Date: ${formatDate(invoice.date)}</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-8 mb-10">
+                            <div>
+                                <p class="text-xs font-bold text-gray-400 uppercase mb-2">Invoiced To</p>
+                                <h3 class="text-xl font-bold text-gray-800">${invoice.customerName}</h3>
+                                <p class="text-sm text-gray-500">${invoice.customer?.email || ''}</p>
+                                <p class="text-sm text-gray-500">${invoice.customer?.phone || ''}</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-xs font-bold text-gray-400 uppercase mb-2">Totals</p>
+                                <p class="text-3xl font-bold text-blue-900">${formatCurrency(d.total, d.currency)}</p>
+                                <p class="text-xs text-green-600 font-medium mt-1 uppercase tracking-wide">${invoice.status}</p>
+                            </div>
+                        </div>
+
+                        <table class="w-full text-sm mb-8">
+                            <thead class="bg-blue-50 text-blue-900 uppercase text-xs font-bold">
+                                <tr>
+                                    <th class="py-3 px-4 text-left rounded-l-lg">Description</th>
+                                    <th class="py-3 px-4 text-center">Qty</th>
+                                    <th class="py-3 px-4 text-right">Price</th>
+                                    <th class="py-3 px-4 text-right rounded-r-lg">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-blue-50">
+                                ${invoice.items.map(item => `
+                                <tr>
+                                    <td class="py-4 px-4">
+                                        <p class="font-medium text-gray-800">${item.name}</p>
+                                        ${item.isSerialized ? `<p class="text-xs text-gray-400">SN: ${item.serialNumber}</p>` : ''}
+                                    </td>
+                                    <td class="py-4 px-4 text-center">${item.qty}</td>
+                                    <td class="py-4 px-4 text-right">${formatCurrency(item.price, d.currency)}</td>
+                                    <td class="py-4 px-4 text-right font-bold text-gray-800">${formatCurrency(item.price * item.qty, d.currency)}</td>
+                                </tr>`).join('')}
+                            </tbody>
+                        </table>
+
+                        <div class="flex justify-end">
+                            <div class="w-1/2 space-y-2">
+                                <div class="flex justify-between text-sm text-gray-600"><span>Subtotal</span> <span>${formatCurrency(d.subtotal, d.currency)}</span></div>
+                                <div class="flex justify-between text-sm text-gray-600"><span>Tax</span> <span>${formatCurrency(d.tax, d.currency)}</span></div>
+                                ${d.discountAmount > 0 ? `<div class="flex justify-between text-sm text-blue-600"><span>Discount</span> <span>-${formatCurrency(d.discountAmount, d.currency)}</span></div>` : ''}
+                                <div class="flex justify-between text-xl font-bold text-blue-900 border-t border-blue-100 pt-3 mt-1">
+                                    <span>Total</span> <span>${formatCurrency(d.total, d.currency)}</span>
+                                </div>
+                                ${d.due > 0 ? `<div class="flex justify-between text-sm text-red-500 font-medium"><span>Balance Due</span> <span>${formatCurrency(d.due, d.currency)}</span></div>` : ''}
+                            </div>
+                        </div>
+                        
+                        <!-- EMI / Footer Area -->
+                        <div class="mt-12 bg-gray-50 p-6 rounded-lg text-sm text-gray-500 flex flex-col md:flex-row justify-between items-center gap-4">
+                            <div>
+                                ${d.emiData ? `<p class="text-blue-900 font-bold text-xs uppercase mb-1">Financed via EMI</p><p>Monthly Pmt: ${formatCurrency(d.emiData.emiAmount, d.currency)}</p>` : ''}
+                                <p class="mt-2">${(d.store.settings?.receiptFooterText || 'Thank you for your business.').replace(/\n/g, '<br>')}</p>
+                            </div>
+                            <div class="text-right text-xs">
+                                <p>Auth: ${invoice.cashierName}</p>
+                                <p>${new Date().toLocaleTimeString()}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="h-2 bg-blue-900 w-full mt-auto"></div>
+                </div>`;
+            }
+        },
+
+        'creative_pop': {
+            name: 'Creative Pop',
+            preview: `<div class="p-2 bg-white relative overflow-hidden"><div class="absolute top-0 right-0 w-8 h-8 bg-purple-100 rounded-bl-full"></div><div class="relative z-10 text-[8px] font-bold text-purple-600">INVOICE</div></div>`,
+            getBody: (invoice, paymentState) => {
+                const d = extractInvoiceData(invoice, paymentState);
+                return `
+                <div id="receipt-content" class="bg-white p-10 max-w-2xl mx-auto font-sans relative overflow-hidden text-gray-800">
+                    <!-- Shapes -->
+                    <div class="absolute -top-10 -right-10 w-64 h-64 bg-purple-50 rounded-full z-0"></div>
+                    <div class="absolute top-20 right-40 w-12 h-12 bg-yellow-50 rounded-full z-0"></div>
+                    <div class="absolute bottom-0 left-0 w-full h-3 bg-gradient-to-r from-purple-400 to-pink-400 z-0"></div>
+
+                    <div class="relative z-10">
+                        <div class="flex justify-between items-center mb-10">
+                            <h1 class="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-500 uppercase tracking-tighter">
+                                ${d.store.name}
+                            </h1>
+                            <div class="text-right">
+                                <p class="text-sm font-bold text-gray-400 uppercase tracking-widest">${d.title}</p>
+                                <p class="font-mono text-purple-600 text-lg">#${invoice.id.slice(-6)}</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-white/80 backdrop-blur-sm border border-purple-100 rounded-2xl p-6 shadow-sm mb-8">
+                            <p class="text-xs text-gray-400 font-bold uppercase mb-2">Hey there,</p>
+                            <h2 class="text-2xl font-bold text-gray-800 mb-1">${invoice.customerName}</h2>
+                            <p class="text-sm text-gray-500">Thanks for shopping on ${formatDate(invoice.date)}.</p>
+                            ${d.emiData ? `<p class="mt-2 inline-block bg-purple-100 text-purple-700 text-xs px-2 py-1 rounded-full font-bold">EMI Plan Active</p>` : ''}
+                        </div>
+
+                        <table class="w-full text-sm mb-8">
+                            <thead>
+                                <tr class="text-gray-400 text-xs uppercase tracking-wider text-left">
+                                    <th class="pb-3 pl-2">Product</th>
+                                    <th class="pb-3 text-right pr-2">Price</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-base font-medium">
+                                ${invoice.items.map(item => `
+                                <tr class="border-b border-purple-50">
+                                    <td class="py-3 pl-2">
+                                        ${item.name}
+                                        <span class="text-xs text-purple-400 bg-purple-50 px-2 py-0.5 rounded-full ml-2">x${item.qty}</span>
+                                    </td>
+                                    <td class="py-3 text-right pr-2 text-gray-600">${formatCurrency(item.price * item.qty, d.currency)}</td>
+                                </tr>`).join('')}
+                            </tbody>
+                        </table>
+
+                        <div class="flex justify-between items-center bg-purple-50 p-6 rounded-2xl">
+                            <div>
+                                <p class="text-xs text-purple-400 font-bold uppercase">Total Amount</p>
+                                <p class="text-3xl font-black text-purple-900">${formatCurrency(d.total, d.currency)}</p>
+                            </div>
+                            <div class="text-right text-xs text-purple-800 space-y-1">
+                                <p>Subtotal: ${formatCurrency(d.subtotal, d.currency)}</p>
+                                <p>Tax: ${formatCurrency(d.tax, d.currency)}</p>
+                                ${d.discountAmount > 0 ? `<p class="text-pink-500 font-bold">Savings: -${formatCurrency(d.discountAmount, d.currency)}</p>` : ''}
+                            </div>
+                        </div>
+
+                        <div class="mt-8 text-center text-xs text-gray-400">
+                             <p>You earned <span class="text-purple-600 font-bold">${invoice.pointsEarned || 0}</span> loyalty points!</p>
+                             ${d.recommendations ? `<p class="mt-1">Next time, try: <span class="text-gray-600">${d.recommendations}</span></p>` : ''}
+                        </div>
+                    </div>
+                </div>`;
+            }
+        },
+
+        'elegant_serif': {
+            name: 'Elegant Serif',
+            preview: `<div class="bg-[#fcfbf9] border border-gray-200 p-2 font-serif text-[6px] text-center"><div class="border-b border-gray-300 pb-1 mb-1 italic">The Store</div><div>Invoice #001</div></div>`,
+            getBody: (invoice, paymentState) => {
+                const d = extractInvoiceData(invoice, paymentState);
+                return `
+                <div id="receipt-content" class="bg-[#fcfbf9] text-gray-900 font-serif p-12 max-w-2xl mx-auto shadow-sm" style="font-family: 'Georgia', serif;">
+                    <div class="text-center border-b-2 border-gray-800 pb-8 mb-8">
+                        <h1 class="text-4xl italic font-bold tracking-tight mb-2">${d.store.name}</h1>
+                        <p class="text-sm text-gray-600 uppercase tracking-widest text-[10px]">${d.title}</p>
+                    </div>
+                    
+                    <div class="flex justify-between text-sm mb-8">
+                        <div>
+                            <p class="font-bold uppercase text-[10px] text-gray-500 tracking-wider mb-1">Client</p>
+                            <p class="text-lg">${invoice.customerName}</p>
+                        </div>
+                        <div class="text-right">
+                             <p class="font-bold uppercase text-[10px] text-gray-500 tracking-wider mb-1">Details</p>
+                             <p>No. ${invoice.id.slice(-6)}</p>
+                             <p>${formatDate(invoice.date)}</p>
+                        </div>
+                    </div>
+
+                    <table class="w-full text-sm mb-8">
+                        <thead>
+                            <tr class="border-b border-gray-300">
+                                <th class="py-3 text-left font-normal italic text-gray-500">Description</th>
+                                <th class="py-3 text-center font-normal italic text-gray-500">Quantity</th>
+                                <th class="py-3 text-right font-normal italic text-gray-500">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                             ${invoice.items.map(item => `
+                            <tr class="border-b border-gray-100">
+                                <td class="py-4">
+                                    <p>${item.name}</p>
+                                    ${item.isSerialized ? `<p class="text-[10px] text-gray-400 italic">SN: ${item.serialNumber}</p>` : ''}
+                                </td>
+                                <td class="py-4 text-center">${item.qty}</td>
+                                <td class="py-4 text-right">${formatCurrency(item.price * item.qty, d.currency)}</td>
+                            </tr>`).join('')}
+                        </tbody>
+                    </table>
+
+                    <div class="flex justify-end mb-12">
+                        <div class="w-1/2 text-right space-y-2">
+                             <div class="flex justify-between text-sm"><span>Subtotal</span> <span>${formatCurrency(d.subtotal, d.currency)}</span></div>
+                             ${d.discountAmount > 0 ? `<div class="flex justify-between text-sm italic"><span>Less Discount</span> <span>-${formatCurrency(d.discountAmount, d.currency)}</span></div>` : ''}
+                             <div class="flex justify-between text-sm"><span>Tax</span> <span>${formatCurrency(d.tax, d.currency)}</span></div>
+                             <div class="flex justify-between text-xl font-bold border-t border-gray-800 pt-4 mt-2">
+                                <span>Total</span> <span>${formatCurrency(d.total, d.currency)}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    ${d.emiData ? `
+                        <div class="text-center p-4 border border-gray-300 mb-8">
+                            <p class="uppercase text-[10px] tracking-widest text-gray-500 mb-1">Financing Details</p>
+                            <p class="font-bold">Monthly Installment: ${formatCurrency(d.emiData.emiAmount, d.currency)}</p>
+                        </div>
+                    ` : ''}
+
+                    <div class="text-center text-xs text-gray-500">
+                        <p>Thank you for choosing ${d.store.name}.</p>
+                    </div>
+                </div>`;
+            }
+        },
+
+        'compact_thermal_plus': {
+            name: 'Thermal Plus',
+            preview: `<div class="w-full bg-white border border-gray-200 p-2 font-mono text-[6px] flex flex-col items-center"><div class="font-bold">STORE</div><div>***</div><div class="w-full flex justify-between"><span>Item</span><span>10.00</span></div><div class="border-t border-black w-full mt-1"></div></div>`,
+            getBody: (invoice, paymentState) => {
+                const d = extractInvoiceData(invoice, paymentState);
+                // Optimized for 80mm/58mm thermal printers
+                return `
+                <div id="receipt-content" style="width: 300px; margin: 0 auto; background: #fff; color: #000; font-family: 'Courier New', monospace; font-size: 12px; padding: 10px;">
+                    <div style="text-align: center; margin-bottom: 10px;">
+                        <h2 style="font-size: 16px; font-weight: bold; margin: 0;">${d.store.name.toUpperCase()}</h2>
+                        <p style="font-size: 10px;">${d.store.address}</p>
+                        <p style="font-size: 10px;">${d.store.contact}</p>
+                    </div>
+                    
+                    <div style="border-bottom: 1px dashed #000; margin-bottom: 5px; padding-bottom: 5px;">
+                        <div style="display: flex; justify-content: space-between;"><span>Date:</span><span>${new Date(invoice.date).toLocaleDateString()}</span></div>
+                        <div style="display: flex; justify-content: space-between;"><span>Inv #:</span><span>${invoice.id}</span></div>
+                        <div style="display: flex; justify-content: space-between;"><span>Cashier:</span><span>${invoice.cashierName}</span></div>
+                    </div>
+                    
+                    <div style="margin-bottom: 5px; font-weight: bold;">
+                        <div style="display: flex;">
+                            <span style="flex: 2;">Item</span>
+                            <span style="flex: 1; text-align: center;">Qty</span>
+                            <span style="flex: 1; text-align: right;">Amt</span>
+                        </div>
+                    </div>
+                    
+                    <div style="border-bottom: 1px solid #000; margin-bottom: 5px;"></div>
+                    
+                    ${invoice.items.map(item => `
+                    <div style="margin-bottom: 4px;">
+                        <div style="font-weight: bold;">${item.name}</div>
+                        ${item.isSerialized ? `<div style="font-size: 10px;">SN:${item.serialNumber}</div>` : ''}
+                        <div style="display: flex;">
+                            <span style="flex: 2;"></span>
+                            <span style="flex: 1; text-align: center;">${item.qty}</span>
+                            <span style="flex: 1; text-align: right;">${formatCurrency(item.price * item.qty, d.currency)}</span>
+                        </div>
+                    </div>`).join('')}
+                    
+                    <div style="border-top: 1px dashed #000; margin-top: 5px; padding-top: 5px;">
+                         <div style="display: flex; justify-content: space-between;"><span>Subtotal:</span><span>${formatCurrency(d.subtotal, d.currency)}</span></div>
+                         ${d.discountAmount > 0 ? `<div style="display: flex; justify-content: space-between;"><span>Disc:</span><span>-${formatCurrency(d.discountAmount, d.currency)}</span></div>` : ''}
+                         <div style="display: flex; justify-content: space-between;"><span>Tax:</span><span>${formatCurrency(d.tax, d.currency)}</span></div>
+                         <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 14px; margin-top: 5px;"><span>TOTAL:</span><span>${formatCurrency(d.total, d.currency)}</span></div>
+                    </div>
+                    
+                    ${d.emiData ? `
+                    <div style="margin-top: 10px; border: 1px solid #000; padding: 5px; text-align: center;">
+                        <strong>EMI PLAN</strong><br>
+                        ${formatCurrency(d.emiData.emiAmount, d.currency)} / mo
+                    </div>` : ''}
+                    
+                    <div style="text-align: center; margin-top: 15px; font-size: 10px;">
+                        <p>${(d.store.settings?.receiptFooterText || 'THANK YOU').replace(/\n/g, '<br>')}</p>
+                        <p>Customer: ${invoice.customerName}</p>
+                    </div>
+                </div>`;
+            }
+        },
+
+        'modern_grid': {
+            name: 'Modern Grid',
+            preview: `<div class="bg-gray-50 border border-gray-200 p-2 grid grid-cols-2 gap-1 h-full"><div class="bg-white h-full rounded"></div><div class="bg-white h-full rounded"></div></div>`,
+            getBody: (invoice, paymentState) => {
+                const d = extractInvoiceData(invoice, paymentState);
+                return `
+                <div id="receipt-content" class="bg-gray-100 p-10 font-sans text-gray-800 max-w-4xl mx-auto">
+                    <!-- Header Card -->
+                    <div class="bg-white rounded-2xl shadow-sm p-8 mb-6 flex justify-between items-center">
+                        <div>
+                            <h1 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                                <span class="w-2 h-8 bg-indigo-500 rounded-full block"></span> ${d.store.name}
+                            </h1>
+                        </div>
+                        <div class="text-right">
+                             <div class="text-xs uppercase font-bold text-gray-400 tracking-wider">Amount Due</div>
+                             <div class="text-4xl font-bold text-indigo-600">${formatCurrency(d.due, d.currency)}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-12 gap-6">
+                        <!-- Left Col: Invoice Info -->
+                        <div class="col-span-8 space-y-6">
+                             <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+                                <table class="w-full text-sm">
+                                    <thead class="bg-gray-50 text-gray-500 uppercase text-xs font-bold">
+                                        <tr><th class="p-4 text-left">Description</th><th class="p-4 text-center">Qty</th><th class="p-4 text-right">Amount</th></tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-100">
+                                        ${invoice.items.map(item => `
+                                        <tr>
+                                            <td class="p-4">
+                                                <div class="font-semibold text-gray-800">${item.name}</div>
+                                                <div class="text-xs text-gray-400">${item.id}</div>
+                                            </td>
+                                            <td class="p-4 text-center bg-gray-50/50 font-medium">${item.qty}</td>
+                                            <td class="p-4 text-right font-bold text-gray-700">${formatCurrency(item.price * item.qty, d.currency)}</td>
+                                        </tr>`).join('')}
+                                    </tbody>
+                                </table>
+                             </div>
+                             
+                             <div class="bg-white rounded-2xl shadow-sm p-6 flex justify-between items-center">
+                                <div>
+                                    <p class="text-xs font-bold text-gray-400 uppercase">Payment Method</p>
+                                    <p class="font-medium mt-1">${d.payments.map(p => p.method).join(', ') || 'Unpaid'}</p>
+                                </div>
+                                <div class="text-right">
+                                     <p class="text-xs font-bold text-gray-400 uppercase">Total Paid</p>
+                                     <p class="font-bold text-green-600 text-lg">${formatCurrency(d.paidAmount, d.currency)}</p>
+                                </div>
+                             </div>
+                        </div>
+                        
+                        <!-- Right Col: Summary & Details -->
+                        <div class="col-span-4 space-y-6">
+                             <div class="bg-white rounded-2xl shadow-sm p-6">
+                                <p class="text-xs font-bold text-gray-400 uppercase mb-4">Summary</p>
+                                <div class="space-y-3 text-sm">
+                                    <div class="flex justify-between"><span>Subtotal</span> <span>${formatCurrency(d.subtotal, d.currency)}</span></div>
+                                    <div class="flex justify-between text-red-500"><span>Discount</span> <span>-${formatCurrency(d.discountAmount, d.currency)}</span></div>
+                                    <div class="flex justify-between"><span>Tax</span> <span>${formatCurrency(d.tax, d.currency)}</span></div>
+                                    <div class="h-px bg-gray-100 my-2"></div>
+                                    <div class="flex justify-between font-bold text-lg"><span>Total</span> <span>${formatCurrency(d.total, d.currency)}</span></div>
+                                </div>
+                             </div>
+                             
+                             <div class="bg-indigo-50 rounded-2xl p-6 border border-indigo-100">
+                                <p class="text-xs font-bold text-indigo-400 uppercase mb-2">Customer</p>
+                                <p class="font-bold text-indigo-900">${invoice.customerName}</p>
+                                <p class="text-xs text-indigo-700 mt-1">${invoice.customer?.email || ''}</p>
+                             </div>
+                        </div>
+                    </div>
+                </div>`;
+            }
+        },
+
+        'minimalist_mono': {
+            name: 'Minimalist Mono',
+            preview: `<div class="bg-white border p-2 font-mono text-[6px] h-full flex flex-col justify-between"><div>INVOICE</div><div>---</div><div class="text-right">TOTAL</div></div>`,
+            getBody: (invoice, paymentState) => {
+                const d = extractInvoiceData(invoice, paymentState);
+                return `
+                <div id="receipt-content" class="bg-white text-black font-mono p-12 max-w-2xl mx-auto border-l-4 border-black">
+                    <div class="mb-12">
+                        <h1 class="text-4xl font-bold tracking-tight mb-2">INVOICE</h1>
+                        <p class="text-sm">NO. ${invoice.id}</p>
+                        <p class="text-sm">DATE ${new Date(invoice.date).toISOString().split('T')[0]}</p>
+                    </div>
+
+                    <div class="mb-12 grid grid-cols-2">
+                        <div>
+                            <p class="font-bold mb-1">FROM</p>
+                            <p>${d.store.name}</p>
+                            <p class="text-xs w-48 mt-1">${d.store.address}</p>
+                        </div>
+                        <div>
+                            <p class="font-bold mb-1">TO</p>
+                            <p>${invoice.customerName}</p>
+                            <p class="text-xs mt-1">${invoice.customer?.phone || ''}</p>
+                        </div>
+                    </div>
+
+                    <div class="border-t-2 border-b-2 border-black py-4 mb-8">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="text-left">
+                                    <th class="pb-4 w-1/2">DESCRIPTION</th>
+                                    <th class="pb-4 text-center">QTY</th>
+                                    <th class="pb-4 text-right">PRICE</th>
+                                    <th class="pb-4 text-right">AMOUNT</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${invoice.items.map(item => `
+                                <tr>
+                                    <td class="py-2 pr-4">${item.name}</td>
+                                    <td class="py-2 text-center">${item.qty}</td>
+                                    <td class="py-2 text-right">${formatCurrency(item.price, d.currency)}</td>
+                                    <td class="py-2 text-right font-bold">${formatCurrency(item.price * item.qty, d.currency)}</td>
+                                </tr>`).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="flex justify-end">
+                        <div class="w-1/2 space-y-2 text-sm">
+                            <div class="flex justify-between"><span>SUBTOTAL</span> <span>${formatCurrency(d.subtotal, d.currency)}</span></div>
+                            <div class="flex justify-between"><span>TAX</span> <span>${formatCurrency(d.tax, d.currency)}</span></div>
+                            <div class="flex justify-between font-bold text-xl mt-4 pt-4 border-t border-black">
+                                <span>TOTAL</span> <span>${formatCurrency(d.total, d.currency)}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            }
+        },
+
+        'service_focused': {
+            name: 'Service Pro',
+            preview: `<div class="bg-white border p-2 h-full flex flex-col"><div class="bg-gray-100 p-1 mb-1"></div><div class="flex-grow bg-gray-50 rounded"></div></div>`,
+            getBody: (invoice, paymentState) => {
+                const d = extractInvoiceData(invoice, paymentState);
+                return `
+                <div id="receipt-content" class="bg-white text-gray-700 font-sans p-10 max-w-3xl mx-auto border border-gray-200 shadow-sm">
+                    <header class="flex justify-between items-center mb-10 pb-6 border-b border-gray-100">
+                        <h1 class="text-2xl font-light text-gray-400 uppercase tracking-widest">Statement</h1>
+                        <div class="text-right">
+                             <h2 class="text-lg font-bold text-gray-900">${d.store.name}</h2>
+                        </div>
+                    </header>
+                    
+                    <div class="bg-gray-50 rounded-lg p-6 mb-8 flex justify-between items-center">
+                        <div>
+                            <p class="text-xs uppercase font-bold text-gray-400 mb-1">Total Due</p>
+                            <p class="text-3xl font-bold text-gray-900">${formatCurrency(d.due, d.currency)}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-xs uppercase font-bold text-gray-400 mb-1">Due Date</p>
+                            <p class="font-medium text-gray-700">${new Date().toLocaleDateString()}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-8">
+                        <h3 class="text-sm font-bold text-gray-900 uppercase border-b border-gray-200 pb-2 mb-4">Services / Products</h3>
+                        ${invoice.items.map(item => `
+                        <div class="flex justify-between items-start mb-4 pb-4 border-b border-gray-50 last:border-0">
+                            <div>
+                                <p class="font-bold text-gray-800">${item.name}</p>
+                                <p class="text-xs text-gray-500">${item.id}</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-medium">${formatCurrency(item.price * item.qty, d.currency)}</p>
+                                <p class="text-xs text-gray-400">${item.qty} @ ${formatCurrency(item.price, d.currency)}</p>
+                            </div>
+                        </div>`).join('')}
+                    </div>
+                    
+                    <div class="flex justify-end">
+                        <div class="w-64 bg-gray-50 p-4 rounded-lg">
+                            <div class="flex justify-between mb-2"><span>Subtotal</span> <span>${formatCurrency(d.subtotal, d.currency)}</span></div>
+                            <div class="flex justify-between mb-2 text-gray-500"><span>Tax</span> <span>${formatCurrency(d.tax, d.currency)}</span></div>
+                            <div class="h-px bg-gray-200 my-2"></div>
+                            <div class="flex justify-between font-bold text-gray-900 text-lg"><span>Total</span> <span>${formatCurrency(d.total, d.currency)}</span></div>
+                        </div>
+                    </div>
+                </div>`;
+            }
+        },
+
+        'cafe_style': {
+            name: 'Cafe Style',
+            preview: `<div class="bg-[#fffcf5] border border-orange-100 p-2 text-center h-full flex flex-col items-center justify-center font-serif text-[6px] text-amber-900"><div>The Cafe</div><div>---</div><div>Latte $5</div></div>`,
+            getBody: (invoice, paymentState) => {
+                const d = extractInvoiceData(invoice, paymentState);
+                return `
+                <div id="receipt-content" class="bg-[#fffcf5] text-amber-900 p-12 max-w-xl mx-auto font-serif text-center border-y-8 border-amber-900/10 shadow-sm relative">
+                    <div class="border-2 border-amber-900/20 p-8 h-full">
+                        <div class="mb-8">
+                            <h1 class="text-4xl italic font-bold mb-2">${d.store.name}</h1>
+                            <div class="flex justify-center gap-2 text-xs text-amber-700 uppercase tracking-widest mb-1">
+                                <span>Fresh</span> &bull; <span>Local</span> &bull; <span>Quality</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-between text-xs text-amber-800/60 mb-6 px-4 pb-4 border-b border-dashed border-amber-300">
+                             <span>Server: ${invoice.cashierName}</span>
+                             <span>${new Date(invoice.date).toLocaleTimeString()}</span>
+                        </div>
+
+                        <div class="space-y-3 mb-8 text-left px-4">
+                            ${invoice.items.map(item => `
+                            <div class="flex justify-between items-end">
+                                <div class="relative z-10 bg-[#fffcf5] pr-2">
+                                    <span class="font-bold text-lg">${item.name}</span>
+                                    <span class="text-xs text-amber-600 ml-1">x${item.qty}</span>
+                                </div>
+                                <div class="flex-grow border-b border-dotted border-amber-300 mb-1"></div>
+                                <div class="relative z-10 bg-[#fffcf5] pl-2 font-mono">${formatCurrency(item.price * item.qty, d.currency)}</div>
+                            </div>`).join('')}
+                        </div>
+
+                        <div class="bg-amber-50 p-6 rounded-lg mb-8 mx-4">
+                            <div class="flex justify-between text-xl font-bold text-amber-950">
+                                <span>Total</span>
+                                <span>${formatCurrency(d.total, d.currency)}</span>
+                            </div>
+                            <div class="text-right text-xs text-amber-700 mt-1">Includes Tax</div>
+                        </div>
+
+                        <div class="text-xs text-amber-800 italic">
+                            <p>~ Thank you for visiting ~</p>
+                            <p class="mt-1">Wifi: guest_wifi // Pass: coffee123</p>
+                        </div>
+                    </div>
+                </div>`;
+            }
+        }
+    };
+
+    // --- Template Registration ---
+    window.invoiceTemplates = newTemplates;
+    if (window.receiptTemplates) {
+        Object.assign(window.receiptTemplates, newTemplates);
+    }
+    
+    // --- Helper to refresh if appState is present ---
+    if (typeof window.appState !== 'undefined') {
+        // Trigger a re-render if the settings pane is open to show updated previews
+        const activeTab = window.appState.tabs?.find(t => t.id === window.appState.activeTabId);
+        if (activeTab?.viewType === 'settings') {
+             // We can't easily call initSettings from here without the container, 
+             // but the next interaction will pick up the changes.
+             console.log("Templates updated. Please refresh the settings view if open.");
+        }
+    }
+
+})();

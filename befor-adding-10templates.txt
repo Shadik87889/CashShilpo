@@ -1106,7 +1106,6 @@
     <script src="cashshilpo-bn-lan.js"></script>
     <script src="cashshilpo-theme.js"></script>
     <script src="cashshilpo-visuals.js"></script>
-    <script src="log-in-interface.js"></script>
     <script src="templates-invoice.js"></script>
     <script src="cashshilpo-settings-tab.js"></script>
     <script src="cashshilpo-tooltips.js"></script>
@@ -22793,9 +22792,7 @@ const receiptTemplates = {
                  <div class="mt-4 pt-4 border-t border-green-800/50 text-center text-[10px] text-green-400/50"> <p>Powered by CashShilpo</p> </div>
             </div>`;
         }
-    },
-    // --- INTEGRATION: Add World-Class Templates ---
-    ...(window.invoiceTemplates || {})
+    }
 };
 
           const showReceipt = (invoice, paymentState = null) => {
@@ -22803,14 +22800,7 @@ const receiptTemplates = {
              const templateKey = appState.settings.selectedReceiptTemplate;
              const template = receiptTemplates[templateKey] || receiptTemplates.modern; // Fallback to modern
              // --- END UPDATED ---
-             let content = template.getBody(invoice, paymentState);
-             
-             // --- FIX: Ensure ID exists for printing for external templates ---
-             // The printElement function looks for 'receipt-content'. If the template doesn't provide it, we wrap it.
-             if (!content.includes('id="receipt-content"')) {
-                 content = `<div id="receipt-content" class="h-full w-full bg-white text-black">${content}</div>`;
-             }
-             // --- END FIX ---
+             const content = template.getBody(invoice, paymentState);
              
              // --- NEW: Change modal title for returns ---
              const isReturn = invoice.invoiceType === 'return';
