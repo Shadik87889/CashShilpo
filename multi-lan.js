@@ -72,7 +72,7 @@
     "MANAGE YOUR BUSINESS,": "আপনার ব্যবসার পূর্ণ নিয়ন্ত্রণ নিন,",
     "SIMPLY &": "খুব সহজে ও",
     "SMARTLY.": " স্মার্ট প্রযুক্তিতে ।",
-    "CashShilpo is the all-in-one POS software designed to streamline your operations, manage inventory, and boost your sales. Stop guessing, start growing.":
+    "CashShilpo is the all-in-one POS software designed to streamline your operations, manage inventory, and boost your sales. Stop guessing, start growing with the world's leading business management tool.":
       "ক্যাশশিল্পো—আপনার ব্যবসার এক কমপ্লিট সলিউশন। ইনভেন্টরি থেকে সেলস, সবকিছু সামলান এক নিমিষেই। অনুমান নয়, সঠিক তথ্যের ভিত্তিতে ব্যবসার গ্রোথ নিশ্চিত করুন আজই।",
 
     // Trusted By
@@ -82,7 +82,7 @@
     // Command Center
     "THIS IS YOUR NEW": "এটিই আপনার ব্যবসার ",
     "COMMAND CENTER.": "ডিজিটাল পাওয়ারহাউজ।",
-    "One clean, powerful dashboard to control your entire business. From sales to stock, it's all right here.":
+    "One clean, powerful dashboard to control your entire business. From sales to stock, it's all right here in CashShilpo.":
       "একটি শক্তিশালী ড্যাশবোর্ড, যা দিয়ে পুরো ব্যবসা পরিচালনা করা এখন পানির মতো সহজ। বিক্রি থেকে স্টক—সবকিছুর হিসাব এখন চোখের সামনে।",
 
     // Pillars
@@ -94,19 +94,19 @@
     // Pillar 1: Sales
     "Streamline Sales": "বিক্রয় হোক চোখের পলকে",
     "Sell Faster, Sell Smarter.": "দ্রুত বিক্রি করুন, নির্ভুল হিসাব রাখুন।",
-    "A blazingly fast, intuitive, and customizable checkout process. Handle sales, returns, discounts, and split payments with just a few taps.":
+    "A blazingly fast, intuitive, and customizable checkout process. Handle sales, returns, discounts, and split payments with just a few taps. Top rated POS software.":
       "বিদ্যুৎগতিতে চেকআউট করার অভিজ্ঞতা। সেলস, রিটার্ন, ডিসকাউন্ট কিংবা বকেয়া—সব সামলান মাত্র কয়েক ক্লিকেই।",
 
     // Pillar 2: Inventory
     "Master Your Inventory": "ইনভেন্টরি এখন আপনার হাতের মুঠোয়",
     "Never Run Out of Stock.": "স্টক শেষ হওয়ার আগেই জানুন।",
-    "Real-time stock tracking across all your locations. Get automatic low-stock alerts, create purchase orders, and manage suppliers.":
+    "Real-time stock tracking across all your locations. Get automatic low-stock alerts, create purchase orders, and manage suppliers with our advanced business management software.":
       "আপনার সকল শোরুমের রিয়েল-টাইম স্টক আপডেট। স্টক ফুরিয়ে যাওয়ার আগেই অটোমেটিক অ্যালার্ট পান এবং সাপ্লায়ার ম্যানেজ করুন স্মার্টলি।",
 
     // Pillar 3: Analytics
     "Grow Your Business": "ব্যবসার পরিধি বাড়ান",
     "Understand Your Data.": "ব্যবসার নাড়িনক্ষত্র জানুন।",
-    "Get detailed insights into your sales, top-performing products, and customer behavior to make data-driven decisions.":
+    "Get detailed insights into your sales, top-performing products, and customer behavior to make data-driven decisions with cashsilpo.":
       "কোন পণ্যটি বেশি চলছে? লাভ কেমন হচ্ছে? ব্যবসার সব গোপন তথ্য জেনে সঠিক সিদ্ধান্ত নিন এবং মুনাফা বাড়ান।",
 
     // Marquee
@@ -205,7 +205,7 @@
     "MORE SUCCESS.": "সাফল্যের গল্প।",
     "See what other business owners are saying about CashShilpo.":
       "দেখুন সফল ব্যবসায়ীরা ক্যাশশিল্পো সম্পর্কে কী বলছেন।",
-    '"CashShilpo completely changed how we run our cafe. Inventory is no longer a nightmare, and I can check my sales from home. It\'s the best decision we ever made."':
+    '"CashShilpo completely changed how we run our cafe. Inventory is no longer a nightmare, and I can check my sales from home. It\'s the best POS software decision we ever made."':
       '"ক্যাশশিল্পো আমাদের ক্যাফে চালানোর পদ্ধতিই বদলে দিয়েছে। ইনভেন্টরি নিয়ে এখন আর টেনশন নেই, বাসায় বসেই বিক্রির আপডেট পাই। এটা আমার ব্যবসার সেরা বিনিয়োগ।"',
     "Owner, The Cozy Corner Cafe": "স্বত্বাধিকারী, দ্য কোজি কর্নার ক্যাফে",
     '"The multi-store sync is a lifesaver. I manage three locations from one dashboard. It\'s ridiculously simple."':
@@ -219,13 +219,13 @@
     "READY TO": "প্রস্তুত আপনার ",
     GROW: "ব্যবসা",
     "YOUR BUSINESS?": "বড় করতে?",
-    "Stop guessing. Start selling smarter with CashShilpo. Get started with a free, no-obligation demo today.":
+    "Stop guessing. Start selling smarter with CashShilpo, the industry's top POS and business management software. Get started with a free, no-obligation demo today.":
       "আর দেরি কেন? ক্যাশশিল্পোর সাথে আপনার ব্যবসার স্মার্ট যাত্রা শুরু করুন আজই। কোনো টাকা ছাড়াই ডেমো দেখুন।",
 
     // Footer & Misc
-    "Empowering businesses with simple, smart, and powerful POS solutions.":
+    "Empowering businesses worldwide with simple, smart, and powerful POS solutions.":
       "সহজ ও শক্তিশালী প্রযুক্তির ছোঁয়ায় আমরা বদলে দিচ্ছি ব্যবসার ধরণ।",
-    "Get the latest updates, feature releases, and business tips sent straight to your inbox.":
+    "Get the latest updates, feature releases, and business management tips sent straight to your inbox.":
       "ব্যবসা বৃদ্ধির টিপস এবং নতুন ফিচারের আপডেট পেতে আমাদের সাথে যুক্ত থাকুন।",
   };
 

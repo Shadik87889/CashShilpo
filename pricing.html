@@ -221,6 +221,21 @@
       :root {
         --accent-color: #39ff14;
       }
+      .enterprise-note {
+        line-height: 1.6;
+      }
+
+      .enterprise-note--important::before {
+        content: "Important: ";
+        font-weight: 800;
+        color: #fff;
+      }
+
+      .enterprise-note--install::before {
+        content: "Installation & Setup Cost: ";
+        font-weight: 800;
+        color: #fff;
+      }
       body {
         font-family: "Inter", sans-serif;
         background-color: #000;
@@ -1291,11 +1306,16 @@
               <p class="text-gray-400 mt-2 mb-6">
                 For large-scale operations with custom needs.
               </p>
+
               <div class="my-4">
                 <span class="text-5xl font-extrabold text-white"
                   >Let's Talk</span
                 >
+                <span class="block text-sm text-gray-400 mt-2">
+                  Requires an active plan (Basic / Standard / Premium)
+                </span>
               </div>
+
               <ul
                 class="space-y-4 mt-8 text-gray-300 flex-grow"
                 aria-label="Enterprise Plan Features"
@@ -1305,39 +1325,102 @@
                     data-lucide="check-check"
                     class="h-5 w-5 check-accent flex-shrink-0"
                     aria-hidden="true"
-                  ></i
-                  ><span>All Premium Features</span>
+                  ></i>
+                  <span><b>All Premium Features</b></span>
                 </li>
+
+                <li class="flex items-center space-x-3">
+                  <i
+                    data-lucide="package-check"
+                    class="h-5 w-5 check-accent flex-shrink-0"
+                    aria-hidden="true"
+                  ></i>
+                  <span><b>All Products Included</b> </span>
+                </li>
+
+                <li class="flex items-center space-x-3">
+                  <i
+                    data-lucide="graduation-cap"
+                    class="h-5 w-5 check-accent flex-shrink-0"
+                    aria-hidden="true"
+                  ></i>
+                  <span class="font-bold">
+                    Hand-on-Hand Training for Owner & Staff
+                  </span>
+                </li>
+
+                <li class="flex items-center space-x-3">
+                  <i
+                    data-lucide="headset"
+                    class="h-5 w-5 check-accent flex-shrink-0"
+                    aria-hidden="true"
+                  ></i>
+                  <span>Full Support (Priority)</span>
+                </li>
+
                 <li class="flex items-center space-x-3">
                   <i
                     data-lucide="link"
                     class="h-5 w-5 check-accent flex-shrink-0"
                     aria-hidden="true"
-                  ></i
-                  ><span>Custom Integrations</span>
+                  ></i>
+                  <span>Custom Integrations</span>
                 </li>
+
                 <li class="flex items-center space-x-3">
                   <i
                     data-lucide="shield-alert"
                     class="h-5 w-5 check-accent flex-shrink-0"
                     aria-hidden="true"
-                  ></i
-                  ><span>24/7 Priority Support</span>
+                  ></i>
+                  <span>24/7 Priority Support</span>
                 </li>
+
                 <li class="flex items-center space-x-3">
                   <i
                     data-lucide="server"
                     class="h-5 w-5 check-accent flex-shrink-0"
                     aria-hidden="true"
-                  ></i
-                  ><span>Custom Infrastructure</span>
+                  ></i>
+                  <span>Custom Infrastructure</span>
+                </li>
+
+                <li
+                  class="flex items-start space-x-3 pt-4 border-t border-gray-700 mt-4"
+                >
+                  <i
+                    data-lucide="info"
+                    class="h-5 w-5 text-gray-400 flex-shrink-0 mt-0.5"
+                    aria-hidden="true"
+                  ></i>
+                  <span
+                    class="text-gray-300 enterprise-note enterprise-note--important"
+                  >
+                    Enterprise requires choosing Basic/Standard/Premium first.
+                  </span>
+                </li>
+
+                <li class="flex items-start space-x-3">
+                  <i
+                    data-lucide="badge-dollar-sign"
+                    class="h-5 w-5 text-gray-400 flex-shrink-0 mt-0.5"
+                    aria-hidden="true"
+                  ></i>
+                  <span
+                    class="text-gray-300 enterprise-note enterprise-note--install"
+                  >
+                    Installation & Setup Cost will be added (one-time).
+                  </span>
                 </li>
               </ul>
-              <a
-                href="mailto:sales@cashshilpo.com"
+
+              <button
+                id="enterprise-call-btn"
                 class="w-full text-center bg-gray-800 text-white font-semibold px-6 py-3 rounded-full hover:bg-gray-700 transition-all duration-300 mt-8"
-                >যোগাযোগ করুন</a
+                type="button"
               >
+                যোগাযোগ করুন
+              </button>
             </article>
           </div>
         </section>
@@ -2301,9 +2384,161 @@
           </div>
         </div>
       </footer>
+      <!-- Enterprise Call Modal -->
+      <div
+        id="enterprise-call-modal"
+        class="fixed inset-0 hidden items-center justify-center z-[99999]"
+        aria-hidden="true"
+      >
+        <div class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
+
+        <div
+          class="relative w-[92%] max-w-md rounded-2xl border border-gray-800 bg-gray-900 p-6 shadow-accent-2xl"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="enterprise-call-title"
+        >
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <h3
+                id="enterprise-call-title"
+                class="text-2xl font-extrabold text-white"
+              >
+                Call Now
+              </h3>
+              <p class="text-gray-400 mt-2">
+                For Enterprise setup, training & full support.
+              </p>
+            </div>
+
+            <button
+              id="enterprise-call-close"
+              class="rounded-full border border-gray-700 px-3 py-1 text-gray-300 hover:text-white hover:border-gray-500 transition"
+              type="button"
+              aria-label="Close"
+            >
+              ✕
+            </button>
+          </div>
+
+          <div class="mt-6 rounded-xl border border-gray-800 bg-black p-4">
+            <p class="text-gray-400 text-sm">Call:</p>
+            <p class="text-3xl font-extrabold text-accent tracking-wide mt-1">
+              01938529096
+            </p>
+          </div>
+
+          <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <a
+              href="tel:01938529096"
+              class="text-center bg-accent text-black font-bold px-6 py-3 rounded-full hover:bg-white transition-all duration-300"
+            >
+              Call Now
+            </a>
+
+            <button
+              id="enterprise-copy-number"
+              class="text-center bg-gray-800 text-white font-semibold px-6 py-3 rounded-full hover:bg-gray-700 transition-all duration-300"
+              type="button"
+            >
+              Copy Number
+            </button>
+          </div>
+
+          <p
+            id="enterprise-copy-toast"
+            class="text-sm text-gray-400 mt-3 hidden"
+          >
+            Number copied ✅
+          </p>
+        </div>
+      </div>
     </div>
 
     <script>
+      (function () {
+        const phoneNumber = "01938529096";
+        const telLink = `tel:${phoneNumber}`;
+
+        const btn = document.getElementById("enterprise-call-btn");
+        const modal = document.getElementById("enterprise-call-modal");
+        const closeBtn = document.getElementById("enterprise-call-close");
+        const copyBtn = document.getElementById("enterprise-copy-number");
+        const toast = document.getElementById("enterprise-copy-toast");
+
+        if (!btn || !modal) return;
+
+        function isDesktop() {
+          // Tailwind md breakpoint style desktop-ish check
+          return window.matchMedia("(min-width: 768px)").matches;
+        }
+
+        function openModal() {
+          modal.classList.remove("hidden");
+          modal.classList.add("flex");
+          modal.setAttribute("aria-hidden", "false");
+          document.body.style.overflow = "hidden";
+        }
+
+        function closeModal() {
+          modal.classList.add("hidden");
+          modal.classList.remove("flex");
+          modal.setAttribute("aria-hidden", "true");
+          document.body.style.overflow = "";
+          if (toast) toast.classList.add("hidden");
+        }
+
+        btn.addEventListener("click", () => {
+          if (isDesktop()) {
+            // Desktop: show a nice popup
+            openModal();
+          } else {
+            // Mobile: direct call redirect
+            window.location.href = telLink;
+          }
+        });
+
+        if (closeBtn) closeBtn.addEventListener("click", closeModal);
+
+        // Close when clicking backdrop
+        modal.addEventListener("click", (e) => {
+          if (e.target === modal || e.target.classList.contains("backdrop")) {
+            closeModal();
+          }
+        });
+
+        // ESC to close
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && !modal.classList.contains("hidden")) {
+            closeModal();
+          }
+        });
+
+        // Copy number
+        if (copyBtn) {
+          copyBtn.addEventListener("click", async () => {
+            try {
+              await navigator.clipboard.writeText(phoneNumber);
+              if (toast) {
+                toast.classList.remove("hidden");
+                setTimeout(() => toast.classList.add("hidden"), 1500);
+              }
+            } catch (err) {
+              // fallback
+              const temp = document.createElement("input");
+              temp.value = phoneNumber;
+              document.body.appendChild(temp);
+              temp.select();
+              document.execCommand("copy");
+              document.body.removeChild(temp);
+              if (toast) {
+                toast.classList.remove("hidden");
+                setTimeout(() => toast.classList.add("hidden"), 1500);
+              }
+            }
+          });
+        }
+      })();
       // Simple mobile menu toggle
       const menuButton = document.getElementById("mobile-menu-button");
       const mobileMenu = document.getElementById("mobile-menu");
@@ -2517,6 +2752,31 @@
           "Send professional price quotes to clients and convert them to invoices with one click.":
             "ক্লায়েন্টদের প্রফেশনাল কোটেশন পাঠান এবং এক ক্লিকেই তা বিক্রয়ে রূপান্তর করুন।",
           "Customer Management (CRM)": "কাস্টমার ম্যানেজমেন্ট (CRM)",
+          // Enterprise (Bangla translations)
+          "Requires an active plan (Basic / Standard / Premium)":
+            "এন্টারপ্রাইজ নিতে হলে আগে বেসিক / স্ট্যান্ডার্ড / প্রিমিয়াম—যেকোনো একটি প্ল্যান অ্যাক্টিভ থাকতে হবে।",
+
+          "All Premium Features": "প্রিমিয়ামের সব ফিচার",
+
+          "All Products Included": "সব পণ্য ইনক্লুডেড",
+
+          "Hand-on-Hand Training for Owner & Staff":
+            "হাতে-কলমে ট্রেনিং (মালিক ও স্টাফ)",
+
+          "Full Support (Priority)": "পূর্ণ সাপোর্ট (প্রায়োরিটি)",
+
+          "Custom Integrations": "কাস্টম ইন্টিগ্রেশন",
+
+          "24/7 Priority Support": "২৪/৭ প্রায়োরিটি সাপোর্ট",
+
+          "Custom Infrastructure": "কাস্টম ইনফ্রাস্ট্রাকচার",
+
+          "Enterprise requires choosing Basic/Standard/Premium first.":
+            "এন্টারপ্রাইজ নিতে হলে আগে বেসিক/স্ট্যান্ডার্ড/প্রিমিয়াম—যেকোনো একটি প্ল্যান বেছে নিতে হবে।",
+
+          "Installation & Setup Cost will be added (one-time).":
+            "ইনস্টলেশন ও সেটআপ খরচ যোগ হবে (একবারের জন্য)।",
+          "Let's Talk": "কথা বলুন",
           "Build customer profiles, track purchase history, manage credit, and handle due payments.":
             "কাস্টমারের কেনাকাটার ইতিহাস ও বকেয়া বা বাকি খাতার হিসাব রাখুন খুব সহজে।",
           "Reports & Analytics": "রিপোর্ট ও অ্যানালিটিক্স",
@@ -2625,21 +2885,38 @@
 
         function translatePage(targetLang) {
           const body = document.body;
+          const root = document.documentElement;
+
           if (targetLang === "bn") {
             body.classList.add("lang-bn");
             walkAndTranslate(body, "toBangla");
             document.documentElement.lang = "bn";
+
+            // ✅ update pseudo labels for Bangla
+            root.style.setProperty("--label-important", "গুরুত্বপূর্ণ: ");
+            root.style.setProperty(
+              "--label-install",
+              "ইনস্টলেশন ও সেটআপ খরচ: ",
+            );
           } else {
             body.classList.remove("lang-bn");
             walkAndTranslate(body, "toEnglish");
             document.documentElement.lang = "en";
+
+            // ✅ back to English
+            root.style.setProperty("--label-important", "Important: ");
+            root.style.setProperty(
+              "--label-install",
+              "Installation & Setup Cost: ",
+            );
           }
+
           const btn = document.getElementById("lang-toggle-btn");
           if (btn) btn.innerHTML = getButtonContent(targetLang);
+
           localStorage.setItem(CONFIG.storageKey, targetLang);
           currentLang = targetLang;
         }
-
         function walkAndTranslate(node, direction) {
           if (node.nodeType === 3) {
             handleTextNode(node, direction);
