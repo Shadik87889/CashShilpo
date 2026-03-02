@@ -1932,6 +1932,9 @@
     "Breakeven Units": "ব্রেকইভেন ইউনিটস",
 
     "Breakeven Revenue": "ব্রেকইভেন রেভিনিউ",
+    Templates: "টেমপ্লেট",
+    "Bank Transfer": "ব্যাংক ট্রান্সফার",
+    "Select Bank": "ব্যাংক নির্বাচন করুন",
   };
 
   // 4. TRANSLATION LOGIC
@@ -1942,7 +1945,7 @@
     if (dictionary[trimmed]) return dictionary[trimmed];
     // Check case-insensitive
     const lowerKey = Object.keys(dictionary).find(
-      (k) => k.toLowerCase() === trimmed.toLowerCase()
+      (k) => k.toLowerCase() === trimmed.toLowerCase(),
     );
     if (lowerKey) return dictionary[lowerKey];
     // Basic plural check (e.g., "Customers" -> "কাস্টমার")

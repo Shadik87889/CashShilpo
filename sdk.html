@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-black">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Shadik Hossain — Portfolio</title>
+
+    <!-- Tailwind (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              display: [
+                "ui-sans-serif",
+                "system-ui",
+                "Inter",
+                "Segoe UI",
+                "Arial",
+              ],
+              mono: [
+                "ui-monospace",
+                "SFMono-Regular",
+                "Menlo",
+                "Monaco",
+                "Consolas",
+                "monospace",
+              ],
+            },
+            colors: {
+              ink: "#050607",
+              mist: "#e7e7ea",
+              glass: "rgba(255,255,255,0.06)",
+              glass2: "rgba(255,255,255,0.10)",
+              accent: "#7CFFB2", // change to electric blue if you want
+              accent2: "#7AA2FF",
+            },
+            boxShadow: {
+              soft: "0 10px 30px rgba(0,0,0,0.45)",
+              glow:
+                "0 0 0 1px rgba(124,255,178,0.18), 0 18px 50px rgba(124,255,178,0.10)",
+            },
+            borderRadius: {
+              "2xl": "1.25rem",
+            },
+          },
+        },
+      };
+    </script>
+
+    <!-- GSAP + ScrollTrigger -->
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+
+    <!-- Lenis smooth scroll -->
+    <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.39/bundled/lenis.min.js"></script>
+
+    <!-- SplitType (text splitting) -->
+    <script src="https://cdn.jsdelivr.net/npm/split-type@0.3.4/umd/index.min.js"></script>
+
+    <style>
+      /* Subtle grain overlay */
+      .grain:before {
+        content: "";
+        position: fixed;
+        inset: -50%;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+        background-size: 180px 180px;
+        opacity: 0.1;
+        mix-blend-mode: overlay;
+        pointer-events: none;
+        transform: translate3d(0, 0, 0);
+        z-index: 50;
+      }
+
+      /* Fancy selection */
+      ::selection {
+        background: rgba(124, 255, 178, 0.25);
+      }
+
+      /* Custom cursor */
+      .cursor {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 14px;
+        height: 14px;
+        border-radius: 999px;
+        background: rgba(231, 231, 234, 0.8);
+        mix-blend-mode: difference;
+        pointer-events: none;
+        transform: translate(-50%, -50%);
+        z-index: 60;
+        will-change: transform;
+      }
+      .cursor-ring {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 44px;
+        height: 44px;
+        border-radius: 999px;
+        border: 1px solid rgba(231, 231, 234, 0.55);
+        mix-blend-mode: difference;
+        pointer-events: none;
+        transform: translate(-50%, -50%);
+        z-index: 59;
+        will-change: transform;
+      }
+
+      /* Smooth image hover distortion-ish feel (simple) */
+      .tilt {
+        transform-style: preserve-3d;
+        will-change: transform;
+      }
+      .tilt > .tilt-inner {
+        transform: translateZ(30px);
+      }
+
+      /* Subtle animated gradient border */
+      .grad-border {
+        position: relative;
+      }
+      .grad-border:before {
+        content: "";
+        position: absolute;
+        inset: -1px;
+        background: linear-gradient(
+          120deg,
+          rgba(124, 255, 178, 0.35),
+          rgba(122, 162, 255, 0.25),
+          rgba(124, 255, 178, 0.25)
+        );
+        filter: blur(8px);
+        opacity: 0.35;
+        z-index: -1;
+        border-radius: 1.35rem;
+        animation: breathe 6s ease-in-out infinite;
+      }
+      @keyframes breathe {
+        0%,
+        100% {
+          opacity: 0.25;
+        }
+        50% {
+          opacity: 0.55;
+        }
+      }
+
+      /* Sticky nav backdrop */
+      .nav-blur {
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+      }
+
+      /* Canvas background */
+      #bgCanvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        opacity: 0.55;
+      }
+
+      /* Reduce motion */
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          scroll-behavior: auto !important;
+        }
+      }
+    </style>
+  </head>
+
+  <body class="h-full text-mist font-display grain overflow-x-hidden">
+    <!-- Custom Cursor -->
+    <div class="cursor hidden md:block"></div>
+    <div class="cursor-ring hidden md:block"></div>
+
+    <!-- Top Nav -->
+    <header class="fixed top-0 left-0 right-0 z-40">
+      <div class="mx-auto max-w-7xl px-5">
+        <nav
+          class="nav-blur mt-4 flex items-center justify-between rounded-2xl border border-white/10 bg-glass px-4 py-3 shadow-soft"
+        >
+          <a href="#top" class="group inline-flex items-center gap-2">
+            <span
+              class="h-2.5 w-2.5 rounded-full bg-accent shadow-[0_0_18px_rgba(124,255,178,.45)]"
+            ></span>
+            <span class="text-sm tracking-wide text-white/90"
+              >Shadik<span class="text-white/50">.portfolio</span></span
+            >
+          </a>
+          <div class="hidden md:flex items-center gap-7 text-sm text-white/70">
+            <a class="hover:text-white transition" href="#work">Work</a>
+            <a class="hover:text-white transition" href="#about">About</a>
+            <a class="hover:text-white transition" href="#timeline">Timeline</a>
+            <a class="hover:text-white transition" href="#contact">Contact</a>
+          </div>
+          <div class="flex items-center gap-2">
+            <a
+              class="magnetic inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/80 hover:bg-white/10 transition"
+              href="#work"
+              data-magnetic
+            >
+              View Work
+            </a>
+            <a
+              class="magnetic inline-flex items-center justify-center rounded-xl border border-accent/25 bg-accent/10 px-3 py-2 text-sm text-white hover:bg-accent/15 transition"
+              href="#contact"
+              data-magnetic
+            >
+              Contact
+            </a>
+          </div>
+        </nav>
+      </div>
+    </header>
+
+    <!-- Main -->
+    <main id="top" class="relative">
+      <!-- HERO -->
+      <section class="relative min-h-[100svh] overflow-hidden">
+        <canvas id="bgCanvas" aria-hidden="true"></canvas>
+
+        <div class="relative z-10 mx-auto max-w-7xl px-5 pt-32 md:pt-40 pb-16">
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-10 items-end">
+            <div class="md:col-span-8">
+              <p
+                class="reveal-up inline-flex items-center gap-2 rounded-full border border-white/10 bg-glass px-4 py-2 text-xs tracking-widest uppercase text-white/70"
+              >
+                <span class="h-1.5 w-1.5 rounded-full bg-accent"></span>
+                Systems • UI • Motion • Impact
+              </p>
+
+              <h1
+                class="reveal-up mt-5 text-4xl md:text-6xl lg:text-7xl font-semibold leading-[1.02] tracking-tight"
+              >
+                <span class="text-white">Shadik Hossain</span><br />
+                <span class="text-white/60">Building systems for</span>
+                <span class="text-accent"> real-world impact</span>.
+              </h1>
+
+              <p
+                class="reveal-up mt-6 max-w-2xl text-base md:text-lg text-white/60 leading-relaxed"
+              >
+                Web developer & system thinker. Founder of
+                <span class="text-white/85">Rural Peace</span>. I design premium
+                experiences and scalable products that solve practical problems.
+              </p>
+
+              <div class="reveal-up mt-8 flex flex-wrap gap-3">
+                <a
+                  href="#work"
+                  class="magnetic group inline-flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm text-white/85 hover:bg-white/10 transition"
+                  data-magnetic
+                >
+                  <span
+                    class="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-white/5 border border-white/10"
+                  >
+                    <span
+                      class="block h-2.5 w-2.5 rounded-full bg-accent"
+                    ></span>
+                  </span>
+                  Enter Experience
+                  <span
+                    class="text-white/40 group-hover:text-white/70 transition"
+                    >↘</span
+                  >
+                </a>
+
+                <button
+                  id="copyEmailBtn"
+                  class="magnetic inline-flex items-center gap-2 rounded-2xl border border-accent/25 bg-accent/10 px-5 py-3 text-sm text-white hover:bg-accent/15 transition"
+                  data-magnetic
+                >
+                  Copy Email
+                  <span class="text-white/60"
+                    >mdshadikhossain830@gmail.com</span
+                  >
+                </button>
+              </div>
+
+              <div
+                class="reveal-up mt-10 flex items-center gap-5 text-xs text-white/50"
+              >
+                <div class="flex items-center gap-2">
+                  <span class="h-1.5 w-1.5 rounded-full bg-white/40"></span>
+                  <span>Available for freelance</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="h-1.5 w-1.5 rounded-full bg-white/40"></span>
+                  <span>Bangladesh • Remote</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="md:col-span-4">
+              <div
+                class="reveal-up grad-border rounded-2xl border border-white/10 bg-glass p-5 shadow-soft"
+              >
+                <p class="text-xs uppercase tracking-widest text-white/50">
+                  Now
+                </p>
+                <p class="mt-2 text-sm text-white/75 leading-relaxed">
+                  Crafting a portfolio with motion, clarity, and premium UI —
+                  inspired by Awwwards-level experiences.
+                </p>
+
+                <div class="mt-5 grid grid-cols-2 gap-3 text-xs">
+                  <div
+                    class="rounded-2xl border border-white/10 bg-white/5 p-4"
+                  >
+                    <p class="text-white/60">Focus</p>
+                    <p class="mt-1 text-white/85">Systems</p>
+                  </div>
+                  <div
+                    class="rounded-2xl border border-white/10 bg-white/5 p-4"
+                  >
+                    <p class="text-white/60">Style</p>
+                    <p class="mt-1 text-white/85">Premium Minimal</p>
+                  </div>
+                  <div
+                    class="rounded-2xl border border-white/10 bg-white/5 p-4"
+                  >
+                    <p class="text-white/60">Stack</p>
+                    <p class="mt-1 text-white/85">Node + Motion</p>
+                  </div>
+                  <div
+                    class="rounded-2xl border border-white/10 bg-white/5 p-4"
+                  >
+                    <p class="text-white/60">Mission</p>
+                    <p class="mt-1 text-white/85">Impact</p>
+                  </div>
+                </div>
+
+                <div class="mt-5 flex items-center justify-between">
+                  <p class="text-xs text-white/50">Scroll</p>
+                  <div
+                    class="h-8 w-8 rounded-full border border-white/15 bg-white/5 flex items-center justify-center"
+                  >
+                    <span class="animate-bounce text-white/60">↓</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- marquee -->
+          <div
+            class="mt-16 overflow-hidden rounded-2xl border border-white/10 bg-white/5"
+          >
+            <div
+              class="marquee flex w-[200%] gap-10 py-4 text-xs uppercase tracking-[.3em] text-white/35"
+            >
+              <div class="flex w-1/2 justify-around">
+                <span>UI/UX</span><span>Systems</span><span>Motion</span
+                ><span>Scalable Products</span><span>Impact</span
+                ><span>Premium Web</span>
+              </div>
+              <div class="flex w-1/2 justify-around">
+                <span>UI/UX</span><span>Systems</span><span>Motion</span
+                ><span>Scalable Products</span><span>Impact</span
+                ><span>Premium Web</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-b from-transparent to-black"
+        ></div>
+      </section>
+
+      <!-- STATEMENT -->
+      <section class="relative py-20">
+        <div class="mx-auto max-w-7xl px-5">
+          <div class="grid md:grid-cols-12 gap-10 items-start">
+            <div class="md:col-span-7">
+              <h2
+                class="split text-3xl md:text-5xl font-semibold tracking-tight leading-[1.05]"
+              >
+                I don’t just build websites.<br />I build
+                <span class="text-accent">systems</span>.
+              </h2>
+            </div>
+            <div class="md:col-span-5">
+              <p class="text-white/60 leading-relaxed">
+                From small business tools to community-focused platforms, I turn
+                messy real-world problems into clean, scalable digital
+                experiences.
+              </p>
+              <div class="mt-6 flex flex-wrap gap-2 text-xs text-white/60">
+                <span
+                  class="rounded-full border border-white/10 bg-white/5 px-3 py-1"
+                  >Product Thinking</span
+                >
+                <span
+                  class="rounded-full border border-white/10 bg-white/5 px-3 py-1"
+                  >System Design</span
+                >
+                <span
+                  class="rounded-full border border-white/10 bg-white/5 px-3 py-1"
+                  >Motion + UI</span
+                >
+                <span
+                  class="rounded-full border border-white/10 bg-white/5 px-3 py-1"
+                  >Real Impact</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- WORK -->
+      <section id="work" class="py-20">
+        <div class="mx-auto max-w-7xl px-5">
+          <div class="flex items-end justify-between gap-6">
+            <div>
+              <p class="text-xs uppercase tracking-widest text-white/50">
+                Selected Work
+              </p>
+              <h3
+                class="mt-2 text-2xl md:text-4xl font-semibold tracking-tight"
+              >
+                Case studies that feel like launches.
+              </h3>
+            </div>
+            <div
+              class="hidden md:flex items-center gap-2 text-xs text-white/50"
+            >
+              <span class="h-1.5 w-1.5 rounded-full bg-accent"></span>
+              Hover to tilt • Click for details
+            </div>
+          </div>
+
+          <div
+            id="projectsGrid"
+            class="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6"
+          ></div>
+
+          <!-- Modal -->
+          <div id="modal" class="fixed inset-0 z-50 hidden">
+            <div id="modalBackdrop" class="absolute inset-0 bg-black/70"></div>
+            <div class="relative mx-auto mt-20 max-w-3xl px-5">
+              <div
+                class="grad-border rounded-2xl border border-white/10 bg-ink p-6 shadow-soft"
+              >
+                <div class="flex items-start justify-between gap-4">
+                  <div>
+                    <p
+                      id="modalTag"
+                      class="text-xs uppercase tracking-widest text-white/50"
+                    ></p>
+                    <h4
+                      id="modalTitle"
+                      class="mt-2 text-2xl font-semibold"
+                    ></h4>
+                  </div>
+                  <button
+                    id="modalClose"
+                    class="magnetic rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/80 hover:bg-white/10 transition"
+                    data-magnetic
+                  >
+                    Close
+                  </button>
+                </div>
+                <p
+                  id="modalDesc"
+                  class="mt-4 text-white/60 leading-relaxed"
+                ></p>
+
+                <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div
+                    class="rounded-2xl border border-white/10 bg-white/5 p-4"
+                  >
+                    <p class="text-xs text-white/50">Problem</p>
+                    <p id="modalProblem" class="mt-1 text-sm text-white/80"></p>
+                  </div>
+                  <div
+                    class="rounded-2xl border border-white/10 bg-white/5 p-4"
+                  >
+                    <p class="text-xs text-white/50">Solution</p>
+                    <p
+                      id="modalSolution"
+                      class="mt-1 text-sm text-white/80"
+                    ></p>
+                  </div>
+                  <div
+                    class="rounded-2xl border border-white/10 bg-white/5 p-4"
+                  >
+                    <p class="text-xs text-white/50">Stack</p>
+                    <p id="modalStack" class="mt-1 text-sm text-white/80"></p>
+                  </div>
+                </div>
+
+                <div class="mt-6 flex flex-wrap gap-2">
+                  <a
+                    id="modalLink"
+                    href="#"
+                    target="_blank"
+                    rel="noreferrer"
+                    class="magnetic inline-flex items-center gap-2 rounded-2xl border border-accent/25 bg-accent/10 px-4 py-2 text-sm text-white hover:bg-accent/15 transition"
+                    data-magnetic
+                  >
+                    Open Link <span class="text-white/60">↗</span>
+                  </a>
+                  <button
+                    id="modalCopy"
+                    class="magnetic inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/80 hover:bg-white/10 transition"
+                    data-magnetic
+                  >
+                    Copy summary
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ABOUT -->
+      <section id="about" class="py-20">
+        <div class="mx-auto max-w-7xl px-5">
+          <div class="grid md:grid-cols-12 gap-10 items-start">
+            <div class="md:col-span-6">
+              <p class="text-xs uppercase tracking-widest text-white/50">
+                About
+              </p>
+              <h3
+                class="mt-2 text-3xl md:text-5xl font-semibold tracking-tight leading-[1.05]"
+              >
+                Responsibility begins with <span class="text-accent">me</span>.
+              </h3>
+              <p class="mt-6 text-white/60 leading-relaxed">
+                I’m a humanities-background student who fell in love with
+                building practical systems. I’m the founder of
+                <span class="text-white/80">Rural Peace</span> and I create
+                initiatives like
+                <span class="text-white/80">SoftShilpo</span> to help businesses
+                and communities operate smarter.
+              </p>
+            </div>
+            <div class="md:col-span-6">
+              <div
+                class="grad-border rounded-2xl border border-white/10 bg-glass p-6 shadow-soft"
+              >
+                <p class="text-xs uppercase tracking-widest text-white/50">
+                  Highlights
+                </p>
+                <ul class="mt-4 space-y-3 text-sm text-white/70">
+                  <li class="flex items-start gap-3">
+                    <span class="mt-1 h-2 w-2 rounded-full bg-accent"></span>
+                    <span
+                      >GPA 5.00 in SSC & HSC • Ranked 57th under Rajshahi
+                      Board</span
+                    >
+                  </li>
+                  <li class="flex items-start gap-3">
+                    <span class="mt-1 h-2 w-2 rounded-full bg-accent"></span>
+                    <span
+                      >Built systems like CashShilpo, GramShilpo, HostelShilpo
+                      (and more)</span
+                    >
+                  </li>
+                  <li class="flex items-start gap-3">
+                    <span class="mt-1 h-2 w-2 rounded-full bg-accent"></span>
+                    <span
+                      >Wrote books early • Strong bias toward action +
+                      creation</span
+                    >
+                  </li>
+                </ul>
+
+                <div class="mt-6 border-t border-white/10 pt-6">
+                  <p class="text-xs uppercase tracking-widest text-white/50">
+                    Skill Cloud
+                  </p>
+                  <div id="skillCloud" class="mt-4 flex flex-wrap gap-2"></div>
+                  <p class="mt-4 text-xs text-white/45">
+                    Drag tags. Yes, it’s playful.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TIMELINE (horizontal scroll) -->
+      <section id="timeline" class="py-20">
+        <div class="mx-auto max-w-7xl px-5">
+          <div class="flex items-end justify-between gap-6">
+            <div>
+              <p class="text-xs uppercase tracking-widest text-white/50">
+                Timeline
+              </p>
+              <h3
+                class="mt-2 text-2xl md:text-4xl font-semibold tracking-tight"
+              >
+                Proof of momentum.
+              </h3>
+            </div>
+            <p class="hidden md:block text-sm text-white/50">Scroll →</p>
+          </div>
+
+          <div
+            class="mt-10 overflow-hidden rounded-2xl border border-white/10 bg-white/5"
+          >
+            <div id="timelineTrack" class="flex gap-4 p-4 md:p-6 w-max">
+              <!-- injected -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CONTACT -->
+      <section id="contact" class="py-20">
+        <div class="mx-auto max-w-7xl px-5">
+          <div
+            class="grad-border rounded-2xl border border-white/10 bg-glass p-8 md:p-12 shadow-soft"
+          >
+            <p class="text-xs uppercase tracking-widest text-white/50">
+              Contact
+            </p>
+            <h3
+              class="mt-2 text-3xl md:text-5xl font-semibold tracking-tight leading-[1.05]"
+            >
+              Let’s build something <span class="text-accent">meaningful</span>.
+            </h3>
+            <p class="mt-6 max-w-2xl text-white/60 leading-relaxed">
+              If you need a premium website, a motion-heavy landing page, or a
+              product system with clean UI — I’m ready.
+            </p>
+
+            <div class="mt-8 flex flex-wrap items-center gap-3">
+              <a
+                class="magnetic inline-flex items-center gap-2 rounded-2xl border border-accent/25 bg-accent/10 px-5 py-3 text-sm text-white hover:bg-accent/15 transition"
+                href="mailto:mdshadikhossain830@gmail.com"
+                data-magnetic
+              >
+                Email Me <span class="text-white/60">↗</span>
+              </a>
+
+              <button
+                id="copyEmailBtn2"
+                class="magnetic inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm text-white/85 hover:bg-white/10 transition"
+                data-magnetic
+              >
+                Copy Email
+              </button>
+
+              <a
+                class="magnetic inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm text-white/85 hover:bg-white/10 transition"
+                href="#top"
+                data-magnetic
+              >
+                Back to top <span class="text-white/60">↑</span>
+              </a>
+            </div>
+
+            <div
+              class="mt-10 flex items-center justify-between text-xs text-white/40"
+            >
+              <span>© <span id="year"></span> Shadik Hossain</span>
+              <span class="font-mono">GSAP • Lenis • Tailwind • SplitType</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Toast -->
+    <div
+      id="toast"
+      class="fixed bottom-6 left-1/2 z-[70] hidden -translate-x-1/2 rounded-2xl border border-white/10 bg-ink/90 px-4 py-3 text-sm text-white/85 shadow-soft"
+    >
+      Copied.
+    </div>
+
+    <script>
+      // -----------------------------
+      // Lenis smooth scrolling
+      // -----------------------------
+      const lenis = new Lenis({
+        duration: 1.15,
+        smoothWheel: true,
+        smoothTouch: false,
+      });
+
+      function raf(time) {
+        lenis.raf(time);
+        requestAnimationFrame(raf);
+      }
+      requestAnimationFrame(raf);
+
+      // Enable GSAP ScrollTrigger with Lenis
+      gsap.registerPlugin(ScrollTrigger);
+      lenis.on("scroll", ScrollTrigger.update);
+      gsap.ticker.add((time) => lenis.raf(time * 1000));
+      gsap.ticker.lagSmoothing(0);
+
+      // -----------------------------
+      // Data
+      // -----------------------------
+      const projects = [
+        {
+          title: "SoftShilpo Suite",
+          tag: "Systems • Small Business",
+          desc:
+            "A family of tools designed to organize operations, data, and workflows for real-world use — built with simplicity and scale in mind.",
+          problem:
+            "Small businesses & communities struggle with messy, manual operations.",
+          solution:
+            "Structured modules for cashflow, population data, hostel ops, and more.",
+          stack: "Node.js • Express • UI Systems • Motion",
+          link: "https://ruralpeace.org",
+        },
+        {
+          title: "Rural Peace (Org)",
+          tag: "Impact • Community",
+          desc:
+            "A platform and mission focused on empowering rural development through organized systems and accessible digital experiences.",
+          problem:
+            "Rural initiatives often lack structure, visibility, and digital tools.",
+          solution: "Clear brand + systems mindset + scalable web presence.",
+          stack: "Web • Content • Community Systems",
+          link: "https://ruralpeace.org",
+        },
+        {
+          title: "CashShilpo",
+          tag: "Fintech • Operations",
+          desc:
+            "A practical cash & transaction management concept designed for small shops to keep records clean and fast.",
+          problem: "Manual transaction logs cause errors and confusion.",
+          solution: "Simple flows + dashboard-first UI for quick daily use.",
+          stack: "UI/UX • Dashboards • Data Flow",
+          link: "https://ruralpeace.org",
+        },
+        {
+          title: "GramShilpo",
+          tag: "Civic • Data",
+          desc:
+            "A structured approach to digitizing village population and local data — built for clarity and future integration.",
+          problem: "Local data is scattered and unusable.",
+          solution: "Normalize and structure population records for scale.",
+          stack: "Data Modeling • Systems • Admin UI",
+          link: "https://ruralpeace.org",
+        },
+      ];
+
+      const timeline = [
+        {
+          title: "Wrote early books",
+          meta: "Created stories & published early",
+          year: "Teen years",
+        },
+        {
+          title: "Started building systems",
+          meta: "Turned problems into products",
+          year: "Early",
+        },
+        {
+          title: "Founded Rural Peace",
+          meta: "Non-profit mission & community impact",
+          year: "Now",
+        },
+        {
+          title: "SoftShilpo initiatives",
+          meta: "CashShilpo, GramShilpo, HostelShilpo...",
+          year: "Ongoing",
+        },
+        {
+          title: "Premium web experiences",
+          meta: "Motion + UX + performance",
+          year: "Current",
+        },
+      ];
+
+      const skills = [
+        "React",
+        "Node.js",
+        "Express",
+        "UI/UX",
+        "System Design",
+        "Motion",
+        "Brand",
+        "Strategy",
+        "MIS Vision",
+        "Performance",
+      ];
+
+      // -----------------------------
+      // Render projects
+      // -----------------------------
+      const grid = document.getElementById("projectsGrid");
+
+      projects.forEach((p, idx) => {
+        const card = document.createElement("button");
+        card.className =
+          "project-card tilt group text-left rounded-2xl border border-white/10 bg-white/5 p-6 shadow-soft hover:shadow-glow transition focus:outline-none";
+        card.setAttribute("type", "button");
+        card.dataset.index = idx;
+
+        card.innerHTML = `
+        <div class="tilt-inner">
+          <p class="text-xs uppercase tracking-widest text-white/50">${p.tag}</p>
+          <h4 class="mt-2 text-xl md:text-2xl font-semibold tracking-tight text-white">${p.title}</h4>
+          <p class="mt-3 text-sm text-white/60 leading-relaxed">${p.desc}</p>
+
+          <div class="mt-6 flex items-center justify-between">
+            <div class="flex items-center gap-2 text-xs text-white/45">
+              <span class="h-1.5 w-1.5 rounded-full bg-accent"></span>
+              <span>Open case study</span>
+            </div>
+            <span class="text-white/40 group-hover:text-white/70 transition">↗</span>
+          </div>
+        </div>
+      `;
+        grid.appendChild(card);
+      });
+
+      // -----------------------------
+      // Render timeline
+      // -----------------------------
+      const track = document.getElementById("timelineTrack");
+      timeline.forEach((t) => {
+        const item = document.createElement("div");
+        item.className =
+          "timeline-card min-w-[260px] md:min-w-[320px] rounded-2xl border border-white/10 bg-ink/60 p-5";
+        item.innerHTML = `
+        <p class="text-xs uppercase tracking-widest text-white/50">${t.year}</p>
+        <h4 class="mt-2 text-lg font-semibold">${t.title}</h4>
+        <p class="mt-2 text-sm text-white/60 leading-relaxed">${t.meta}</p>
+      `;
+        track.appendChild(item);
+      });
+
+      // -----------------------------
+      // Skill cloud (draggable)
+      // -----------------------------
+      const cloud = document.getElementById("skillCloud");
+      skills.forEach((s) => {
+        const tag = document.createElement("div");
+        tag.className =
+          "skill-chip cursor-grab select-none rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/70";
+        tag.textContent = s;
+        cloud.appendChild(tag);
+      });
+
+      // Basic drag (nice feel without extra libs)
+      let dragEl = null,
+        startX = 0,
+        startY = 0,
+        elX = 0,
+        elY = 0;
+      cloud.addEventListener("pointerdown", (e) => {
+        const target = e.target.closest(".skill-chip");
+        if (!target) return;
+        dragEl = target;
+        dragEl.setPointerCapture(e.pointerId);
+        dragEl.classList.add("cursor-grabbing");
+        const rect = dragEl.getBoundingClientRect();
+        startX = e.clientX;
+        startY = e.clientY;
+        elX = rect.left;
+        elY = rect.top;
+        dragEl.style.position = "relative";
+        dragEl.style.zIndex = 10;
+      });
+      cloud.addEventListener("pointermove", (e) => {
+        if (!dragEl) return;
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        dragEl.style.transform = `translate(${dx}px, ${dy}px)`;
+      });
+      cloud.addEventListener("pointerup", () => {
+        if (!dragEl) return;
+        dragEl.classList.remove("cursor-grabbing");
+        gsap.to(dragEl, { x: 0, y: 0, duration: 0.6, ease: "expo.out" });
+        dragEl.style.transform = "";
+        dragEl.style.zIndex = "";
+        dragEl = null;
+      });
+
+      // -----------------------------
+      // Modal
+      // -----------------------------
+      const modal = document.getElementById("modal");
+      const modalBackdrop = document.getElementById("modalBackdrop");
+      const modalClose = document.getElementById("modalClose");
+      const modalTag = document.getElementById("modalTag");
+      const modalTitle = document.getElementById("modalTitle");
+      const modalDesc = document.getElementById("modalDesc");
+      const modalProblem = document.getElementById("modalProblem");
+      const modalSolution = document.getElementById("modalSolution");
+      const modalStack = document.getElementById("modalStack");
+      const modalLink = document.getElementById("modalLink");
+      const modalCopy = document.getElementById("modalCopy");
+
+      function openModal(p) {
+        modalTag.textContent = p.tag;
+        modalTitle.textContent = p.title;
+        modalDesc.textContent = p.desc;
+        modalProblem.textContent = p.problem;
+        modalSolution.textContent = p.solution;
+        modalStack.textContent = p.stack;
+        modalLink.href = p.link;
+
+        modal.classList.remove("hidden");
+        gsap.fromTo(
+          modal.querySelector(".grad-border"),
+          { y: 20, opacity: 0, scale: 0.98 },
+          { y: 0, opacity: 1, scale: 1, duration: 0.6, ease: "expo.out" },
+        );
+      }
+      function closeModal() {
+        gsap.to(modal.querySelector(".grad-border"), {
+          y: 12,
+          opacity: 0,
+          scale: 0.99,
+          duration: 0.35,
+          ease: "expo.in",
+          onComplete: () => modal.classList.add("hidden"),
+        });
+      }
+
+      grid.addEventListener("click", (e) => {
+        const card = e.target.closest(".project-card");
+        if (!card) return;
+        const p = projects[Number(card.dataset.index)];
+        openModal(p);
+      });
+
+      modalBackdrop.addEventListener("click", closeModal);
+      modalClose.addEventListener("click", closeModal);
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && !modal.classList.contains("hidden"))
+          closeModal();
+      });
+
+      modalCopy.addEventListener("click", async () => {
+        const text = `${modalTitle.textContent} — ${modalDesc.textContent}\nProblem: ${modalProblem.textContent}\nSolution: ${modalSolution.textContent}\nStack: ${modalStack.textContent}`;
+        await navigator.clipboard.writeText(text);
+        toast("Copied summary.");
+      });
+
+      // -----------------------------
+      // Copy email + toast
+      // -----------------------------
+      const email = "mdshadikhossain830@gmail.com";
+      document
+        .getElementById("copyEmailBtn")
+        .addEventListener("click", async () => {
+          await navigator.clipboard.writeText(email);
+          toast("Copied email.");
+        });
+      document
+        .getElementById("copyEmailBtn2")
+        .addEventListener("click", async () => {
+          await navigator.clipboard.writeText(email);
+          toast("Copied email.");
+        });
+
+      const toastEl = document.getElementById("toast");
+      let toastTimer = null;
+      function toast(msg) {
+        toastEl.textContent = msg;
+        toastEl.classList.remove("hidden");
+        gsap.fromTo(
+          toastEl,
+          { y: 10, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.35, ease: "expo.out" },
+        );
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => {
+          gsap.to(toastEl, {
+            y: 10,
+            opacity: 0,
+            duration: 0.3,
+            ease: "expo.in",
+            onComplete: () => toastEl.classList.add("hidden"),
+          });
+        }, 1200);
+      }
+
+      document.getElementById("year").textContent = new Date().getFullYear();
+
+      // -----------------------------
+      // Magnetic buttons
+      // -----------------------------
+      const magnets = document.querySelectorAll("[data-magnetic]");
+      magnets.forEach((el) => {
+        const strength = 0.28;
+        el.addEventListener("mousemove", (e) => {
+          const r = el.getBoundingClientRect();
+          const x = (e.clientX - (r.left + r.width / 2)) * strength;
+          const y = (e.clientY - (r.top + r.height / 2)) * strength;
+          gsap.to(el, { x, y, duration: 0.35, ease: "power3.out" });
+        });
+        el.addEventListener("mouseleave", () => {
+          gsap.to(el, { x: 0, y: 0, duration: 0.55, ease: "expo.out" });
+        });
+      });
+
+      // -----------------------------
+      // Tilt cards (simple)
+      // -----------------------------
+      const tilts = document.querySelectorAll(".tilt");
+      tilts.forEach((card) => {
+        const inner = card.querySelector(".tilt-inner");
+        card.addEventListener("mousemove", (e) => {
+          const r = card.getBoundingClientRect();
+          const px = (e.clientX - r.left) / r.width;
+          const py = (e.clientY - r.top) / r.height;
+          const rx = (py - 0.5) * -10;
+          const ry = (px - 0.5) * 10;
+          gsap.to(card, {
+            rotateX: rx,
+            rotateY: ry,
+            duration: 0.35,
+            ease: "power3.out",
+          });
+          gsap.to(inner, {
+            x: (px - 0.5) * 8,
+            y: (py - 0.5) * 8,
+            duration: 0.35,
+            ease: "power3.out",
+          });
+        });
+        card.addEventListener("mouseleave", () => {
+          gsap.to(card, {
+            rotateX: 0,
+            rotateY: 0,
+            duration: 0.7,
+            ease: "expo.out",
+          });
+          gsap.to(inner, { x: 0, y: 0, duration: 0.7, ease: "expo.out" });
+        });
+      });
+
+      // -----------------------------
+      // Custom cursor
+      // -----------------------------
+      const cursor = document.querySelector(".cursor");
+      const ring = document.querySelector(".cursor-ring");
+
+      let mouseX = window.innerWidth / 2,
+        mouseY = window.innerHeight / 2;
+      let ringX = mouseX,
+        ringY = mouseY;
+
+      window.addEventListener("mousemove", (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        gsap.to(cursor, {
+          x: mouseX,
+          y: mouseY,
+          duration: 0.08,
+          ease: "power2.out",
+        });
+      });
+
+      function cursorLoop() {
+        ringX += (mouseX - ringX) * 0.12;
+        ringY += (mouseY - ringY) * 0.12;
+        ring.style.transform = `translate(${ringX}px, ${ringY}px) translate(-50%,-50%)`;
+        requestAnimationFrame(cursorLoop);
+      }
+      cursorLoop();
+
+      // Cursor scale on interactive items
+      const interactive = document.querySelectorAll(
+        "a, button, .project-card, .timeline-card, .skill-chip",
+      );
+      interactive.forEach((el) => {
+        el.addEventListener("mouseenter", () => {
+          gsap.to(cursor, { scale: 1.8, duration: 0.25, ease: "power3.out" });
+          gsap.to(ring, { scale: 1.25, duration: 0.25, ease: "power3.out" });
+        });
+        el.addEventListener("mouseleave", () => {
+          gsap.to(cursor, { scale: 1, duration: 0.25, ease: "power3.out" });
+          gsap.to(ring, { scale: 1, duration: 0.25, ease: "power3.out" });
+        });
+      });
+
+      // -----------------------------
+      // Marquee animation (CSS-free via GSAP for smooth)
+      // -----------------------------
+      gsap.to(".marquee", {
+        xPercent: -50,
+        repeat: -1,
+        duration: 18,
+        ease: "none",
+      });
+
+      // -----------------------------
+      // Text splitting + animations
+      // -----------------------------
+      const split = new SplitType(".split", {
+        types: "lines,words",
+        lineClass: "split-line",
+      });
+
+      gsap.from(split.words, {
+        yPercent: 120,
+        opacity: 0,
+        stagger: 0.012,
+        duration: 0.9,
+        ease: "expo.out",
+        scrollTrigger: {
+          trigger: ".split",
+          start: "top 80%",
+        },
+      });
+
+      // Reveal-up group
+      gsap.utils.toArray(".reveal-up").forEach((el, i) => {
+        gsap.fromTo(
+          el,
+          { y: 18, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.9,
+            ease: "expo.out",
+            delay: i * 0.05,
+          },
+        );
+      });
+
+      // Section entrance
+      gsap.utils.toArray("section").forEach((sec) => {
+        gsap.fromTo(
+          sec.querySelectorAll(".project-card, .timeline-card"),
+          { y: 18, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.85,
+            ease: "power3.out",
+            stagger: 0.06,
+            scrollTrigger: { trigger: sec, start: "top 75%" },
+          },
+        );
+      });
+
+      // Horizontal-ish timeline scroll effect (simulate)
+      // We'll pin the timeline on desktop and scrub track translateX.
+      const timelineSection = document.querySelector("#timeline");
+      const timelineTrack = document.querySelector("#timelineTrack");
+
+      function setupTimelinePin() {
+        ScrollTrigger.getAll().forEach((st) => {
+          if (st.vars && st.vars.id === "timelinePin") st.kill();
+        });
+
+        if (window.matchMedia("(min-width: 768px)").matches) {
+          const totalWidth = timelineTrack.scrollWidth;
+          const visibleWidth = timelineSection.querySelector(".overflow-hidden")
+            .clientWidth;
+          const distance = totalWidth - visibleWidth;
+
+          gsap.to(timelineTrack, {
+            x: -Math.max(0, distance),
+            ease: "none",
+            scrollTrigger: {
+              id: "timelinePin",
+              trigger: timelineSection,
+              start: "top top",
+              end: () => `+=${Math.max(400, totalWidth)}`,
+              scrub: 0.8,
+              pin: true,
+              anticipatePin: 1,
+            },
+          });
+        } else {
+          gsap.set(timelineTrack, { x: 0 });
+        }
+      }
+      setupTimelinePin();
+      window.addEventListener("resize", () => {
+        setupTimelinePin();
+        ScrollTrigger.refresh();
+      });
+
+      // -----------------------------
+      // Hero Canvas background (animated grid + nodes)
+      // -----------------------------
+      const canvas = document.getElementById("bgCanvas");
+      const ctx = canvas.getContext("2d", { alpha: true });
+      let w, h, dpr;
+
+      function resize() {
+        dpr = Math.min(2, window.devicePixelRatio || 1);
+        w = canvas.clientWidth;
+        h = canvas.clientHeight;
+        canvas.width = Math.floor(w * dpr);
+        canvas.height = Math.floor(h * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+      window.addEventListener("resize", resize);
+      resize();
+
+      const nodes = Array.from({ length: 70 }).map(() => ({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        vx: (Math.random() - 0.5) * 0.25,
+        vy: (Math.random() - 0.5) * 0.25,
+      }));
+
+      function drawGrid() {
+        ctx.clearRect(0, 0, w, h);
+
+        // Gradient wash
+        const g = ctx.createRadialGradient(
+          w * 0.55,
+          h * 0.35,
+          40,
+          w * 0.55,
+          h * 0.35,
+          Math.max(w, h),
+        );
+        g.addColorStop(0, "rgba(124,255,178,0.08)");
+        g.addColorStop(0.4, "rgba(122,162,255,0.06)");
+        g.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, w, h);
+
+        // grid
+        ctx.globalAlpha = 0.35;
+        ctx.strokeStyle = "rgba(255,255,255,0.07)";
+        ctx.lineWidth = 1;
+        const step = 44;
+        for (let x = 0; x < w; x += step) {
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, h);
+          ctx.stroke();
+        }
+        for (let y = 0; y < h; y += step) {
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(w, y);
+          ctx.stroke();
+        }
+        ctx.globalAlpha = 1;
+
+        // nodes + lines
+        for (const n of nodes) {
+          n.x += n.vx;
+          n.y += n.vy;
+          if (n.x < 0 || n.x > w) n.vx *= -1;
+          if (n.y < 0 || n.y > h) n.vy *= -1;
+        }
+
+        for (let i = 0; i < nodes.length; i++) {
+          for (let j = i + 1; j < nodes.length; j++) {
+            const a = nodes[i],
+              b = nodes[j];
+            const dx = a.x - b.x,
+              dy = a.y - b.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 120) {
+              ctx.strokeStyle = `rgba(124,255,178,${(1 - dist / 120) * 0.09})`;
+              ctx.beginPath();
+              ctx.moveTo(a.x, a.y);
+              ctx.lineTo(b.x, b.y);
+              ctx.stroke();
+            }
+          }
+        }
+
+        for (const n of nodes) {
+          ctx.fillStyle = "rgba(231,231,234,0.35)";
+          ctx.beginPath();
+          ctx.arc(n.x, n.y, 1.2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        requestAnimationFrame(drawGrid);
+      }
+      drawGrid();
+
+      // -----------------------------
+      // Smooth anchor scrolling (Lenis)
+      // -----------------------------
+      document.querySelectorAll('a[href^="#"]').forEach((a) => {
+        a.addEventListener("click", (e) => {
+          const href = a.getAttribute("href");
+          if (!href || href === "#") return;
+          const target = document.querySelector(href);
+          if (!target) return;
+          e.preventDefault();
+          lenis.scrollTo(target, { offset: -90, duration: 1.1 });
+        });
+      });
+    </script>
+  </body>
+</html>

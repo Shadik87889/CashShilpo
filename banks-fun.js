@@ -1,20 +1,14 @@
 /**
- * BANKING FUN MODULE - BANGLADESH EDITION (ENHANCED)
+ * BANKING FUN MODULE - BANGLADESH EDITION (ENHANCED & LOCALIZED)
  * * This module injects advanced banking capabilities into the existing POS system.
  * It simulates a complete list of Bangladeshi banks and integrates seamlessly
  * with the existing payment flow by leveraging DOM manipulation and Event Delegation.
- * * Features:
- * - Comprehensive BD Bank List
- * - Add Custom Bank Support
- * - Smart POS Integration (Card/Transfer)
- * - Due Payment Modal Integration
- * - Button Overflow Fixes
- * * Usage: Include this script in index.html.
+ * * * FIX APPLIED: Now supports Bangla localization detection to prevent buttons
+ * from disappearing when language is switched.
  */
 
 (function () {
   // --- 1. DATA: Comprehensive List of Banks in Bangladesh ---
-  // We use let so we can push new banks to it
   let bdBanks = [
     // State-owned Commercial Banks (SCBs)
     {
@@ -168,6 +162,15 @@
 
   // --- 2. STATE: Context Management ---
   let currentFlow = "transfer"; // 'transfer', 'card', 'due-card', 'due-transfer'
+
+  // --- Constants for Localization ---
+  const POS_TITLES = ["Process Payment", "পেমেন্ট প্রক্রিয়া"];
+  const DUE_TITLES = [
+    "Receive Due Payment",
+    "বকেয়া পেমেন্ট গ্রহণ করুন",
+    "Receive Payment",
+    "পেমেন্ট গ্রহণ",
+  ];
 
   // --- 3. LOGIC: Bank Selection Modal & Add Bank ---
 
@@ -383,16 +386,20 @@
 
   function selectBank(bankName) {
     // We need to identify WHICH modal is active (POS or Due Payment)
-    const posModal = Array.from(
+    // FIX: Check for both English and Bangla titles in internalText or query
+    const activeModals = Array.from(
       document.querySelectorAll(".modal-content"),
-    ).find(
-      (m) =>
-        m.innerText.includes("Process Payment") &&
-        !m.innerText.includes("Receive Due Payment"),
     );
-    const dueModal = Array.from(
-      document.querySelectorAll(".modal-content"),
-    ).find((m) => m.innerText.includes("Receive Due Payment"));
+
+    const posModal = activeModals.find((m) => {
+      const text = m.innerText || "";
+      return POS_TITLES.some((title) => text.includes(title));
+    });
+
+    const dueModal = activeModals.find((m) => {
+      const text = m.innerText || "";
+      return DUE_TITLES.some((title) => text.includes(title));
+    });
 
     let targetModal = null;
     let methodString = "";
@@ -431,11 +438,9 @@
         // find the form and update its state manually since we hid the original selector
         const form = targetModal.querySelector("form");
         if (form) {
-          let hiddenInput = form.querySelector('input[name="paymentMethod"]');
           const select = form.querySelector('select[name="paymentMethod"]');
 
           // If original select exists, try to update it.
-          // Since it likely doesn't have "Card: DBBL" as an option, we might need to add it dynamically or use a hidden input.
           if (select) {
             // Create option if not exists
             let option = Array.from(select.options).find(
@@ -449,7 +454,6 @@
             }
             select.value = methodString;
           }
-          // Fallback to updating our custom hidden input if we swapped it out
         }
       }
 
@@ -491,7 +495,6 @@
         }
       } else {
         // Find Bank Transfer button
-        // In POS it's #custom-bank-btn, In Due Modal it's likely similar if we inject it
         const bankTransferBtn =
           targetModal.querySelector("#custom-bank-btn") ||
           targetModal.querySelector('button[data-method="Bank Transfer"]');
@@ -516,16 +519,17 @@
       mutation.addedNodes.forEach((node) => {
         if (node.nodeType === 1 && node.classList.contains("modal-overlay")) {
           const titleEl = node.querySelector("h3");
-          // 1. Detect POS Payment Modal
-          if (titleEl && titleEl.textContent === "Process Payment") {
+
+          if (!titleEl) return;
+
+          const titleText = titleEl.textContent;
+
+          // 1. Detect POS Payment Modal (English OR Bangla)
+          if (POS_TITLES.includes(titleText)) {
             injectPOSFeatures(node);
           }
-          // 2. Detect Due Payment Modal
-          if (
-            titleEl &&
-            (titleEl.textContent === "Receive Due Payment" ||
-              titleEl.textContent === "Receive Payment")
-          ) {
+          // 2. Detect Due Payment Modal (English OR Bangla)
+          if (DUE_TITLES.includes(titleText)) {
             injectDuePaymentFeatures(node);
           }
         }
@@ -667,7 +671,7 @@
 
     // Insert grid after the hidden select container
     selectContainer.after(gridContainer);
-    // Insert Bank Transfer separate row like in POS
+    // Insert Bank Transfer separate row like in POS---
     const bankRow = document.createElement("div");
     bankRow.className = "mb-4";
     bankRow.appendChild(bankBtn);
@@ -676,6 +680,6 @@
   }
 
   console.log(
-    "Banking Fun Module Loaded: Bangladesh Banks Ready 🇧🇩 (Enhanced POS + Due Payment)",
+    "Banking Fun Module Loaded: Bangladesh Banks Ready 🇧🇩 (Enhanced POS + Due Payment + Localization Support)",
   );
 })();

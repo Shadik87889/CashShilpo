@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Shadik Hossain Shakib - Premium CV</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
+
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['"DM Sans"', "sans-serif"],
+              serif: ['"Playfair Display"', "serif"],
+            },
+            colors: {
+              navy: {
+                950: "#020617",
+                900: "#0f172a",
+                800: "#1e293b",
+                700: "#334155",
+              },
+              gold: {
+                600: "#92702D",
+                500: "#b08d55",
+                400: "#c5a059",
+                300: "#e5c585",
+                100: "#f9f5eb",
+              },
+            },
+            boxShadow: {
+              premium: "0 20px 40px -15px rgba(0, 0, 0, 0.15)",
+              card:
+                "0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)",
+              book:
+                "3px 6px 12px rgba(0,0,0,0.3), inset 2px 0px 0px rgba(255,255,255,0.15)",
+            },
+            spacing: {
+              "18": "4.5rem",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      /* Print Optimization */
+      @media print {
+        @page {
+          margin: 0;
+          size: A4;
+        }
+        body {
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+          background-color: white !important;
+        }
+        .no-print {
+          display: none !important;
+        }
+        /* Enforce Layout in Print */
+        .print-flex-row {
+          display: flex !important;
+          flex-direction: row !important;
+        }
+        .print-h-a4 {
+          height: 297mm !important;
+          overflow: hidden !important;
+        }
+        /* Color correction for print */
+        .text-slate-300 {
+          color: #cbd5e1 !important;
+        }
+        .text-slate-400 {
+          color: #94a3b8 !important;
+        }
+      }
+
+      /* Subtle texture for background */
+      .bg-texture {
+        background-color: #ffffff;
+        background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+        background-size: 24px 24px;
+      }
+
+      /* Refined typography utilities */
+      .text-balance {
+        text-wrap: balance;
+      }
+    </style>
+  </head>
+  <body
+    class="bg-slate-100 min-h-screen flex justify-center py-10 print:py-0 print:bg-white font-sans text-slate-800 relative"
+  >
+    <!-- Save PDF Button -->
+    <button
+      onclick="window.print()"
+      class="no-print fixed bottom-8 right-8 bg-navy-900 text-gold-400 px-8 py-4 rounded-full shadow-2xl hover:bg-navy-800 transition-all z-50 flex items-center gap-3 font-bold border-2 border-gold-400 cursor-pointer"
+    >
+      <i class="fas fa-file-pdf text-2xl text-gold-400"></i>
+      <span class="text-white">Save as PDF</span>
+    </button>
+
+    <!-- A4 Container -->
+    <div
+      class="w-[210mm] h-[297mm] bg-white shadow-premium flex flex-col md:flex-row print-flex-row print-h-a4 relative print:shadow-none print:w-full overflow-hidden mx-auto"
+    >
+      <!-- LEFT SIDEBAR (Dark & Elegant) -->
+      <div
+        class="md:w-[34%] print-w-[34%] bg-navy-950 text-slate-200 flex flex-col relative overflow-hidden p-8 border-r border-navy-900"
+      >
+        <!-- Subtle Gradient Overlay -->
+        <div
+          class="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-navy-800/60 to-transparent pointer-events-none"
+        ></div>
+
+        <div class="z-10 flex flex-col h-full">
+          <!-- Profile Image Area -->
+          <div class="flex flex-col items-center mb-8">
+            <div
+              class="w-36 h-36 rounded-full p-1.5 bg-gradient-to-br from-gold-400 via-gold-300 to-navy-800 mb-5 shadow-2xl relative"
+            >
+              <div
+                class="w-full h-full rounded-full overflow-hidden border-4 border-navy-950 bg-navy-800"
+              >
+                <!-- REPLACE WITH YOUR PHOTO -->
+                <img
+                  src="Md_Shadik_Hossain_Photo.png"
+                  alt="Shadik Hossain Shakib"
+                  class="w-full h-full object-cover"
+                />
+              </div>
+              <!-- Status Dot -->
+              <div
+                class="absolute bottom-2 right-2 w-5 h-5 bg-green-500 border-4 border-navy-950 rounded-full"
+              ></div>
+            </div>
+
+            <!-- Contact Info -->
+            <div class="w-full space-y-3">
+              <div class="flex items-center gap-3">
+                <span
+                  class="w-7 h-7 rounded-lg bg-navy-800 flex items-center justify-center text-gold-400 shadow-md"
+                >
+                  <i class="fas fa-envelope text-xs"></i>
+                </span>
+                <span class="font-medium text-xs tracking-wide text-slate-300"
+                  >shadikworld@gmail.com</span
+                >
+              </div>
+              <div class="flex items-center gap-3">
+                <span
+                  class="w-7 h-7 rounded-lg bg-navy-800 flex items-center justify-center text-gold-400 shadow-md"
+                >
+                  <i class="fas fa-phone text-xs"></i>
+                </span>
+                <span class="font-medium text-xs tracking-wide text-slate-300"
+                  >+880 1750087889</span
+                >
+              </div>
+              <div class="flex items-center gap-3">
+                <span
+                  class="w-7 h-7 rounded-lg bg-navy-800 flex items-center justify-center text-gold-400 shadow-md"
+                >
+                  <i class="fas fa-map-marker-alt text-xs"></i>
+                </span>
+                <span class="font-medium text-xs tracking-wide text-slate-300"
+                  >Dhaka, Bangladesh</span
+                >
+              </div>
+              <div class="flex items-center gap-3">
+                <span
+                  class="w-7 h-7 rounded-lg bg-navy-800 flex items-center justify-center text-gold-400 shadow-md"
+                >
+                  <i class="fa-solid fa-globe"></i>
+                </span>
+                <span class="font-medium text-xs tracking-wide text-slate-300"
+                  >shadik.onrender.com</span
+                >
+              </div>
+              <!-- <div class="flex items-center gap-3">
+                <span
+                  class="w-7 h-7 rounded-lg bg-navy-800 flex items-center justify-center text-gold-400 shadow-md"
+                >
+                  <i class="fab fa-github text-xs"></i>
+                </span>
+                <span class="font-medium text-xs tracking-wide text-slate-300"
+                  >github.com/Shadik87889</span
+                >
+              </div> -->
+            </div>
+          </div>
+
+          <!-- Education Highlight -->
+          <div class="mb-8 relative">
+            <h3
+              class="font-serif text-lg text-white mb-3 italic flex items-center gap-2"
+            >
+              <span class="w-6 h-[1px] bg-gold-400"></span> Education
+            </h3>
+
+            <div
+              class="border border-gold-400/30 bg-navy-900/50 p-4 rounded-lg relative backdrop-blur-sm"
+            >
+              <div
+                class="absolute -top-2.5 right-3 bg-gradient-to-r from-gold-400 to-gold-600 text-navy-950 text-[9px] font-bold px-2 py-0.5 rounded shadow-lg uppercase tracking-wider"
+              >
+                Top 0.03%
+              </div>
+              <h4 class="text-white font-bold text-base mb-0.5">
+                SSC & HSC (Humanities)
+              </h4>
+              <div class="text-gold-400 text-xs font-medium mb-2">
+                Rajshahi Board
+              </div>
+
+              <div
+                class="flex justify-between items-end border-b border-navy-700 pb-2 mb-2"
+              >
+                <span
+                  class="text-[10px] text-slate-400 uppercase tracking-widest font-semibold"
+                  >GPA</span
+                >
+                <span class="text-white font-bold text-base"
+                  >5.00 <span class="text-slate-500 text-xs">/ 5.00</span></span
+                >
+              </div>
+
+              <p class="text-xs leading-relaxed text-slate-300">
+                Achieved
+                <strong class="text-white">57th Merit Position</strong> among
+                ~181,904 students.
+              </p>
+            </div>
+          </div>
+
+          <!-- Skills -->
+          <!-- <div class="mb-8">
+            <h3
+              class="font-serif text-lg text-white mb-3 italic flex items-center gap-2"
+            >
+              <span class="w-6 h-[1px] bg-gold-400"></span> Competencies
+            </h3>
+            <div class="flex flex-wrap gap-1.5">
+              <span
+                class="px-2.5 py-1 bg-navy-800 text-[11px] font-medium text-slate-200 rounded-md border border-navy-700"
+                >Full Stack Dev</span
+              >
+              <span
+                class="px-2.5 py-1 bg-navy-800 text-[11px] font-medium text-slate-200 rounded-md border border-navy-700"
+                >HTML</span
+              >
+              <span
+                class="px-2.5 py-1 bg-navy-800 text-[11px] font-medium text-slate-200 rounded-md border border-navy-700"
+                >Vanilla JavaScript</span
+              >
+              <span
+                class="px-2.5 py-1 bg-navy-800 text-[11px] font-medium text-slate-200 rounded-md border border-navy-700"
+                >CSS</span
+              >
+              <span
+                class="px-2.5 py-1 bg-navy-800 text-[11px] font-medium text-slate-200 rounded-md border border-navy-700"
+                >ECMAScript 2024</span
+              >
+              <span
+                class="px-2.5 py-1 bg-navy-800 text-[11px] font-medium text-slate-200 rounded-md border border-navy-700"
+                >Tailwind CSS</span
+              >
+              <span
+                class="px-2.5 py-1 bg-navy-800 text-[11px] font-medium text-slate-200 rounded-md border border-navy-700"
+                >Firebase</span
+              >
+              <span
+                class="px-2.5 py-1 bg-navy-800 text-[11px] font-medium text-slate-200 rounded-md border border-navy-700"
+                >GSAP</span
+              >
+              <span
+                class="px-2.5 py-1 bg-navy-800 text-[11px] font-medium text-slate-200 rounded-md border border-navy-700"
+                >Three.js</span
+              >
+              <span
+                class="px-2.5 py-1 bg-navy-800 text-[11px] font-medium text-slate-200 rounded-md border border-navy-700"
+                >Strategic Leadership</span
+              >
+              <span
+                class="px-2.5 py-1 bg-navy-800 text-[11px] font-medium text-slate-200 rounded-md border border-navy-700"
+                >Digital Marketing</span
+              >
+            </div>
+          </div> -->
+          <!-- Intended Field of Study -->
+          <div class="mb-8">
+            <h3
+              class="font-serif text-lg text-white mb-3 italic flex items-center gap-2"
+            >
+              <span class="w-6 h-[1px] bg-gold-400"></span> Intended Field of
+              Study
+            </h3>
+            <div
+              class="border border-gold-400/30 bg-navy-900/50 p-4 rounded-lg backdrop-blur-sm"
+            >
+              <h4 class="text-white font-bold text-base">
+                Management Information Systems (MIS)
+              </h4>
+            </div>
+          </div>
+          <!-- Languages -->
+          <div class="mt-auto">
+            <h3
+              class="font-serif text-lg text-white mb-3 italic flex items-center gap-2"
+            >
+              <span class="w-6 h-[1px] bg-gold-400"></span> Languages
+            </h3>
+            <div class="space-y-3">
+              <div>
+                <div
+                  class="flex justify-between text-[11px] font-semibold mb-1 tracking-wide"
+                >
+                  <span class="text-slate-200">Bengali</span>
+                  <span class="text-gold-400">Native</span>
+                </div>
+                <div class="h-1 bg-navy-800 rounded-full overflow-hidden">
+                  <div class="h-full bg-gold-400 w-full rounded-full"></div>
+                </div>
+              </div>
+              <div>
+                <div
+                  class="flex justify-between text-[11px] font-semibold mb-1 tracking-wide"
+                >
+                  <span class="text-slate-200">English</span>
+                  <span class="text-gold-400">Advanced</span>
+                </div>
+                <div class="h-1 bg-navy-800 rounded-full overflow-hidden">
+                  <div
+                    class="h-full bg-gold-400 w-[90%] rounded-full shadow-[0_0_10px_rgba(197,160,89,0.5)]"
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT CONTENT (White & Clean) -->
+      <div
+        class="md:w-[66%] print-w-[66%] px-8 py-8 flex flex-col relative bg-texture h-full"
+      >
+        <!-- HEADER -->
+        <header class="mb-7 border-b-2 border-slate-100 pb-6">
+          <h1
+            class="font-serif uppercase text-[1.7rem] text-navy-950 mb-1 leading-[1] tracking-tight"
+          >
+            Md Shadik Hossain
+            <span class="text-[1.7rem] font-normal text-slate-400"
+              >Talukder</span
+            >
+          </h1>
+          <p
+            class="text-gold-600 font-bold tracking-[0.25em] text-[10px] uppercase mb-4 pl-1"
+          >
+            Student • Social Initiatives Volunteer • Author
+          </p>
+          <p class="text-slate-600 leading-relaxed max-w-2xl text-sm">
+            I am a student with a strong academic background and an interest in
+            technology and community development. I achieved GPA 5.00 in both
+            SSC and HSC examinations and ranked 57th among 181,904 students
+            under the Rajshahi Education Board. Alongside my studies, I have
+            worked on small software projects and social initiatives that aim to
+            support local communities and encourage practical problem-solving.
+          </p>
+        </header>
+
+        <!-- SECTION: SOCIAL IMPACT -->
+        <section class="mb-7">
+          <div class="flex items-end gap-3 mb-4">
+            <h2 class="font-serif text-xl text-navy-950 font-bold leading-none">
+              Social Leadership
+            </h2>
+            <div class="h-[1px] bg-slate-200 flex-1 mb-1.5"></div>
+          </div>
+
+          <div class="space-y-4">
+            <!-- Impact Item 1 -->
+            <div class="flex gap-3">
+              <div class="flex flex-col items-center pt-1.5">
+                <div
+                  class="w-2.5 h-2.5 bg-navy-900 rounded-full ring-4 ring-slate-100"
+                ></div>
+                <div class="w-[2px] bg-slate-100 flex-1 my-1"></div>
+              </div>
+              <div class="pb-1">
+                <div class="flex justify-between items-baseline">
+                  <h3 class="font-bold text-lg">Rural Peace Organization</h3>
+                  <span
+                    class="text-xs text-gold-600 font-semibold bg-gray-100 px-2 py-1 rounded"
+                    >Founder | Est. Sep 2024</span
+                  >
+                </div>
+                <!-- <div
+                  class="text-[10px] text-gold-600 font-bold uppercase tracking-wider mb-1.5 flex items-center gap-1.5"
+                >
+                  <i class="far fa-calendar-alt"></i> Founder | Est. Sep 2024
+                </div> -->
+                <p class="text-[13px] text-slate-600 mb-2 leading-relaxed">
+                  A grassroots non-profit empowering rural communities through
+                  direct action.
+                </p>
+                <ul class="text-[12px] text-slate-600 space-y-1.5">
+                  <li class="flex items-start gap-2">
+                    <span class="text-gold-500 text-[8px] mt-1"
+                      ><i class="fas fa-circle"></i
+                    ></span>
+                    <span
+                      >Mobilized volunteers for traffic assistance during a
+                      period of public disruption in July 2024 to support road
+                      safety.
+                    </span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <span class="text-gold-500 text-[8px] mt-1"
+                      ><i class="fas fa-circle"></i
+                    ></span>
+                    <span
+                      >Led fundraising and distribution efforts for flood
+                      victims in Sylhet.</span
+                    >
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <span class="text-gold-500 text-[8px] mt-1"
+                      ><i class="fas fa-circle"></i
+                    ></span>
+                    <span
+                      >Organized regular blood donation drives and health
+                      awareness campaigns.</span
+                    >
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Impact Item 2 -->
+            <div class="flex gap-3">
+              <div class="flex flex-col items-center pt-1.5">
+                <div
+                  class="w-2.5 h-2.5 bg-navy-900 rounded-full ring-4 ring-slate-100"
+                ></div>
+              </div>
+              <div>
+                <div class="flex justify-between items-baseline">
+                  <h3 class="font-bold text-lg">The Daily Origin</h3>
+                  <span
+                    class="text-xs text-gold-600 font-semibold bg-gray-100 px-2 py-1 rounded"
+                    >Founder & Chief Editor</span
+                  >
+                </div>
+                <p class="text-[13px] text-slate-600 leading-relaxed">
+                  Independent bilingual digital platform focusing on social
+                  issues, culture, and development.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION: INNOVATION -->
+        <section class="mb-2 flex-1">
+          <div class="flex items-end gap-3 mb-4">
+            <h2 class="font-serif text-xl text-navy-950 font-bold leading-none">
+              The SoftShilpo Ecosystem
+            </h2>
+            <div class="h-[1px] bg-slate-200 flex-1 mb-1.5"></div>
+          </div>
+
+          <!-- Premium Grid -->
+          <div class="grid grid-cols-2 gap-3">
+            <!-- Tech Card 1 -->
+            <div
+              class="p-4 border border-slate-200 bg-white rounded-xl shadow-sm border-l-2 border-l-gold-400"
+            >
+              <div class="flex items-center gap-2.5 mb-1.5">
+                <div
+                  class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-gold-500"
+                >
+                  <i class="fas fa-cash-register text-sm"></i>
+                </div>
+                <h4 class="font-bold text-navy-950 text-sm">CashShilpo</h4>
+              </div>
+              <p class="text-xs text-slate-500 pl-0.5 leading-snug">
+                A POS and business management system developed to support small
+                shops in going digital
+              </p>
+            </div>
+
+            <!-- Tech Card 2 -->
+            <div
+              class="p-4 border border-slate-200 bg-white rounded-xl shadow-sm border-l-2 border-l-gold-400"
+            >
+              <div class="flex items-center gap-2.5 mb-1.5">
+                <div
+                  class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-gold-500"
+                >
+                  <i class="fas fa-building text-sm"></i>
+                </div>
+                <h4 class="font-bold text-navy-950 text-sm">HostelShilpo</h4>
+              </div>
+              <p class="text-xs text-slate-500 pl-0.5 leading-snug">
+                Comprehensive management for student housing.
+              </p>
+            </div>
+
+            <!-- Tech Card 3 -->
+            <div
+              class="p-4 border border-slate-200 bg-white rounded-xl shadow-sm border-l-2 border-l-gold-400"
+            >
+              <div class="flex items-center gap-2.5 mb-1.5">
+                <div
+                  class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-gold-500"
+                >
+                  <i class="fa-solid fa-house"></i>
+                </div>
+                <h4 class="font-bold text-navy-950 text-sm">GramShilpo</h4>
+              </div>
+              <p class="text-xs text-slate-500 pl-0.5 leading-snug">
+                Community data organization platform
+              </p>
+            </div>
+
+            <!-- Tech Card 4 -->
+            <div
+              class="p-4 border border-slate-200 bg-white rounded-xl shadow-sm border-l-2 border-l-gold-400"
+            >
+              <div class="flex items-center gap-2.5 mb-1.5">
+                <div
+                  class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-gold-500"
+                >
+                  <i class="fas fa-keyboard text-sm"></i>
+                </div>
+                <h4 class="font-bold text-navy-950 text-sm">TypeShilpo</h4>
+              </div>
+              <p class="text-xs text-slate-500 pl-0.5 leading-snug">
+                Educational typing speed platform.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION: PUBLICATIONS & HONORS -->
+        <section class="mt-auto pt-5 border-t border-slate-100">
+          <div class="flex gap-6">
+            <!-- Book Mockups (Publications) -->
+            <div class="w-[55%]">
+              <h2
+                class="font-serif text-base text-navy-950 font-bold mb-4 flex items-center gap-2"
+              >
+                <i class="fas fa-book-open text-gold-500 text-sm"></i>
+                Publications
+              </h2>
+
+              <div class="flex gap-4 pl-1">
+                <!-- Book 1 Mockup -->
+                <div class="cursor-default">
+                  <div
+                    class="w-[6rem] h-[9rem] bg-navy-950 rounded-r-sm shadow-book flex flex-col items-center justify-center p-1.5 relative overflow-hidden border-l-[2px] border-gold-400"
+                  >
+                    <div
+                      class="absolute top-0 right-0 w-6 h-6 bg-white/5 rounded-full -mr-3 -mt-3 blur-md"
+                    ></div>
+                    <div
+                      class="text-[7px] text-gold-100 uppercase tracking-widest mb-1 opacity-70"
+                    >
+                      Memoir
+                    </div>
+                    <h4
+                      class="text-white font-serif text-center text-[13px] leading-tight tracking-wide"
+                    >
+                      The Incidents<br /><span class="italic">I Faced</span>
+                    </h4>
+                    <div class="mt-1.5 w-6 h-[0.5px] bg-gold-400"></div>
+                    <div class="absolute bottom-2.5 text-[10px] text-slate-400">
+                      2022
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Book 2 Mockup -->
+                <div class="cursor-default">
+                  <div
+                    class="w-[6rem] h-[9rem] bg-white rounded-r-sm shadow-book flex flex-col items-center justify-center p-1.5 relative overflow-hidden border border-gray-200 border-l-[2px] border-navy-900"
+                  >
+                    <div
+                      class="text-[7px] text-navy-500 uppercase tracking-widest mb-1 opacity-70"
+                    >
+                      Philosophy
+                    </div>
+                    <h4
+                      class="text-navy-900 font-serif text-center text-[13px] leading-tight tracking-wide"
+                    >
+                      The<br /><span class="italic">Experience</span>
+                    </h4>
+                    <div class="mt-1.5 w-6 h-[0.5px] bg-navy-900"></div>
+                    <div class="absolute bottom-1.5 text-[10px] text-slate-400">
+                      2023
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Honors List -->
+            <div class="flex-1 border-l border-slate-100 pl-6">
+              <h2
+                class="font-serif text-base text-navy-950 font-bold mb-4 flex items-center gap-2"
+              >
+                <i class="fas fa-medal text-gold-500 text-sm"></i> Honors
+              </h2>
+              <ul class="space-y-3">
+                <li>
+                  <strong class="text-navy-950 block text-xs mb-0.5"
+                    >Anthem Competition Winner</strong
+                  >
+                  <span class="text-slate-500 text-[11px] block leading-relaxed"
+                    >1st Place @ District Level.<br />Cultural excellence.</span
+                  >
+                </li>
+                <li>
+                  <strong class="text-navy-950 block text-xs mb-0.5"
+                    >Red Crescent Member</strong
+                  >
+                  <span class="text-slate-500 text-[11px] block leading-relaxed"
+                    >Participated as a volunteer with the Bangladesh Red
+                    Crescent Society in community support activities.
+                  </span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </body>
+</html>
