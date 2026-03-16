@@ -206,6 +206,7 @@
     <style>
       body {
         font-family: "Inter", sans-serif;
+        background-color: #030303;
       }
       .font-testimonial {
         font-family: "Cormorant Garamond", serif;
@@ -293,6 +294,85 @@
       .shadow-accent-2xl {
         box-shadow: 0 0px 40px -12px rgba(57, 255, 20, 0.4);
       }
+
+      /* Premium Hero Section Animations & Effects */
+      .hero-glow-blob {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(120px);
+        z-index: 0;
+        pointer-events: none;
+        opacity: 0.4;
+      }
+      .gradient-text-premium {
+        background: linear-gradient(
+          135deg,
+          #39ff14 0%,
+          #a8ff78 50%,
+          #ffffff 100%
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+      .glass-card {
+        background: rgba(15, 15, 15, 0.6);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.8),
+          inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      }
+      @keyframes float-soft {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-12px);
+        }
+      }
+      @keyframes float-medium {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-18px);
+        }
+      }
+      @keyframes float-slow {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-8px);
+        }
+      }
+      .anim-float-1 {
+        animation: float-soft 6s ease-in-out infinite;
+      }
+      .anim-float-2 {
+        animation: float-medium 7s ease-in-out 1s infinite;
+      }
+      .anim-float-3 {
+        animation: float-slow 5s ease-in-out 2s infinite;
+      }
+
+      /* Dashboard 3D Perspective Setup */
+      .dashboard-perspective {
+        perspective: 1200px;
+        transform-style: preserve-3d;
+      }
+      .dashboard-3d-wrap {
+        transform: rotateY(-12deg) rotateX(4deg) scale(0.95);
+        transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
+      .dashboard-perspective:hover .dashboard-3d-wrap {
+        transform: rotateY(-4deg) rotateX(2deg) scale(1);
+      }
+
       .animate-fade-in-up,
       .animate-fade-in-left,
       .animate-fade-in-right,
@@ -336,7 +416,6 @@
         opacity: 1;
         transform: translateY(0) scale(1);
       }
-      /* Expand staggering support to max cards */
       .animate-stagger-children.is-visible .animate-card:nth-child(1) {
         transition-delay: 0.1s;
       }
@@ -354,24 +433,6 @@
       }
       .animate-stagger-children.is-visible .animate-card:nth-child(6) {
         transition-delay: 0.6s;
-      }
-      .hero-header h1.animate-fade-in-up.is-visible {
-        transition-delay: 0.1s;
-      }
-      .hero-header p.animate-fade-in-up.is-visible {
-        transition-delay: 0.2s;
-      }
-      .hero-header div.animate-fade-in-up.is-visible {
-        transition-delay: 0.3s;
-      }
-      .cta-section h2.animate-fade-in-up.is-visible {
-        transition-delay: 0.1s;
-      }
-      .cta-section p.animate-fade-in-up.is-visible {
-        transition-delay: 0.2s;
-      }
-      .cta-section div.animate-fade-in-up.is-visible {
-        transition-delay: 0.3s;
       }
 
       .stats-overlay {
@@ -478,13 +539,31 @@
           transform: translateY(0) scale(1);
         }
       }
+
+      /* Hero Avatars Group */
+      .avatar-group {
+        display: flex;
+        align-items: center;
+      }
+      .avatar-img {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        border: 2px solid #000;
+        object-fit: cover;
+        margin-left: -10px;
+        background-color: #222;
+      }
+      .avatar-img:first-child {
+        margin-left: 0;
+      }
     </style>
   </head>
-  <body class="bg-black text-white antialiased">
+  <body class="text-white antialiased">
     <div class="overflow-x-hidden">
       <!-- Navigation -->
       <nav
-        class="container mx-auto px-6 py-6 flex justify-between items-center sticky top-0 z-50 bg-black bg-opacity-80 backdrop-blur-md"
+        class="container mx-auto px-6 py-6 flex justify-between items-center sticky top-0 z-50 bg-[#030303]/80 backdrop-blur-lg border-b border-white/5"
       >
         <!-- Logo -->
         <a
@@ -501,13 +580,13 @@
         </a>
 
         <!-- Desktop Nav -->
-        <div class="hidden md:flex space-x-8 items-center">
+        <div class="hidden md:flex space-x-8 items-center font-medium">
           <a href="#features" class="nav-link text-gray-300">Features</a>
           <a href="pricing" class="nav-link text-gray-300">Pricing</a>
           <a href="support" class="nav-link text-gray-300">Support</a>
           <a
             href="workplace"
-            class="bg-accent text-black font-semibold px-6 py-3 rounded-full hover:bg-white hover:scale-105 transition-all duration-300 transform"
+            class="bg-accent text-black font-bold px-6 py-2.5 rounded-full hover:bg-white hover:shadow-[0_0_20px_rgba(57,255,20,0.4)] transition-all duration-300 transform hover:-translate-y-0.5"
           >
             Get Started
           </a>
@@ -526,127 +605,488 @@
       <!-- Mobile Menu -->
       <div
         id="mobile-menu"
-        class="hidden md:hidden bg-gray-900 p-6 absolute top-24 left-0 right-0 z-40 border-b-2 border-accent"
+        class="hidden md:hidden bg-[#0a0a0a] p-6 absolute top-24 left-0 right-0 z-40 border-b border-white/10 shadow-2xl"
       >
-        <a href="#features" class="block text-gray-300 hover:text-accent py-2"
+        <a
+          href="#features"
+          class="block text-gray-300 hover:text-accent py-3 font-medium"
           >Features</a
         >
-        <a href="pricing" class="block text-gray-300 hover:text-accent py-2"
+        <a
+          href="pricing"
+          class="block text-gray-300 hover:text-accent py-3 font-medium"
           >Pricing</a
         >
-        <a href="support" class="block text-gray-300 hover:text-accent py-2"
+        <a
+          href="support"
+          class="block text-gray-300 hover:text-accent py-3 font-medium"
           >Support</a
         >
         <a
           href="workplace"
-          class="mt-4 block bg-accent text-black font-semibold px-6 py-3 rounded-full text-center hover:bg-white transition-all duration-300"
+          class="mt-6 block bg-accent text-black font-bold px-6 py-3.5 rounded-full text-center hover:bg-white transition-all duration-300"
         >
           Get Started
         </a>
       </div>
 
-      <!-- Hero Section -->
+      <!-- SUPER PREMIUM HERO SECTION -->
       <header
-        class="hero-header container mx-auto px-6 pt-24 pb-32 md:pt-32 md:pb-40 text-center"
+        class="relative pt-8 pb-24 lg:pt-20 lg:pb-32 overflow-hidden bg-[#030303] min-h-[92vh] flex items-center border-b border-white/5"
       >
-        <h1
-          class="text-5xl sm:text-6xl md:text-8xl font-extrabold leading-tight tracking-tighter animate-fade-in-up"
-        >
-          MANAGE YOUR BUSINESS,
-          <br class="hidden md:block" />
-          SIMPLY & <span class="text-accent">SMARTLY.</span>
-        </h1>
-        <p
-          class="text-lg md:text-xl text-gray-400 mt-8 max-w-3xl mx-auto animate-fade-in-up"
-        >
-          CashShilpo is the all-in-one POS software designed to streamline your
-          operations, manage inventory, and boost your sales. Stop guessing,
-          start growing with the world's leading business management tool.
-        </p>
-        <div class="mt-12 animate-fade-in-up">
-          <a
-            href="workplace"
-            class="bg-accent text-black font-bold text-lg px-10 py-5 rounded-full hover:bg-white hover:scale-105 transition-all duration-300 transform"
-          >
-            Start Your 7-Day Free Trial
-          </a>
+        <!-- Subtle Grid & Glowing Orbs Background -->
+        <div class="absolute inset-0 z-0 pointer-events-none">
+          <!-- Fine Grid Pattern -->
+          <div
+            class="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:3rem_3rem][mask-image:radial-gradient(ellipse_80%_80%_at_50%_40%,#000_20%,transparent_100%)]"
+          ></div>
+          <!-- Glow Blobs -->
+          <div
+            class="hero-glow-blob w-[500px] h-[500px] bg-accent/20 top-0 left-[10%]"
+          ></div>
+          <div
+            class="hero-glow-blob w-[400px] h-[400px] bg-blue-600/20 bottom-0 right-[10%]"
+          ></div>
+        </div>
+
+        <div class="container mx-auto px-6 relative z-10">
+          <div class="grid lg:grid-cols-12 gap-16 lg:gap-8 items-center">
+            <!-- LEFT COLUMN: Typography & CTAs -->
+            <div
+              class="lg:col-span-6 text-center lg:text-left pt-10 lg:pt-0 animate-fade-in-up"
+            >
+              <!-- 5-Star Trust Badge -->
+              <div
+                class="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-md text-sm font-medium text-gray-300 mb-8 shadow-xl mx-auto lg:mx-0"
+              >
+                <div class="flex gap-0.5 text-[#ffc107]">
+                  <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                  <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                  <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                  <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                  <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                </div>
+                <span class="w-px h-3 bg-white/20"></span>
+                <span class="text-gray-200">4.9/5 Average Rating</span>
+              </div>
+
+              <!-- Main Headline -->
+              <h1
+                class="text-[3rem] sm:text-6xl lg:text-[4.5rem] font-extrabold tracking-tight leading-[1.05] mb-6 text-white drop-shadow-lg"
+              >
+                The Ultimate <br class="hidden sm:block" />
+                <span class="gradient-text-premium pb-2">Business OS.</span>
+              </h1>
+
+              <!-- Subheadline -->
+              <p
+                class="text-lg sm:text-xl text-gray-400 mb-10 max-w-xl mx-auto lg:mx-0 leading-relaxed font-medium"
+              >
+                From lightning-fast billing to real-time inventory and deep
+                analytics. Control your retail or restaurant business smartly.
+                Stop guessing, start growing.
+              </p>
+
+              <!-- CTAs -->
+              <div
+                class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-5"
+              >
+                <a
+                  href="workplace"
+                  class="w-full sm:w-auto bg-accent text-black font-extrabold text-lg px-9 py-4 rounded-full hover:bg-white hover:shadow-[0_0_30px_rgba(57,255,20,0.4)] transition-all duration-300 transform hover:-translate-y-1 text-center"
+                >
+                  Start 7-Day Free Trial
+                </a>
+                <a
+                  href="pricing"
+                  class="w-full sm:w-auto bg-white/5 border border-white/10 backdrop-blur-md text-white font-bold text-lg px-9 py-4 rounded-full hover:bg-white/10 hover:border-white/30 transition-all duration-300 text-center flex items-center justify-center gap-2 group"
+                >
+                  <i
+                    data-lucide="play-circle"
+                    class="w-5 h-5 text-gray-400 group-hover:text-white transition-colors"
+                  ></i>
+                  প্যাকেজসমূহ দেখুন
+                </a>
+              </div>
+
+              <!-- Secondary Trust Markers (Bottom Left) -->
+              <div
+                class="mt-12 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-6 border-t border-white/10 pt-8"
+              >
+                <div class="flex items-center gap-4">
+                  <div class="avatar-group">
+                    <img
+                      src="https://i.pravatar.cc/100?img=1"
+                      alt="User"
+                      class="avatar-img"
+                    />
+                    <img
+                      src="https://i.pravatar.cc/100?img=3"
+                      alt="User"
+                      class="avatar-img"
+                    />
+                    <img
+                      src="https://i.pravatar.cc/100?img=5"
+                      alt="User"
+                      class="avatar-img"
+                    />
+                    <img
+                      src="https://i.pravatar.cc/100?img=8"
+                      alt="User"
+                      class="avatar-img"
+                    />
+                    <div
+                      class="avatar-img flex items-center justify-center bg-gray-800 text-xs font-bold text-white border-2 border-[#030303] z-10 relative"
+                    >
+                      5k+
+                    </div>
+                  </div>
+                  <div class="text-left">
+                    <p class="text-sm font-bold text-white leading-tight">
+                      Trusted by 500+
+                    </p>
+                    <p class="text-xs text-gray-500 font-medium">
+                      businesses globally
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- RIGHT COLUMN: Premium 3D Glassmorphic Dashboard Visual -->
+            <div
+              class="lg:col-span-6 relative w-full h-[450px] lg:h-[650px] flex items-center justify-center dashboard-perspective mt-12 lg:mt-0 animate-fade-in-left"
+            >
+              <!-- Main Central Dashboard Window -->
+              <div
+                class="dashboard-3d-wrap glass-card w-full max-w-[640px] h-[440px] rounded-2xl overflow-hidden relative z-10 flex flex-col"
+              >
+                <!-- Mac-like Header -->
+                <div
+                  class="h-12 bg-white/[0.03] border-b border-white/5 flex items-center px-5 justify-between flex-shrink-0"
+                >
+                  <div class="flex space-x-2.5">
+                    <div
+                      class="w-3.5 h-3.5 rounded-full bg-[#ff5f56] shadow-[0_0_8px_#ff5f56]"
+                    ></div>
+                    <div class="w-3.5 h-3.5 rounded-full bg-[#ffbd2e]"></div>
+                    <div class="w-3.5 h-3.5 rounded-full bg-[#27c93f]"></div>
+                  </div>
+                  <div
+                    class="flex items-center gap-2 bg-black/40 px-3 py-1.5 rounded-md border border-white/5"
+                  >
+                    <i
+                      data-lucide="search"
+                      class="w-3.5 h-3.5 text-gray-500"
+                    ></i>
+                    <div class="w-32 h-2 bg-gray-700/50 rounded-full"></div>
+                  </div>
+                  <div
+                    class="w-7 h-7 rounded-full bg-gradient-to-tr from-accent to-blue-500 p-0.5"
+                  >
+                    <div
+                      class="w-full h-full bg-black rounded-full border border-black overflow-hidden"
+                    >
+                      <img
+                        src="https://i.pravatar.cc/100?img=11"
+                        class="w-full h-full object-cover opacity-80"
+                        alt="Profile"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Dashboard Content Layout -->
+                <div class="flex flex-1 overflow-hidden">
+                  <!-- Left Slim Sidebar -->
+                  <div
+                    class="w-16 bg-black/20 border-r border-white/5 flex flex-col items-center py-6 gap-6"
+                  >
+                    <div
+                      class="w-10 h-10 rounded-xl bg-accent/20 flex items-center justify-center text-accent shadow-[0_0_15px_rgba(57,255,20,0.15)]"
+                    >
+                      <i data-lucide="layout-grid" class="w-5 h-5"></i>
+                    </div>
+                    <div
+                      class="w-10 h-10 rounded-xl text-gray-500 hover:text-white hover:bg-white/5 transition-all flex items-center justify-center"
+                    >
+                      <i data-lucide="tag" class="w-5 h-5"></i>
+                    </div>
+                    <div
+                      class="w-10 h-10 rounded-xl text-gray-500 hover:text-white hover:bg-white/5 transition-all flex items-center justify-center"
+                    >
+                      <i data-lucide="users" class="w-5 h-5"></i>
+                    </div>
+                    <div
+                      class="w-10 h-10 rounded-xl text-gray-500 hover:text-white hover:bg-white/5 transition-all flex items-center justify-center"
+                    >
+                      <i data-lucide="bar-chart-2" class="w-5 h-5"></i>
+                    </div>
+                    <div
+                      class="mt-auto w-10 h-10 rounded-xl text-gray-600 flex items-center justify-center"
+                    >
+                      <i data-lucide="settings" class="w-5 h-5"></i>
+                    </div>
+                  </div>
+
+                  <!-- Main Analytics Area -->
+                  <div
+                    class="flex-1 p-6 bg-gradient-to-br from-white/[0.02] to-transparent flex flex-col gap-6"
+                  >
+                    <!-- Top Stat Cards (3 Columns) -->
+                    <div class="grid grid-cols-3 gap-4">
+                      <!-- Stat Card 1 -->
+                      <div
+                        class="bg-black/40 border border-white/5 rounded-xl p-4 flex flex-col justify-between"
+                      >
+                        <div class="flex justify-between items-start mb-2">
+                          <div
+                            class="w-8 h-8 rounded-lg bg-green-500/10 flex items-center justify-center"
+                          >
+                            <i
+                              data-lucide="dollar-sign"
+                              class="w-4 h-4 text-green-400"
+                            ></i>
+                          </div>
+                          <span
+                            class="text-[10px] font-bold text-green-400 bg-green-500/10 px-1.5 py-0.5 rounded"
+                            >+14%</span
+                          >
+                        </div>
+                        <div class="text-xs text-gray-500 font-medium mb-1">
+                          Total Sales
+                        </div>
+                        <div class="text-xl font-bold text-white">৳ 124.5k</div>
+                      </div>
+                      <!-- Stat Card 2 -->
+                      <div
+                        class="bg-black/40 border border-white/5 rounded-xl p-4 flex flex-col justify-between"
+                      >
+                        <div class="flex justify-between items-start mb-2">
+                          <div
+                            class="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center"
+                          >
+                            <i
+                              data-lucide="shopping-cart"
+                              class="w-4 h-4 text-blue-400"
+                            ></i>
+                          </div>
+                          <span
+                            class="text-[10px] font-bold text-blue-400 bg-blue-500/10 px-1.5 py-0.5 rounded"
+                            >+5%</span
+                          >
+                        </div>
+                        <div class="text-xs text-gray-500 font-medium mb-1">
+                          Orders
+                        </div>
+                        <div class="text-xl font-bold text-white">842</div>
+                      </div>
+                      <!-- Stat Card 3 -->
+                      <div
+                        class="bg-black/40 border border-white/5 rounded-xl p-4 flex flex-col justify-between"
+                      >
+                        <div class="flex justify-between items-start mb-2">
+                          <div
+                            class="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center"
+                          >
+                            <i
+                              data-lucide="box"
+                              class="w-4 h-4 text-purple-400"
+                            ></i>
+                          </div>
+                          <span
+                            class="text-[10px] font-bold text-red-400 bg-red-500/10 px-1.5 py-0.5 rounded"
+                            >-2%</span
+                          >
+                        </div>
+                        <div class="text-xs text-gray-500 font-medium mb-1">
+                          Low Stock
+                        </div>
+                        <div class="text-xl font-bold text-white">12 Items</div>
+                      </div>
+                    </div>
+
+                    <!-- Large Chart Placeholder -->
+                    <div
+                      class="flex-1 bg-black/40 border border-white/5 rounded-xl p-4 flex flex-col relative overflow-hidden"
+                    >
+                      <div
+                        class="flex justify-between items-center mb-4 relative z-10"
+                      >
+                        <div class="text-sm font-semibold text-gray-300">
+                          Revenue Overview
+                        </div>
+                        <div class="flex gap-2">
+                          <div class="w-4 h-1.5 bg-gray-700 rounded-full"></div>
+                          <div class="w-4 h-1.5 bg-gray-700 rounded-full"></div>
+                          <div class="w-4 h-1.5 bg-gray-700 rounded-full"></div>
+                        </div>
+                      </div>
+                      <!-- CSS Graphic representing a Line Chart -->
+                      <div
+                        class="flex-1 flex items-end gap-2 px-2 relative z-10 pb-2"
+                      >
+                        <div
+                          class="w-full bg-gradient-to-t from-accent/20 to-transparent h-[40%] rounded-t-sm border-t border-accent/50"
+                        ></div>
+                        <div
+                          class="w-full bg-gradient-to-t from-accent/20 to-transparent h-[60%] rounded-t-sm border-t border-accent/50"
+                        ></div>
+                        <div
+                          class="w-full bg-gradient-to-t from-accent/20 to-transparent h-[30%] rounded-t-sm border-t border-accent/50"
+                        ></div>
+                        <div
+                          class="w-full bg-gradient-to-t from-accent/20 to-transparent h-[80%] rounded-t-sm border-t border-accent/50 relative"
+                        >
+                          <div
+                            class="absolute -top-1.5 right-1 w-3 h-3 bg-white rounded-full border-2 border-accent shadow-[0_0_10px_#39ff14]"
+                          ></div>
+                        </div>
+                        <div
+                          class="w-full bg-gradient-to-t from-accent/20 to-transparent h-[50%] rounded-t-sm border-t border-accent/50"
+                        ></div>
+                      </div>
+                      <!-- Grid lines -->
+                      <div
+                        class="absolute inset-0 bg-[linear-gradient(to_bottom,transparent_19%,rgba(255,255,255,0.02)_20%)] bg-[size:100%_20%] z-0"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- FLOATING ELEMENT 1: Live Notification (Top Right) -->
+              <div
+                class="anim-float-1 absolute -top-6 -right-4 lg:-right-12 glass-card p-4 rounded-2xl z-20 flex items-center gap-4 min-w-[220px]"
+              >
+                <div
+                  class="w-12 h-12 rounded-full bg-green-500/20 border border-green-500/30 flex items-center justify-center text-accent"
+                >
+                  <i data-lucide="check-circle-2" class="w-6 h-6"></i>
+                </div>
+                <div>
+                  <p
+                    class="text-xs text-gray-400 font-medium uppercase tracking-wider mb-0.5"
+                  >
+                    Payment Received
+                  </p>
+                  <p class="text-lg font-bold text-white">৳ 3,450.00</p>
+                </div>
+              </div>
+
+              <!-- FLOATING ELEMENT 2: Inventory Sync Badge (Bottom Right) -->
+              <div
+                class="anim-float-2 absolute -bottom-4 right-8 lg:-right-4 glass-card px-5 py-3 rounded-full z-20 flex items-center gap-3"
+              >
+                <div
+                  class="w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse shadow-[0_0_10px_#3b82f6]"
+                ></div>
+                <p class="text-sm font-semibold text-gray-200">Auto-Syncing</p>
+                <span
+                  class="bg-white/10 text-[10px] px-2 py-0.5 rounded text-white font-bold tracking-wider"
+                  >CLOUD</span
+                >
+              </div>
+
+              <!-- FLOATING ELEMENT 3: Quick Action / Product Scan (Center Left) -->
+              <div
+                class="anim-float-3 absolute top-1/2 -translate-y-1/2 -left-4 lg:-left-16 glass-card p-3 rounded-xl z-20 flex flex-col gap-3 w-40"
+              >
+                <div
+                  class="w-full h-24 bg-black/50 rounded-lg border border-white/5 relative overflow-hidden flex items-center justify-center"
+                >
+                  <i data-lucide="barcode" class="w-10 h-10 text-gray-600"></i>
+                  <!-- Scanner Laser line -->
+                  <div
+                    class="absolute top-1/2 left-0 w-full h-[2px] bg-red-500 shadow-[0_0_8px_#ef4444]"
+                  ></div>
+                </div>
+                <div class="text-center">
+                  <p class="text-xs text-white font-bold">Scan Item</p>
+                  <p class="text-[10px] text-gray-500 mt-0.5">
+                    Ready for barcode
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </header>
 
       <!-- Trusted By Section -->
-      <section class="py-16 bg-black">
+      <section class="py-12 bg-[#030303] border-b border-white/5">
         <div class="container mx-auto px-6">
           <p
-            class="text-center text-gray-500 font-semibold uppercase tracking-widest mb-8 animate-fade-in-up"
+            class="text-center text-gray-600 text-sm font-bold uppercase tracking-[0.2em] mb-8 animate-fade-in-up"
           >
-            Trusted by businesses like yours
+            Powering top brands & SMEs across the country
           </p>
         </div>
 
         <div class="relative w-full overflow-hidden animate-fade-in-up">
           <div
-            class="absolute top-0 left-0 w-48 h-full bg-gradient-to-r from-black to-transparent z-10"
+            class="absolute top-0 left-0 w-32 md:w-64 h-full bg-gradient-to-r from-[#030303] to-transparent z-10"
           ></div>
           <div
-            class="absolute top-0 right-0 w-48 h-full bg-gradient-to-l from-black to-transparent z-10"
+            class="absolute top-0 right-0 w-32 md:w-64 h-full bg-gradient-to-l from-[#030303] to-transparent z-10"
           ></div>
           <div class="flex" id="logo-marquee-content">
             <div
               class="flex-shrink-0 flex justify-around items-center w-screen"
             >
               <div
-                class="text-center text-2xl font-bold text-gray-400 logo-cloud-item px-12"
+                class="text-center text-2xl font-black text-gray-500 logo-cloud-item px-12 tracking-tight"
               >
-                BRAND.IO
+                BRAND<span class="text-white">.IO</span>
               </div>
               <div
-                class="text-center text-2xl font-bold text-gray-400 logo-cloud-item px-12"
+                class="text-center text-2xl font-bold text-gray-500 logo-cloud-item px-12 uppercase"
               >
-                ECOFOODS
+                Ecofoods
               </div>
               <div
-                class="text-center text-2xl font-bold text-gray-400 logo-cloud-item px-12"
+                class="text-center text-2xl font-serif italic font-bold text-gray-500 logo-cloud-item px-12"
               >
-                FUTURA
+                Futura
               </div>
               <div
-                class="text-center text-2xl font-bold text-gray-400 logo-cloud-item px-12"
+                class="text-center text-2xl font-black text-gray-500 logo-cloud-item px-12 tracking-widest uppercase"
               >
-                THE HUB
+                The Hub
               </div>
               <div
-                class="text-center text-2xl font-bold text-gray-400 logo-cloud-item px-12"
+                class="text-center text-2xl font-semibold text-gray-500 logo-cloud-item px-12"
               >
-                LOCAL GEMS
+                Local Gems
               </div>
             </div>
             <div
               class="flex-shrink-0 flex justify-around items-center w-screen"
             >
               <div
-                class="text-center text-2xl font-bold text-gray-400 logo-cloud-item px-12"
+                class="text-center text-2xl font-black text-gray-500 logo-cloud-item px-12 tracking-tight"
               >
-                BRAND.IO
+                BRAND<span class="text-white">.IO</span>
               </div>
               <div
-                class="text-center text-2xl font-bold text-gray-400 logo-cloud-item px-12"
+                class="text-center text-2xl font-bold text-gray-500 logo-cloud-item px-12 uppercase"
               >
-                ECOFOODS
+                Ecofoods
               </div>
               <div
-                class="text-center text-2xl font-bold text-gray-400 logo-cloud-item px-12"
+                class="text-center text-2xl font-serif italic font-bold text-gray-500 logo-cloud-item px-12"
               >
-                FUTURA
+                Futura
               </div>
               <div
-                class="text-center text-2xl font-bold text-gray-400 logo-cloud-item px-12"
+                class="text-center text-2xl font-black text-gray-500 logo-cloud-item px-12 tracking-widest uppercase"
               >
-                THE HUB
+                The Hub
               </div>
               <div
-                class="text-center text-2xl font-bold text-gray-400 logo-cloud-item px-12"
+                class="text-center text-2xl font-semibold text-gray-500 logo-cloud-item px-12"
               >
-                LOCAL GEMS
+                Local Gems
               </div>
             </div>
           </div>
@@ -1298,11 +1738,11 @@
         >
           <!-- Feature 1 -->
           <div
-            class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 animate-card flex flex-col h-full"
+            class="feature-card bg-[#0a0a0a] p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 animate-card flex flex-col h-full"
             aria-label="Analytics Dashboard - সেলস এবং লাভ-ক্ষতি ড্যাশবোর্ড"
           >
             <div
-              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0"
+              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0 shadow-[0_0_15px_rgba(57,255,20,0.3)]"
             >
               <i data-lucide="layout-dashboard" class="h-8 w-8 text-black"></i>
             </div>
@@ -1316,11 +1756,11 @@
 
           <!-- Feature 2 -->
           <div
-            class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 animate-card flex flex-col h-full"
+            class="feature-card bg-[#0a0a0a] p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 animate-card flex flex-col h-full"
             aria-label="POS Terminal - পস টার্মিনাল ও বিলিং সফটওয়্যার"
           >
             <div
-              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0"
+              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0 shadow-[0_0_15px_rgba(57,255,20,0.3)]"
             >
               <i data-lucide="scan-line" class="h-8 w-8 text-black"></i>
             </div>
@@ -1333,11 +1773,11 @@
 
           <!-- Feature 3 -->
           <div
-            class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 animate-card flex flex-col h-full"
+            class="feature-card bg-[#0a0a0a] p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 animate-card flex flex-col h-full"
             aria-label="Inventory Management - স্টক ও ইনভেন্টরি সফটওয়্যার"
           >
             <div
-              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0"
+              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0 shadow-[0_0_15px_rgba(57,255,20,0.3)]"
             >
               <i data-lucide="boxes" class="h-8 w-8 text-black"></i>
             </div>
@@ -1350,11 +1790,11 @@
 
           <!-- Feature 4 -->
           <div
-            class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 animate-card flex flex-col h-full"
+            class="feature-card bg-[#0a0a0a] p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 animate-card flex flex-col h-full"
             aria-label="Invoice Management - ডিজিটাল ক্যাশ মেমো"
           >
             <div
-              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0"
+              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0 shadow-[0_0_15px_rgba(57,255,20,0.3)]"
             >
               <i data-lucide="file-text" class="h-8 w-8 text-black"></i>
             </div>
@@ -1368,11 +1808,11 @@
 
           <!-- Feature 5 -->
           <div
-            class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 animate-card flex flex-col h-full"
+            class="feature-card bg-[#0a0a0a] p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 animate-card flex flex-col h-full"
             aria-label="Quotation Management - ব্যবসার কোটেশন মেকার"
           >
             <div
-              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0"
+              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0 shadow-[0_0_15px_rgba(57,255,20,0.3)]"
             >
               <i data-lucide="clipboard-list" class="h-8 w-8 text-black"></i>
             </div>
@@ -1386,11 +1826,11 @@
 
           <!-- Feature 6 -->
           <div
-            class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 animate-card flex flex-col h-full"
+            class="feature-card bg-[#0a0a0a] p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 animate-card flex flex-col h-full"
             aria-label="Customer Management CRM - বাকির খাতা ও কাস্টমার প্রোফাইল"
           >
             <div
-              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0"
+              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0 shadow-[0_0_15px_rgba(57,255,20,0.3)]"
             >
               <i data-lucide="users" class="h-8 w-8 text-black"></i>
             </div>
@@ -1404,11 +1844,11 @@
 
           <!-- Feature 7 -->
           <div
-            class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full"
+            class="feature-card bg-[#0a0a0a] p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full"
             aria-label="Reports & Analytics - ব্যবসার বিস্তারিত রিপোর্ট"
           >
             <div
-              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0"
+              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0 shadow-[0_0_15px_rgba(57,255,20,0.3)]"
             >
               <i data-lucide="bar-chart-3" class="h-8 w-8 text-black"></i>
             </div>
@@ -1422,11 +1862,11 @@
 
           <!-- Feature 8 -->
           <div
-            class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full"
+            class="feature-card bg-[#0a0a0a] p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full"
             aria-label="Purchase Orders PO - পারচেস অর্ডার সফটওয়্যার"
           >
             <div
-              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0"
+              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0 shadow-[0_0_15px_rgba(57,255,20,0.3)]"
             >
               <i data-lucide="shopping-cart" class="h-8 w-8 text-black"></i>
             </div>
@@ -1440,11 +1880,11 @@
 
           <!-- Feature 9 -->
           <div
-            class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full"
+            class="feature-card bg-[#0a0a0a] p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full"
             aria-label="Supplier Management - মহাজন ও সাপ্লায়ার হিসাব"
           >
             <div
-              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0"
+              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0 shadow-[0_0_15px_rgba(57,255,20,0.3)]"
             >
               <i data-lucide="truck" class="h-8 w-8 text-black"></i>
             </div>
@@ -1458,11 +1898,11 @@
 
           <!-- Feature 10 -->
           <div
-            class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full"
+            class="feature-card bg-[#0a0a0a] p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full"
             aria-label="Expense Tracking - ব্যবসার খরচ হিসাব করার অ্যাপ"
           >
             <div
-              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0"
+              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0 shadow-[0_0_15px_rgba(57,255,20,0.3)]"
             >
               <i data-lucide="wallet" class="h-8 w-8 text-black"></i>
             </div>
@@ -1476,11 +1916,11 @@
 
           <!-- Feature 11 -->
           <div
-            class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full"
+            class="feature-card bg-[#0a0a0a] p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full"
             aria-label="Staff Management - কর্মচারী ম্যানেজমেন্ট"
           >
             <div
-              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0"
+              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0 shadow-[0_0_15px_rgba(57,255,20,0.3)]"
             >
               <i data-lucide="user-cog" class="h-8 w-8 text-black"></i>
             </div>
@@ -1494,11 +1934,11 @@
 
           <!-- Feature 12 -->
           <div
-            class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full"
+            class="feature-card bg-[#0a0a0a] p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full"
             aria-label="User Roles & Permissions - পস পারমিশন কন্ট্রোল"
           >
             <div
-              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0"
+              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0 shadow-[0_0_15px_rgba(57,255,20,0.3)]"
             >
               <i data-lucide="shield-check" class="h-8 w-8 text-black"></i>
             </div>
@@ -1512,11 +1952,11 @@
 
           <!-- Feature 13 -->
           <div
-            class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full"
+            class="feature-card bg-[#0a0a0a] p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full"
             aria-label="Loyalty Program - কাস্টমার পয়েন্ট ও রিওয়ার্ড"
           >
             <div
-              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0"
+              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0 shadow-[0_0_15px_rgba(57,255,20,0.3)]"
             >
               <i data-lucide="award" class="h-8 w-8 text-black"></i>
             </div>
@@ -1530,11 +1970,11 @@
 
           <!-- Feature 14 -->
           <div
-            class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full"
+            class="feature-card bg-[#0a0a0a] p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full"
             aria-label="Payroll Management - বেতন ও পে-রোল হিসাব"
           >
             <div
-              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0"
+              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0 shadow-[0_0_15px_rgba(57,255,20,0.3)]"
             >
               <i data-lucide="dollar-sign" class="h-8 w-8 text-black"></i>
             </div>
@@ -1548,11 +1988,11 @@
 
           <!-- Feature 15 -->
           <div
-            class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full"
+            class="feature-card bg-[#0a0a0a] p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full"
             aria-label="Warranty & Claims - প্রোডাক্ট ওয়ারেন্টি ট্র্যাকার"
           >
             <div
-              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0"
+              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0 shadow-[0_0_15px_rgba(57,255,20,0.3)]"
             >
               <i data-lucide="wrench" class="h-8 w-8 text-black"></i>
             </div>
@@ -1566,11 +2006,11 @@
 
           <!-- Feature 16 -->
           <div
-            class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full"
+            class="feature-card bg-[#0a0a0a] p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full"
             aria-label="Barcode Generator - নিজস্ব বারকোড মেকার"
           >
             <div
-              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0"
+              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0 shadow-[0_0_15px_rgba(57,255,20,0.3)]"
             >
               <i data-lucide="barcode" class="h-8 w-8 text-black"></i>
             </div>
@@ -1583,11 +2023,11 @@
 
           <!-- Feature 17 -->
           <div
-            class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full"
+            class="feature-card bg-[#0a0a0a] p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full"
             aria-label="Product Attributes - পণ্যের সাইজ ও কালার ভেরিয়েন্ট"
           >
             <div
-              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0"
+              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0 shadow-[0_0_15px_rgba(57,255,20,0.3)]"
             >
               <i data-lucide="tags" class="h-8 w-8 text-black"></i>
             </div>
@@ -1601,11 +2041,11 @@
 
           <!-- Feature 18 -->
           <div
-            class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full"
+            class="feature-card bg-[#0a0a0a] p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full"
             aria-label="Advanced Settings - ভ্যাট ও মেমো কাস্টমাইজেশন"
           >
             <div
-              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0"
+              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0 shadow-[0_0_15px_rgba(57,255,20,0.3)]"
             >
               <i data-lucide="settings" class="h-8 w-8 text-black"></i>
             </div>
@@ -1618,11 +2058,11 @@
 
           <!-- Feature 19 -->
           <div
-            class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full"
+            class="feature-card bg-[#0a0a0a] p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full"
             aria-label="AI Assistant - আর্টিফিশিয়াল ইন্টেলিজেন্স অ্যাসিস্ট্যান্ট"
           >
             <div
-              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0"
+              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0 shadow-[0_0_15px_rgba(57,255,20,0.3)]"
             >
               <i data-lucide="sparkles" class="h-8 w-8 text-black"></i>
             </div>
@@ -1636,11 +2076,11 @@
 
           <!-- Feature 20 -->
           <div
-            class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full"
+            class="feature-card bg-[#0a0a0a] p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full"
             aria-label="Multi-Store Management - একাধিক দোকান বা ব্রাঞ্চ পরিচালনা"
           >
             <div
-              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0"
+              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0 shadow-[0_0_15px_rgba(57,255,20,0.3)]"
             >
               <i data-lucide="store" class="h-8 w-8 text-black"></i>
             </div>
@@ -1653,11 +2093,11 @@
 
           <!-- Feature 21 -->
           <div
-            class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full"
+            class="feature-card bg-[#0a0a0a] p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full"
             aria-label="Daybook - দৈনিক বেচাকেনা ও ক্যাশ খতিয়ান"
           >
             <div
-              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0"
+              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0 shadow-[0_0_15px_rgba(57,255,20,0.3)]"
             >
               <i data-lucide="book-open-check" class="h-8 w-8 text-black"></i>
             </div>
@@ -1671,11 +2111,11 @@
 
           <!-- Feature 22 -->
           <div
-            class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full"
+            class="feature-card bg-[#0a0a0a] p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full"
             aria-label="Subscription Management - সফটওয়্যার প্যাকেজ ও সাবস্ক্রিপশন"
           >
             <div
-              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0"
+              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0 shadow-[0_0_15px_rgba(57,255,20,0.3)]"
             >
               <i data-lucide="crown" class="h-8 w-8 text-black"></i>
             </div>
@@ -1689,12 +2129,12 @@
             </p>
           </div>
 
-          <!-- Feature 23 (Previously Injected dynamically) -->
+          <!-- Feature 23 -->
           <div
-            class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full"
+            class="feature-card bg-[#0a0a0a] p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full"
           >
             <div
-              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0"
+              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0 shadow-[0_0_15px_rgba(57,255,20,0.3)]"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -1722,12 +2162,12 @@
             </p>
           </div>
 
-          <!-- Feature 24 (Previously Injected dynamically) -->
+          <!-- Feature 24 -->
           <div
-            class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full"
+            class="feature-card bg-[#0a0a0a] p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full"
           >
             <div
-              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0"
+              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0 shadow-[0_0_15px_rgba(57,255,20,0.3)]"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -1756,12 +2196,12 @@
             </p>
           </div>
 
-          <!-- Feature 25 (Previously Injected dynamically) -->
+          <!-- Feature 25 -->
           <div
-            class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full"
+            class="feature-card bg-[#0a0a0a] p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full"
           >
             <div
-              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0"
+              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0 shadow-[0_0_15px_rgba(57,255,20,0.3)]"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -1785,12 +2225,12 @@
             <p class="text-gray-400">Personalize your CashShilpo experience.</p>
           </div>
 
-          <!-- Feature 26 (Previously Injected dynamically) -->
+          <!-- Feature 26 -->
           <div
-            class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full"
+            class="feature-card bg-[#0a0a0a] p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full"
           >
             <div
-              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0"
+              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0 shadow-[0_0_15px_rgba(57,255,20,0.3)]"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -1815,12 +2255,12 @@
             </p>
           </div>
 
-          <!-- Feature 27 (Previously Injected dynamically) -->
+          <!-- Feature 27 -->
           <div
-            class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full"
+            class="feature-card bg-[#0a0a0a] p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full"
           >
             <div
-              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0"
+              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0 shadow-[0_0_15px_rgba(57,255,20,0.3)]"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -1845,12 +2285,12 @@
             </p>
           </div>
 
-          <!-- Feature 28 (Previously Injected dynamically) -->
+          <!-- Feature 28 -->
           <div
-            class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full"
+            class="feature-card bg-[#0a0a0a] p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full"
           >
             <div
-              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0"
+              class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0 shadow-[0_0_15px_rgba(57,255,20,0.3)]"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -2455,6 +2895,29 @@
     <script>
       // Single Source of Truth for Translations (0 Redundancy)
       const DICTIONARY = {
+        "4.9/5 Average Rating": "৪.৯/৫ এভারেজ রেটিং",
+        "The Ultimate": "সেরা প্রযুক্তির",
+        "Business OS.": "বিজনেস ম্যানেজমেন্ট।",
+        "The #1 POS Software for Modern Businesses":
+          "আধুনিক ব্যবসার ১ নম্বর পস সফটওয়্যার",
+        "From lightning-fast billing to real-time inventory and deep analytics. Control your retail or restaurant business smartly. Stop guessing, start growing.":
+          "বিদ্যুৎগতির বিলিং থেকে শুরু করে রিয়েল-টাইম ইনভেন্টরি—আপনার ব্যবসার সম্পূর্ণ নিয়ন্ত্রণ নিন। অনুমান নয়, স্মার্ট অ্যানালিটিক্স দিয়ে ব্যবসার পরিধি বাড়ান।",
+        "Start 7-Day Free Trial": "৭ দিনের ফ্রি ট্রায়াল শুরু করুন",
+        "View Packages": "প্যাকেজসমূহ দেখুন",
+        "No Credit Card Required": "কোনো ক্রেডিট কার্ডের প্রয়োজন নেই",
+        "Secure & Cloud-Based": "নিরাপদ ও ক্লাউড-ভিত্তিক",
+        "Trusted by 5,000+": "আস্থা রেখেছেন ৫,০০০+",
+        "businesses globally": "ব্যবসা প্রতিষ্ঠান",
+        "Total Sales": "মোট বিক্রয়",
+        Today: "আজ",
+        "New Order": "নতুন অর্ডার",
+        "Inventory Status": "ইনভেন্টরি স্ট্যাটাস",
+        "Payment Received": "পেমেন্ট রিসিভড",
+        "Auto-Syncing": "অটো-সিঙ্ক হচ্ছে",
+        "Scan Item": "স্ক্যান করুন",
+        "Ready for barcode": "বারকোডের জন্য প্রস্তুত",
+        "Powering top brands & SMEs across the country":
+          "দেশজুড়ে শীর্ষ ব্র্যান্ড এবং মাঝারি ব্যবসার ডিজিটাল পার্টনার",
         "System Language": "সিস্টেম ল্যাঙ্গুয়েজ",
         "Toggle between English and Bengali interface.":
           "যখন খুশি ইংরেজি থেকে বাংলায় সুইচ করুন। আপনার ব্যবসার ভাষা হোক আপনার নিজের ভাষায়।",
