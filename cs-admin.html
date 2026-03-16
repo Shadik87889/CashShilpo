@@ -3,281 +3,395 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Super Admin Dashboard</title>
+    <title>Nexus Core | Super Admin</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Plus Jakarta Sans", "sans-serif"],
+            },
+            colors: {
+              "bg-primary": "var(--bg-primary)",
+              "bg-secondary": "var(--bg-secondary)",
+              "bg-tertiary": "var(--bg-tertiary)",
+              "border-color": "var(--border-color)",
+              "border-color-hover": "var(--border-color-hover)",
+              "text-primary": "var(--text-primary)",
+              "text-secondary": "var(--text-secondary)",
+              accent: "var(--accent)",
+              danger: "var(--danger)",
+              success: "var(--success)",
+              warning: "var(--warning)",
+            },
+          },
+        },
+      };
+    </script>
+
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
     <link
       rel="shortcut icon"
-      href="The Official-Cashsilpo-Fav.png"
+      href="cashshilpo-official-fav.png"
       type="image/x-icon"
     />
 
     <style>
       :root {
-        --bg-primary: #0a0a0a;
-        --bg-secondary: #121212;
-        --bg-tertiary: #1a1a1a;
-        --sidebar-bg: #151515;
-        --header-bg: rgba(18, 18, 18, 0.6);
-        --border-color: rgba(255, 255, 255, 0.1);
-        --border-color-hover: rgba(255, 255, 255, 0.2);
-        --text-primary: #e5e7eb; /* gray-200 */
-        --text-secondary: #9ca3af; /* gray-400 */
-        --accent: #0077ff; /* Vibrant Blue */
-        --accent-hover: #3391ff;
-        --accent-glow: rgba(0, 119, 255, 0.3);
-        --accent-glow-strong: rgba(0, 119, 255, 0.5);
-        --danger: #ff4560;
-        --success: #00e396;
-        --warning: #feb019;
-      }
+        --bg-primary: #030305;
+        --bg-secondary: rgba(20, 20, 28, 0.4);
+        --bg-tertiary: rgba(255, 255, 255, 0.03);
+        --border-color: rgba(255, 255, 255, 0.08);
+        --border-color-hover: rgba(255, 255, 255, 0.15);
 
-      /* @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(10px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
+        --text-primary: #ffffff;
+        --text-secondary: #8b949e;
+
+        --accent: #6366f1; /* Indigo 500 */
+        --accent-glow: rgba(99, 102, 241, 0.5);
+        --danger: #f43f5e;
+        --success: #10b981;
+        --warning: #f59e0b;
       }
-      @keyframes slideInDown {
-        from {
-          opacity: 0;
-          transform: translateY(-100%);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-      @keyframes slideInLeft {
-        from {
-          opacity: 0;
-          transform: translateX(-100%);
-        }
-        to {
-          opacity: 1;
-          transform: translateX(0);
-        }
-      }
-      @keyframes backgroundShine {
-        from {
-          background-position: 200% 0;
-        }
-        to {
-          background-position: -200% 0;
-        }
-      } */
 
       body {
-        background-color: var(--bg-primary);
-        color: var(--text-primary);
-        font-family: "Inter", sans-serif;
+        font-family: "Plus Jakarta Sans", sans-serif;
         overflow: hidden;
       }
 
-      .animated-gradient-text {
-        background: linear-gradient(
-          90deg,
-          var(--text-secondary),
-          var(--text-primary),
-          var(--text-secondary)
-        );
-        background-size: 200% auto;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        animation: backgroundShine 5s linear infinite;
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.2);
       }
 
+      /* Premium Glass Morphism */
       .glass-pane {
-        background-color: rgba(26, 26, 26, 0.5);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
+        background: var(--bg-secondary);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
         border: 1px solid var(--border-color);
-        border-radius: 1rem;
-        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        border-radius: 1.5rem;
+        box-shadow: 0 4px 24px -4px rgba(0, 0, 0, 0.5),
+          inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       }
-
       .glass-pane:hover {
         border-color: var(--border-color-hover);
-        box-shadow: 0 0 40px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 8px 32px -4px rgba(0, 0, 0, 0.6),
+          inset 0 1px 0 rgba(255, 255, 255, 0.1);
       }
 
+      /* Ultra Sleek Forms */
       .form-input,
       .form-select,
       .form-textarea {
-        background-color: var(--bg-secondary);
+        background-color: rgba(10, 10, 15, 0.6);
         border: 1px solid var(--border-color);
         color: var(--text-primary);
-        border-radius: 0.5rem;
-        transition: all 0.2s ease;
-        padding: 0.75rem 1rem;
+        border-radius: 0.75rem;
+        padding: 0.75rem 1.25rem;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+        width: 100%;
       }
-
       .form-input:focus,
       .form-select:focus,
       .form-textarea:focus {
-        box-shadow: 0 0 0 3px var(--accent-glow);
-        border-color: var(--accent);
         outline: none;
-        background-color: var(--bg-tertiary);
+        border-color: var(--accent);
+        background-color: rgba(15, 15, 20, 0.9);
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15),
+          inset 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
+      .form-select option {
+        background-color: #1a1a24;
+        color: #fff;
       }
 
+      /* Buttons with Gradient & Glow */
       .btn {
         display: inline-flex;
         align-items: center;
         justify-content: center;
         padding: 0.75rem 1.5rem;
-        border-radius: 0.5rem;
+        border-radius: 0.75rem;
         font-weight: 600;
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        border: 1px solid transparent;
+        font-size: 0.875rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         position: relative;
         overflow: hidden;
-      }
-
-      .btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        gap: 0.5rem;
+        z-index: 1;
+        cursor: pointer;
       }
       .btn::before {
         content: "";
         position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 300%;
-        height: 300%;
-        background: radial-gradient(
-          circle,
-          rgba(255, 255, 255, 0.2) 0%,
-          rgba(255, 255, 255, 0) 60%
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.15) 0%,
+          rgba(255, 255, 255, 0) 100%
         );
-        transform: translate(-50%, -50%) scale(0);
-        transition: transform 0.5s ease;
-        border-radius: 50%;
+        z-index: -1;
+        opacity: 0;
+        transition: opacity 0.3s ease;
       }
       .btn:hover::before {
-        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+      }
+      .btn-sm {
+        padding: 0.5rem 1rem;
+        font-size: 0.8rem;
+        border-radius: 0.5rem;
       }
 
       .btn-primary {
-        background-color: var(--accent);
-        color: white;
-        border-color: var(--accent);
-        box-shadow: 0 0 25px var(--accent-glow);
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        color: #fff;
+        border: none;
+        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4),
+          inset 0 1px 0 rgba(255, 255, 255, 0.2);
       }
-
       .btn-primary:hover {
-        background-color: var(--accent-hover);
+        box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6),
+          inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        transform: translateY(-2px);
       }
       .btn-secondary {
-        background-color: var(--bg-tertiary);
+        background: rgba(255, 255, 255, 0.05);
         color: var(--text-primary);
-        border-color: var(--border-color);
+        border: 1px solid var(--border-color);
       }
       .btn-secondary:hover {
-        background-color: #2a2a2a;
+        background: rgba(255, 255, 255, 0.08);
         border-color: var(--border-color-hover);
+        transform: translateY(-2px);
+      }
+      .btn-danger {
+        background: linear-gradient(135deg, #f43f5e, #e11d48);
+        color: #fff;
+        border: none;
+        box-shadow: 0 4px 15px rgba(244, 63, 94, 0.4),
+          inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      }
+      .btn-danger:hover {
+        box-shadow: 0 6px 20px rgba(244, 63, 94, 0.6),
+          inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        transform: translateY(-2px);
       }
 
+      /* Futuristic Table */
       .table-pro {
         width: 100%;
-        text-align: left;
         border-collapse: separate;
-        border-spacing: 0;
+        border-spacing: 0 0.5rem;
       }
       .table-pro th {
-        padding: 1rem;
+        padding: 1rem 1.25rem;
         color: var(--text-secondary);
-        text-transform: uppercase;
+        font-weight: 700;
         font-size: 0.75rem;
-        letter-spacing: 0.05em;
-        border-bottom: 1px solid var(--border-color);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        text-align: left;
+      }
+      .table-pro tbody tr {
+        background: rgba(255, 255, 255, 0.02);
+        transition: all 0.3s ease;
+      }
+      .table-pro tbody tr:hover {
+        background: rgba(255, 255, 255, 0.04);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
       }
       .table-pro td {
-        padding: 1rem 1rem;
-        border-bottom: 1px solid var(--border-color);
-        transition: background-color 0.2s ease;
+        padding: 1.25rem;
+        border: none;
+        border-top: 1px solid transparent;
+        border-bottom: 1px solid transparent;
+        vertical-align: middle;
       }
-      .table-pro tbody tr:last-child td {
-        border-bottom: none;
+      .table-pro tbody tr td:first-child {
+        border-top-left-radius: 1rem;
+        border-bottom-left-radius: 1rem;
+        border-left: 1px solid transparent;
       }
-      .table-pro tbody tr:hover td {
-        background-color: rgba(255, 255, 255, 0.03);
-      }
-      .table-pro tbody tr.user-row.expanded td {
-        background-color: rgba(26, 26, 26, 0.7);
+      .table-pro tbody tr td:last-child {
+        border-top-right-radius: 1rem;
+        border-bottom-right-radius: 1rem;
+        border-right: 1px solid transparent;
       }
 
+      .table-pro tbody tr.user-row.expanded td {
+        background-color: rgba(99, 102, 241, 0.05);
+        border-color: rgba(99, 102, 241, 0.2);
+      }
+
+      /* Hidden Elements Handlers used in JS */
+      .stores-row.hidden,
+      .ticket-row.hidden,
+      .ticket-message-row.hidden {
+        display: none;
+      }
+      .user-row i[data-lucide="chevron-down"] {
+        transition: transform 0.3s ease;
+      }
+      .user-row.expanded i[data-lucide="chevron-down"] {
+        transform: rotate(180deg);
+      }
+
+      /* Neon Status Badges */
       .status-badge {
-        padding: 0.25rem 0.75rem;
+        padding: 0.35rem 0.85rem;
         border-radius: 9999px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        text-transform: capitalize;
+        font-size: 0.7rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
         display: inline-flex;
         align-items: center;
-        gap: 0.25rem;
+        gap: 0.375rem;
+        border: 1px solid transparent;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
       }
       .status-badge::before {
         content: "";
         width: 6px;
         height: 6px;
         border-radius: 50%;
-      }
-      .status-badge.trial {
-        background-color: rgba(254, 176, 25, 0.1);
-        color: var(--warning);
-      }
-      .status-badge.trial::before {
-        background-color: var(--warning);
+        box-shadow: 0 0 8px currentColor;
       }
       .status-badge.active {
-        background-color: rgba(0, 227, 150, 0.1);
-        color: var(--success);
+        background: rgba(16, 185, 129, 0.15);
+        color: #34d399;
+        border-color: rgba(16, 185, 129, 0.3);
       }
       .status-badge.active::before {
-        background-color: var(--success);
+        background-color: #34d399;
+      }
+      .status-badge.trial {
+        background: rgba(245, 158, 11, 0.15);
+        color: #fbbf24;
+        border-color: rgba(245, 158, 11, 0.3);
+      }
+      .status-badge.trial::before {
+        background-color: #fbbf24;
       }
       .status-badge.expired,
       .status-badge.disabled {
-        background-color: rgba(255, 69, 96, 0.1);
-        color: var(--danger);
+        background: rgba(244, 63, 94, 0.15);
+        color: #fb7185;
+        border-color: rgba(244, 63, 94, 0.3);
       }
       .status-badge.expired::before,
       .status-badge.disabled::before {
-        background-color: var(--danger);
+        background-color: #fb7185;
       }
       .status-badge.unknown {
-        background-color: rgba(156, 163, 175, 0.1);
-        color: var(--text-secondary);
+        background: rgba(148, 163, 184, 0.15);
+        color: #94a3b8;
+        border-color: rgba(148, 163, 184, 0.3);
       }
       .status-badge.unknown::before {
-        background-color: var(--text-secondary);
+        background-color: #94a3b8;
       }
 
+      /* Cinematic Modals */
       .modal-overlay {
-        transition: opacity 0.2s ease-out;
+        transition: opacity 0.3s ease-out;
       }
       .modal-content {
-        transition: opacity 0.2s ease-out,
-          transform 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+        background: rgba(15, 15, 20, 0.85) !important;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7),
+          inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+        border: 1px solid var(--border-color-hover) !important;
+        transition: opacity 0.3s ease-out,
+          transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
       }
+
+      /* View Transitions */
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(15px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      #workspace-content > div {
+        animation: fadeIn 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+      }
+      @keyframes slideInLeft {
+        from {
+          opacity: 0;
+          transform: translateX(-50px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+      @keyframes slideInDown {
+        from {
+          opacity: 0;
+          transform: translateY(-50px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      #app-sidebar.animated {
+        animation: slideInLeft 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
+      #app-header.animated {
+        animation: slideInDown 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s
+          backwards;
+      }
+
+      /* High-End Loaders */
       .loader {
         width: 48px;
         height: 48px;
-        border: 5px solid var(--bg-tertiary);
+        border: 4px solid rgba(255, 255, 255, 0.1);
         border-bottom-color: var(--accent);
         border-radius: 50%;
+        animation: rotation 1s linear infinite;
+      }
+      .loader-sm {
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        border-bottom-color: white;
+        border-radius: 50%;
         display: inline-block;
-        box-sizing: border-box;
         animation: rotation 1s linear infinite;
       }
       @keyframes rotation {
@@ -289,20 +403,7 @@
         }
       }
 
-      ::-webkit-scrollbar {
-        width: 8px;
-      }
-      ::-webkit-scrollbar-track {
-        background: var(--bg-secondary);
-      }
-      ::-webkit-scrollbar-thumb {
-        background: var(--border-color);
-        border-radius: 4px;
-      }
-      ::-webkit-scrollbar-thumb:hover {
-        background: var(--border-color-hover);
-      }
-
+      /* Custom Toggle Switch */
       .toggle-switch-label {
         display: inline-flex;
         align-items: center;
@@ -312,119 +413,168 @@
         display: none;
       }
       .toggle-switch-track {
-        width: 44px;
-        height: 24px;
-        background-color: var(--bg-tertiary);
-        border-radius: 9999px;
+        width: 48px;
+        height: 26px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 26px;
         position: relative;
-        transition: background-color 0.2s ease;
+        transition: all 0.3s;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
         border: 1px solid var(--border-color);
       }
       .toggle-switch-thumb {
-        content: "";
         width: 20px;
         height: 20px;
-        background-color: white;
+        background: white;
         border-radius: 50%;
         position: absolute;
-        top: 1px;
-        left: 1px;
-        transition: transform 0.2s ease;
+        top: 2px;
+        left: 2px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
       }
       .toggle-switch-input:checked + .toggle-switch-track {
-        background-color: var(--accent);
-        border-color: var(--accent);
+        background: linear-gradient(135deg, var(--accent), #8b5cf6);
+        border-color: transparent;
       }
       .toggle-switch-input:checked + .toggle-switch-track .toggle-switch-thumb {
-        transform: translateX(20px);
+        transform: translateX(22px);
       }
 
-      .stores-row.hidden {
-        display: none;
-      }
-      .user-row i[data-lucide="chevron-down"] {
-        transition: transform 0.2s ease-in-out;
-      }
-      .user-row.expanded i[data-lucide="chevron-down"] {
-        transform: rotate(180deg);
-      }
-
-      .ticket-row.hidden {
-        display: none;
-      }
-      .ticket-message-row.hidden {
-        display: none;
-      }
-
-      #workspace-content > div {
-        animation: fadeIn 0.5s ease-out;
-      }
-
+      /* Floating Tooltips */
       .tooltip {
         position: absolute;
-        left: 110%;
+        left: calc(100% + 15px);
         top: 50%;
-        transform: translateY(-50%);
-        background-color: var(--bg-tertiary);
-        color: var(--text-primary);
-        padding: 0.5rem 1rem;
+        transform: translateY(-50%) translateX(-10px);
+        background: #ffffff;
+        color: #000000;
+        padding: 0.5rem 0.875rem;
         border-radius: 0.5rem;
-        font-size: 0.875rem;
-        font-weight: 500;
+        font-size: 0.75rem;
+        font-weight: 700;
         white-space: nowrap;
         opacity: 0;
         visibility: hidden;
-        transition: opacity 0.2s ease, visibility 0.2s ease;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         pointer-events: none;
-        z-index: 10;
-        border: 1px solid var(--border-color);
+        z-index: 50;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      }
+      .tooltip::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        right: 100%;
+        transform: translateY(-50%);
+        border-width: 5px;
+        border-style: solid;
+        border-color: transparent #ffffff transparent transparent;
       }
       [data-tooltip]:hover .tooltip {
         opacity: 1;
         visibility: visible;
+        transform: translateY(-50%) translateX(0);
       }
 
-      #app-sidebar.animated {
-        animation: slideInLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      /* Sidebar Navigation States */
+      #main-nav > a {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 3.5rem;
+        width: 3.5rem;
+        border-radius: 1rem;
+        color: var(--text-secondary);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       }
-      #app-header.animated {
-        animation: slideInDown 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.2s;
-        animation-fill-mode: backwards;
-      }
-
-      #main-nav > a.active {
-        background-color: var(--accent);
+      #main-nav > a:hover {
         color: white;
+        background: rgba(255, 255, 255, 0.05);
+        transform: translateY(-2px);
+      }
+      #main-nav > a.active {
+        background: linear-gradient(135deg, var(--accent), #8b5cf6);
+        color: white;
+        box-shadow: 0 8px 25px rgba(99, 102, 241, 0.5);
+        transform: translateY(-2px);
       }
 
+      /* Toast Notification */
       .toast {
-        animation: fadeIn 0.3s ease-out;
-        transition: transform 0.3s ease-out, opacity 0.3s ease-out;
-        border: 1px solid;
+        background: rgba(15, 15, 20, 0.9) !important;
+        backdrop-filter: blur(16px) !important;
+        border: 1px solid var(--border-color) !important;
+        box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.7) !important;
+        pointer-events: auto;
       }
     </style>
   </head>
-  <body class="antialiased">
+  <body
+    class="antialiased bg-bg-primary text-text-primary selection:bg-accent selection:text-white relative"
+  >
+    <!-- Dynamic Ambient Glow Background -->
+    <div class="fixed inset-0 z-[-1] overflow-hidden pointer-events-none">
+      <!-- Abstract blur shapes -->
+      <div
+        class="absolute top-[-10%] left-[-10%] w-[40vw] h-[40vw] rounded-full bg-indigo-900/20 blur-[150px]"
+      ></div>
+      <div
+        class="absolute bottom-[-10%] right-[-10%] w-[50vw] h-[50vw] rounded-full bg-violet-900/10 blur-[150px]"
+      ></div>
+      <div
+        class="absolute top-[40%] left-[60%] w-[30vw] h-[30vw] rounded-full bg-blue-900/10 blur-[120px]"
+      ></div>
+      <!-- Premium grain overlay -->
+      <div
+        class="absolute inset-0 opacity-[0.02]"
+        style="
+          background-image: url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E');
+        "
+      ></div>
+    </div>
+
     <!-- Login Screen -->
     <div
       id="login-container"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-bg-primary bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(0,119,255,0.3),rgba(255,255,255,0))]"
+      class="fixed inset-0 z-50 flex items-center justify-center overflow-hidden"
     >
-      <div class="w-full max-w-sm p-8 space-y-8 rounded-2xl glass-pane">
+      <!-- Intense center ambient light for login -->
+      <div
+        class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-accent opacity-20 blur-[150px] rounded-full pointer-events-none animate-pulse"
+      ></div>
+
+      <div
+        class="w-full max-w-md p-10 space-y-8 rounded-3xl glass-pane relative z-10 border border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)]"
+      >
         <div class="text-center">
-          <i
-            data-lucide="shield-half"
-            class="mx-auto h-16 w-16 text-accent"
-          ></i>
-          <h1 class="text-3xl font-bold text-white mt-4">Super Admin</h1>
-          <p class="animated-gradient-text">Control Panel Access</p>
+          <div
+            class="mx-auto h-20 w-20 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/30 transform -rotate-3 mb-6"
+          >
+            <i
+              data-lucide="shield-half"
+              class="h-10 w-10 text-white rotate-3"
+            ></i>
+          </div>
+          <h1 class="text-4xl font-extrabold text-white tracking-tight mb-2">
+            Nexus<span
+              class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400"
+              >Core</span
+            >
+          </h1>
+          <p
+            class="text-text-secondary text-sm font-semibold tracking-widest uppercase"
+          >
+            Super Admin Portal
+          </p>
         </div>
         <form id="login-form" class="space-y-6">
-          <div>
+          <div class="space-y-1">
             <label
               for="email"
-              class="block text-sm font-medium text-text-secondary"
-              >Admin Email</label
+              class="block text-xs font-bold text-text-secondary uppercase tracking-wider pl-1"
+              >Admin Identity</label
             >
             <input
               id="email"
@@ -432,30 +582,38 @@
               type="email"
               autocomplete="email"
               required
-              class="form-input w-full mt-1"
+              class="form-input w-full"
               value="admin@cashshilpo.com"
+              placeholder="Enter your email"
             />
           </div>
-          <div>
+          <div class="space-y-1">
             <label
               for="password"
-              class="block text-sm font-medium text-text-secondary"
-              >Password</label
+              class="block text-xs font-bold text-text-secondary uppercase tracking-wider pl-1"
+              >Security Key</label
             >
             <input
               id="password"
               name="password"
               type="password"
               required
-              class="form-input w-full mt-1"
+              class="form-input w-full"
               value="superadmin123"
+              placeholder="••••••••"
             />
           </div>
-          <p id="auth-error" class="text-red-400 text-sm hidden"></p>
-          <div>
-            <button type="submit" class="btn btn-primary w-full text-base py-3">
-              <i data-lucide="lock" class="w-4 h-4 mr-2"></i>
-              Secure Login
+          <p
+            id="auth-error"
+            class="text-danger text-sm font-medium hidden text-center bg-danger/10 py-2 rounded-lg border border-danger/20"
+          ></p>
+          <div class="pt-2">
+            <button
+              type="submit"
+              class="btn btn-primary w-full text-base py-3.5 shadow-indigo-500/25"
+            >
+              <i data-lucide="lock" class="w-5 h-5 mr-2"></i>
+              Authenticate Session
             </button>
           </div>
         </form>
@@ -465,170 +623,205 @@
     <!-- Loading Overlay -->
     <div
       id="loading-overlay"
-      class="fixed inset-0 z-[60] flex flex-col items-center justify-center bg-bg-primary/80 backdrop-blur-sm hidden"
+      class="fixed inset-0 z-[60] flex flex-col items-center justify-center bg-bg-primary/90 backdrop-blur-2xl hidden"
     >
-      <div class="loader"></div>
-      <p class="mt-4 text-text-secondary animated-gradient-text">
-        Connecting to mission control...
+      <div class="relative w-28 h-28 flex items-center justify-center">
+        <div
+          class="absolute inset-0 rounded-full border-t-[3px] border-indigo-500 animate-[spin_2s_linear_infinite] opacity-80"
+        ></div>
+        <div
+          class="absolute inset-2 rounded-full border-b-[3px] border-violet-500 animate-[spin_1.5s_linear_infinite_reverse] opacity-80"
+        ></div>
+        <div
+          class="absolute inset-4 rounded-full border-l-[3px] border-blue-500 animate-[spin_1s_linear_infinite] opacity-80"
+        ></div>
+        <i
+          data-lucide="zap"
+          class="w-8 h-8 text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] animate-pulse"
+        ></i>
+      </div>
+      <p
+        class="mt-8 text-white font-bold tracking-[0.2em] uppercase text-sm animate-pulse bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-violet-400"
+      >
+        Initializing Nexus Core...
       </p>
     </div>
 
     <!-- Main App Layout -->
-    <div id="app-container" class="hidden h-screen overflow-hidden">
-      <div class="flex h-full">
+    <div id="app-container" class="hidden h-screen overflow-hidden relative">
+      <div class="flex h-full p-5 gap-5 relative z-10">
         <!-- Floating Sidebar -->
         <aside
           id="app-sidebar"
-          class="h-full flex items-center justify-center p-4"
+          class="h-full flex flex-col w-24 glass-pane !rounded-[2rem] py-8 items-center border border-white/5 shadow-2xl flex-shrink-0"
         >
-          <div
-            class="flex flex-col items-center gap-2 h-full max-h-[95vh] w-20 py-6 bg-sidebar-bg border border-border-color rounded-2xl shadow-2xl shadow-black/30"
-          >
-            <a href="#" class="flex-shrink-0 mb-6">
-              <div
-                class="w-12 h-12 rounded-xl bg-gradient-to-br from-accent to-blue-700 flex items-center justify-center shadow-lg shadow-accent-glow"
-              >
-                <i data-lucide="shield-check" class="w-7 h-7 text-white"></i>
-              </div>
-            </a>
-            <nav
-              id="main-nav"
-              class="flex-grow w-full flex flex-col items-center space-y-2"
+          <a href="#" class="flex-shrink-0 mb-10 group">
+            <div
+              class="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/30 group-hover:scale-110 transition-transform duration-300"
             >
-              <a
-                href="#"
-                data-view="dashboard"
-                class="group relative flex items-center justify-center h-14 w-14 rounded-xl text-text-secondary hover:bg-bg-tertiary hover:text-white transition-all duration-200"
-                data-tooltip="Dashboard"
-              >
-                <i data-lucide="layout-dashboard" class="w-6 h-6"></i>
-                <div class="tooltip">Dashboard</div>
-              </a>
-              <a
-                href="#"
-                data-view="users"
-                class="group relative flex items-center justify-center h-14 w-14 rounded-xl text-text-secondary hover:bg-bg-tertiary hover:text-white transition-all duration-200"
-                data-tooltip="Users"
-              >
-                <i data-lucide="users" class="w-6 h-6"></i>
-                <div class="tooltip">User Management</div>
-              </a>
-              <a
-                href="#"
-                data-view="subscriptions"
-                class="group relative flex items-center justify-center h-14 w-14 rounded-xl text-text-secondary hover:bg-bg-tertiary hover:text-white transition-all duration-200"
-                data-tooltip="Subscriptions"
-              >
-                <i data-lucide="credit-card" class="w-6 h-6"></i>
-                <div class="tooltip">Subscriptions</div>
-              </a>
-              <a
-                href="#"
-                data-view="support_tickets"
-                class="group relative flex items-center justify-center h-14 w-14 rounded-xl text-text-secondary hover:bg-bg-tertiary hover:text-white transition-all duration-200"
-                data-tooltip="Support"
-              >
-                <i data-lucide="life-buoy" class="w-6 h-6"></i>
-                <div class="tooltip">Support Tickets</div>
-              </a>
-              <a
-                href="#"
-                data-view="audit_log"
-                class="group relative flex items-center justify-center h-14 w-14 rounded-xl text-text-secondary hover:bg-bg-tertiary hover:text-white transition-all duration-200"
-                data-tooltip="Audit Log"
-              >
-                <i data-lucide="history" class="w-6 h-6"></i>
-                <div class="tooltip">Audit Log</div>
-              </a>
-              <a
-                href="#"
-                data-view="settings"
-                class="group relative flex items-center justify-center h-14 w-14 rounded-xl text-text-secondary hover:bg-bg-tertiary hover:text-white transition-all duration-200"
-                data-tooltip="Settings"
-              >
-                <i data-lucide="sliders-horizontal" class="w-6 h-6"></i>
-                <div class="tooltip">System Settings</div>
-              </a>
-            </nav>
-            <div class="w-full flex flex-col items-center mt-auto space-y-2">
-              <div
-                data-action="logout"
-                class="group relative flex items-center justify-center h-14 w-14 rounded-xl text-text-secondary hover:bg-red-500/10 hover:text-red-400 transition-colors cursor-pointer"
-                data-tooltip="Sign Out"
-              >
-                <i data-lucide="log-out" class="w-6 h-6"></i>
-                <div class="tooltip">Sign Out</div>
-              </div>
+              <i data-lucide="shield-check" class="w-8 h-8 text-white"></i>
+            </div>
+          </a>
+          <nav
+            id="main-nav"
+            class="flex-grow w-full flex flex-col items-center space-y-4"
+          >
+            <a
+              href="#"
+              data-view="dashboard"
+              class="group"
+              data-tooltip="Overview"
+            >
+              <i data-lucide="layout-dashboard" class="w-6 h-6"></i>
+              <div class="tooltip">Overview</div>
+            </a>
+            <a
+              href="#"
+              data-view="users"
+              class="group"
+              data-tooltip="User Network"
+            >
+              <i data-lucide="users" class="w-6 h-6"></i>
+              <div class="tooltip">User Network</div>
+            </a>
+            <a
+              href="#"
+              data-view="subscriptions"
+              class="group"
+              data-tooltip="Revenue"
+            >
+              <i data-lucide="credit-card" class="w-6 h-6"></i>
+              <div class="tooltip">Revenue</div>
+            </a>
+            <a
+              href="#"
+              data-view="support_tickets"
+              class="group"
+              data-tooltip="Help Desk"
+            >
+              <i data-lucide="life-buoy" class="w-6 h-6"></i>
+              <div class="tooltip">Help Desk</div>
+            </a>
+            <a
+              href="#"
+              data-view="audit_log"
+              class="group"
+              data-tooltip="System Logs"
+            >
+              <i data-lucide="history" class="w-6 h-6"></i>
+              <div class="tooltip">System Logs</div>
+            </a>
+            <a
+              href="#"
+              data-view="settings"
+              class="group"
+              data-tooltip="Configuration"
+            >
+              <i data-lucide="sliders-horizontal" class="w-6 h-6"></i>
+              <div class="tooltip">Configuration</div>
+            </a>
+          </nav>
+          <div class="w-full flex flex-col items-center mt-auto space-y-2">
+            <div
+              data-action="logout"
+              class="group relative flex items-center justify-center h-12 w-12 rounded-xl text-text-secondary hover:bg-danger/10 hover:text-danger transition-colors cursor-pointer"
+              data-tooltip="Terminate Session"
+            >
+              <i data-lucide="power" class="w-6 h-6"></i>
+              <div class="tooltip">Terminate Session</div>
             </div>
           </div>
         </aside>
 
-        <!-- Main Content Area -->
-        <div class="flex-1 flex flex-col overflow-hidden">
+        <!-- Main Workspace Canvas -->
+        <div
+          class="flex-1 flex flex-col h-full glass-pane !rounded-[2rem] border border-white/5 shadow-2xl overflow-hidden relative bg-bg-primary/20 backdrop-blur-3xl"
+        >
           <!-- Header -->
           <header
             id="app-header"
-            class="flex-shrink-0 h-20 px-8 flex items-center justify-between border-b border-border-color bg-header-bg backdrop-blur-xl"
+            class="flex-shrink-0 h-24 px-10 flex items-center justify-between border-b border-white/5 bg-transparent z-20"
           >
             <div class="flex items-center gap-4">
-              <h1 id="view-title" class="text-2xl font-bold">Dashboard</h1>
+              <h1
+                id="view-title"
+                class="text-3xl font-extrabold tracking-tight text-white drop-shadow-sm"
+              >
+                Dashboard
+              </h1>
             </div>
-            <div class="flex items-center gap-6">
-              <div class="relative w-72">
-                <i
-                  data-lucide="search"
-                  class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-secondary"
-                ></i>
-                <input
-                  type="text"
-                  id="global-search-input"
-                  placeholder="Search users, subscriptions..."
-                  class="form-input w-full pl-12 bg-bg-tertiary border-border-color focus:bg-bg-secondary"
-                />
+            <div class="flex items-center gap-8">
+              <!-- Animated Search Bar -->
+              <div class="relative w-80 group hidden md:block">
+                <div
+                  class="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full blur opacity-0 group-focus-within:opacity-20 transition-opacity duration-500"
+                ></div>
+                <div
+                  class="relative flex items-center bg-bg-tertiary border border-border-color rounded-full px-5 py-2.5 transition-colors group-focus-within:border-accent"
+                >
+                  <i
+                    data-lucide="search"
+                    class="w-5 h-5 text-text-secondary mr-3 group-focus-within:text-accent transition-colors"
+                  ></i>
+                  <input
+                    type="text"
+                    id="global-search-input"
+                    placeholder="Search parameters..."
+                    class="bg-transparent border-none outline-none text-white w-full text-sm placeholder:text-text-secondary/60 focus:ring-0"
+                  />
+                </div>
               </div>
-              <div class="flex items-center gap-4">
+
+              <div class="flex items-center gap-6">
+                <!-- Notification Bell -->
                 <button
                   id="notification-bell"
                   data-action="open-notifications"
-                  class="relative w-10 h-10 flex items-center justify-center rounded-full bg-bg-tertiary border border-border-color text-text-secondary hover:text-white hover:border-border-color-hover transition-colors"
+                  class="relative w-12 h-12 flex items-center justify-center rounded-full bg-bg-tertiary border border-border-color text-text-secondary hover:text-white hover:border-accent hover:shadow-[0_0_15px_rgba(99,102,241,0.3)] transition-all"
                 >
                   <i data-lucide="bell" class="w-5 h-5"></i>
                   <div
                     id="notification-badge"
-                    class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-danger border-2 border-sidebar-bg text-white text-xs flex items-center justify-center hidden"
+                    class="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-danger border-2 border-bg-primary text-white text-[10px] font-bold flex items-center justify-center hidden shadow-[0_0_10px_rgba(244,63,94,0.6)]"
                   ></div>
                 </button>
-                <div class="text-right">
+                <!-- Time & Date -->
+                <div
+                  class="text-right flex flex-col justify-center border-l border-white/10 pl-6 hidden sm:flex"
+                >
                   <p
                     id="current-time"
-                    class="font-semibold text-text-primary"
+                    class="font-bold text-white tracking-wide text-lg leading-tight"
                   ></p>
-                  <p id="current-date" class="text-xs text-text-secondary"></p>
+                  <p
+                    id="current-date"
+                    class="text-xs text-accent font-semibold tracking-widest uppercase"
+                  ></p>
                 </div>
               </div>
             </div>
           </header>
 
-          <!-- Workspace -->
+          <!-- Dynamic Injection Container -->
           <main
             id="workspace-content"
-            class="flex-1 overflow-y-auto p-8 lg:p-12"
+            class="flex-1 overflow-y-auto p-8 lg:p-12 scroll-smooth z-10 relative"
           >
-            <!-- Content will be injected here -->
+            <!-- Content will be injected here by Javascript -->
           </main>
         </div>
       </div>
     </div>
 
-    <!-- Modals & Toasts Containers -->
+    <!-- Modals & Toasts Base Containers -->
     <div id="modals-container"></div>
     <div
       id="toasts-container"
-      class="fixed top-5 right-5 z-[100] space-y-2"
+      class="fixed top-8 right-8 z-[100] space-y-4 flex flex-col items-end pointer-events-none"
     ></div>
 
+    <!-- IDENTICAL SCRIPT BLOCK: DO NOT MODIFY LOGIC -->
     <script type="module">
-      // --- FIREBASE SDK IMPORTS ---
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
       import {
         getAuth,
@@ -653,13 +846,11 @@
         orderBy,
         limit,
         deleteDoc,
-        getDocs, // <-- IMPORT getDocs
+        getDocs,
       } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-      // --- SESSION START TIME ---
       const sessionStartTime = new Date();
 
-      // --- FIREBASE CONFIG & INITIALIZATION ---
       const firebaseConfig = {
         apiKey: "AIzaSyCBhzyl_1KpaROyjDaXX7fyLv-gQRoOTY0",
         authDomain: "cashshilpo.firebaseapp.com",
@@ -674,7 +865,6 @@
       const auth = getAuth(app);
       const db = getFirestore(app);
 
-      // --- APPLICATION STATE ---
       let appState = {
         activeView: "dashboard",
         settings: {
@@ -702,13 +892,8 @@
       let activeListeners = [];
       let chartInstances = {};
       let clockInterval;
-      let processedNotificationIds = new Set(); // Track processed doc IDs to prevent duplicates
-      // This variable is no longer used and will be replaced by logic inside the listener.
+      let processedNotificationIds = new Set();
 
-      // --- NEW: Comprehensive Plan Details (Fallback) ---
-      // This object provides a complete fallback for all plan details.
-      // The "approve" logic will first try to use limits from the request object,
-      // but will use this if the request object is missing them.
       const YEARLY_DISCOUNT_PERCENT = 20;
       const LOCAL_PLANS_DETAILS = {
         basic_monthly: {
@@ -754,16 +939,13 @@
           limits: { stores: 10, products: 50000, staff: 50, ai: "advanced" },
         },
       };
-      // --- END NEW ---
 
-      // --- NEW: Flags to prevent notification creation on initial data load ---
       let isInitialDataLoaded = {
         users: false,
         subscriptions: false,
         tickets: false,
       };
 
-      // --- NEW/UPDATED UI UTILITIES (from Canvas code) ---
       const playNotificationSound = () => {
         const audioContext = new (window.AudioContext ||
           window.webkitAudioContext)();
@@ -863,7 +1045,6 @@
         setTimeout(() => modalEl.remove(), 200);
       };
 
-      // --- EXISTING UTILITIES (Unchanged) ---
       const renderPaginationControls = (
         container,
         totalItems,
@@ -878,28 +1059,30 @@
         }
         const startItem = (currentPage - 1) * itemsPerPage + 1;
         const endItem = Math.min(startItem + itemsPerPage - 1, totalItems);
-        let paginationHTML = `<div class="flex items-center justify-between text-sm text-text-secondary">
-                <div>Showing <span class="font-medium text-text-primary">${startItem}</span> to <span class="font-medium text-text-primary">${endItem}</span> of <span class="font-medium text-text-primary">${totalItems}</span> results</div>
+        let paginationHTML = `<div class="flex items-center justify-between text-sm text-text-secondary mt-4">
+                <div>Showing <span class="font-bold text-text-primary">${startItem}</span> to <span class="font-bold text-text-primary">${endItem}</span> of <span class="font-bold text-text-primary">${totalItems}</span> results</div>
                 <div class="flex items-center gap-2">
                     <button data-action="paginate" data-view-type="${viewType}" data-page="${
           currentPage - 1
-        }" class="px-2 py-1 border border-border-color rounded-md disabled:opacity-50 disabled:cursor-not-allowed" ${
+        }" class="px-3 py-1 border border-border-color rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-white/5 transition-colors" ${
           currentPage === 1 ? "disabled" : ""
         }><i data-lucide="chevron-left" class="w-5 h-5"></i></button>
-                    <span class="px-2">Page ${currentPage} of ${totalPages}</span>
+                    <span class="px-3 font-semibold">Page ${currentPage} of ${totalPages}</span>
                     <button data-action="paginate" data-view-type="${viewType}" data-page="${
           currentPage + 1
-        }" class="px-2 py-1 border border-border-color rounded-md disabled:opacity-50 disabled:cursor-not-allowed" ${
+        }" class="px-3 py-1 border border-border-color rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-white/5 transition-colors" ${
           currentPage === totalPages ? "disabled" : ""
         }><i data-lucide="chevron-right" class="w-5 h-5"></i></button>
                 </div></div>`;
         container.innerHTML = paginationHTML;
         if (typeof lucide !== "undefined") lucide.createIcons();
       };
+
       const destroyCharts = () => {
         Object.values(chartInstances).forEach((chart) => chart.destroy());
         chartInstances = {};
       };
+
       const updateClock = () => {
         const now = new Date();
         const optionsTime = {
@@ -923,6 +1106,7 @@
         if (dateEl)
           dateEl.textContent = now.toLocaleDateString("en-US", optionsDate);
       };
+
       const formatTimeAgo = (date) => {
         if (!date) return "";
         const seconds = Math.floor((new Date() - date) / 1000);
@@ -939,7 +1123,6 @@
         return Math.floor(seconds) + " seconds ago";
       };
 
-      // --- REWRITTEN NOTIFICATION SYSTEM ---
       async function openNotificationsModal() {
         const notifications = firestoreData.notifications;
 
@@ -957,8 +1140,8 @@
                                     info: "info",
                                     warning: "alert-triangle",
                                     success: "check-circle",
-                                    store: "store", // <-- ADDED
-                                    "user-check": "user-check", // <-- ADDED
+                                    store: "store",
+                                    "user-check": "user-check",
                                   };
                                   const icon = icons[n.icon] || "bell";
                                   const isUnread = !n.read;
@@ -966,7 +1149,7 @@
                                 <div class="notification-item flex items-start gap-4 py-4 px-6 ${
                                   isUnread ? "bg-blue-500/10" : "opacity-60"
                                 } hover:opacity-100 hover:bg-bg-secondary transition-all duration-200">
-                                    <div class="w-8 h-8 rounded-full flex items-center justify-center bg-accent/10 text-accent shrink-0 mt-1">
+                                    <div class="w-8 h-8 rounded-full flex items-center justify-center bg-accent/20 text-accent shrink-0 mt-1">
                                         <i data-lucide="${icon}" class="w-5 h-5"></i>
                                     </div>
                                     <div class="flex-grow">
@@ -980,14 +1163,14 @@
                                     </div>
                                     ${
                                       isUnread
-                                        ? '<div class="w-2.5 h-2.5 bg-blue-400 rounded-full ml-2 self-center shrink-0"></div>'
+                                        ? '<div class="w-2.5 h-2.5 bg-blue-400 rounded-full ml-2 self-center shrink-0 shadow-[0_0_8px_rgba(96,165,250,0.8)]"></div>'
                                         : ""
                                     }
                                 </div>
                                 `;
                                 })
                                 .join("")
-                            : `<p class="text-center text-text-secondary py-8 px-6">You have no notifications.</p>`
+                            : `<p class="text-center text-text-secondary py-8 px-6 font-medium">You have no notifications.</p>`
                         }
                     </div>
                 </div>
@@ -998,14 +1181,13 @@
             ? `<button data-action="clear-all-notifications" class="btn btn-secondary text-sm">Clear All</button>`
             : "";
 
-        const modal = showModal("Notifications", content, footer, {
+        const modal = showModal("System Notifications", content, footer, {
           size: "max-w-lg",
         });
         if (!modal) return;
 
         lucide.createIcons();
 
-        // Mark as read when the modal is closed
         modal
           .querySelector('button[data-action="close-modal"]')
           .addEventListener("click", async () => {
@@ -1033,7 +1215,7 @@
           clearAllBtn.addEventListener("click", async () => {
             const confirmModal = showModal(
               "Confirm Clear",
-              "Are you sure you want to delete all notifications?",
+              "Are you sure you want to delete all notifications? This action cannot be undone.",
               `<button data-action="close-modal" class="btn btn-secondary">Cancel</button><button id="confirm-clear" class="btn btn-danger">Yes, Clear All</button>`,
             );
 
@@ -1069,15 +1251,13 @@
           .length;
 
         if (unreadCount > 0) {
-          badge.textContent = unreadCount;
+          badge.textContent = unreadCount > 99 ? "99+" : unreadCount;
           badge.classList.remove("hidden");
         } else {
           badge.classList.add("hidden");
         }
       };
 
-      // --- VIEW RENDERERS ---
-      // --- Copying full implementations of render functions ---
       function renderDashboardView() {
         destroyCharts();
         const container = document.getElementById("workspace-content");
@@ -1121,27 +1301,27 @@
                 <div class="space-y-8">
                     <!-- KPIs -->
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <div class="glass-pane p-6 rounded-xl"><div class="flex items-center gap-4"><i data-lucide="users" class="w-8 h-8 text-accent"></i><div><p class="text-sm text-text-secondary">Total Users</p><p class="text-3xl font-bold">${totalUsers}</p></div></div></div>
-                        <div class="glass-pane p-6 rounded-xl"><div class="flex items-center gap-4"><i data-lucide="shield-check" class="w-8 h-8 text-success"></i><div><p class="text-sm text-text-secondary">Active Subscriptions</p><p class="text-3xl font-bold">${activeSubs}</p></div></div></div>
-                        <div class="glass-pane p-6 rounded-xl"><div class="flex items-center gap-4"><i data-lucide="clock" class="w-8 h-8 text-warning"></i><div><p class="text-sm text-text-secondary">Users on Trial</p><p class="text-3xl font-bold">${onTrial}</p></div></div></div>
-                        <div class="glass-pane p-6 rounded-xl"><div class="flex items-center gap-4"><i data-lucide="shield-off" class="w-8 h-8 text-danger"></i><div><p class="text-sm text-text-secondary">Expired / Action Required</p><p class="text-3xl font-bold">${expired}</p></div></div></div>
+                        <div class="glass-pane p-6 rounded-2xl group"><div class="flex items-center gap-5"><div class="w-14 h-14 rounded-full bg-accent/10 flex items-center justify-center group-hover:scale-110 transition-transform"><i data-lucide="users" class="w-7 h-7 text-accent"></i></div><div><p class="text-sm font-semibold text-text-secondary uppercase tracking-wider">Total Network</p><p class="text-4xl font-extrabold text-white mt-1">${totalUsers}</p></div></div></div>
+                        <div class="glass-pane p-6 rounded-2xl group"><div class="flex items-center gap-5"><div class="w-14 h-14 rounded-full bg-success/10 flex items-center justify-center group-hover:scale-110 transition-transform"><i data-lucide="shield-check" class="w-7 h-7 text-success"></i></div><div><p class="text-sm font-semibold text-text-secondary uppercase tracking-wider">Active Subs</p><p class="text-4xl font-extrabold text-white mt-1">${activeSubs}</p></div></div></div>
+                        <div class="glass-pane p-6 rounded-2xl group"><div class="flex items-center gap-5"><div class="w-14 h-14 rounded-full bg-warning/10 flex items-center justify-center group-hover:scale-110 transition-transform"><i data-lucide="clock" class="w-7 h-7 text-warning"></i></div><div><p class="text-sm font-semibold text-text-secondary uppercase tracking-wider">In Trial Phase</p><p class="text-4xl font-extrabold text-white mt-1">${onTrial}</p></div></div></div>
+                        <div class="glass-pane p-6 rounded-2xl group"><div class="flex items-center gap-5"><div class="w-14 h-14 rounded-full bg-danger/10 flex items-center justify-center group-hover:scale-110 transition-transform"><i data-lucide="shield-off" class="w-7 h-7 text-danger"></i></div><div><p class="text-sm font-semibold text-text-secondary uppercase tracking-wider">Action Reqd.</p><p class="text-4xl font-extrabold text-white mt-1">${expired}</p></div></div></div>
                     </div>
                     <!-- Charts & Lists -->
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <div class="lg:col-span-2 glass-pane p-6 rounded-xl h-96 flex flex-col">
-                            <h3 class="text-xl font-semibold mb-4">User Signups Over Time</h3>
-                            <div class="flex-grow"><canvas id="signups-chart"></canvas></div>
+                        <div class="lg:col-span-2 glass-pane p-8 rounded-2xl h-[450px] flex flex-col">
+                            <h3 class="text-xl font-bold mb-6 text-white tracking-wide">Network Expansion Tracker</h3>
+                            <div class="flex-grow relative"><canvas id="signups-chart"></canvas></div>
                         </div>
-                        <div class="glass-pane p-6 rounded-xl">
-                            <h3 class="text-xl font-semibold mb-4">Pending Requests</h3>
-                            <div class="space-y-4">
-                                <a href="#" data-action="quick-nav" data-view="subscriptions" class="flex justify-between items-center p-4 bg-bg-tertiary/70 rounded-lg hover:bg-border-color transition-colors">
-                                    <div><p class="font-semibold text-text-primary">Subscription Renewals</p><p class="text-xs text-text-secondary">Users waiting for verification.</p></div>
-                                    <div id="pending-subs-count" class="w-8 h-8 rounded-full bg-accent text-white flex items-center justify-center font-bold text-sm">${pendingSubs}</div>
+                        <div class="glass-pane p-8 rounded-2xl flex flex-col">
+                            <h3 class="text-xl font-bold mb-6 text-white tracking-wide">Pending Operations</h3>
+                            <div class="space-y-4 flex-grow">
+                                <a href="#" data-action="quick-nav" data-view="subscriptions" class="flex justify-between items-center p-5 bg-bg-tertiary rounded-xl hover:bg-white/5 border border-white/5 hover:border-white/10 transition-all group shadow-sm">
+                                    <div><p class="font-bold text-white group-hover:text-accent transition-colors text-lg">Renewals</p><p class="text-sm text-text-secondary mt-1">Verification queue.</p></div>
+                                    <div id="pending-subs-count" class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 text-white flex items-center justify-center font-bold text-base shadow-[0_0_15px_rgba(99,102,241,0.5)]">${pendingSubs}</div>
                                 </a>
-                                 <a href="#" data-action="quick-nav" data-view="support_tickets" class="flex justify-between items-center p-4 bg-bg-tertiary/70 rounded-lg hover:bg-border-color transition-colors">
-                                    <div><p class="font-semibold text-text-primary">Support Tickets</p><p class="text-xs text-text-secondary">Users requiring assistance.</p></div>
-                                    <div id="open-tickets-count" class="w-8 h-8 rounded-full bg-warning text-black flex items-center justify-center font-bold text-sm">${openTickets}</div>
+                                 <a href="#" data-action="quick-nav" data-view="support_tickets" class="flex justify-between items-center p-5 bg-bg-tertiary rounded-xl hover:bg-white/5 border border-white/5 hover:border-white/10 transition-all group shadow-sm mt-4">
+                                    <div><p class="font-bold text-white group-hover:text-warning transition-colors text-lg">Support Deck</p><p class="text-sm text-text-secondary mt-1">Assistance required.</p></div>
+                                    <div id="open-tickets-count" class="w-10 h-10 rounded-full bg-warning text-black flex items-center justify-center font-bold text-base shadow-[0_0_15px_rgba(245,158,11,0.5)]">${openTickets}</div>
                                 </a>
                             </div>
                         </div>
@@ -1153,9 +1333,9 @@
         const chartCtx = document
           .getElementById("signups-chart")
           .getContext("2d");
-        const gradient = chartCtx.createLinearGradient(0, 0, 0, 300);
-        gradient.addColorStop(0, "rgba(0, 119, 255, 0.4)");
-        gradient.addColorStop(1, "rgba(0, 119, 255, 0)");
+        const gradient = chartCtx.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, "rgba(99, 102, 241, 0.5)");
+        gradient.addColorStop(1, "rgba(99, 102, 241, 0.0)");
 
         chartInstances.signups = new Chart(chartCtx, {
           type: "line",
@@ -1163,40 +1343,65 @@
             labels: Object.keys(signupsByMonth),
             datasets: [
               {
-                label: "New Users",
+                label: "Network Joins",
                 data: Object.values(signupsByMonth),
-                borderColor: "var(--accent)",
+                borderColor: "#6366f1",
+                borderWidth: 3,
                 backgroundColor: gradient,
                 fill: true,
                 tension: 0.4,
-                pointBackgroundColor: "var(--accent)",
-                pointBorderColor: "var(--bg-primary)",
+                pointBackgroundColor: "#fff",
+                pointBorderColor: "#6366f1",
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 6,
                 pointHoverBackgroundColor: "#fff",
-                pointHoverBorderColor: "var(--accent)",
+                pointHoverBorderColor: "#8b5cf6",
               },
             ],
           },
           options: {
             responsive: true,
             maintainAspectRatio: false,
+            interaction: {
+              intersect: false,
+              mode: "index",
+            },
             scales: {
               y: {
                 beginAtZero: true,
-                grid: { color: "rgba(255,255,255,0.05)" },
-                ticks: { color: "var(--text-secondary)" },
-                border: { dash: [4, 4] },
+                grid: { color: "rgba(255,255,255,0.03)" },
+                ticks: {
+                  color: "#8b949e",
+                  font: { family: "Plus Jakarta Sans" },
+                },
+                border: { display: false },
               },
               x: {
                 grid: { display: false },
-                ticks: { color: "var(--text-secondary)" },
+                ticks: {
+                  color: "#8b949e",
+                  font: { family: "Plus Jakarta Sans" },
+                },
+                border: { display: false },
               },
             },
-            plugins: { legend: { display: false } },
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: "rgba(15, 15, 20, 0.9)",
+                titleFont: { family: "Plus Jakarta Sans", size: 14 },
+                bodyFont: { family: "Plus Jakarta Sans", size: 14 },
+                padding: 12,
+                borderColor: "rgba(255,255,255,0.1)",
+                borderWidth: 1,
+                displayColors: false,
+              },
+            },
           },
         });
       }
 
-      // --- *** UPDATED: renderUsersView *** ---
       function renderUsersView() {
         destroyCharts();
         const container = document.getElementById("workspace-content");
@@ -1204,22 +1409,22 @@
 
         container.innerHTML = `
                 <div class="space-y-6">
-                    <div class="glass-pane p-4 rounded-xl flex items-center gap-4">
+                    <div class="glass-pane p-5 rounded-2xl flex items-center gap-4">
                         <div class="relative flex-grow">
-                             <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-text-secondary"></i>
-                             <input type="text" id="user-search" placeholder="Search by Owner Name, UID, or Store Name..." class="form-input w-full pl-10" value="${viewState.searchQuery}">
+                             <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-secondary"></i>
+                             <input type="text" id="user-search" placeholder="Query Identity, UID, or Store Name..." class="form-input w-full pl-12 py-3" value="${viewState.searchQuery}">
                         </div>
-                        <select id="user-filter" class="form-select w-64">
-                            <option value="all">All Statuses</option>
+                        <select id="user-filter" class="form-select w-64 py-3">
+                            <option value="all">Global (All Statuses)</option>
                             <option value="trial">On Trial</option>
-                            <option value="active">Active</option>
-                            <option value="expired">Expired</option>
-                            <option value="disabled">Disabled</option>
+                            <option value="active">Active Members</option>
+                            <option value="expired">Expired Members</option>
+                            <option value="disabled">Terminated</option>
                         </select>
                     </div>
-                    <div class="glass-pane rounded-xl overflow-hidden">
+                    <div class="glass-pane p-2 rounded-2xl overflow-x-auto">
                         <table class="table-pro">
-                            <thead><tr><th class="w-12"></th><th>Store Owner (Admin)</th><th>Store Usage</th><th>Subscription Status</th><th>Actions</th></tr></thead>
+                            <thead><tr><th class="w-12 pl-6"></th><th>Network Owner</th><th>Infrastructure Usage</th><th>Subscription State</th><th>Operations</th></tr></thead>
                             <tbody id="users-table-body"></tbody>
                         </table>
                     </div>
@@ -1261,7 +1466,6 @@
 
           if (viewState.filter !== "all") {
             filteredUsers = filteredUsers.filter((user) => {
-              // Get current status, respecting auto-expiry logic
               const sub = user.subscription || {};
               let status = sub.status || "unknown";
               const now = new Date();
@@ -1298,14 +1502,13 @@
           const tableBody = container.querySelector("#users-table-body");
           let tableHTML = "";
           if (paginatedUsers.length === 0) {
-            tableHTML = `<tr><td colspan="5" class="text-center py-12 text-text-secondary">No store owners found.</td></tr>`;
+            tableHTML = `<tr><td colspan="5" class="text-center py-16 text-text-secondary font-medium">No results found in the network.</td></tr>`;
           } else {
             paginatedUsers.forEach((user) => {
               const userStores = storesByUser[user.id] || [];
-              const userName = user?.displayName || "Unknown User";
+              const userName = user?.displayName || "Unknown Identity";
               const storeLimit = user?.storeLimit || 1;
 
-              // --- NEW: Status and Days Left Logic ---
               const sub = user.subscription || {};
               let status = sub.status || "unknown";
               let expiryDate = null;
@@ -1317,7 +1520,6 @@
                 expiryDate = sub.expiresAt ? sub.expiresAt.toDate() : null;
               }
 
-              // Auto-detect expired status for display
               if (
                 expiryDate &&
                 expiryDate < now &&
@@ -1332,17 +1534,14 @@
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
                 if (diffDays > 0) {
-                  daysLeftString = `<span class="text-xs text-text-secondary mt-1">${diffDays} ${
+                  daysLeftString = `<span class="text-xs text-text-secondary mt-1 block font-medium">${diffDays} ${
                     diffDays === 1 ? "day" : "days"
-                  } left</span>`;
+                  } remaining</span>`;
                 } else {
-                  // This branch will be hit if status is 'trial'/'active' but date is in the past
-                  // We already set status = 'expired' above, so this will be overwritten
-                  // But we keep it just in case
                   const pastDays = Math.abs(
                     Math.floor(diffTime / (1000 * 60 * 60 * 24)),
                   );
-                  daysLeftString = `<span class="text-xs text-danger mt-1">Expired ${pastDays} ${
+                  daysLeftString = `<span class="text-xs text-danger mt-1 block font-medium">Expired ${pastDays} ${
                     pastDays === 1 ? "day" : "days"
                   } ago</span>`;
                 }
@@ -1351,7 +1550,6 @@
               if (status === "expired") {
                 let expiredAgoString = "Subscription has expired";
                 if (expiryDate) {
-                  // Show how long ago it expired
                   const diffTime = now.getTime() - expiryDate.getTime();
                   const pastDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
                   if (pastDays >= 0) {
@@ -1360,47 +1558,49 @@
                     } ago`;
                   }
                 }
-                daysLeftString = `<span class="text-xs text-danger mt-1">${expiredAgoString}</span>`;
+                daysLeftString = `<span class="text-xs text-danger mt-1 block font-medium">${expiredAgoString}</span>`;
               } else if (status === "disabled") {
-                daysLeftString = `<span class="text-xs text-danger mt-1">Account disabled</span>`;
+                daysLeftString = `<span class="text-xs text-danger mt-1 block font-medium">Access revoked</span>`;
               }
-              // --- END: Status and Days Left Logic ---
 
               tableHTML += `
-                            <tr class="user-row cursor-pointer" data-action="toggle-stores" data-uid="${
+                            <tr class="user-row cursor-pointer group" data-action="toggle-stores" data-uid="${
                               user.id
                             }">
-                                <td><i data-lucide="chevron-down" class="w-5 h-5 text-text-secondary"></i></td>
+                                <td class="pl-6"><div class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-white/10 transition-colors"><i data-lucide="chevron-down" class="w-4 h-4 text-text-secondary"></i></div></td>
                                 <td>
-                                    <p class="font-medium text-text-primary">${userName}</p>
-                                    <p class="font-mono text-xs text-text-secondary">${
+                                    <p class="font-bold text-white text-base">${userName}</p>
+                                    <p class="font-mono text-xs text-text-secondary mt-1 px-2 py-0.5 bg-white/5 rounded-md inline-block">${
                                       user.id
                                     }</p>
                                 </td>
                                 <td>
-                                    <span class="font-semibold text-lg">${
-                                      userStores.length
-                                    }</span>
-                                    <span class="text-text-secondary">/ ${storeLimit} Stores</span>
+                                    <div class="flex items-baseline gap-1">
+                                      <span class="font-black text-xl text-white">${
+                                        userStores.length
+                                      }</span>
+                                      <span class="text-text-secondary text-sm font-medium">/ ${storeLimit} nodes</span>
+                                    </div>
                                 </td>
                                 <td>
-                                    <div class="flex flex-col">
+                                    <div class="flex flex-col items-start">
                                         <div class="status-badge ${status}">${status}</div>
-                                        ${daysLeftString} <!-- NEW: Display days left -->
+                                        ${daysLeftString}
                                     </div>
                                 </td>
                                 <td><button data-action="manage-user" data-uid="${
                                   user.id
-                                }" class="btn btn-secondary btn-sm">Manage User</button></td>
+                                }" class="btn btn-secondary btn-sm"><i data-lucide="settings-2" class="w-4 h-4"></i>Configure</button></td>
                             </tr>
                             <tr class="stores-row hidden" data-stores-for="${
                               user.id
                             }">
-                                <td colspan="5" class="p-0"><div class="p-4 bg-bg-primary">
-                                    <h4 class="px-4 pb-2 font-semibold text-text-secondary">Stores for ${userName}</h4>
-                                    <div class="rounded-lg border border-border-color overflow-hidden">
-                                        <table class="table-pro w-full">
-                                            <thead><tr><th>Store Name</th><th>Created On</th><th>Status</th><th>Actions</th></tr></thead>
+                                <td colspan="5" class="p-0 border-none">
+                                  <div class="px-10 py-6 bg-black/20 backdrop-blur-md border-t border-b border-white/5 shadow-inner">
+                                    <h4 class="mb-4 font-bold text-white uppercase tracking-wider text-sm flex items-center gap-2"><i data-lucide="server" class="w-4 h-4 text-accent"></i> Associated Infrastructure Nodes</h4>
+                                    <div class="rounded-xl border border-border-color overflow-hidden bg-bg-secondary/50">
+                                        <table class="table-pro w-full mb-0">
+                                            <thead class="bg-black/40"><tr><th class="pl-6">Node Identifier</th><th>Deployment Date</th><th>Status</th><th class="pr-6">Operations</th></tr></thead>
                                             <tbody>
                                                 ${
                                                   userStores.length > 0
@@ -1410,10 +1610,10 @@
                                                             store.isEnabled !==
                                                             false;
                                                           return `<tr>
-                                                        <td class="font-medium">${
+                                                        <td class="font-bold text-white pl-6">${
                                                           store.name
                                                         }</td>
-                                                        <td>${new Date(
+                                                        <td class="text-sm font-medium text-text-secondary">${new Date(
                                                           store.createdAt,
                                                         ).toLocaleDateString()}</td>
                                                         <td>
@@ -1426,28 +1626,28 @@
                                                               : ""
                                                           }>
                                                                 <div class="toggle-switch-track"><div class="toggle-switch-thumb"></div></div>
-                                                                <span class="ml-3 text-sm font-medium ${
+                                                                <span class="ml-3 text-sm font-bold uppercase tracking-wider ${
                                                                   isEnabled
                                                                     ? "text-success"
                                                                     : "text-danger"
                                                                 }">${
                                                             isEnabled
-                                                              ? "Enabled"
-                                                              : "Disabled"
+                                                              ? "Online"
+                                                              : "Offline"
                                                           }</span>
                                                             </label>
                                                         </td>
-                                                        <td>
+                                                        <td class="pr-6">
                                                             <button data-action="view-store-staff" data-store-id="${
                                                               store.id
                                                             }" class="btn btn-secondary btn-sm">
-                                                                <i data-lucide="users" class="w-4 h-4 mr-2"></i>View Staff
+                                                                <i data-lucide="users" class="w-4 h-4"></i>Inspect Personnel
                                                             </button>
                                                         </td>
                                                     </tr>`;
                                                         })
                                                         .join("")
-                                                    : `<tr><td colspan="4" class="text-center text-text-secondary py-4">No stores created by this user.</td></tr>`
+                                                    : `<tr><td colspan="4" class="text-center text-text-secondary py-6 font-medium">No nodes allocated to this identity.</td></tr>`
                                                 }
                                             </tbody>
                                         </table>
@@ -1486,24 +1686,23 @@
           });
       }
 
-      // --- NEW FUNCTION: openStoreStaffModal ---
       async function openStoreStaffModal(storeId) {
         const store = firestoreData.stores.find((s) => s.id === storeId);
         if (!store) {
-          showToast("Store not found.", "error");
+          showToast("Node not found.", "error");
           return;
         }
 
         const modalContent = `
-              <p class="mb-4">Showing all staff for <strong>${store.name}</strong>.</p>
-              <div id="staff-list-container" class="max-h-96 overflow-y-auto space-y-2">
+              <p class="mb-4 text-sm">Personnel roster for node: <strong class="text-white">${store.name}</strong>.</p>
+              <div id="staff-list-container" class="max-h-96 overflow-y-auto space-y-3">
                   <div class="text-center p-8"><span class="loader"></span></div>
               </div>
           `;
         const modal = showModal(
-          `Staff for ${store.name}`,
+          `Node Personnel`,
           modalContent,
-          `<button data-action="close-modal" class="btn btn-secondary">Close</button>`,
+          `<button data-action="close-modal" class="btn btn-secondary">Close Inspector</button>`,
           { size: "max-w-2xl" },
         );
 
@@ -1515,7 +1714,7 @@
           const container = modal.querySelector("#staff-list-container");
           if (staffList.length === 0) {
             container.innerHTML =
-              '<p class="text-center text-text-secondary p-8">No staff members found for this store.</p>';
+              '<p class="text-center text-text-secondary p-8 font-medium">No personnel registered to this node.</p>';
             return;
           }
 
@@ -1523,27 +1722,31 @@
             .map((staff) => {
               const roleBadge =
                 staff.role === "admin"
-                  ? "bg-accent/20 text-accent"
+                  ? "bg-accent/20 text-accent border border-accent/30"
                   : staff.role === "manager"
-                  ? "bg-blue-500/20 text-blue-300"
-                  : "bg-gray-500/20 text-gray-300";
+                  ? "bg-blue-500/20 text-blue-300 border border-blue-500/30"
+                  : "bg-gray-500/20 text-gray-300 border border-gray-500/30";
 
               return `
-                      <div class="flex items-center justify-between p-3 bg-bg-tertiary rounded-lg">
-                          <div>
-                              <p class="font-medium text-text-primary">${staff.name}</p>
-                              <p class="text-xs text-text-secondary">${staff.email}</p>
+                      <div class="flex items-center justify-between p-4 bg-bg-secondary border border-white/5 rounded-xl hover:border-white/10 transition-colors">
+                          <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center"><i data-lucide="user" class="w-5 h-5 text-text-secondary"></i></div>
+                            <div>
+                                <p class="font-bold text-white">${staff.name}</p>
+                                <p class="text-sm text-text-secondary">${staff.email}</p>
+                            </div>
                           </div>
-                          <span class="px-2 py-1 text-xs font-semibold rounded-full ${roleBadge} capitalize">${staff.role}</span>
+                          <span class="px-3 py-1.5 text-xs font-bold rounded-full ${roleBadge} uppercase tracking-wider">${staff.role}</span>
                       </div>
                   `;
             })
             .join("");
+          lucide.createIcons();
         } catch (error) {
           console.error("Error fetching staff for store:", error);
           modal.querySelector(
             "#staff-list-container",
-          ).innerHTML = `<p class="text-center text-danger p-8">Could not load staff: ${error.message}</p>`;
+          ).innerHTML = `<p class="text-center text-danger p-8 font-medium">Data retrieval failed: ${error.message}</p>`;
         }
       }
 
@@ -1554,22 +1757,22 @@
 
         container.innerHTML = `
                 <div class="space-y-6">
-                    <div class="glass-pane p-4 rounded-xl">
-                        <select id="subs-filter" class="form-select w-64">
+                    <div class="glass-pane p-5 rounded-2xl">
+                        <select id="subs-filter" class="form-select w-64 py-3">
                             <option value="pending" ${
                               viewState.filter === "pending" ? "selected" : ""
-                            }>Pending Requests</option>
+                            }>Pending Clearance</option>
                             <option value="approved" ${
                               viewState.filter === "approved" ? "selected" : ""
-                            }>Approved Requests</option>
+                            }>Cleared Operations</option>
                             <option value="rejected" ${
                               viewState.filter === "rejected" ? "selected" : ""
-                            }>Rejected Requests</option>
+                            }>Rejected Operations</option>
                         </select>
                     </div>
-                    <div class="glass-pane rounded-xl overflow-hidden">
+                    <div class="glass-pane p-2 rounded-2xl overflow-x-auto">
                         <table class="table-pro">
-                            <thead><tr><th>User</th><th>Plan</th><th>Payment Details</th><th>Date</th><th>Actions</th></tr></thead>
+                            <thead><tr><th class="pl-6">Identity</th><th>Asset Plan</th><th>Transaction Data</th><th>Timestamp</th><th class="pr-6">Operations</th></tr></thead>
                             <tbody id="subs-table-body"></tbody>
                         </table>
                     </div>
@@ -1594,46 +1797,50 @@
             ? paginatedRequests
                 .map(
                   (req) => `
-                        <tr>
-                            <td>
-                                <p class="font-medium text-text-primary">${
+                        <tr class="group hover:bg-white/5">
+                            <td class="pl-6">
+                                <p class="font-bold text-white text-base">${
                                   req.userEmail
                                 }</p>
-                                <p class="font-mono text-xs text-text-secondary">${
+                                <p class="font-mono text-xs text-text-secondary mt-1 px-2 py-0.5 bg-white/5 rounded-md inline-block">${
                                   req.userId
                                 }</p>
                             </td>
                             <td>
-                                <p class="font-medium">${req.planName}</p>
-                                <p class="text-sm text-text-secondary">৳${
+                                <p class="font-bold text-accent">${
+                                  req.planName
+                                }</p>
+                                <p class="text-sm font-semibold text-white mt-1">৳${
                                   req.planPrice
                                 }</p>
                             </td>
                             <td>
-                                <p><strong>Method:</strong> ${
-                                  req.paymentMethod
-                                }</p>
-                                <p><strong>TrxID:</strong> <span class="font-mono text-sm">${
-                                  req.transactionId
-                                }</span></p>
-                                <p><strong>From:</strong> ${
-                                  req.senderNumber
-                                }</p>
+                                <div class="text-sm space-y-1 bg-black/20 p-3 rounded-xl border border-white/5">
+                                  <p><span class="text-text-secondary uppercase tracking-wider text-[10px] font-bold mr-2">Method</span> <span class="text-white font-medium">${
+                                    req.paymentMethod
+                                  }</span></p>
+                                  <p><span class="text-text-secondary uppercase tracking-wider text-[10px] font-bold mr-2">TrxID</span> <span class="font-mono text-accent font-bold">${
+                                    req.transactionId
+                                  }</span></p>
+                                  <p><span class="text-text-secondary uppercase tracking-wider text-[10px] font-bold mr-2">Origin</span> <span class="text-white font-medium">${
+                                    req.senderNumber
+                                  }</span></p>
+                                </div>
                             </td>
-                            <td>${
+                            <td class="text-sm font-medium text-text-secondary">${
                               req.requestDate
                                 ? new Date(
                                     req.requestDate.toDate(),
                                   ).toLocaleString()
                                 : "N/A"
                             }</td>
-                            <td>
+                            <td class="pr-6">
                                 ${
                                   viewState.filter === "pending"
                                     ? `
-                                <div class="flex gap-2">
-                                    <button data-action="reject-renewal" data-id="${req.id}" class="btn btn-secondary btn-sm">Reject</button>
-                                    <button data-action="approve-renewal" data-id="${req.id}" class="btn btn-primary btn-sm">Approve</button>
+                                <div class="flex gap-3">
+                                    <button data-action="reject-renewal" data-id="${req.id}" class="btn btn-danger btn-sm shadow-none"><i data-lucide="x" class="w-4 h-4"></i></button>
+                                    <button data-action="approve-renewal" data-id="${req.id}" class="btn btn-primary btn-sm"><i data-lucide="check" class="w-4 h-4"></i>Authorize</button>
                                 </div>
                                 `
                                     : `<div class="status-badge ${
@@ -1647,7 +1854,7 @@
                 `,
                 )
                 .join("")
-            : `<tr><td colspan="5" class="text-center py-12 text-text-secondary">No ${viewState.filter} requests found.</td></tr>`;
+            : `<tr><td colspan="5" class="text-center py-16 text-text-secondary font-medium">No ${viewState.filter} records found.</td></tr>`;
 
           renderPaginationControls(
             container.querySelector("#subs-pagination"),
@@ -1656,6 +1863,7 @@
             appState.itemsPerPage,
             "subscriptions",
           );
+          if (typeof lucide !== "undefined") lucide.createIcons();
         };
         renderTable();
         container
@@ -1666,7 +1874,7 @@
             renderTable();
           });
       }
-      // --- UPDATED: renderSupportTicketsView ---
+
       function renderSupportTicketsView() {
         destroyCharts();
         const container = document.getElementById("workspace-content");
@@ -1674,20 +1882,19 @@
 
         container.innerHTML = `
                 <div class="space-y-6">
-                    <div class="glass-pane p-4 rounded-xl">
-                        <select id="tickets-filter" class="form-select w-64">
+                    <div class="glass-pane p-5 rounded-2xl">
+                        <select id="tickets-filter" class="form-select w-64 py-3">
                             <option value="open" ${
                               viewState.filter === "open" ? "selected" : ""
-                            }>Open Tickets</option>
+                            }>Active Signals</option>
                             <option value="resolved" ${
                               viewState.filter === "resolved" ? "selected" : ""
-                            }>Resolved Tickets</option>
+                            }>Resolved Signals</option>
                         </select>
                     </div>
-                    <div class="glass-pane rounded-xl overflow-hidden">
+                    <div class="glass-pane p-2 rounded-2xl overflow-x-auto">
                         <table class="table-pro">
-                            <!-- UPDATED: Header -->
-                            <thead><tr><th>User Details</th><th>Subject</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+                            <thead><tr><th class="pl-6">Identity Source</th><th>Signal Subject</th><th>Timestamp</th><th>State</th><th class="pr-6">Operations</th></tr></thead>
                             <tbody id="tickets-table-body"></tbody>
                         </table>
                     </div>
@@ -1713,28 +1920,29 @@
             ? paginatedTickets
                 .map(
                   (ticket) => `
-                        <!-- UPDATED: Table Row -->
-                        <tr class="ticket-row cursor-pointer" data-action="view-ticket" data-id="${
+                        <tr class="ticket-row cursor-pointer group" data-action="view-ticket" data-id="${
                           ticket.id
                         }">
-                            <td>
-                                <p class="font-medium text-text-primary">${
-                                  ticket.userName || "Unknown Name"
+                            <td class="pl-6">
+                                <p class="font-bold text-white text-base">${
+                                  ticket.userName || "Unknown Source"
                                 }</p>
-                                <p class="text-sm text-text-secondary">${
+                                <p class="text-sm font-medium text-text-secondary mt-0.5">${
                                   ticket.userEmail
                                 }</p>
                                 ${
                                   ticket.userPhone
-                                    ? `<p class="font-mono text-xs text-blue-300">${ticket.userPhone}</p>`
+                                    ? `<p class="font-mono text-xs text-accent mt-0.5">${ticket.userPhone}</p>`
                                     : ""
                                 }
-                                <p class="font-mono text-xs text-text-secondary/60">${
+                                <p class="font-mono text-xs text-text-secondary/50 mt-1">${
                                   ticket.userId
                                 }</p>
                             </td>
-                            <td class="font-medium">${ticket.subject}</td>
-                            <td>${
+                            <td class="font-bold text-white text-lg">${
+                              ticket.subject
+                            }</td>
+                            <td class="text-sm font-medium text-text-secondary">${
                               ticket.ticketDate
                                 ? new Date(
                                     ticket.ticketDate.toDate(),
@@ -1744,41 +1952,39 @@
                             <td><div class="status-badge ${
                               ticket.status === "open" ? "trial" : "active"
                             }">${ticket.status}</div></td>
-                            <td><button data-action="view-ticket" data-id="${
+                            <td class="pr-6"><button data-action="view-ticket" data-id="${
                               ticket.id
-                            }" class="btn btn-secondary btn-sm">View Details</button></td>
+                            }" class="btn btn-secondary btn-sm"><i data-lucide="eye" class="w-4 h-4"></i>Decrypt</button></td>
                         </tr>
-                        <!-- UPDATED: Expanded Row -->
                         <tr class="ticket-message-row hidden" data-message-for="${
                           ticket.id
                         }">
-                            <td colspan="5" class="p-0">
-                                <div class="p-6 bg-bg-primary">
-                                    <div classid="ticket-contact-details" class="pb-4 mb-4 border-b border-border-color space-y-1 text-sm">
-                                        <p><strong>Contact:</strong> ${
+                            <td colspan="5" class="p-0 border-none">
+                                <div class="px-10 py-8 bg-black/40 backdrop-blur-md border-t border-b border-white/5 shadow-inner">
+                                    <div class="pb-6 mb-6 border-b border-white/10 flex flex-wrap gap-6 text-sm">
+                                        <div class="bg-bg-tertiary px-4 py-2 rounded-lg border border-white/5"><span class="text-text-secondary uppercase tracking-wider text-[10px] font-bold block mb-1">Contact Source</span><span class="text-white font-bold">${
                                           ticket.userName || "N/A"
-                                        }</p>
-                                        <p><strong>Email:</strong> ${
+                                        }</span></div>
+                                        <div class="bg-bg-tertiary px-4 py-2 rounded-lg border border-white/5"><span class="text-text-secondary uppercase tracking-wider text-[10px] font-bold block mb-1">Comms Link</span><span class="text-white font-bold">${
                                           ticket.userEmail
-                                        }</p>
+                                        }</span></div>
                                         ${
                                           ticket.userPhone
-                                            ? `<p><strong>Phone:</strong> ${ticket.userPhone}</p>`
+                                            ? `<div class="bg-bg-tertiary px-4 py-2 rounded-lg border border-white/5"><span class="text-text-secondary uppercase tracking-wider text-[10px] font-bold block mb-1">Audio Link</span><span class="text-white font-bold">${ticket.userPhone}</span></div>`
                                             : ""
                                         }
                                     </div>
-                                    <div class="text-sm">${ticket.message.replace(
+                                    <div class="text-base text-white/90 leading-relaxed bg-bg-secondary p-6 rounded-xl border border-white/5 font-medium">${ticket.message.replace(
                                       /\n/g,
                                       "<br>",
                                     )}</div>
-                                    <!-- This is where the 'Mark as Resolved' button gets added -->
                                 </div>
                             </td>
                         </tr>
                 `,
                 )
                 .join("")
-            : `<tr><td colspan="5" class="text-center py-12 text-text-secondary">No ${viewState.filter} tickets found.</td></tr>`;
+            : `<tr><td colspan="5" class="text-center py-16 text-text-secondary font-medium">No ${viewState.filter} signals detected.</td></tr>`;
 
           renderPaginationControls(
             container.querySelector("#tickets-pagination"),
@@ -1787,6 +1993,7 @@
             appState.itemsPerPage,
             "support_tickets",
           );
+          if (typeof lucide !== "undefined") lucide.createIcons();
         };
         renderTable();
         container
@@ -1797,49 +2004,76 @@
             renderTable();
           });
       }
+
       function renderSettingsView() {
         destroyCharts();
         const container = document.getElementById("workspace-content");
 
         container.innerHTML = `
-                <div class="space-y-8 max-w-4xl">
-                    <div class="glass-pane p-6 rounded-xl">
-                        <h3 class="text-xl font-semibold text-text-primary border-b border-border-color pb-4 mb-4">General Settings</h3>
-                        <form id="settings-form" class="space-y-4">
-                            <div>
-                                <label for="trial-days" class="block text-sm font-medium text-text-secondary mb-1">Default Trial Period (days)</label>
-                                <input type="number" id="trial-days" name="trialDays" class="form-input w-full max-w-xs" value="${appState.settings.defaultTrialDays}">
-                                <p class="text-xs text-text-secondary mt-1">Number of free trial days for new users.</p>
-                            </div>
-                            <div class="text-right">
-                                <button type="submit" class="btn btn-primary">Save General Settings</button>
-                            </div>
-                        </form>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-7xl">
+                    <div class="space-y-8">
+                      <div class="glass-pane p-8 rounded-2xl">
+                          <div class="flex items-center gap-3 mb-6 pb-6 border-b border-white/10">
+                            <div class="w-10 h-10 rounded-lg bg-accent/20 flex items-center justify-center"><i data-lucide="settings" class="w-5 h-5 text-accent"></i></div>
+                            <h3 class="text-xl font-bold text-white">Global Parameters</h3>
+                          </div>
+                          <form id="settings-form" class="space-y-6">
+                              <div>
+                                  <label for="trial-days" class="block text-sm font-bold text-text-secondary uppercase tracking-wider mb-2">Initial Sandbox Duration (days)</label>
+                                  <div class="relative w-full max-w-xs">
+                                    <input type="number" id="trial-days" name="trialDays" class="form-input w-full pl-12" value="${appState.settings.defaultTrialDays}">
+                                    <i data-lucide="clock" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-secondary"></i>
+                                  </div>
+                                  <p class="text-xs text-text-secondary mt-2 font-medium">Auto-assigned trial timeframe for new network identities.</p>
+                              </div>
+                              <div class="pt-2">
+                                  <button type="submit" class="btn btn-primary"><i data-lucide="save" class="w-4 h-4"></i>Commit Parameters</button>
+                              </div>
+                          </form>
+                      </div>
+
+                      <div class="glass-pane p-8 rounded-2xl">
+                          <div class="flex items-center gap-3 mb-6 pb-6 border-b border-white/10">
+                            <div class="w-10 h-10 rounded-lg bg-warning/20 flex items-center justify-center"><i data-lucide="toggle-right" class="w-5 h-5 text-warning"></i></div>
+                            <h3 class="text-xl font-bold text-white">Feature Access Protocols</h3>
+                          </div>
+                          <p class="text-sm text-text-secondary mb-6 font-medium">Remotely toggle core functionalities across the entire network.</p>
+                          <div id="feature-flags-container" class="space-y-4"></div>
+                      </div>
                     </div>
-                    <div class="glass-pane p-6 rounded-xl">
-                        <h3 class="text-xl font-semibold text-text-primary border-b border-border-color pb-4 mb-4">Feature Flags</h3>
-                        <p class="text-sm text-text-secondary mb-4">Remotely enable or disable features in the main application.</p>
-                        <div id="feature-flags-container" class="space-y-3"></div>
-                    </div>
-                     <div class="glass-pane p-6 rounded-xl">
-                        <h3 class="text-xl font-semibold text-text-primary border-b border-border-color pb-4 mb-4">Broadcast Message</h3>
-                        <p class="text-sm text-text-secondary mb-4">Send a system-wide notification to all active users.</p>
-                        <form id="broadcast-form" class="space-y-4">
-                            <textarea name="message" class="form-textarea w-full h-24" placeholder="Enter your announcement..."></textarea>
-                             <div class="flex justify-end items-center gap-4">
-                                <select name="type" class="form-select w-48">
-                                    <option value="info">Info (Blue)</option>
-                                    <option value="success">Success (Green)</option>
-                                    <option value="warning">Warning (Yellow)</option>
-                                </select>
-                                <button type="submit" class="btn btn-primary">Send Broadcast</button>
-                            </div>
-                        </form>
+
+                    <div>
+                      <div class="glass-pane p-8 rounded-2xl h-full flex flex-col">
+                          <div class="flex items-center gap-3 mb-6 pb-6 border-b border-white/10">
+                            <div class="w-10 h-10 rounded-lg bg-success/20 flex items-center justify-center"><i data-lucide="radio" class="w-5 h-5 text-success"></i></div>
+                            <h3 class="text-xl font-bold text-white">Network Broadcast</h3>
+                          </div>
+                          <p class="text-sm text-text-secondary mb-6 font-medium">Transmit a forced override message to all connected terminals.</p>
+                          <form id="broadcast-form" class="space-y-6 flex-grow flex flex-col">
+                              <div class="flex-grow">
+                                <label class="block text-sm font-bold text-text-secondary uppercase tracking-wider mb-2">Payload Data</label>
+                                <textarea name="message" class="form-textarea w-full h-48 resize-none text-base" placeholder="Enter transmission payload..."></textarea>
+                              </div>
+                              <div class="bg-bg-tertiary p-5 rounded-xl border border-white/5 space-y-4">
+                                <label class="block text-sm font-bold text-text-secondary uppercase tracking-wider">Signal Classification</label>
+                                <div class="flex flex-wrap items-center gap-4">
+                                    <select name="type" class="form-select flex-grow">
+                                        <option value="info">Standard Notice (Blue)</option>
+                                        <option value="success">Clearance (Green)</option>
+                                        <option value="warning">Alert Level 1 (Yellow)</option>
+                                    </select>
+                                    <button type="submit" class="btn btn-primary whitespace-nowrap"><i data-lucide="send" class="w-4 h-4"></i>Initiate Broadcast</button>
+                                </div>
+                              </div>
+                          </form>
+                      </div>
                     </div>
                 </div>
             `;
         renderFeatureFlags();
+        if (typeof lucide !== "undefined") lucide.createIcons();
       }
+
       function renderAuditLogView() {
         destroyCharts();
         const container = document.getElementById("workspace-content");
@@ -1866,9 +2100,9 @@
 
         container.innerHTML = `
                 <div class="space-y-6">
-                    <div class="glass-pane p-4 rounded-xl">
-                        <select id="audit-filter" class="form-select w-64">
-                            <option value="all">All Event Types</option>
+                    <div class="glass-pane p-5 rounded-2xl">
+                        <select id="audit-filter" class="form-select w-64 py-3">
+                            <option value="all">Global Event Stream</option>
                             ${logTypes
                               .map(
                                 (type) =>
@@ -1883,9 +2117,9 @@
                               .join("")}
                         </select>
                     </div>
-                    <div class="glass-pane rounded-xl overflow-hidden">
+                    <div class="glass-pane p-2 rounded-2xl overflow-x-auto">
                         <table class="table-pro">
-                            <thead><tr><th>Timestamp</th><th>User</th><th>Event Type</th><th>Details</th></tr></thead>
+                            <thead><tr><th class="pl-6">Time Index</th><th>Initiator</th><th>Event Signature</th><th class="pr-6">Decrypted Payload</th></tr></thead>
                             <tbody id="audit-table-body">
                                 ${
                                   paginatedLogs.length > 0
@@ -1899,26 +2133,31 @@
                                               l.toUpperCase(),
                                             );
                                           return `
-                                <tr>
-                                    <td class="font-mono text-xs">${
+                                <tr class="hover:bg-white/5">
+                                    <td class="pl-6 font-mono text-xs text-text-secondary">${
                                       log.timestamp
                                         ? new Date(
                                             log.timestamp.toDate(),
                                           ).toLocaleString()
                                         : "Processing..."
                                     }</td>
-                                    <td class="font-medium">${
-                                      log.user.name
-                                    } <span class="text-text-secondary text-xs">(${log.user.id.slice(
-                                            0,
-                                            6,
-                                          )}...)</span></td>
-                                    <td><span class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-500/20 text-blue-300">${eventTypeFormatted}</span></td>
-                                    <td class="text-sm">${log.details}</td>
+                                    <td>
+                                      <p class="font-bold text-white text-sm">${
+                                        log.user.name
+                                      }</p>
+                                      <p class="font-mono text-xs text-accent mt-0.5">${log.user.id.slice(
+                                        0,
+                                        8,
+                                      )}...</p>
+                                    </td>
+                                    <td><span class="px-3 py-1 text-xs font-bold rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30 uppercase tracking-wider">${eventTypeFormatted}</span></td>
+                                    <td class="pr-6 text-sm text-white/90 font-medium">${
+                                      log.details
+                                    }</td>
                                 </tr>`;
                                         })
                                         .join("")
-                                    : `<tr><td colspan="4" class="text-center py-12 text-text-secondary">No logs found.</td></tr>`
+                                    : `<tr><td colspan="4" class="text-center py-16 text-text-secondary font-medium">No log entries found.</td></tr>`
                                 }
                             </tbody>
                         </table>
@@ -1943,6 +2182,7 @@
             renderAuditLogView();
           });
       }
+
       async function openUserManagementModal(uid) {
         const user = firestoreData.users.find((u) => u.id === uid);
         if (!user) return;
@@ -1950,12 +2190,10 @@
         const userStores = firestoreData.stores.filter(
           (s) => s.ownerUid === uid,
         );
-        // --- NEW: Get current plan limits from the first store (or use fallback) ---
         const currentPlanLimits =
           userStores.length > 0 && userStores[0].planLimits
             ? userStores[0].planLimits
-            : { products: 1000, staff: 5, ai: "none" }; // Fallback
-        // --- END NEW ---
+            : { products: 1000, staff: 5, ai: "none" };
 
         const sub = user.subscription || {};
         const trialEndsDate = sub.trialEndsAt
@@ -1964,101 +2202,116 @@
         const trialDateForInput = trialEndsDate.toISOString().split("T")[0];
 
         const content = `
-                <form id="user-management-form" class="space-y-6">
-                    <div class="space-y-2">
-                        <p><strong>User:</strong> ${
-                          user.displayName || user.name || "Unknown User"
-                        }</p>
-                        <p><strong>Email:</strong> ${
-                          user.email || "Not available"
-                        }</p>
-                        <p><strong>Phone:</strong> ${
-                          user.phone || "Not available"
-                        }</p>
-                        <p><strong>UID:</strong> <span class="font-mono text-sm">${
-                          user.id
-                        }</span></p>
-                        <p class="text-xs text-text-secondary mt-2">This user currently owns ${
-                          userStores.length
-                        } store(s).</p>
+                <form id="user-management-form" class="space-y-8">
+                    <div class="bg-black/20 p-6 rounded-xl border border-white/5 flex items-start gap-6">
+                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shrink-0">
+                          <i data-lucide="user" class="w-8 h-8 text-white"></i>
+                        </div>
+                        <div class="space-y-1 w-full">
+                            <p class="text-xl font-bold text-white">${
+                              user.displayName ||
+                              user.name ||
+                              "Unknown Identity"
+                            }</p>
+                            <p class="text-sm text-text-secondary flex justify-between"><span>${
+                              user.email || "No Comms Link"
+                            }</span> <span>${
+          user.phone || "No Audio Link"
+        }</span></p>
+                            <div class="mt-4 pt-4 border-t border-white/10 flex justify-between items-center">
+                               <p class="font-mono text-xs bg-white/5 px-3 py-1 rounded text-accent">${
+                                 user.id
+                               }</p>
+                               <p class="text-xs font-bold text-text-secondary uppercase tracking-wider">${
+                                 userStores.length
+                               } Active Nodes</p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 border-t border-border-color pt-4">
-                        <div>
-                            <label for="subscription-status" class="block text-sm font-medium text-text-secondary mb-1">Subscription Status</label>
-                            <select name="status" id="subscription-status" class="form-select w-full">
-                                <option value="trial" ${
-                                  sub.status === "trial" ? "selected" : ""
-                                }>Trial</option>
-                                <option value="active" ${
-                                  sub.status === "active" ? "selected" : ""
-                                }>Active</option>
-                                <option value="expired" ${
-                                  sub.status === "expired" ? "selected" : ""
-                                }>Expired</option>
-                                <option value="disabled" ${
-                                  sub.status === "disabled" ? "selected" : ""
-                                }>Disabled</option>
-                            </select>
+
+                    <div class="space-y-6">
+                        <h4 class="text-sm font-bold text-text-secondary uppercase tracking-wider flex items-center gap-2"><i data-lucide="shield" class="w-4 h-4"></i> Access Credentials</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div>
+                                <label for="subscription-status" class="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2 pl-1">Authorization State</label>
+                                <select name="status" id="subscription-status" class="form-select w-full">
+                                    <option value="trial" ${
+                                      sub.status === "trial" ? "selected" : ""
+                                    }>Trial Sandbox</option>
+                                    <option value="active" ${
+                                      sub.status === "active" ? "selected" : ""
+                                    }>Fully Cleared</option>
+                                    <option value="expired" ${
+                                      sub.status === "expired" ? "selected" : ""
+                                    }>Clearance Expired</option>
+                                    <option value="disabled" ${
+                                      sub.status === "disabled"
+                                        ? "selected"
+                                        : ""
+                                    }>Access Revoked</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="trial-ends" class="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2 pl-1">Sandbox Expiry</label>
+                                <input type="date" name="trialEnds" id="trial-ends" class="form-input w-full" value="${trialDateForInput}">
+                            </div>
                         </div>
-                        <div>
-                            <label for="trial-ends" class="block text-sm font-medium text-text-secondary mb-1">Trial Ends At</label>
-                            <input type="date" name="trialEnds" id="trial-ends" class="form-input w-full" value="${trialDateForInput}">
+                    </div>
+
+                    <div class="space-y-6 pt-4 border-t border-white/5">
+                        <h4 class="text-sm font-bold text-text-secondary uppercase tracking-wider flex items-center gap-2"><i data-lucide="cpu" class="w-4 h-4"></i> Infrastructure Limits</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div>
+                                <label for="store-limit" class="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2 pl-1">Max Node Count</label>
+                                <input type="number" name="storeLimit" id="store-limit" class="form-input w-full" min="1" value="${
+                                  user.storeLimit || 1
+                                }">
+                            </div>
+                            <div>
+                                <label for="product-limit" class="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2 pl-1">Asset Cap per Node</label>
+                                <input type="number" name="productLimit" id="product-limit" class="form-input w-full" min="1" value="${
+                                  currentPlanLimits.products
+                                }">
+                            </div>
+                            <div>
+                                <label for="staff-limit" class="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2 pl-1">Personnel Cap per Node</label>
+                                <input type="number" name="staffLimit" id="staff-limit" class="form-input w-full" min="1" value="${
+                                  currentPlanLimits.staff
+                                }">
+                            </div>
+                            <div>
+                                <label for="ai-level" class="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2 pl-1">AI Processor Level</label>
+                                <select name="aiLevel" id="ai-level" class="form-select w-full">
+                                    <option value="none" ${
+                                      currentPlanLimits.ai === "none"
+                                        ? "selected"
+                                        : ""
+                                    }>Disabled</option>
+                                    <option value="basic" ${
+                                      currentPlanLimits.ai === "basic"
+                                        ? "selected"
+                                        : ""
+                                    }>Standard Matrix</option>
+                                    <option value="advanced" ${
+                                      currentPlanLimits.ai === "advanced"
+                                        ? "selected"
+                                        : ""
+                                    }>Advanced Neural</option>
+                                </select>
+                            </div>
                         </div>
-                         <div>
-                            <label for="store-limit" class="block text-sm font-medium text-text-secondary mb-1">User Store Limit</label>
-                            <input type="number" name="storeLimit" id="store-limit" class="form-input w-full" min="1" value="${
-                              user.storeLimit || 1
-                            }">
-                        </div>
-                        <!-- --- NEW FIELDS --- -->
-                         <div>
-                            <label for="product-limit" class="block text-sm font-medium text-text-secondary mb-1">Store Product Limit</label>
-                            <input type="number" name="productLimit" id="product-limit" class="form-input w-full" min="1" value="${
-                              currentPlanLimits.products
-                            }">
-                        </div>
-                        <div>
-                            <label for="staff-limit" class="block text-sm font-medium text-text-secondary mb-1">Store Staff Limit</label>
-                            <input type="number" name="staffLimit" id="staff-limit" class="form-input w-full" min="1" value="${
-                              currentPlanLimits.staff
-                            }">
-                        </div>
-                         <div>
-                            <label for="ai-level" class="block text-sm font-medium text-text-secondary mb-1">Store AI Level</label>
-                            <select name="aiLevel" id="ai-level" class="form-select w-full">
-                                <option value="none" ${
-                                  currentPlanLimits.ai === "none"
-                                    ? "selected"
-                                    : ""
-                                }>None</option>
-                                <option value="basic" ${
-                                  currentPlanLimits.ai === "basic"
-                                    ? "selected"
-                                    : ""
-                                }>Basic</option>
-                                <option value="advanced" ${
-                                  currentPlanLimits.ai === "advanced"
-                                    ? "selected"
-                                    : ""
-                                }>Advanced</option>
-                            </select>
-                        </div>
-                        <!-- --- END NEW FIELDS --- -->
                     </div>
                 </form>
             `;
 
         const footer = `
-                <button data-action="close-modal" class="btn btn-secondary">Cancel</button>
-                <button type="submit" form="user-management-form" class="btn btn-primary">Save Changes</button>
+                <button data-action="close-modal" class="btn btn-secondary">Abort</button>
+                <button type="submit" form="user-management-form" class="btn btn-primary"><i data-lucide="check-circle" class="w-4 h-4"></i>Commit Changes</button>
             `;
 
-        const modal = showModal(
-          `Manage User: ${user.displayName || user.id.slice(0, 8)}`,
-          content,
-          footer,
-          { size: "max-w-2xl" },
-        );
+        const modal = showModal(`Configure Identity`, content, footer, {
+          size: "max-w-2xl",
+        });
 
         modal
           .querySelector("#user-management-form")
@@ -2068,7 +2321,6 @@
             const newStatus = formData.get("status");
             const newTrialEndDate = new Date(formData.get("trialEnds"));
             const newStoreLimit = parseInt(formData.get("storeLimit"));
-            // --- NEW: Get new plan limit values ---
             const newProductLimit = parseInt(formData.get("productLimit"));
             const newStaffLimit = parseInt(formData.get("staffLimit"));
             const newAiLevel = formData.get("aiLevel");
@@ -2085,8 +2337,6 @@
             const userRef = doc(db, "users", uid);
             await updateDoc(userRef, userUpdateData);
 
-            // --- REVISED BATCH LOGIC ---
-            // Update all stores owned by this user with the new plan limits
             if (userStores.length > 0) {
               const batch = writeBatch(db);
               userStores.forEach((store) => {
@@ -2099,7 +2349,6 @@
               });
               await batch.commit();
             }
-            // --- END REVISED BATCH LOGIC ---
 
             await addDoc(collection(db, "global_audit_log"), {
               type: "user_settings_updated",
@@ -2113,23 +2362,26 @@
             closeModal(modal);
           });
       }
+
       async function updateGlobalSettings(newSettings) {
         const settingsRef = doc(db, "global_settings", "app_config");
         await setDoc(settingsRef, newSettings, { merge: true });
       }
+
       function renderFeatureFlags() {
         const container = document.getElementById("feature-flags-container");
         const flags = [
           {
             id: "aiAssistantEnabled",
-            name: "Enable Global AI Assistant",
-            description: "Toggles the AI chat button in the main app header.",
+            name: "Neural Chat Interface",
+            description:
+              "Engages the global AI assistant widget across all user interfaces.",
           },
           {
             id: "smartSuggestionsEnabled",
-            name: "Enable AI Dashboard Insights",
+            name: "Predictive Analytics",
             description:
-              "Shows AI-powered suggestions on the main app dashboard.",
+              "Surfaces AI-generated insights natively on client dashboards.",
           },
         ];
 
@@ -2137,12 +2389,12 @@
           .map((flag) => {
             const isEnabled = appState.settings.featureFlags[flag.id] !== false;
             return `
-                <div class="flex items-center justify-between p-3 bg-bg-tertiary rounded-lg border border-border-color">
+                <div class="flex items-center justify-between p-5 bg-bg-tertiary rounded-xl border border-white/5 hover:border-white/10 transition-colors">
                     <div>
-                        <p class="font-medium text-text-primary">${
+                        <p class="font-bold text-white text-base">${
                           flag.name
                         }</p>
-                        <p class="text-xs text-text-secondary">${
+                        <p class="text-sm font-medium text-text-secondary mt-1">${
                           flag.description
                         }</p>
                     </div>
@@ -2160,7 +2412,6 @@
           .join("");
       }
 
-      // --- FIREBASE LISTENERS ---
       const initFirebaseListeners = () => {
         const settingsRef = doc(db, "global_settings", "app_config");
         const unsubSettings = onSnapshot(settingsRef, (docSnap) => {
@@ -2201,7 +2452,6 @@
           orderBy("requestDate", "desc"),
         );
         const unsubSubs = onSnapshot(subsQuery, (snapshot) => {
-          // Using docChanges() is more reliable for detecting new documents.
           if (isInitialDataLoaded.subscriptions) {
             const batch = writeBatch(db);
             let hasNewNotifications = false;
@@ -2211,13 +2461,13 @@
                 change.type === "added" &&
                 !processedNotificationIds.has(change.doc.id)
               ) {
-                processedNotificationIds.add(change.doc.id); // Prevent duplicates
+                processedNotificationIds.add(change.doc.id);
                 const newDoc = change.doc.data();
                 const notifRef = doc(collection(db, "global_notifications"));
                 batch.set(notifRef, {
                   timestamp: serverTimestamp(),
                   read: false,
-                  message: `New subscription request from ${newDoc.userEmail}`,
+                  message: `New clearance request from ${newDoc.userEmail}`,
                   icon: "credit-card",
                   link: { view: "subscriptions", id: change.doc.id },
                 });
@@ -2234,7 +2484,7 @@
             id: doc.id,
             ...doc.data(),
           }));
-          isInitialDataLoaded.subscriptions = true; // Mark as loaded after the first pass
+          isInitialDataLoaded.subscriptions = true;
 
           if (appState.activeView === "dashboard") renderDashboardView();
           if (appState.activeView === "subscriptions")
@@ -2256,13 +2506,13 @@
                 change.type === "added" &&
                 !processedNotificationIds.has(change.doc.id)
               ) {
-                processedNotificationIds.add(change.doc.id); // Prevent duplicates
+                processedNotificationIds.add(change.doc.id);
                 const newDoc = change.doc.data();
                 const notifRef = doc(collection(db, "global_notifications"));
                 batch.set(notifRef, {
                   timestamp: serverTimestamp(),
                   read: false,
-                  message: `New support ticket: "${newDoc.subject}"`,
+                  message: `Incoming Support Signal: "${newDoc.subject}"`,
                   icon: "life-buoy",
                   link: { view: "support_tickets", id: change.doc.id },
                 });
@@ -2279,7 +2529,7 @@
             id: doc.id,
             ...doc.data(),
           }));
-          isInitialDataLoaded.tickets = true; // Mark as loaded after the first pass
+          isInitialDataLoaded.tickets = true;
 
           if (appState.activeView === "dashboard") renderDashboardView();
           if (appState.activeView === "support_tickets")
@@ -2289,7 +2539,6 @@
 
         const usersQuery = query(collection(db, "users"));
         const unsubUsers = onSnapshot(usersQuery, async (snapshot) => {
-          // Handle notification creation for new users
           if (isInitialDataLoaded.users) {
             const batch = writeBatch(db);
             let hasNewNotifications = false;
@@ -2299,46 +2548,42 @@
                 change.type === "added" &&
                 !processedNotificationIds.has(change.doc.id)
               ) {
-                processedNotificationIds.add(change.doc.id); // Prevent duplicates
+                processedNotificationIds.add(change.doc.id);
                 const newDoc = change.doc.data();
 
-                // --- MODIFIED LOGIC for notification message ---
-                let message = `New user signed up: ${
+                let message = `New network identity established: ${
                   newDoc.displayName || "Unknown"
-                }`; // Default
-                let icon = "user-plus"; // Default
+                }`;
+                let icon = "user-plus";
                 const userName =
                   newDoc.displayName || newDoc.email || "Unknown";
 
                 if (newDoc.stores && newDoc.stores.length > 0) {
-                  // User is associated with a store, let's find out their role.
                   const role = newDoc.stores[0].role || "staff";
                   const storeId = newDoc.stores[0].id;
                   const store = firestoreData.stores.find(
                     (s) => s.id === storeId,
                   );
-                  const storeName = store ? store.name : "an existing store";
+                  const storeName = store ? store.name : "an existing node";
 
                   if (role === "admin") {
-                    message = `New Store Owner registered: <strong>${userName}</strong> (Store: <strong>${storeName}</strong>)`;
-                    icon = "store"; // Use 'store' icon for new owners
+                    message = `New Node Commander identified: <strong>${userName}</strong> (Node: <strong>${storeName}</strong>)`;
+                    icon = "store";
                   } else {
-                    message = `New ${role} (<strong>${userName}</strong>) was added to <strong>${storeName}</strong>.`;
-                    icon = "user-check"; // Use 'user-check' icon for new staff
+                    message = `New ${role} (<strong>${userName}</strong>) deployed to <strong>${storeName}</strong>.`;
+                    icon = "user-check";
                   }
                 } else {
-                  // Fallback for users somehow created without a store link
-                  message = `New user registered: <strong>${userName}</strong>`;
+                  message = `New identity registered: <strong>${userName}</strong>`;
                   icon = "user-plus";
                 }
-                // --- END MODIFIED LOGIC ---
 
                 const notifRef = doc(collection(db, "global_notifications"));
                 batch.set(notifRef, {
                   timestamp: serverTimestamp(),
                   read: false,
-                  message: message, // Use the new dynamic message
-                  icon: icon, // Use the new dynamic icon
+                  message: message,
+                  icon: icon,
                   link: { view: "users", id: change.doc.id },
                 });
                 hasNewNotifications = true;
@@ -2355,11 +2600,9 @@
             ...doc.data(),
           }));
 
-          // Enrich user data with details from staff subcollection if they are missing
           const enrichedUserPromises = newUsersRaw.map(async (user) => {
             let enrichedUser = { ...user };
 
-            // If subscription is missing, create a default trial
             if (!enrichedUser.subscription) {
               const createdAt = enrichedUser.createdAt
                 ? enrichedUser.createdAt.toDate()
@@ -2372,7 +2615,6 @@
                 status: "trial",
                 trialEndsAt: Timestamp.fromDate(trialEndsAt),
               };
-              // Check if doc exists before updating, or just set it
               const userRef = doc(db, "users", enrichedUser.id);
               const userSnap = await getDoc(userRef);
               if (userSnap.exists()) {
@@ -2383,14 +2625,12 @@
               enrichedUser.subscription = defaultSub;
             }
 
-            // If display name is missing, fetch from the staff collection of their first store
             if (
               !enrichedUser.displayName &&
               enrichedUser.stores &&
               enrichedUser.stores.length > 0
             ) {
               try {
-                // Find the user's *current* store, or default to the first one
                 const storeIdToFetch =
                   enrichedUser.currentStoreId || enrichedUser.stores[0].id;
                 const staffDocRef = doc(
@@ -2407,7 +2647,6 @@
                   enrichedUser.email = staffData.email;
                   enrichedUser.phone = staffData.phone;
 
-                  // Also back-fill this info to the /users doc
                   const userRef = doc(db, "users", enrichedUser.id);
                   await updateDoc(userRef, {
                     displayName: staffData.name,
@@ -2427,19 +2666,16 @@
 
           const updatedUsers = await Promise.all(enrichedUserPromises);
 
-          // --- *** NEW: AUTO-EXPIRE LOGIC *** ---
-          // Run this check *after* enriching users but *before* saving to state
           const batch = writeBatch(db);
           let changesMade = false;
           const now = new Date();
           updatedUsers.forEach((user) => {
             const sub = user.subscription;
-            if (!sub) return; // No subscription
+            if (!sub) return;
 
             let needsUpdate = false;
             let newStatus = sub.status;
 
-            // Check trial expiry
             if (
               sub.status === "trial" &&
               sub.trialEndsAt &&
@@ -2449,7 +2685,6 @@
               needsUpdate = true;
             }
 
-            // Check active expiry
             if (
               sub.status === "active" &&
               sub.expiresAt &&
@@ -2463,7 +2698,6 @@
               const userRef = doc(db, "users", user.id);
               batch.update(userRef, { "subscription.status": newStatus });
               changesMade = true;
-              // Manually update the local data so the UI is instant
               user.subscription.status = newStatus;
             }
           });
@@ -2472,22 +2706,16 @@
             console.log(
               "Admin panel: Found and updated expired user subscriptions.",
             );
-            // Don't await this, let it run in the background.
-            // The listener will re-fire anyway.
             batch.commit().catch(console.error);
           }
-          // --- *** END: AUTO-EXPIRE LOGIC *** ---
 
           firestoreData.users = updatedUsers;
-          isInitialDataLoaded.users = true; // Mark as loaded
+          isInitialDataLoaded.users = true;
           if (appState.activeView === "dashboard") renderDashboardView();
           if (appState.activeView === "users") renderUsersView();
         });
         activeListeners.push(unsubUsers);
 
-        // --- DEFINITIVE REAL-TIME NOTIFICATION LISTENER (SOLVED) ---
-        // This logic compares notification timestamps against the session start time
-        // to prevent alerts for historical notifications on page load.
         const notificationsQuery = query(
           collection(db, "global_notifications"),
           orderBy("timestamp", "desc"),
@@ -2496,13 +2724,10 @@
         const unsubNotifications = onSnapshot(
           notificationsQuery,
           (snapshot) => {
-            // Iterate through changes to find genuinely new notifications.
             snapshot.docChanges().forEach((change) => {
               if (change.type === "added") {
                 const newNotifData = change.doc.data();
 
-                // A notification is considered "new" for alerting purposes only if it was created
-                // *after* the current browser session started.
                 if (
                   newNotifData.timestamp &&
                   typeof newNotifData.timestamp.toDate === "function"
@@ -2510,7 +2735,6 @@
                   const notificationDate = newNotifData.timestamp.toDate();
 
                   if (notificationDate > sessionStartTime) {
-                    // This is a real-time notification, so show an alert.
                     showToast(
                       newNotifData.message.replace(/<[^>]*>?/gm, ""),
                       "info",
@@ -2521,8 +2745,6 @@
               }
             });
 
-            // Always update the UI with the full, latest list from the snapshot,
-            // regardless of whether alerts were shown.
             firestoreData.notifications = snapshot.docs.map((doc) => ({
               id: doc.id,
               ...doc.data(),
@@ -2536,7 +2758,6 @@
         activeListeners.push(unsubNotifications);
       };
 
-      // --- APP INITIALIZATION & EVENT LISTENERS ---
       const workspaceContent = document.getElementById("workspace-content");
       const viewTitle = document.getElementById("view-title");
 
@@ -2548,7 +2769,7 @@
         const viewNameEl = document.querySelector(
           `#main-nav a[data-view="${appState.activeView}"] .tooltip`,
         );
-        const viewName = viewNameEl ? viewNameEl.textContent : "Dashboard";
+        const viewName = viewNameEl ? viewNameEl.textContent : "Overview";
         viewTitle.textContent = viewName;
 
         switch (appState.activeView) {
@@ -2616,9 +2837,8 @@
           }
         }
 
-        // --- NEW ACTION: view-store-staff ---
         if (action === "view-store-staff") {
-          e.stopPropagation(); // Prevent the row from toggling
+          e.stopPropagation();
           openStoreStaffModal(storeId);
         }
 
@@ -2640,39 +2860,35 @@
           );
           if (!request) return;
           const modal = showModal(
-            "Approve Subscription",
-            `Are you sure you want to approve the '${request.planName}' for ${request.userEmail}?`,
-            `<button data-action="close-modal" class="btn btn-secondary">Cancel</button><button id="confirm-approve" class="btn btn-primary">Approve</button>`,
+            "Authorize Operation",
+            `Grant clearance for '${request.planName}' to identity ${request.userEmail}?`,
+            `<button data-action="close-modal" class="btn btn-secondary">Abort</button><button id="confirm-approve" class="btn btn-primary"><i data-lucide="check" class="w-4 h-4"></i>Confirm Authorization</button>`,
           );
           modal
             .querySelector("#confirm-approve")
             .addEventListener("click", async () => {
-              // --- NEW APPROVAL LOGIC ---
               const button = modal.querySelector("#confirm-approve");
               button.disabled = true;
-              button.innerHTML = `<span class="loader-sm"></span> Processing...`;
+              button.innerHTML = `<span class="loader-sm mr-2"></span> Processing...`;
 
               try {
                 const userRef = doc(db, "users", request.userId);
                 const requestRef = doc(db, "subscription_requests", request.id);
-                const planId = request.planId; // e.g., "basic_monthly"
-                // --- NEW: Clarify ownerId ---
+                const planId = request.planId;
                 const ownerId = request.userId;
 
-                // 1. Determine Plan Limits and Duration
                 let limitsToApply = request.planLimits;
                 let durationString = request.planDuration;
                 let planName = request.planName;
 
                 if (!limitsToApply || !durationString) {
-                  // Fallback: Limits were not on the request, use local object
                   const fallbackPlan = LOCAL_PLANS_DETAILS[planId];
                   if (!fallbackPlan) {
                     throw new Error(`Unknown Plan ID: ${planId}`);
                   }
                   limitsToApply = fallbackPlan.limits;
                   durationString = fallbackPlan.duration;
-                  planName = fallbackPlan.name; // Use fallback name
+                  planName = fallbackPlan.name;
                 }
 
                 if (!limitsToApply) {
@@ -2681,10 +2897,9 @@
 
                 const planDurationDays = durationString === "yearly" ? 365 : 30;
 
-                // 2. Calculate new Expiry Date (handles early renewal)
                 const userSnap = await getDoc(userRef);
                 if (!userSnap.exists()) {
-                  throw new Error("User document not found.");
+                  throw new Error("Identity record not found.");
                 }
                 const userData = userSnap.data();
                 const currentSub = userData.subscription || {};
@@ -2693,113 +2908,92 @@
                   : new Date();
                 const now = new Date();
 
-                // Start new plan from today or from current expiry, whichever is later
                 const startDate = currentExpiry > now ? currentExpiry : now;
                 const newExpiryDate = new Date(startDate);
                 newExpiryDate.setDate(
                   newExpiryDate.getDate() + planDurationDays,
                 );
 
-                // --- NEW STEP: Find all associated staff user IDs ---
                 const userStores = firestoreData.stores.filter(
                   (s) => s.ownerUid === ownerId,
                 );
 
                 const staffUserIds = new Set();
 
-                // We must query Firestore to get the staff for each store
                 for (const store of userStores) {
                   const staffQuery = query(
                     collection(db, `stores/${store.id}/staff`),
                   );
                   const staffSnapshot = await getDocs(staffQuery);
                   staffSnapshot.docs.forEach((doc) => {
-                    // The staff doc ID is the same as the user ID
                     staffUserIds.add(doc.id);
                   });
                 }
 
-                // Remove the owner's ID from the set, just in case they are listed as staff
                 staffUserIds.delete(ownerId);
-                // --- END NEW STEP ---
 
-                // 3. Create Batch Write
                 const batch = writeBatch(db);
 
-                // 3a. Update User Document (THE OWNER)
-                // --- NEW: Renamed variable for clarity ---
                 const ownerSubscriptionUpdate = {
                   "subscription.status": "active",
                   "subscription.planId": planId,
                   "subscription.planName": planName,
                   "subscription.expiresAt": Timestamp.fromDate(newExpiryDate),
-                  storeLimit: limitsToApply.stores, // Set user's store creation limit
+                  storeLimit: limitsToApply.stores,
                 };
                 batch.update(userRef, ownerSubscriptionUpdate);
 
-                // 3b. Update all Stores owned by this User
-                // --- MODIFICATION: Removed userStores definition, as it's now above ---
                 userStores.forEach((store) => {
                   const storeRef = doc(db, "stores", store.id);
                   batch.update(storeRef, {
-                    // Store the plan limits directly on the store doc
                     "planLimits.products": limitsToApply.products,
                     "planLimits.staff": limitsToApply.staff,
                     "planLimits.ai": limitsToApply.ai,
-                    planName: planName, // Also add plan name to store
+                    planName: planName,
                   });
                 });
 
-                // --- NEW 3c. Update all Staff User Documents ---
                 const staffSubscriptionUpdate = {
                   "subscription.status": "active",
                   "subscription.planId": planId,
                   "subscription.planName": planName,
                   "subscription.expiresAt": Timestamp.fromDate(newExpiryDate),
-                  // Note: We don't apply 'storeLimit' to staff
                 };
                 staffUserIds.forEach((staffId) => {
                   const staffUserRef = doc(db, "users", staffId);
-                  // We apply the same subscription data to the staff
                   batch.update(staffUserRef, staffSubscriptionUpdate);
                 });
-                // --- END NEW 3c ---
 
-                // 3d. Update Request Document (was 3c)
                 batch.update(requestRef, {
                   status: "approved",
                   processedBy: auth.currentUser.email,
                   processedAt: serverTimestamp(),
                 });
 
-                // 4. Commit Batch
                 await batch.commit();
 
-                // 5. Add Audit Log
                 await addDoc(collection(db, "global_audit_log"), {
                   type: "subscription_approved",
                   timestamp: serverTimestamp(),
-                  details: `Approved '${planName}' for ${
+                  details: `Authorized '${planName}' for ${
                     request.userEmail
-                  }. New expiry: ${newExpiryDate.toLocaleDateString()}. Applied to owner and ${
+                  }. Expiry: ${newExpiryDate.toLocaleDateString()}. Synced to owner & ${
                     staffUserIds.size
-                  } staff members.`, // <-- MODIFIED LOG
+                  } personnel.`,
                   user: { id: auth.currentUser.uid, name: "Super Admin" },
                 });
 
-                // 6. Success
                 showToast(
-                  `Subscription approved. Applied to owner and ${staffUserIds.size} staff.`, // <-- MODIFIED TOAST
+                  `Clearance granted. Applied to owner and ${staffUserIds.size} personnel.`,
                   "success",
                 );
                 closeModal(modal);
               } catch (error) {
-                console.error("Error approving subscription:", error);
-                showToast(`Approval failed: ${error.message}`, "error");
+                console.error("Error processing authorization:", error);
+                showToast(`Authorization failed: ${error.message}`, "error");
                 button.disabled = false;
-                button.innerHTML = "Approve";
+                button.innerHTML = "Confirm Authorization";
               }
-              // --- END NEW LOGIC ---
             });
         }
         if (action === "reject-renewal") {
@@ -2808,9 +3002,9 @@
           );
           if (!request) return;
           const modal = showModal(
-            "Reject Subscription",
-            `Are you sure you want to reject this request for ${request.userEmail}?`,
-            `<button data-action="close-modal" class="btn btn-secondary">Cancel</button><button id="confirm-reject" class="btn btn-danger">Reject</button>`,
+            "Reject Operation",
+            `Confirm rejection of clearance for ${request.userEmail}?`,
+            `<button data-action="close-modal" class="btn btn-secondary">Abort</button><button id="confirm-reject" class="btn btn-danger"><i data-lucide="x" class="w-4 h-4"></i>Confirm Rejection</button>`,
           );
           modal
             .querySelector("#confirm-reject")
@@ -2821,21 +3015,22 @@
               closeModal(modal);
             });
         }
-        // --- UPDATED: action="view-ticket" ---
         if (action === "view-ticket") {
           const row = target.closest(".ticket-row");
           const messageRow = row.nextElementSibling;
           row.classList.toggle("expanded");
           messageRow.classList.toggle("hidden");
-          if (!messageRow.querySelector("button")) {
+          if (
+            !messageRow.querySelector("button[data-action='resolve-ticket']")
+          ) {
             const ticket = firestoreData.supportTickets.find(
               (t) => t.id === id,
             );
             if (ticket.status === "open") {
-              // Select the inner div to append the button
               const innerDiv = messageRow.querySelector("td > div");
               if (innerDiv) {
-                innerDiv.innerHTML += `<div class="mt-4 border-t border-border-color pt-4"><button data-action="resolve-ticket" data-id="${id}" class="btn btn-primary">Mark as Resolved</button></div>`;
+                innerDiv.innerHTML += `<div class="mt-6 border-t border-white/10 pt-6"><button data-action="resolve-ticket" data-id="${id}" class="btn btn-success bg-success text-black border-none hover:bg-emerald-400 font-bold"><i data-lucide="check-circle" class="w-4 h-4"></i>Mark Signal Resolved</button></div>`;
+                lucide.createIcons();
               }
             }
           }
@@ -2844,6 +3039,7 @@
           await updateDoc(doc(db, "support_tickets", id), {
             status: "resolved",
           });
+          showToast("Signal state updated to resolved.", "success");
         }
         if (action === "toggle-feature-flag") {
           const isEnabled = e.target.checked;
@@ -2859,8 +3055,8 @@
           await addDoc(collection(db, "global_audit_log"), {
             type: "store_status_changed",
             timestamp: serverTimestamp(),
-            details: `Store ${storeId} set to ${
-              isEnabled ? "Enabled" : "Disabled"
+            details: `Node ${storeId} access state forced to ${
+              isEnabled ? "Online" : "Offline"
             }`,
             user: { id: auth.currentUser.uid, name: "Super Admin" },
           });
@@ -2874,6 +3070,7 @@
           const days = parseInt(form.trialDays.value);
           if (!isNaN(days)) {
             await updateGlobalSettings({ defaultTrialDays: days });
+            showToast("Global parameters updated successfully.", "success");
           }
         }
         if (form.id === "broadcast-form") {
@@ -2890,7 +3087,7 @@
             );
             batch.set(newNotifRef, {
               date: new Date().toISOString(),
-              message: `<strong>[Admin Broadcast]</strong> ${message}`,
+              message: `<strong>[NETWORK OVERRIDE]</strong> ${message}`,
               type: type,
               read: false,
               targetRoles: ["admin", "manager", "cashier"],
@@ -2901,10 +3098,14 @@
           await addDoc(collection(db, "global_audit_log"), {
             type: "broadcast_sent",
             timestamp: serverTimestamp(),
-            details: `Sent '${type}' broadcast: "${message}"`,
+            details: `Transmitted '${type}' override: "${message}"`,
             user: { id: auth.currentUser.uid, name: "Super Admin" },
           });
 
+          showToast(
+            "Broadcast transmission initiated across all nodes.",
+            "success",
+          );
           form.reset();
         }
       });
@@ -2924,7 +3125,6 @@
           }
         });
 
-      // --- AUTHENTICATION ---
       onAuthStateChanged(auth, (user) => {
         const loginContainer = document.getElementById("login-container");
         const appContainer = document.getElementById("app-container");
@@ -2971,9 +3171,16 @@
         const errorEl = document.getElementById("auth-error");
         errorEl.classList.add("hidden");
 
+        const btn = e.target.querySelector('button[type="submit"]');
+        const originalBtnText = btn.innerHTML;
+        btn.innerHTML = `<span class="loader-sm mr-2"></span> Verifying...`;
+        btn.disabled = true;
+
         signInWithEmailAndPassword(auth, email, password).catch((error) => {
-          errorEl.textContent = error.message.replace("Firebase: ", "");
+          errorEl.textContent = "Authentication Failed: Invalid Credentials";
           errorEl.classList.remove("hidden");
+          btn.innerHTML = originalBtnText;
+          btn.disabled = false;
         });
       });
 

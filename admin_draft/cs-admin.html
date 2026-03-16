@@ -1,0 +1,2773 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nexus Core | Super Admin</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Inter", "Plus Jakarta Sans", "sans-serif"],
+              mono: ["JetBrains Mono", "monospace"],
+            },
+            colors: {
+              background: "#09090b", // Zinc 950
+              surface: "#18181b", // Zinc 900
+              surfaceHover: "#27272a", // Zinc 800
+              borderDim: "rgba(255, 255, 255, 0.06)",
+              borderBright: "rgba(255, 255, 255, 0.12)",
+              textMain: "#f4f4f5", // Zinc 100
+              textMuted: "#a1a1aa", // Zinc 400
+              accent: "#6366f1", // Indigo 500
+              accentHover: "#4f46e5", // Indigo 600
+              danger: "#ef4444",
+              success: "#10b981",
+              warning: "#f59e0b",
+            },
+            boxShadow: {
+              glow: "0 0 20px rgba(99, 102, 241, 0.15)",
+              premium:
+                "0 4px 20px -2px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.05)",
+              "inner-light": "inset 0 1px 0 0 rgba(255, 255, 255, 0.05)",
+            },
+          },
+        },
+      };
+    </script>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="shortcut icon"
+      href="cashshilpo-official-fav.png"
+      type="image/x-icon"
+    />
+
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #09090b;
+        color: #f4f4f5;
+        overflow: hidden;
+      }
+
+      /* Premium Scrollbar */
+      ::-webkit-scrollbar {
+        width: 4px;
+        height: 4px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #27272a;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #3f3f46;
+      }
+
+      /* Sleek Panels */
+      .panel {
+        background: #0f0f11;
+        border: 1px solid var(--borderDim);
+        border-radius: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3),
+          0 2px 4px -1px rgba(0, 0, 0, 0.2),
+          inset 0 1px 0 0 rgba(255, 255, 255, 0.02);
+      }
+
+      /* Advanced Forms */
+      .form-input,
+      .form-select,
+      .form-textarea {
+        background-color: #18181b;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #f4f4f5;
+        border-radius: 8px;
+        padding: 0.6rem 1rem;
+        transition: all 0.2s ease;
+        font-size: 0.875rem;
+        width: 100%;
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
+      }
+      .form-input:focus,
+      .form-select:focus,
+      .form-textarea:focus {
+        outline: none;
+        border-color: #6366f1;
+        background-color: #18181b;
+        box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2),
+          inset 0 1px 2px rgba(0, 0, 0, 0.2);
+      }
+      .form-select option {
+        background-color: #18181b;
+        color: #f4f4f5;
+      }
+
+      /* Tactile Buttons */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-weight: 500;
+        font-size: 0.875rem;
+        transition: all 0.2s ease;
+        gap: 0.5rem;
+        cursor: pointer;
+        user-select: none;
+      }
+      .btn-sm {
+        padding: 0.35rem 0.75rem;
+        font-size: 0.8125rem;
+      }
+      .btn-primary {
+        background: linear-gradient(180deg, #6366f1 0%, #4f46e5 100%);
+        color: white;
+        border: 1px solid #4338ca;
+        box-shadow: inset 0 1px 0.5px rgba(255, 255, 255, 0.2),
+          0 1px 2px rgba(0, 0, 0, 0.2);
+      }
+      .btn-primary:hover {
+        background: linear-gradient(180deg, #6366f1 0%, #4338ca 100%);
+        transform: translateY(-1px);
+      }
+      .btn-secondary {
+        background: #18181b;
+        color: #e4e4e7;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02),
+          0 1px 2px rgba(0, 0, 0, 0.2);
+      }
+      .btn-secondary:hover {
+        background: #27272a;
+        border-color: rgba(255, 255, 255, 0.15);
+      }
+      .btn-danger {
+        background: linear-gradient(180deg, #ef4444 0%, #dc2626 100%);
+        color: white;
+        border: 1px solid #b91c1c;
+        box-shadow: inset 0 1px 0.5px rgba(255, 255, 255, 0.2),
+          0 1px 2px rgba(0, 0, 0, 0.2);
+      }
+      .btn-danger:hover {
+        background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%);
+        transform: translateY(-1px);
+      }
+
+      /* Dribbble-Quality Tables */
+      .table-pro {
+        width: 100%;
+        text-align: left;
+        border-collapse: separate;
+        border-spacing: 0;
+      }
+      .table-pro th {
+        padding: 1rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #a1a1aa;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        background: #09090b;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+      }
+      .table-pro td {
+        padding: 1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        vertical-align: middle;
+        font-size: 0.875rem;
+        transition: background 0.2s;
+      }
+      .table-pro tbody tr:hover td {
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      .stores-row.hidden,
+      .ticket-row.hidden,
+      .ticket-message-row.hidden {
+        display: none;
+      }
+      .user-row i[data-lucide="chevron-down"] {
+        transition: transform 0.2s ease;
+      }
+      .user-row.expanded i[data-lucide="chevron-down"] {
+        transform: rotate(180deg);
+      }
+      .user-row.expanded td {
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      /* Refined Status Badges */
+      .status-badge {
+        padding: 0.25rem 0.6rem;
+        border-radius: 6px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+      }
+      .status-badge::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+      }
+      .status-badge.active {
+        background: rgba(16, 185, 129, 0.1);
+        color: #34d399;
+        border: 1px solid rgba(16, 185, 129, 0.2);
+      }
+      .status-badge.active::before {
+        background-color: #34d399;
+        box-shadow: 0 0 8px rgba(52, 211, 153, 0.5);
+      }
+      .status-badge.trial {
+        background: rgba(245, 158, 11, 0.1);
+        color: #fbbf24;
+        border: 1px solid rgba(245, 158, 11, 0.2);
+      }
+      .status-badge.trial::before {
+        background-color: #fbbf24;
+        box-shadow: 0 0 8px rgba(251, 191, 36, 0.5);
+      }
+      .status-badge.expired,
+      .status-badge.disabled {
+        background: rgba(239, 68, 68, 0.1);
+        color: #f87171;
+        border: 1px solid rgba(239, 68, 68, 0.2);
+      }
+      .status-badge.expired::before,
+      .status-badge.disabled::before {
+        background-color: #f87171;
+        box-shadow: 0 0 8px rgba(248, 113, 113, 0.5);
+      }
+      .status-badge.unknown {
+        background: rgba(161, 161, 170, 0.1);
+        color: #a1a1aa;
+        border: 1px solid rgba(161, 161, 170, 0.2);
+      }
+      .status-badge.unknown::before {
+        background-color: #a1a1aa;
+      }
+
+      /* Elegant Modals */
+      .modal-overlay {
+        transition: opacity 0.2s ease-out;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+      }
+      .modal-content {
+        background: #0f0f11 !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5),
+          inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      /* View Transitions */
+      @keyframes softFade {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      #workspace-content > div {
+        animation: softFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
+
+      /* Linear-like Custom Toggle */
+      .toggle-switch-label {
+        display: inline-flex;
+        align-items: center;
+        cursor: pointer;
+      }
+      .toggle-switch-input {
+        display: none;
+      }
+      .toggle-switch-track {
+        width: 36px;
+        height: 20px;
+        background: #27272a;
+        border-radius: 20px;
+        position: relative;
+        transition: background 0.2s;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+      .toggle-switch-thumb {
+        width: 14px;
+        height: 14px;
+        background: white;
+        border-radius: 50%;
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
+      .toggle-switch-input:checked + .toggle-switch-track {
+        background: #6366f1;
+        border-color: #6366f1;
+      }
+      .toggle-switch-input:checked + .toggle-switch-track .toggle-switch-thumb {
+        transform: translateX(16px);
+      }
+
+      /* Sleek Sidebar Navigation */
+      #main-nav > a {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 2.75rem;
+        width: 2.75rem;
+        border-radius: 10px;
+        color: #a1a1aa;
+        transition: all 0.2s;
+      }
+      #main-nav > a:hover {
+        color: #f4f4f5;
+        background: rgba(255, 255, 255, 0.05);
+      }
+      #main-nav > a.active {
+        color: white;
+        background: rgba(99, 102, 241, 0.1);
+        border: 1px solid rgba(99, 102, 241, 0.2);
+      }
+      #main-nav > a.active::before {
+        content: "";
+        position: absolute;
+        left: -12px;
+        top: 20%;
+        height: 60%;
+        width: 3px;
+        background: #6366f1;
+        border-radius: 0 4px 4px 0;
+      }
+
+      /* Sophisticated Tooltips */
+      .tooltip {
+        position: absolute;
+        left: calc(100% + 12px);
+        top: 50%;
+        transform: translateY(-50%) translateX(-4px);
+        background: #27272a;
+        color: #f4f4f5;
+        padding: 0.35rem 0.75rem;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.2s;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        z-index: 50;
+      }
+      [data-tooltip]:hover .tooltip {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(-50%) translateX(0);
+      }
+
+      /* Toasts */
+      .toast {
+        background: #18181b !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5) !important;
+        pointer-events: auto;
+      }
+
+      /* Loader */
+      .loader-sm {
+        width: 14px;
+        height: 14px;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-bottom-color: white;
+        border-radius: 50%;
+        display: inline-block;
+        animation: rotation 0.8s linear infinite;
+      }
+      @keyframes rotation {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Subtle Grid Background for elegance */
+      .bg-grid-pattern {
+        background-image: linear-gradient(
+            to right,
+            rgba(255, 255, 255, 0.02) 1px,
+            transparent 1px
+          ),
+          linear-gradient(
+            to bottom,
+            rgba(255, 255, 255, 0.02) 1px,
+            transparent 1px
+          );
+        background-size: 40px 40px;
+        mask-image: radial-gradient(ellipse at top, black 40%, transparent 70%);
+        -webkit-mask-image: radial-gradient(
+          ellipse at top,
+          black 40%,
+          transparent 70%
+        );
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Ambient Background -->
+    <div class="fixed inset-0 z-[-1] pointer-events-none bg-background">
+      <div class="absolute inset-0 bg-grid-pattern opacity-50"></div>
+      <div
+        class="absolute top-[-20%] left-[20%] w-[50vw] h-[50vw] rounded-full bg-indigo-500/5 blur-[120px]"
+      ></div>
+    </div>
+
+    <!-- Login Screen -->
+    <div
+      id="login-container"
+      class="fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-background"
+    >
+      <div class="absolute inset-0 bg-grid-pattern opacity-20"></div>
+      <div
+        class="absolute top-[20%] right-[20%] w-[400px] h-[400px] bg-indigo-600/10 blur-[100px] rounded-full"
+      ></div>
+
+      <div
+        class="w-full max-w-sm p-8 space-y-8 rounded-2xl panel relative z-10 backdrop-blur-xl"
+      >
+        <div class="text-center">
+          <div
+            class="mx-auto h-12 w-12 bg-indigo-500/10 rounded-xl flex items-center justify-center border border-indigo-500/20 mb-5"
+          >
+            <i data-lucide="command" class="h-6 w-6 text-indigo-400"></i>
+          </div>
+          <h1 class="text-2xl font-semibold text-white tracking-tight mb-1">
+            Nexus Core
+          </h1>
+          <p class="text-zinc-400 text-sm">Sign in to Super Admin Portal</p>
+        </div>
+        <form id="login-form" class="space-y-5">
+          <div class="space-y-1.5">
+            <label for="email" class="block text-xs font-medium text-zinc-400"
+              >Email Address</label
+            >
+            <input
+              id="email"
+              name="email"
+              type="email"
+              autocomplete="email"
+              required
+              class="form-input"
+              value="admin@cashshilpo.com"
+              placeholder="admin@nexus.com"
+            />
+          </div>
+          <div class="space-y-1.5">
+            <label
+              for="password"
+              class="block text-xs font-medium text-zinc-400"
+              >Password</label
+            >
+            <input
+              id="password"
+              name="password"
+              type="password"
+              required
+              class="form-input"
+              value="superadmin123"
+              placeholder="••••••••"
+            />
+          </div>
+          <p
+            id="auth-error"
+            class="text-red-400 text-sm font-medium hidden text-center bg-red-500/10 py-2 rounded-lg border border-red-500/20"
+          ></p>
+          <div class="pt-2">
+            <button type="submit" class="btn btn-primary w-full py-2.5 text-sm">
+              Authenticate
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div
+      id="loading-overlay"
+      class="fixed inset-0 z-[60] flex flex-col items-center justify-center bg-background/95 backdrop-blur-md hidden"
+    >
+      <div class="relative w-16 h-16 flex items-center justify-center mb-4">
+        <div
+          class="absolute inset-0 rounded-full border-2 border-indigo-500/20 border-t-indigo-500 animate-spin"
+        ></div>
+        <i
+          data-lucide="command"
+          class="w-6 h-6 text-indigo-400 animate-pulse"
+        ></i>
+      </div>
+      <p class="text-zinc-400 font-medium text-sm tracking-widest uppercase">
+        Initializing Environment
+      </p>
+    </div>
+
+    <!-- Main App Layout -->
+    <div
+      id="app-container"
+      class="hidden h-screen overflow-hidden flex bg-transparent relative"
+    >
+      <!-- Minimal Sidebar -->
+      <aside
+        id="app-sidebar"
+        class="w-20 border-r border-white/5 bg-surface/50 backdrop-blur-xl flex flex-col items-center py-6 flex-shrink-0 z-20"
+      >
+        <a href="#" class="mb-10 flex items-center justify-center">
+          <div
+            class="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20"
+          >
+            <i data-lucide="command" class="w-5 h-5 text-indigo-400"></i>
+          </div>
+        </a>
+        <nav
+          id="main-nav"
+          class="flex-grow w-full flex flex-col items-center space-y-3"
+        >
+          <a
+            href="#"
+            data-view="dashboard"
+            class="group"
+            data-tooltip="Overview"
+          >
+            <i data-lucide="layout-grid" class="w-5 h-5"></i>
+            <div class="tooltip">Overview</div>
+          </a>
+          <a
+            href="#"
+            data-view="users"
+            class="group"
+            data-tooltip="User Network"
+          >
+            <i data-lucide="users" class="w-5 h-5"></i>
+            <div class="tooltip">User Network</div>
+          </a>
+          <a
+            href="#"
+            data-view="subscriptions"
+            class="group"
+            data-tooltip="Revenue Operations"
+          >
+            <i data-lucide="banknote" class="w-5 h-5"></i>
+            <div class="tooltip">Revenue Operations</div>
+          </a>
+          <a
+            href="#"
+            data-view="support_tickets"
+            class="group"
+            data-tooltip="Support Desk"
+          >
+            <i data-lucide="inbox" class="w-5 h-5"></i>
+            <div class="tooltip">Support Desk</div>
+          </a>
+          <a
+            href="#"
+            data-view="audit_log"
+            class="group"
+            data-tooltip="Audit Logs"
+          >
+            <i data-lucide="activity" class="w-5 h-5"></i>
+            <div class="tooltip">Audit Logs</div>
+          </a>
+          <a
+            href="#"
+            data-view="settings"
+            class="group"
+            data-tooltip="Configurations"
+          >
+            <i data-lucide="settings-2" class="w-5 h-5"></i>
+            <div class="tooltip">Configurations</div>
+          </a>
+        </nav>
+        <div class="mt-auto">
+          <button
+            data-action="logout"
+            class="h-10 w-10 flex items-center justify-center rounded-lg text-zinc-500 hover:text-red-400 hover:bg-red-500/10 transition-colors group relative"
+            data-tooltip="Log Out"
+          >
+            <i data-lucide="log-out" class="w-5 h-5"></i>
+            <div class="tooltip">Log Out</div>
+          </button>
+        </div>
+      </aside>
+
+      <!-- Main Workspace -->
+      <div class="flex-1 flex flex-col h-full overflow-hidden relative z-10">
+        <!-- Header -->
+        <header
+          id="app-header"
+          class="h-16 px-8 flex items-center justify-between border-b border-white/5 bg-surface/30 backdrop-blur-lg z-20 shrink-0"
+        >
+          <div class="flex items-center gap-4">
+            <h1
+              id="view-title"
+              class="text-lg font-semibold text-white tracking-tight"
+            >
+              Overview
+            </h1>
+          </div>
+          <div class="flex items-center gap-6">
+            <!-- Sleek Search -->
+            <div class="relative w-64 hidden md:block">
+              <i
+                data-lucide="search"
+                class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500"
+              ></i>
+              <input
+                type="text"
+                id="global-search-input"
+                placeholder="Search universally..."
+                class="bg-[#121214] border border-white/5 text-sm text-white rounded-lg pl-9 pr-4 py-1.5 w-full focus:outline-none focus:border-indigo-500/50 focus:bg-[#18181b] transition-all placeholder:text-zinc-600 shadow-inner"
+              />
+            </div>
+
+            <div class="flex items-center gap-4 border-l border-white/5 pl-6">
+              <button
+                id="notification-bell"
+                data-action="open-notifications"
+                class="relative text-zinc-400 hover:text-white transition-colors"
+              >
+                <i data-lucide="bell" class="w-5 h-5"></i>
+                <div
+                  id="notification-badge"
+                  class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-indigo-500 border-2 border-[#09090b] hidden"
+                ></div>
+              </button>
+              <div class="hidden sm:block text-right">
+                <p
+                  id="current-time"
+                  class="text-sm font-medium text-white font-mono"
+                ></p>
+                <p
+                  id="current-date"
+                  class="text-[10px] text-zinc-500 uppercase tracking-wider"
+                ></p>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <!-- Dynamic Content -->
+        <main
+          id="workspace-content"
+          class="flex-1 overflow-y-auto p-8 scroll-smooth z-10 relative bg-transparent"
+        >
+          <!-- Injected Content -->
+        </main>
+      </div>
+    </div>
+
+    <!-- Modals & Toasts -->
+    <div id="modals-container"></div>
+    <div
+      id="toasts-container"
+      class="fixed bottom-6 right-6 z-[100] space-y-3 flex flex-col items-end pointer-events-none"
+    ></div>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+      import {
+        getAuth,
+        signInWithEmailAndPassword,
+        signOut,
+        onAuthStateChanged,
+      } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+      import {
+        getFirestore,
+        doc,
+        getDoc,
+        setDoc,
+        updateDoc,
+        onSnapshot,
+        collection,
+        query,
+        writeBatch,
+        addDoc,
+        serverTimestamp,
+        where,
+        Timestamp,
+        orderBy,
+        limit,
+        deleteDoc,
+        getDocs,
+      } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+      const sessionStartTime = new Date();
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyCBhzyl_1KpaROyjDaXX7fyLv-gQRoOTY0",
+        authDomain: "cashshilpo.firebaseapp.com",
+        projectId: "cashshilpo",
+        storageBucket: "cashshilpo.firebasestorage.app",
+        messagingSenderId: "544846655087",
+        appId: "1:544846655087:web:0269ce6564c6b42c62a79a",
+        measurementId: "G-GT06B6K2T6",
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
+
+      let appState = {
+        activeView: "dashboard",
+        settings: { defaultTrialDays: 7, featureFlags: {} },
+        viewStates: {
+          users: { currentPage: 1, searchQuery: "", filter: "all" },
+          audit_log: { currentPage: 1, filter: "all" },
+          subscriptions: { currentPage: 1, filter: "pending" },
+          support_tickets: { currentPage: 1, filter: "open" },
+        },
+        itemsPerPage: 10,
+      };
+
+      let firestoreData = {
+        stores: [],
+        users: [],
+        auditLog: [],
+        subscriptionRequests: [],
+        supportTickets: [],
+        notifications: [],
+      };
+      let activeListeners = [];
+      let chartInstances = {};
+      let clockInterval;
+      let processedNotificationIds = new Set();
+
+      const YEARLY_DISCOUNT_PERCENT = 20;
+      const LOCAL_PLANS_DETAILS = {
+        basic_monthly: {
+          id: "basic_monthly",
+          name: "Basic (Monthly Plan)",
+          price: 1499,
+          duration: "monthly",
+          limits: { stores: 1, products: 1000, staff: 5, ai: "none" },
+        },
+        basic_yearly: {
+          id: "basic_yearly",
+          name: "Basic (Yearly Plan)",
+          price: Math.round(1499 * 12 * (1 - YEARLY_DISCOUNT_PERCENT / 100)),
+          duration: "yearly",
+          limits: { stores: 1, products: 1000, staff: 5, ai: "none" },
+        },
+        standard_monthly: {
+          id: "standard_monthly",
+          name: "Standard (Monthly Plan)",
+          price: 2999,
+          duration: "monthly",
+          limits: { stores: 3, products: 10000, staff: 20, ai: "basic" },
+        },
+        standard_yearly: {
+          id: "standard_yearly",
+          name: "Standard (Yearly Plan)",
+          price: Math.round(2999 * 12 * (1 - YEARLY_DISCOUNT_PERCENT / 100)),
+          duration: "yearly",
+          limits: { stores: 3, products: 10000, staff: 20, ai: "basic" },
+        },
+        premium_monthly: {
+          id: "premium_monthly",
+          name: "Premium (Monthly Plan)",
+          price: 5999,
+          duration: "monthly",
+          limits: { stores: 10, products: 50000, staff: 50, ai: "advanced" },
+        },
+        premium_yearly: {
+          id: "premium_yearly",
+          name: "Premium (Yearly Plan)",
+          price: Math.round(5999 * 12 * (1 - YEARLY_DISCOUNT_PERCENT / 100)),
+          duration: "yearly",
+          limits: { stores: 10, products: 50000, staff: 50, ai: "advanced" },
+        },
+      };
+
+      let isInitialDataLoaded = {
+        users: false,
+        subscriptions: false,
+        tickets: false,
+      };
+
+      const playNotificationSound = () => {
+        const audioContext = new (window.AudioContext ||
+          window.webkitAudioContext)();
+        if (!audioContext) return;
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+        gainNode.gain.linearRampToValueAtTime(
+          0.3,
+          audioContext.currentTime + 0.01,
+        );
+        oscillator.type = "sine";
+        oscillator.frequency.setValueAtTime(880, audioContext.currentTime);
+        oscillator.start(audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(
+          0.00001,
+          audioContext.currentTime + 0.15,
+        );
+        oscillator.stop(audioContext.currentTime + 0.15);
+      };
+
+      const showToast = (message, type = "success") => {
+        const toastsContainer = document.getElementById("toasts-container");
+        if (!toastsContainer) return;
+        const style =
+          type === "success"
+            ? { c: "text-emerald-400", i: "check-circle" }
+            : type === "error"
+            ? { c: "text-red-400", i: "alert-circle" }
+            : type === "warning"
+            ? { c: "text-amber-400", i: "alert-triangle" }
+            : { c: "text-indigo-400", i: "info" };
+
+        const toast = document.createElement("div");
+        toast.className = `toast flex items-center gap-3 text-white text-sm font-medium px-4 py-3 rounded-xl shadow-xl border border-white/5`;
+        toast.innerHTML = `<i data-lucide="${style.i}" class="w-4 h-4 ${style.c}"></i><p class="flex-1">${message}</p>`;
+        toastsContainer.appendChild(toast);
+        lucide.createIcons();
+        setTimeout(() => {
+          toast.style.transform = "translateX(120%)";
+          toast.style.opacity = "0";
+          setTimeout(() => toast.remove(), 300);
+        }, 4000);
+      };
+
+      const showModal = (title, content, footer, options = {}) => {
+        const modalsContainer = document.getElementById("modals-container");
+        const { size = "max-w-xl", customClasses = "" } = options;
+        const modalId = `modal-${Date.now()}`;
+        const modalHTML = `
+                <div id="${modalId}" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4 opacity-0">
+                    <div class="modal-content rounded-2xl w-full ${size} ${customClasses} transform scale-95 flex flex-col max-h-[90vh]">
+                        <div class="flex justify-between items-center p-5 border-b border-white/5 shrink-0">
+                            <h3 class="text-base font-semibold text-white">${title}</h3>
+                            <button data-action="close-modal" class="text-zinc-500 hover:text-white transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
+                        </div>
+                        <div class="p-6 text-zinc-300 overflow-y-auto">${content}</div>
+                        ${
+                          footer
+                            ? `<div class="flex justify-end items-center p-4 border-t border-white/5 bg-white/[0.02] shrink-0 gap-3 rounded-b-2xl">${footer}</div>`
+                            : ""
+                        }
+                    </div>
+                </div>`;
+        modalsContainer.insertAdjacentHTML("beforeend", modalHTML);
+        if (typeof lucide !== "undefined") lucide.createIcons();
+        const modalEl = document.getElementById(modalId);
+        setTimeout(() => {
+          modalEl.classList.remove("opacity-0");
+          modalEl.querySelector(".modal-content").classList.remove("scale-95");
+        }, 10);
+        return modalEl;
+      };
+
+      const closeModal = (modalEl) => {
+        if (!modalEl) return;
+        modalEl.classList.add("opacity-0");
+        modalEl.querySelector(".modal-content").classList.add("scale-95");
+        setTimeout(() => modalEl.remove(), 200);
+      };
+
+      const renderPaginationControls = (
+        container,
+        totalItems,
+        currentPage,
+        itemsPerPage,
+        viewType,
+      ) => {
+        const totalPages = Math.ceil(totalItems / itemsPerPage);
+        if (totalPages <= 1) {
+          container.innerHTML = "";
+          return;
+        }
+        const startItem = (currentPage - 1) * itemsPerPage + 1;
+        const endItem = Math.min(startItem + itemsPerPage - 1, totalItems);
+        let paginationHTML = `
+          <div class="flex items-center justify-between text-xs text-zinc-500 mt-4 px-2">
+            <div>Showing <span class="font-medium text-zinc-300">${startItem}</span> to <span class="font-medium text-zinc-300">${endItem}</span> of <span class="font-medium text-zinc-300">${totalItems}</span></div>
+            <div class="flex items-center gap-2">
+                <button data-action="paginate" data-view-type="${viewType}" data-page="${
+          currentPage - 1
+        }" class="p-1.5 rounded-md hover:bg-white/5 transition-colors disabled:opacity-30 disabled:hover:bg-transparent" ${
+          currentPage === 1 ? "disabled" : ""
+        }><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+                <span class="px-2 font-medium text-zinc-300">${currentPage} / ${totalPages}</span>
+                <button data-action="paginate" data-view-type="${viewType}" data-page="${
+          currentPage + 1
+        }" class="p-1.5 rounded-md hover:bg-white/5 transition-colors disabled:opacity-30 disabled:hover:bg-transparent" ${
+          currentPage === totalPages ? "disabled" : ""
+        }><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+            </div>
+          </div>`;
+        container.innerHTML = paginationHTML;
+        if (typeof lucide !== "undefined") lucide.createIcons();
+      };
+
+      const destroyCharts = () => {
+        Object.values(chartInstances).forEach((chart) => chart.destroy());
+        chartInstances = {};
+      };
+
+      const updateClock = () => {
+        const now = new Date();
+        const timeEl = document.getElementById("current-time");
+        const dateEl = document.getElementById("current-date");
+        if (timeEl)
+          timeEl.textContent = now.toLocaleTimeString("en-US", {
+            timeZone: "Asia/Dhaka",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+          });
+        if (dateEl)
+          dateEl.textContent = now.toLocaleDateString("en-US", {
+            timeZone: "Asia/Dhaka",
+            weekday: "short",
+            month: "short",
+            day: "numeric",
+          });
+      };
+
+      const formatTimeAgo = (date) => {
+        if (!date) return "";
+        const seconds = Math.floor((new Date() - date) / 1000);
+        let interval = seconds / 31536000;
+        if (interval > 1) return Math.floor(interval) + "y ago";
+        interval = seconds / 2592000;
+        if (interval > 1) return Math.floor(interval) + "mo ago";
+        interval = seconds / 86400;
+        if (interval > 1) return Math.floor(interval) + "d ago";
+        interval = seconds / 3600;
+        if (interval > 1) return Math.floor(interval) + "h ago";
+        interval = seconds / 60;
+        if (interval > 1) return Math.floor(interval) + "m ago";
+        return Math.floor(seconds) + "s ago";
+      };
+
+      async function openNotificationsModal() {
+        const notifications = firestoreData.notifications;
+        const content = `
+                <div class="-mx-6 -my-2">
+                    <div class="divide-y divide-white/5">
+                        ${
+                          notifications.length > 0
+                            ? notifications
+                                .map((n) => {
+                                  const icon =
+                                    {
+                                      "user-plus": "user-plus",
+                                      "credit-card": "credit-card",
+                                      "life-buoy": "inbox",
+                                      info: "info",
+                                      warning: "alert-triangle",
+                                      success: "check",
+                                      store: "database",
+                                      "user-check": "user-check",
+                                    }[n.icon] || "bell";
+                                  const isUnread = !n.read;
+                                  return `
+                                <div class="flex items-start gap-4 py-3 px-6 ${
+                                  isUnread ? "bg-indigo-500/5" : ""
+                                } hover:bg-white/[0.02] transition-colors">
+                                    <div class="mt-0.5"><i data-lucide="${icon}" class="w-4 h-4 ${
+                                    isUnread
+                                      ? "text-indigo-400"
+                                      : "text-zinc-500"
+                                  }"></i></div>
+                                    <div class="flex-grow">
+                                        <p class="text-sm ${
+                                          isUnread
+                                            ? "text-white"
+                                            : "text-zinc-400"
+                                        }">${n.message}</p>
+                                        <p class="text-[10px] text-zinc-500 mt-1 uppercase tracking-wider">${formatTimeAgo(
+                                          n.timestamp?.toDate(),
+                                        )}</p>
+                                    </div>
+                                    ${
+                                      isUnread
+                                        ? '<div class="w-1.5 h-1.5 bg-indigo-500 rounded-full mt-1.5"></div>'
+                                        : ""
+                                    }
+                                </div>`;
+                                })
+                                .join("")
+                            : `<p class="text-center text-zinc-500 py-8 text-sm">No new notifications.</p>`
+                        }
+                    </div>
+                </div>`;
+        const footer =
+          notifications.length > 0
+            ? `<button data-action="clear-all-notifications" class="btn btn-secondary text-xs">Clear Archive</button>`
+            : "";
+        const modal = showModal("System Notifications", content, footer, {
+          size: "max-w-md",
+        });
+        if (!modal) return;
+        lucide.createIcons();
+
+        modal
+          .querySelector('button[data-action="close-modal"]')
+          .addEventListener("click", async () => {
+            const unread = firestoreData.notifications.filter((n) => !n.read);
+            if (unread.length > 0) {
+              const batch = writeBatch(db);
+              unread.forEach((n) =>
+                batch.update(doc(db, "global_notifications", n.id), {
+                  read: true,
+                }),
+              );
+              await batch.commit().catch(console.error);
+            }
+          });
+
+        const clearBtn = modal.querySelector(
+          '[data-action="clear-all-notifications"]',
+        );
+        if (clearBtn) {
+          clearBtn.addEventListener("click", async () => {
+            clearBtn.disabled = true;
+            clearBtn.textContent = "Clearing...";
+            const batch = writeBatch(db);
+            firestoreData.notifications.forEach((n) =>
+              batch.delete(doc(db, "global_notifications", n.id)),
+            );
+            await batch.commit();
+            showToast("Archive cleared");
+            closeModal(modal);
+          });
+        }
+      }
+
+      const updateNotificationBadge = () => {
+        const badge = document.getElementById("notification-badge");
+        const unreadCount = firestoreData.notifications.filter((n) => !n.read)
+          .length;
+        if (unreadCount > 0) badge.classList.remove("hidden");
+        else badge.classList.add("hidden");
+      };
+
+      function renderDashboardView() {
+        destroyCharts();
+        const container = document.getElementById("workspace-content");
+        const now = new Date();
+        const users = firestoreData.users;
+
+        const totalUsers = users.length;
+        const onTrial = users.filter(
+          (u) =>
+            u.subscription?.status === "trial" &&
+            u.subscription.trialEndsAt.toDate() > now,
+        ).length;
+        const activeSubs = users.filter(
+          (u) => u.subscription?.status === "active",
+        ).length;
+        const expired = users.filter(
+          (u) =>
+            u.subscription?.status === "expired" ||
+            (u.subscription?.status === "trial" &&
+              u.subscription.trialEndsAt.toDate() < now),
+        ).length;
+
+        const signupsByMonth = users.reduce((acc, user) => {
+          if (!user.createdAt) return acc;
+          const month = new Date(
+            user.createdAt.toDate(),
+          ).toLocaleString("default", { month: "short" });
+          acc[month] = (acc[month] || 0) + 1;
+          return acc;
+        }, {});
+
+        const pendingSubs = firestoreData.subscriptionRequests.filter(
+          (req) => req.status === "pending",
+        ).length;
+        const openTickets = firestoreData.supportTickets.filter(
+          (t) => t.status === "open",
+        ).length;
+
+        container.innerHTML = `
+                <div class="max-w-6xl mx-auto space-y-6">
+                    <!-- Metrics -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="panel p-5 relative overflow-hidden group hover:border-white/20 transition-all duration-300">
+                          <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                          <div class="flex justify-between items-start">
+                             <div><p class="text-xs font-medium text-zinc-400 mb-1">Total Network</p><p class="text-2xl font-semibold text-white tracking-tight">${totalUsers}</p></div>
+                             <div class="text-indigo-400 bg-indigo-500/10 p-2 rounded-lg"><i data-lucide="users" class="w-4 h-4"></i></div>
+                          </div>
+                        </div>
+                        <div class="panel p-5 relative overflow-hidden group hover:border-white/20 transition-all duration-300">
+                          <div class="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                          <div class="flex justify-between items-start">
+                             <div><p class="text-xs font-medium text-zinc-400 mb-1">Active Subscriptions</p><p class="text-2xl font-semibold text-white tracking-tight">${activeSubs}</p></div>
+                             <div class="text-emerald-400 bg-emerald-500/10 p-2 rounded-lg"><i data-lucide="shield-check" class="w-4 h-4"></i></div>
+                          </div>
+                        </div>
+                        <div class="panel p-5 relative overflow-hidden group hover:border-white/20 transition-all duration-300">
+                          <div class="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                          <div class="flex justify-between items-start">
+                             <div><p class="text-xs font-medium text-zinc-400 mb-1">In Sandbox/Trial</p><p class="text-2xl font-semibold text-white tracking-tight">${onTrial}</p></div>
+                             <div class="text-amber-400 bg-amber-500/10 p-2 rounded-lg"><i data-lucide="clock" class="w-4 h-4"></i></div>
+                          </div>
+                        </div>
+                        <div class="panel p-5 relative overflow-hidden group hover:border-white/20 transition-all duration-300">
+                          <div class="absolute inset-0 bg-gradient-to-br from-red-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                          <div class="flex justify-between items-start">
+                             <div><p class="text-xs font-medium text-zinc-400 mb-1">Action Required</p><p class="text-2xl font-semibold text-white tracking-tight">${expired}</p></div>
+                             <div class="text-red-400 bg-red-500/10 p-2 rounded-lg"><i data-lucide="alert-circle" class="w-4 h-4"></i></div>
+                          </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Main Grid -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Chart -->
+                        <div class="lg:col-span-2 panel p-6 h-[400px] flex flex-col relative overflow-hidden">
+                            <h3 class="text-sm font-semibold text-white mb-6">Network Growth Matrix</h3>
+                            <div class="flex-grow relative z-10"><canvas id="signups-chart"></canvas></div>
+                        </div>
+                        
+                        <!-- Actions -->
+                        <div class="panel p-6 flex flex-col">
+                            <h3 class="text-sm font-semibold text-white mb-6">Operations Queue</h3>
+                            <div class="space-y-3 flex-grow">
+                                <a href="#" data-action="quick-nav" data-view="subscriptions" class="block p-4 rounded-xl border border-white/5 bg-[#121214] hover:border-indigo-500/30 hover:bg-indigo-500/5 transition-all group">
+                                    <div class="flex justify-between items-center">
+                                      <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-full bg-indigo-500/10 flex items-center justify-center group-hover:scale-110 transition-transform"><i data-lucide="banknote" class="w-4 h-4 text-indigo-400"></i></div>
+                                        <div><p class="text-sm font-medium text-white group-hover:text-indigo-400 transition-colors">Pending Renewals</p></div>
+                                      </div>
+                                      <span class="text-sm font-bold bg-white/10 px-2.5 py-1 rounded text-white group-hover:bg-indigo-500 group-hover:text-white transition-colors">${pendingSubs}</span>
+                                    </div>
+                                </a>
+                                <a href="#" data-action="quick-nav" data-view="support_tickets" class="block p-4 rounded-xl border border-white/5 bg-[#121214] hover:border-amber-500/30 hover:bg-amber-500/5 transition-all group">
+                                    <div class="flex justify-between items-center">
+                                      <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-full bg-amber-500/10 flex items-center justify-center group-hover:scale-110 transition-transform"><i data-lucide="inbox" class="w-4 h-4 text-amber-400"></i></div>
+                                        <div><p class="text-sm font-medium text-white group-hover:text-amber-400 transition-colors">Open Signals</p></div>
+                                      </div>
+                                      <span class="text-sm font-bold bg-white/10 px-2.5 py-1 rounded text-white group-hover:bg-amber-500 group-hover:text-black transition-colors">${openTickets}</span>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        if (typeof lucide !== "undefined") lucide.createIcons();
+
+        const chartCtx = document
+          .getElementById("signups-chart")
+          .getContext("2d");
+        const gradient = chartCtx.createLinearGradient(0, 0, 0, 300);
+        gradient.addColorStop(0, "rgba(99, 102, 241, 0.2)");
+        gradient.addColorStop(1, "rgba(99, 102, 241, 0.0)");
+
+        chartInstances.signups = new Chart(chartCtx, {
+          type: "line",
+          data: {
+            labels: Object.keys(signupsByMonth),
+            datasets: [
+              {
+                label: "Identities",
+                data: Object.values(signupsByMonth),
+                borderColor: "#6366f1",
+                borderWidth: 2,
+                backgroundColor: gradient,
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: "#09090b",
+                pointBorderColor: "#6366f1",
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { intersect: false, mode: "index" },
+            scales: {
+              y: {
+                beginAtZero: true,
+                grid: { color: "rgba(255,255,255,0.03)" },
+                ticks: {
+                  color: "#71717a",
+                  font: { family: "Inter", size: 11 },
+                },
+                border: { display: false },
+              },
+              x: {
+                grid: { display: false },
+                ticks: {
+                  color: "#71717a",
+                  font: { family: "Inter", size: 11 },
+                },
+                border: { display: false },
+              },
+            },
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: "#18181b",
+                titleFont: { family: "Inter", size: 12 },
+                bodyFont: { family: "Inter", size: 12 },
+                padding: 10,
+                borderColor: "rgba(255,255,255,0.1)",
+                borderWidth: 1,
+                cornerRadius: 8,
+                displayColors: false,
+              },
+            },
+          },
+        });
+      }
+
+      function renderUsersView() {
+        destroyCharts();
+        const container = document.getElementById("workspace-content");
+        const viewState = appState.viewStates.users;
+
+        container.innerHTML = `
+                <div class="max-w-7xl mx-auto space-y-4">
+                    <div class="flex flex-col sm:flex-row items-center gap-3 w-full">
+                        <div class="relative flex-grow w-full sm:w-auto">
+                             <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500"></i>
+                             <input type="text" id="user-search" placeholder="Search identities, UIDs..." class="form-input pl-9 text-sm py-2 bg-surface border-white/5 shadow-none" value="${viewState.searchQuery}">
+                        </div>
+                        <select id="user-filter" class="form-select w-full sm:w-48 text-sm py-2 bg-surface border-white/5 shadow-none">
+                            <option value="all">All States</option>
+                            <option value="trial">Sandbox (Trial)</option>
+                            <option value="active">Active</option>
+                            <option value="expired">Expired</option>
+                            <option value="disabled">Terminated</option>
+                        </select>
+                    </div>
+                    
+                    <div class="panel overflow-hidden">
+                        <div class="overflow-x-auto">
+                          <table class="table-pro">
+                              <thead><tr><th class="w-10 text-center"></th><th>Identity</th><th>Allocations</th><th>State</th><th class="text-right">Actions</th></tr></thead>
+                              <tbody id="users-table-body"></tbody>
+                          </table>
+                        </div>
+                    </div>
+                    <div id="users-pagination"></div>
+                </div>
+            `;
+        container.querySelector("#user-filter").value = viewState.filter;
+
+        const renderTable = () => {
+          const storesByUser = firestoreData.stores.reduce((acc, store) => {
+            const ownerId = store.ownerUid;
+            if (!acc[ownerId]) acc[ownerId] = [];
+            acc[ownerId].push(store);
+            return acc;
+          }, {});
+          const storeOwnerIds = new Set(
+            firestoreData.stores.map((store) => store.ownerUid),
+          );
+          let usersToShow = firestoreData.users.filter((user) =>
+            storeOwnerIds.has(user.id),
+          );
+          let filteredUsers = [...usersToShow];
+
+          if (viewState.searchQuery) {
+            const query = viewState.searchQuery.toLowerCase();
+            filteredUsers = filteredUsers.filter((user) => {
+              const userStores = storesByUser[user.id] || [];
+              const userName = user?.displayName?.toLowerCase() || "";
+              return (
+                user.id.toLowerCase().includes(query) ||
+                userName.includes(query) ||
+                userStores.some((s) => s.name.toLowerCase().includes(query))
+              );
+            });
+          }
+
+          if (viewState.filter !== "all") {
+            filteredUsers = filteredUsers.filter((user) => {
+              const sub = user.subscription || {};
+              let status = sub.status || "unknown";
+              const now = new Date();
+              const trialEndsDate = sub.trialEndsAt
+                ? sub.trialEndsAt.toDate()
+                : null;
+              const activeEndsDate = sub.expiresAt
+                ? sub.expiresAt.toDate()
+                : null;
+              if (status === "trial" && trialEndsDate && trialEndsDate < now)
+                status = "expired";
+              else if (
+                status === "active" &&
+                activeEndsDate &&
+                activeEndsDate < now
+              )
+                status = "expired";
+              return status === viewState.filter;
+            });
+          }
+
+          const totalItems = filteredUsers.length;
+          const startIndex =
+            (viewState.currentPage - 1) * appState.itemsPerPage;
+          const paginatedUsers = filteredUsers.slice(
+            startIndex,
+            startIndex + appState.itemsPerPage,
+          );
+
+          const tableBody = container.querySelector("#users-table-body");
+          let tableHTML = "";
+          if (paginatedUsers.length === 0) {
+            tableHTML = `<tr><td colspan="5" class="text-center py-12 text-zinc-500 text-sm">No identities found.</td></tr>`;
+          } else {
+            paginatedUsers.forEach((user) => {
+              const userStores = storesByUser[user.id] || [];
+              const userName = user?.displayName || "Unknown";
+              const storeLimit = user?.storeLimit || 1;
+
+              const sub = user.subscription || {};
+              let status = sub.status || "unknown";
+              let expiryDate = null;
+              const now = new Date();
+              if (status === "trial")
+                expiryDate = sub.trialEndsAt ? sub.trialEndsAt.toDate() : null;
+              else if (status === "active")
+                expiryDate = sub.expiresAt ? sub.expiresAt.toDate() : null;
+
+              if (
+                expiryDate &&
+                expiryDate < now &&
+                (status === "trial" || status === "active")
+              )
+                status = "expired";
+
+              let daysLeftString = "";
+              if (expiryDate && (status === "trial" || status === "active")) {
+                const diffTime = expiryDate.getTime() - now.getTime();
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                daysLeftString = `<span class="text-[11px] text-zinc-500 mt-1 block">${
+                  diffDays > 0 ? diffDays + " days left" : "Expired"
+                }</span>`;
+              }
+              if (status === "expired")
+                daysLeftString = `<span class="text-[11px] text-red-400 mt-1 block">Expired</span>`;
+              else if (status === "disabled")
+                daysLeftString = `<span class="text-[11px] text-red-400 mt-1 block">Revoked</span>`;
+
+              tableHTML += `
+                            <tr class="user-row cursor-pointer" data-action="toggle-stores" data-uid="${
+                              user.id
+                            }">
+                                <td class="text-center pl-4"><i data-lucide="chevron-down" class="w-4 h-4 text-zinc-500 mx-auto"></i></td>
+                                <td>
+                                    <div class="flex items-center gap-3">
+                                      <div class="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-400 text-xs font-medium border border-white/5">${userName
+                                        .charAt(0)
+                                        .toUpperCase()}</div>
+                                      <div>
+                                        <p class="font-medium text-white text-sm">${userName}</p>
+                                        <p class="font-mono text-[10px] text-zinc-500 mt-0.5">${user.id.slice(
+                                          0,
+                                          10,
+                                        )}...</p>
+                                      </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="flex items-center gap-1.5 text-sm">
+                                      <span class="text-white font-semibold">${
+                                        userStores.length
+                                      }</span>
+                                      <span class="text-zinc-500">/ ${storeLimit} nodes</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <div class="status-badge ${status}">${status}</div>
+                                        ${daysLeftString}
+                                    </div>
+                                </td>
+                                <td class="text-right pr-4"><button data-action="manage-user" data-uid="${
+                                  user.id
+                                }" class="btn btn-secondary btn-sm" onclick="event.stopPropagation()"><i data-lucide="sliders-horizontal" class="w-3.5 h-3.5"></i> Edit</button></td>
+                            </tr>
+                            <tr class="stores-row hidden" data-stores-for="${
+                              user.id
+                            }">
+                                <td colspan="5" class="p-0 border-b border-white/5">
+                                  <div class="pl-14 pr-4 py-4 bg-black/20 shadow-inner">
+                                    <div class="rounded-lg border border-white/5 bg-[#121214] overflow-hidden">
+                                        <table class="table-pro w-full text-xs">
+                                            <thead><tr><th class="bg-transparent border-b border-white/5 pl-4 py-2 text-[10px]">Node Name</th><th class="bg-transparent border-b border-white/5 py-2 text-[10px]">Deployed</th><th class="bg-transparent border-b border-white/5 py-2 text-[10px]">State</th><th class="bg-transparent border-b border-white/5 py-2 text-[10px] text-right pr-4">Actions</th></tr></thead>
+                                            <tbody>
+                                                ${
+                                                  userStores.length > 0
+                                                    ? userStores
+                                                        .map((store) => {
+                                                          const isEnabled =
+                                                            store.isEnabled !==
+                                                            false;
+                                                          return `<tr>
+                                                        <td class="font-medium text-white pl-4 py-2 border-none">${
+                                                          store.name
+                                                        }</td>
+                                                        <td class="text-zinc-500 py-2 border-none font-mono">${new Date(
+                                                          store.createdAt,
+                                                        ).toLocaleDateString()}</td>
+                                                        <td class="py-2 border-none">
+                                                            <label class="toggle-switch-label">
+                                                                <input type="checkbox" data-action="toggle-store-enabled" data-store-id="${
+                                                                  store.id
+                                                                }" class="toggle-switch-input" ${
+                                                            isEnabled
+                                                              ? "checked"
+                                                              : ""
+                                                          }>
+                                                                <div class="toggle-switch-track"><div class="toggle-switch-thumb"></div></div>
+                                                            </label>
+                                                        </td>
+                                                        <td class="text-right pr-4 py-2 border-none">
+                                                            <button data-action="view-store-staff" data-store-id="${
+                                                              store.id
+                                                            }" class="text-zinc-400 hover:text-white transition-colors" title="View Staff">
+                                                                <i data-lucide="users" class="w-4 h-4 inline"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>`;
+                                                        })
+                                                        .join("")
+                                                    : `<tr><td colspan="4" class="text-center text-zinc-500 py-4 border-none">No nodes deployed.</td></tr>`
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div></td>
+                            </tr>
+                        `;
+            });
+          }
+          tableBody.innerHTML = tableHTML;
+          renderPaginationControls(
+            container.querySelector("#users-pagination"),
+            totalItems,
+            viewState.currentPage,
+            appState.itemsPerPage,
+            "users",
+          );
+          if (typeof lucide !== "undefined") lucide.createIcons();
+        };
+
+        renderTable();
+
+        container
+          .querySelector("#user-search")
+          .addEventListener("input", (e) => {
+            viewState.searchQuery = e.target.value;
+            viewState.currentPage = 1;
+            renderTable();
+          });
+        container
+          .querySelector("#user-filter")
+          .addEventListener("change", (e) => {
+            viewState.filter = e.target.value;
+            viewState.currentPage = 1;
+            renderTable();
+          });
+      }
+
+      async function openStoreStaffModal(storeId) {
+        const store = firestoreData.stores.find((s) => s.id === storeId);
+        if (!store) return showToast("Node not found.", "error");
+
+        const modalContent = `
+              <div id="staff-list-container" class="space-y-2 min-h-[100px] flex flex-col justify-center">
+                  <div class="text-center"><span class="loader-sm border-zinc-500 border-b-white"></span></div>
+              </div>
+          `;
+        const modal = showModal(
+          `Personnel: ${store.name}`,
+          modalContent,
+          `<button data-action="close-modal" class="btn btn-secondary">Close</button>`,
+          { size: "max-w-lg" },
+        );
+
+        try {
+          const staffQuery = query(collection(db, `stores/${storeId}/staff`));
+          const staffSnapshot = await getDocs(staffQuery);
+          const staffList = staffSnapshot.docs.map((doc) => doc.data());
+          const container = modal.querySelector("#staff-list-container");
+
+          if (staffList.length === 0) {
+            container.innerHTML =
+              '<p class="text-center text-zinc-500 text-sm">No personnel assigned.</p>';
+            return;
+          }
+
+          container.classList.remove("justify-center");
+          container.innerHTML = staffList
+            .map((staff) => {
+              const roleColor =
+                staff.role === "admin"
+                  ? "text-indigo-400 bg-indigo-500/10 border-indigo-500/20"
+                  : "text-zinc-300 bg-white/5 border-white/10";
+              return `
+                      <div class="flex items-center justify-between p-3 bg-[#121214] border border-white/5 rounded-lg">
+                          <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-xs font-medium text-zinc-400">${staff.name
+                              .charAt(0)
+                              .toUpperCase()}</div>
+                            <div>
+                                <p class="font-medium text-sm text-white">${
+                                  staff.name
+                                }</p>
+                                <p class="text-[10px] text-zinc-500 font-mono">${
+                                  staff.email
+                                }</p>
+                            </div>
+                          </div>
+                          <span class="px-2 py-0.5 text-[10px] font-medium rounded border ${roleColor} uppercase tracking-wider">${
+                staff.role
+              }</span>
+                      </div>
+                  `;
+            })
+            .join("");
+        } catch (error) {
+          modal.querySelector(
+            "#staff-list-container",
+          ).innerHTML = `<p class="text-center text-red-400 text-sm">Error: ${error.message}</p>`;
+        }
+      }
+
+      function renderSubscriptionsView() {
+        destroyCharts();
+        const container = document.getElementById("workspace-content");
+        const viewState = appState.viewStates.subscriptions;
+
+        container.innerHTML = `
+                <div class="max-w-7xl mx-auto space-y-4">
+                    <div class="flex w-full">
+                        <select id="subs-filter" class="form-select w-full sm:w-48 text-sm py-2 bg-surface border-white/5 shadow-none">
+                            <option value="pending" ${
+                              viewState.filter === "pending" ? "selected" : ""
+                            }>Pending Clearance</option>
+                            <option value="approved" ${
+                              viewState.filter === "approved" ? "selected" : ""
+                            }>Cleared</option>
+                            <option value="rejected" ${
+                              viewState.filter === "rejected" ? "selected" : ""
+                            }>Rejected</option>
+                        </select>
+                    </div>
+                    <div class="panel overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="table-pro">
+                                <thead><tr><th class="pl-6">Identity</th><th>Asset Plan</th><th>Transaction details</th><th class="text-right pr-6">Actions</th></tr></thead>
+                                <tbody id="subs-table-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div id="subs-pagination"></div>
+                </div>
+            `;
+        const renderTable = () => {
+          let filteredRequests = firestoreData.subscriptionRequests.filter(
+            (req) => req.status === viewState.filter,
+          );
+          const totalItems = filteredRequests.length;
+          const startIndex =
+            (viewState.currentPage - 1) * appState.itemsPerPage;
+          const paginatedRequests = filteredRequests.slice(
+            startIndex,
+            startIndex + appState.itemsPerPage,
+          );
+
+          const tableBody = container.querySelector("#subs-table-body");
+          tableBody.innerHTML = paginatedRequests.length
+            ? paginatedRequests
+                .map(
+                  (req) => `
+                        <tr>
+                            <td class="pl-6">
+                                <p class="font-medium text-white text-sm">${
+                                  req.userEmail
+                                }</p>
+                                <p class="font-mono text-[10px] text-zinc-500 mt-0.5">${req.userId.slice(
+                                  0,
+                                  10,
+                                )}...</p>
+                            </td>
+                            <td>
+                                <p class="font-medium text-indigo-400 text-sm">${
+                                  req.planName
+                                }</p>
+                                <p class="text-[11px] font-medium text-zinc-400 mt-0.5">৳${
+                                  req.planPrice
+                                }</p>
+                            </td>
+                            <td>
+                                <div class="flex flex-col gap-0.5 text-xs text-zinc-400 font-mono">
+                                  <span><span class="text-zinc-600">Method:</span> ${
+                                    req.paymentMethod
+                                  }</span>
+                                  <span><span class="text-zinc-600">TrxID:</span> <span class="text-white">${
+                                    req.transactionId
+                                  }</span></span>
+                                  <span><span class="text-zinc-600">Sender:</span> ${
+                                    req.senderNumber
+                                  }</span>
+                                </div>
+                            </td>
+                            <td class="text-right pr-6">
+                                ${
+                                  viewState.filter === "pending"
+                                    ? `
+                                <div class="flex justify-end gap-2">
+                                    <button data-action="reject-renewal" data-id="${req.id}" class="btn btn-secondary btn-sm text-red-400 hover:text-red-300 hover:border-red-500/30"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
+                                    <button data-action="approve-renewal" data-id="${req.id}" class="btn btn-primary btn-sm px-3">Authorize</button>
+                                </div>
+                                `
+                                    : `<div class="status-badge ${
+                                        req.status === "approved"
+                                          ? "active"
+                                          : "expired"
+                                      } float-right">${req.status}</div>`
+                                }
+                            </td>
+                        </tr>
+                `,
+                )
+                .join("")
+            : `<tr><td colspan="4" class="text-center py-12 text-zinc-500 text-sm">No ${viewState.filter} records.</td></tr>`;
+
+          renderPaginationControls(
+            container.querySelector("#subs-pagination"),
+            totalItems,
+            viewState.currentPage,
+            appState.itemsPerPage,
+            "subscriptions",
+          );
+          if (typeof lucide !== "undefined") lucide.createIcons();
+        };
+        renderTable();
+        container
+          .querySelector("#subs-filter")
+          .addEventListener("change", (e) => {
+            viewState.filter = e.target.value;
+            viewState.currentPage = 1;
+            renderTable();
+          });
+      }
+
+      function renderSupportTicketsView() {
+        destroyCharts();
+        const container = document.getElementById("workspace-content");
+        const viewState = appState.viewStates.support_tickets;
+
+        container.innerHTML = `
+                <div class="max-w-7xl mx-auto space-y-4">
+                    <div class="flex w-full">
+                        <select id="tickets-filter" class="form-select w-full sm:w-48 text-sm py-2 bg-surface border-white/5 shadow-none">
+                            <option value="open" ${
+                              viewState.filter === "open" ? "selected" : ""
+                            }>Open Signals</option>
+                            <option value="resolved" ${
+                              viewState.filter === "resolved" ? "selected" : ""
+                            }>Resolved Signals</option>
+                        </select>
+                    </div>
+                    <div class="panel overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="table-pro">
+                                <thead><tr><th class="pl-6">Origin</th><th>Subject</th><th>Timestamp</th><th>State</th><th class="text-right pr-6">Action</th></tr></thead>
+                                <tbody id="tickets-table-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div id="tickets-pagination"></div>
+                </div>
+            `;
+
+        const renderTable = () => {
+          let filteredTickets = firestoreData.supportTickets.filter(
+            (t) => t.status === viewState.filter,
+          );
+          const totalItems = filteredTickets.length;
+          const startIndex =
+            (viewState.currentPage - 1) * appState.itemsPerPage;
+          const paginatedTickets = filteredTickets.slice(
+            startIndex,
+            startIndex + appState.itemsPerPage,
+          );
+
+          const tableBody = container.querySelector("#tickets-table-body");
+          tableBody.innerHTML = paginatedTickets.length
+            ? paginatedTickets
+                .map(
+                  (ticket) => `
+                        <tr class="ticket-row cursor-pointer hover:bg-white/[0.02]" data-action="view-ticket" data-id="${
+                          ticket.id
+                        }">
+                            <td class="pl-6">
+                                <p class="font-medium text-white text-sm">${
+                                  ticket.userName || "Unknown"
+                                }</p>
+                                <p class="text-[11px] text-zinc-500 mt-0.5">${
+                                  ticket.userEmail
+                                }</p>
+                            </td>
+                            <td class="font-medium text-sm text-white">${
+                              ticket.subject
+                            }</td>
+                            <td class="text-xs text-zinc-500 font-mono">${
+                              ticket.ticketDate
+                                ? new Date(
+                                    ticket.ticketDate.toDate(),
+                                  ).toLocaleString()
+                                : "N/A"
+                            }</td>
+                            <td><div class="status-badge ${
+                              ticket.status === "open" ? "trial" : "active"
+                            }">${ticket.status}</div></td>
+                            <td class="text-right pr-6"><button class="btn btn-secondary btn-sm"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button></td>
+                        </tr>
+                        <tr class="ticket-message-row hidden" data-message-for="${
+                          ticket.id
+                        }">
+                            <td colspan="5" class="p-0 border-b border-white/5">
+                                <div class="px-8 py-6 bg-black/20 shadow-inner">
+                                    <div class="mb-4 flex flex-wrap gap-4 text-xs font-mono text-zinc-400">
+                                        <div><span class="text-zinc-600">ID:</span> ${
+                                          ticket.userId
+                                        }</div>
+                                        ${
+                                          ticket.userPhone
+                                            ? `<div><span class="text-zinc-600">Phone:</span> ${ticket.userPhone}</div>`
+                                            : ""
+                                        }
+                                    </div>
+                                    <div class="text-sm text-zinc-300 leading-relaxed bg-[#121214] p-4 rounded-lg border border-white/5 whitespace-pre-wrap">${
+                                      ticket.message
+                                    }</div>
+                                    <div class="mt-4 ticket-action-container"></div>
+                                </div>
+                            </td>
+                        </tr>
+                `,
+                )
+                .join("")
+            : `<tr><td colspan="5" class="text-center py-12 text-zinc-500 text-sm">No ${viewState.filter} signals.</td></tr>`;
+
+          renderPaginationControls(
+            container.querySelector("#tickets-pagination"),
+            totalItems,
+            viewState.currentPage,
+            appState.itemsPerPage,
+            "support_tickets",
+          );
+          if (typeof lucide !== "undefined") lucide.createIcons();
+        };
+        renderTable();
+        container
+          .querySelector("#tickets-filter")
+          .addEventListener("change", (e) => {
+            viewState.filter = e.target.value;
+            viewState.currentPage = 1;
+            renderTable();
+          });
+      }
+
+      function renderSettingsView() {
+        destroyCharts();
+        const container = document.getElementById("workspace-content");
+
+        container.innerHTML = `
+                <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="space-y-6">
+                      <!-- Global Params -->
+                      <div class="panel p-6">
+                          <div class="flex items-center gap-3 mb-5 pb-4 border-b border-white/5">
+                            <i data-lucide="sliders" class="w-5 h-5 text-indigo-400"></i>
+                            <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Global Parameters</h3>
+                          </div>
+                          <form id="settings-form" class="space-y-5">
+                              <div>
+                                  <label class="block text-xs font-medium text-zinc-400 mb-2">Sandbox Duration (Days)</label>
+                                  <div class="relative w-full max-w-[200px]">
+                                    <input type="number" id="trial-days" name="trialDays" class="form-input pl-9" value="${appState.settings.defaultTrialDays}">
+                                    <i data-lucide="clock" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500"></i>
+                                  </div>
+                              </div>
+                              <div class="pt-2">
+                                  <button type="submit" class="btn btn-primary btn-sm">Save Config</button>
+                              </div>
+                          </form>
+                      </div>
+
+                      <!-- Feature Flags -->
+                      <div class="panel p-6">
+                          <div class="flex items-center gap-3 mb-5 pb-4 border-b border-white/5">
+                            <i data-lucide="toggle-right" class="w-5 h-5 text-indigo-400"></i>
+                            <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Feature Flags</h3>
+                          </div>
+                          <div id="feature-flags-container" class="space-y-2"></div>
+                      </div>
+                    </div>
+
+                    <!-- Broadcast -->
+                    <div class="panel p-6 flex flex-col h-full">
+                        <div class="flex items-center gap-3 mb-5 pb-4 border-b border-white/5">
+                          <i data-lucide="radio" class="w-5 h-5 text-indigo-400"></i>
+                          <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Network Broadcast</h3>
+                        </div>
+                        <form id="broadcast-form" class="flex-grow flex flex-col space-y-4">
+                            <div class="flex-grow">
+                              <label class="block text-xs font-medium text-zinc-400 mb-2">Payload Data</label>
+                              <textarea name="message" class="form-textarea w-full h-full min-h-[150px] resize-none font-mono text-sm" placeholder="Enter transmission payload..."></textarea>
+                            </div>
+                            <div class="flex items-center gap-3 bg-[#121214] p-3 rounded-lg border border-white/5">
+                                <select name="type" class="form-select text-sm py-1.5 border-none shadow-none bg-transparent w-auto flex-grow focus:ring-0">
+                                    <option value="info">Standard (Info)</option>
+                                    <option value="success">Clearance (Success)</option>
+                                    <option value="warning">Alert (Warning)</option>
+                                </select>
+                                <button type="submit" class="btn btn-primary btn-sm shrink-0">Transmit</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            `;
+        renderFeatureFlags();
+        if (typeof lucide !== "undefined") lucide.createIcons();
+      }
+
+      function renderAuditLogView() {
+        destroyCharts();
+        const container = document.getElementById("workspace-content");
+        const viewState = appState.viewStates.audit_log;
+
+        let filteredLogs = firestoreData.auditLog;
+        if (viewState.filter !== "all")
+          filteredLogs = filteredLogs.filter(
+            (log) => log.type === viewState.filter,
+          );
+
+        const totalItems = filteredLogs.length;
+        const startIndex = (viewState.currentPage - 1) * appState.itemsPerPage;
+        const paginatedLogs = filteredLogs.slice(
+          startIndex,
+          startIndex + appState.itemsPerPage,
+        );
+
+        const logTypes = [
+          ...new Set(firestoreData.auditLog.map((log) => log.type)),
+        ];
+
+        container.innerHTML = `
+                <div class="max-w-7xl mx-auto space-y-4">
+                    <div class="flex w-full">
+                        <select id="audit-filter" class="form-select w-full sm:w-64 text-sm py-2 bg-surface border-white/5 shadow-none">
+                            <option value="all">Global Event Stream</option>
+                            ${logTypes
+                              .map(
+                                (type) =>
+                                  `<option value="${type}" ${
+                                    viewState.filter === type ? "selected" : ""
+                                  }>${type
+                                    .replace(/_/g, " ")
+                                    .replace(/\b\w/g, (l) =>
+                                      l.toUpperCase(),
+                                    )}</option>`,
+                              )
+                              .join("")}
+                        </select>
+                    </div>
+                    <div class="panel overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="table-pro">
+                                <thead><tr><th class="pl-6">Time</th><th>Initiator</th><th>Event</th><th class="pr-6">Payload</th></tr></thead>
+                                <tbody id="audit-table-body">
+                                    ${
+                                      paginatedLogs.length > 0
+                                        ? paginatedLogs
+                                            .map((log) => {
+                                              const ev = (log.type || "unknown")
+                                                .replace(/_/g, " ")
+                                                .toUpperCase();
+                                              return `
+                                    <tr>
+                                        <td class="pl-6 text-[11px] text-zinc-500 font-mono">${
+                                          log.timestamp
+                                            ? new Date(
+                                                log.timestamp.toDate(),
+                                              ).toLocaleString()
+                                            : "Processing..."
+                                        }</td>
+                                        <td>
+                                          <p class="font-medium text-white text-xs">${
+                                            log.user.name
+                                          }</p>
+                                          <p class="font-mono text-[10px] text-zinc-600">${log.user.id.slice(
+                                            0,
+                                            8,
+                                          )}</p>
+                                        </td>
+                                        <td><span class="text-[10px] font-mono text-indigo-400 bg-indigo-500/10 px-2 py-1 rounded">${ev}</span></td>
+                                        <td class="pr-6 text-xs text-zinc-400 truncate max-w-xs" title="${
+                                          log.details
+                                        }">${log.details}</td>
+                                    </tr>`;
+                                            })
+                                            .join("")
+                                        : `<tr><td colspan="4" class="text-center py-12 text-zinc-500 text-sm">No events.</td></tr>`
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                     <div id="audit-pagination"></div>
+                </div>
+            `;
+        renderPaginationControls(
+          container.querySelector("#audit-pagination"),
+          totalItems,
+          viewState.currentPage,
+          appState.itemsPerPage,
+          "audit_log",
+        );
+        container
+          .querySelector("#audit-filter")
+          .addEventListener("change", (e) => {
+            viewState.filter = e.target.value;
+            viewState.currentPage = 1;
+            renderAuditLogView();
+          });
+      }
+
+      async function openUserManagementModal(uid) {
+        const user = firestoreData.users.find((u) => u.id === uid);
+        if (!user) return;
+
+        const userStores = firestoreData.stores.filter(
+          (s) => s.ownerUid === uid,
+        );
+        const currentPlanLimits =
+          userStores.length > 0 && userStores[0].planLimits
+            ? userStores[0].planLimits
+            : { products: 1000, staff: 5, ai: "none" };
+        const sub = user.subscription || {};
+        const trialDateForInput = (sub.trialEndsAt
+          ? sub.trialEndsAt.toDate()
+          : new Date()
+        )
+          .toISOString()
+          .split("T")[0];
+
+        const content = `
+                <form id="user-management-form" class="space-y-6">
+                    <div class="flex items-center gap-4 mb-2">
+                        <div class="w-12 h-12 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-400 text-lg font-medium border border-white/5">${(
+                          user.displayName ||
+                          user.name ||
+                          "U"
+                        )
+                          .charAt(0)
+                          .toUpperCase()}</div>
+                        <div>
+                            <p class="text-base font-semibold text-white">${
+                              user.displayName ||
+                              user.name ||
+                              "Unknown Identity"
+                            }</p>
+                            <p class="text-xs text-zinc-500 font-mono">${
+                              user.id
+                            }</p>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4 border-t border-white/5 pt-4">
+                        <div>
+                            <label class="block text-[10px] font-medium text-zinc-500 uppercase tracking-wider mb-1.5">State</label>
+                            <select name="status" class="form-select text-sm py-1.5">
+                                <option value="trial" ${
+                                  sub.status === "trial" ? "selected" : ""
+                                }>Trial Sandbox</option>
+                                <option value="active" ${
+                                  sub.status === "active" ? "selected" : ""
+                                }>Active Clearance</option>
+                                <option value="expired" ${
+                                  sub.status === "expired" ? "selected" : ""
+                                }>Expired</option>
+                                <option value="disabled" ${
+                                  sub.status === "disabled" ? "selected" : ""
+                                }>Revoked</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-medium text-zinc-500 uppercase tracking-wider mb-1.5">Trial End</label>
+                            <input type="date" name="trialEnds" class="form-input text-sm py-1.5" value="${trialDateForInput}">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-medium text-zinc-500 uppercase tracking-wider mb-1.5">Nodes Limit</label>
+                            <input type="number" name="storeLimit" class="form-input text-sm py-1.5" min="1" value="${
+                              user.storeLimit || 1
+                            }">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-medium text-zinc-500 uppercase tracking-wider mb-1.5">Assets/Node</label>
+                            <input type="number" name="productLimit" class="form-input text-sm py-1.5" min="1" value="${
+                              currentPlanLimits.products
+                            }">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-medium text-zinc-500 uppercase tracking-wider mb-1.5">Staff/Node</label>
+                            <input type="number" name="staffLimit" class="form-input text-sm py-1.5" min="1" value="${
+                              currentPlanLimits.staff
+                            }">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-medium text-zinc-500 uppercase tracking-wider mb-1.5">AI Engine</label>
+                            <select name="aiLevel" class="form-select text-sm py-1.5">
+                                <option value="none" ${
+                                  currentPlanLimits.ai === "none"
+                                    ? "selected"
+                                    : ""
+                                }>Disabled</option>
+                                <option value="basic" ${
+                                  currentPlanLimits.ai === "basic"
+                                    ? "selected"
+                                    : ""
+                                }>Basic</option>
+                                <option value="advanced" ${
+                                  currentPlanLimits.ai === "advanced"
+                                    ? "selected"
+                                    : ""
+                                }>Advanced</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            `;
+        const footer = `<button data-action="close-modal" class="btn btn-secondary text-sm">Cancel</button><button type="submit" form="user-management-form" class="btn btn-primary text-sm">Save Changes</button>`;
+        const modal = showModal(`Configure Identity`, content, footer, {
+          size: "max-w-md",
+        });
+
+        modal
+          .querySelector("#user-management-form")
+          .addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const fd = new FormData(e.target);
+            const status = fd.get("status"),
+              ends = new Date(fd.get("trialEnds")),
+              stLimit = parseInt(fd.get("storeLimit")),
+              prLimit = parseInt(fd.get("productLimit")),
+              sfLimit = parseInt(fd.get("staffLimit")),
+              aiLvl = fd.get("aiLevel");
+            if (
+              isNaN(stLimit) ||
+              stLimit < 1 ||
+              isNaN(prLimit) ||
+              prLimit < 1 ||
+              isNaN(sfLimit) ||
+              sfLimit < 1
+            )
+              return;
+
+            await updateDoc(doc(db, "users", uid), {
+              "subscription.status": status,
+              "subscription.trialEndsAt": Timestamp.fromDate(ends),
+              storeLimit: stLimit,
+            });
+            if (userStores.length > 0) {
+              const batch = writeBatch(db);
+              userStores.forEach((s) =>
+                batch.update(doc(db, "stores", s.id), {
+                  "planLimits.products": prLimit,
+                  "planLimits.staff": sfLimit,
+                  "planLimits.ai": aiLvl,
+                }),
+              );
+              await batch.commit();
+            }
+            await addDoc(collection(db, "global_audit_log"), {
+              type: "user_settings_updated",
+              timestamp: serverTimestamp(),
+              details: `Updated ${user.displayName || uid}. Status:${status}`,
+              user: { id: auth.currentUser.uid, name: "Admin" },
+            });
+            closeModal(modal);
+          });
+      }
+
+      async function updateGlobalSettings(newSettings) {
+        await setDoc(doc(db, "global_settings", "app_config"), newSettings, {
+          merge: true,
+        });
+      }
+
+      function renderFeatureFlags() {
+        const container = document.getElementById("feature-flags-container");
+        const flags = [
+          {
+            id: "aiAssistantEnabled",
+            name: "AI Interface",
+            desc: "Enable global AI assistant.",
+          },
+          {
+            id: "smartSuggestionsEnabled",
+            name: "Predictive Analytics",
+            desc: "Enable AI suggestions.",
+          },
+        ];
+        container.innerHTML = flags
+          .map((flag) => {
+            const isEnabled = appState.settings.featureFlags[flag.id] !== false;
+            return `
+                <div class="flex items-center justify-between p-3 bg-[#121214] rounded-lg border border-white/5">
+                    <div>
+                        <p class="text-sm font-medium text-white">${
+                          flag.name
+                        }</p>
+                        <p class="text-[10px] text-zinc-500">${flag.desc}</p>
+                    </div>
+                    <label class="toggle-switch-label">
+                        <input type="checkbox" data-action="toggle-feature-flag" data-flag-id="${
+                          flag.id
+                        }" class="toggle-switch-input" ${
+              isEnabled ? "checked" : ""
+            }>
+                        <div class="toggle-switch-track"><div class="toggle-switch-thumb"></div></div>
+                    </label>
+                </div>`;
+          })
+          .join("");
+      }
+
+      const initFirebaseListeners = () => {
+        const unsubSettings = onSnapshot(
+          doc(db, "global_settings", "app_config"),
+          (docSnap) => {
+            if (docSnap.exists())
+              appState.settings = { ...appState.settings, ...docSnap.data() };
+            if (appState.activeView === "settings") renderSettingsView();
+          },
+        );
+        activeListeners.push(unsubSettings);
+
+        const unsubStores = onSnapshot(
+          query(collection(db, "stores")),
+          (snapshot) => {
+            firestoreData.stores = snapshot.docs.map((doc) => ({
+              id: doc.id,
+              ...doc.data(),
+            }));
+            if (appState.activeView === "dashboard") renderDashboardView();
+            if (appState.activeView === "users") renderUsersView();
+          },
+        );
+        activeListeners.push(unsubStores);
+
+        const unsubAudit = onSnapshot(
+          query(
+            collection(db, "global_audit_log"),
+            orderBy("timestamp", "desc"),
+            limit(100),
+          ),
+          (snapshot) => {
+            firestoreData.auditLog = snapshot.docs.map((doc) => ({
+              id: doc.id,
+              ...doc.data(),
+            }));
+            if (appState.activeView === "audit_log") renderAuditLogView();
+          },
+        );
+        activeListeners.push(unsubAudit);
+
+        const unsubSubs = onSnapshot(
+          query(
+            collection(db, "subscription_requests"),
+            orderBy("requestDate", "desc"),
+          ),
+          (snapshot) => {
+            if (isInitialDataLoaded.subscriptions) {
+              const batch = writeBatch(db);
+              let hasNew = false;
+              snapshot.docChanges().forEach((change) => {
+                if (
+                  change.type === "added" &&
+                  !processedNotificationIds.has(change.doc.id)
+                ) {
+                  processedNotificationIds.add(change.doc.id);
+                  batch.set(doc(collection(db, "global_notifications")), {
+                    timestamp: serverTimestamp(),
+                    read: false,
+                    message: `Clearance request from ${
+                      change.doc.data().userEmail
+                    }`,
+                    icon: "credit-card",
+                  });
+                  hasNew = true;
+                }
+              });
+              if (hasNew) batch.commit().catch(console.error);
+            }
+            firestoreData.subscriptionRequests = snapshot.docs.map((doc) => ({
+              id: doc.id,
+              ...doc.data(),
+            }));
+            isInitialDataLoaded.subscriptions = true;
+            if (appState.activeView === "dashboard") renderDashboardView();
+            if (appState.activeView === "subscriptions")
+              renderSubscriptionsView();
+          },
+        );
+        activeListeners.push(unsubSubs);
+
+        const unsubTickets = onSnapshot(
+          query(
+            collection(db, "support_tickets"),
+            orderBy("ticketDate", "desc"),
+          ),
+          (snapshot) => {
+            if (isInitialDataLoaded.tickets) {
+              const batch = writeBatch(db);
+              let hasNew = false;
+              snapshot.docChanges().forEach((change) => {
+                if (
+                  change.type === "added" &&
+                  !processedNotificationIds.has(change.doc.id)
+                ) {
+                  processedNotificationIds.add(change.doc.id);
+                  batch.set(doc(collection(db, "global_notifications")), {
+                    timestamp: serverTimestamp(),
+                    read: false,
+                    message: `Signal: ${change.doc.data().subject}`,
+                    icon: "life-buoy",
+                  });
+                  hasNew = true;
+                }
+              });
+              if (hasNew) batch.commit().catch(console.error);
+            }
+            firestoreData.supportTickets = snapshot.docs.map((doc) => ({
+              id: doc.id,
+              ...doc.data(),
+            }));
+            isInitialDataLoaded.tickets = true;
+            if (appState.activeView === "dashboard") renderDashboardView();
+            if (appState.activeView === "support_tickets")
+              renderSupportTicketsView();
+          },
+        );
+        activeListeners.push(unsubTickets);
+
+        const unsubUsers = onSnapshot(
+          query(collection(db, "users")),
+          async (snapshot) => {
+            if (isInitialDataLoaded.users) {
+              const batch = writeBatch(db);
+              let hasNew = false;
+              snapshot.docChanges().forEach((change) => {
+                if (
+                  change.type === "added" &&
+                  !processedNotificationIds.has(change.doc.id)
+                ) {
+                  processedNotificationIds.add(change.doc.id);
+                  batch.set(doc(collection(db, "global_notifications")), {
+                    timestamp: serverTimestamp(),
+                    read: false,
+                    message: `Identity registered: ${
+                      change.doc.data().displayName || "Unknown"
+                    }`,
+                    icon: "user-plus",
+                  });
+                  hasNew = true;
+                }
+              });
+              if (hasNew) batch.commit().catch(console.error);
+            }
+
+            const updatedUsers = await Promise.all(
+              snapshot.docs
+                .map((doc) => ({ id: doc.id, ...doc.data() }))
+                .map(async (user) => {
+                  let enriched = { ...user };
+                  if (!enriched.subscription) {
+                    const ends = new Date(
+                      enriched.createdAt
+                        ? enriched.createdAt.toDate()
+                        : new Date(),
+                    );
+                    ends.setDate(
+                      ends.getDate() + appState.settings.defaultTrialDays,
+                    );
+                    const def = {
+                      status: "trial",
+                      trialEndsAt: Timestamp.fromDate(ends),
+                    };
+                    if ((await getDoc(doc(db, "users", enriched.id))).exists())
+                      await updateDoc(doc(db, "users", enriched.id), {
+                        subscription: def,
+                      });
+                    enriched.subscription = def;
+                  }
+                  if (!enriched.displayName && enriched.stores?.length > 0) {
+                    try {
+                      const sDoc = await getDoc(
+                        doc(
+                          db,
+                          "stores",
+                          enriched.currentStoreId || enriched.stores[0].id,
+                          "staff",
+                          enriched.id,
+                        ),
+                      );
+                      if (sDoc.exists()) {
+                        enriched.displayName = sDoc.data().name;
+                        enriched.email = sDoc.data().email;
+                        await updateDoc(doc(db, "users", enriched.id), {
+                          displayName: sDoc.data().name,
+                          email: sDoc.data().email,
+                        });
+                      }
+                    } catch (e) {}
+                  }
+                  return enriched;
+                }),
+            );
+
+            const batch = writeBatch(db);
+            let changed = false;
+            const now = new Date();
+            updatedUsers.forEach((u) => {
+              const s = u.subscription;
+              if (!s) return;
+              let ns = s.status;
+              if (s.status === "trial" && s.trialEndsAt?.toDate() < now)
+                ns = "expired";
+              if (s.status === "active" && s.expiresAt?.toDate() < now)
+                ns = "expired";
+              if (ns !== s.status) {
+                batch.update(doc(db, "users", u.id), {
+                  "subscription.status": ns,
+                });
+                changed = true;
+                u.subscription.status = ns;
+              }
+            });
+            if (changed) batch.commit().catch(console.error);
+
+            firestoreData.users = updatedUsers;
+            isInitialDataLoaded.users = true;
+            if (appState.activeView === "dashboard") renderDashboardView();
+            if (appState.activeView === "users") renderUsersView();
+          },
+        );
+        activeListeners.push(unsubUsers);
+
+        const unsubNotifs = onSnapshot(
+          query(
+            collection(db, "global_notifications"),
+            orderBy("timestamp", "desc"),
+            limit(20),
+          ),
+          (snapshot) => {
+            snapshot.docChanges().forEach((change) => {
+              if (
+                change.type === "added" &&
+                change.doc.data().timestamp?.toDate() > sessionStartTime
+              ) {
+                showToast(
+                  change.doc.data().message.replace(/<[^>]*>?/gm, ""),
+                  "info",
+                );
+                playNotificationSound();
+              }
+            });
+            firestoreData.notifications = snapshot.docs.map((doc) => ({
+              id: doc.id,
+              ...doc.data(),
+            }));
+            updateNotificationBadge();
+          },
+        );
+        activeListeners.push(unsubNotifs);
+      };
+
+      const renderActiveView = () => {
+        document
+          .querySelectorAll("#main-nav a")
+          .forEach((a) =>
+            a.classList.toggle(
+              "active",
+              a.dataset.view === appState.activeView,
+            ),
+          );
+        const viewNameEl = document.querySelector(
+          `#main-nav a[data-view="${appState.activeView}"] .tooltip`,
+        );
+        document.getElementById("view-title").textContent = viewNameEl
+          ? viewNameEl.textContent
+          : "Overview";
+        switch (appState.activeView) {
+          case "users":
+            renderUsersView();
+            break;
+          case "subscriptions":
+            renderSubscriptionsView();
+            break;
+          case "support_tickets":
+            renderSupportTicketsView();
+            break;
+          case "audit_log":
+            renderAuditLogView();
+            break;
+          case "settings":
+            renderSettingsView();
+            break;
+          default:
+            renderDashboardView();
+            break;
+        }
+        if (typeof lucide !== "undefined") lucide.createIcons();
+      };
+
+      document.getElementById("main-nav").addEventListener("click", (e) => {
+        const link = e.target.closest("a[data-view]");
+        if (link) {
+          e.preventDefault();
+          appState.activeView = link.dataset.view;
+          renderActiveView();
+        }
+      });
+
+      document.body.addEventListener("click", async (e) => {
+        const target = e.target.closest("[data-action]");
+        if (!target) return;
+        const { action, id, uid, flagId, storeId } = target.dataset;
+
+        if (action === "open-notifications") openNotificationsModal();
+        if (action === "close-modal")
+          closeModal(target.closest(".modal-overlay"));
+        if (action === "manage-user") openUserManagementModal(uid);
+        if (action === "logout") signOut(auth);
+
+        if (action === "toggle-stores") {
+          const uRow = target.closest(".user-row");
+          const sRow = uRow.nextElementSibling;
+          uRow.classList.toggle("expanded");
+          sRow.classList.toggle("hidden");
+          const icon = uRow.querySelector("i[data-lucide]");
+          if (icon) {
+            icon.setAttribute(
+              "data-lucide",
+              uRow.classList.contains("expanded")
+                ? "chevron-up"
+                : "chevron-down",
+            );
+            lucide.createIcons();
+          }
+        }
+        if (action === "view-store-staff") {
+          e.stopPropagation();
+          openStoreStaffModal(storeId);
+        }
+        if (action === "quick-nav") {
+          appState.activeView = target.dataset.view;
+          renderActiveView();
+        }
+        if (action === "paginate") {
+          const vt = target.dataset.viewType;
+          const p = parseInt(target.dataset.page);
+          if (appState.viewStates[vt]) {
+            appState.viewStates[vt].currentPage = p;
+            renderActiveView();
+          }
+        }
+
+        if (action === "approve-renewal") {
+          const request = firestoreData.subscriptionRequests.find(
+            (r) => r.id === id,
+          );
+          if (!request) return;
+          const modal = showModal(
+            "Authorize",
+            `Grant clearance for '${request.planName}' to ${request.userEmail}?`,
+            `<button data-action="close-modal" class="btn btn-secondary">Cancel</button><button id="confirm-approve" class="btn btn-primary">Confirm</button>`,
+          );
+          modal
+            .querySelector("#confirm-approve")
+            .addEventListener("click", async () => {
+              const btn = modal.querySelector("#confirm-approve");
+              btn.disabled = true;
+              btn.innerHTML = `<span class="loader-sm border-indigo-200"></span>`;
+              try {
+                let limits = request.planLimits,
+                  dur = request.planDuration,
+                  pName = request.planName;
+                if (!limits) {
+                  const fp = LOCAL_PLANS_DETAILS[request.planId];
+                  limits = fp.limits;
+                  dur = fp.duration;
+                  pName = fp.name;
+                }
+                const userSnap = await getDoc(doc(db, "users", request.userId));
+                const curExp =
+                  userSnap.data().subscription?.expiresAt?.toDate() ||
+                  new Date();
+                const now = new Date();
+                const newExp = new Date(curExp > now ? curExp : now);
+                newExp.setDate(
+                  newExp.getDate() + (dur === "yearly" ? 365 : 30),
+                );
+
+                const uStores = firestoreData.stores.filter(
+                  (s) => s.ownerUid === request.userId,
+                );
+                const sfIds = new Set();
+                for (const s of uStores) {
+                  (
+                    await getDocs(query(collection(db, `stores/${s.id}/staff`)))
+                  ).docs.forEach((d) => sfIds.add(d.id));
+                }
+                sfIds.delete(request.userId);
+
+                const batch = writeBatch(db);
+                batch.update(doc(db, "users", request.userId), {
+                  "subscription.status": "active",
+                  "subscription.planId": request.planId,
+                  "subscription.planName": pName,
+                  "subscription.expiresAt": Timestamp.fromDate(newExp),
+                  storeLimit: limits.stores,
+                });
+                uStores.forEach((s) =>
+                  batch.update(doc(db, "stores", s.id), {
+                    "planLimits.products": limits.products,
+                    "planLimits.staff": limits.staff,
+                    "planLimits.ai": limits.ai,
+                    planName: pName,
+                  }),
+                );
+                sfIds.forEach((sid) =>
+                  batch.update(doc(db, "users", sid), {
+                    "subscription.status": "active",
+                    "subscription.planId": request.planId,
+                    "subscription.planName": pName,
+                    "subscription.expiresAt": Timestamp.fromDate(newExp),
+                  }),
+                );
+                batch.update(doc(db, "subscription_requests", id), {
+                  status: "approved",
+                  processedBy: auth.currentUser.email,
+                  processedAt: serverTimestamp(),
+                });
+                await batch.commit();
+
+                await addDoc(collection(db, "global_audit_log"), {
+                  type: "subscription_approved",
+                  timestamp: serverTimestamp(),
+                  details: `Authorized '${pName}' for ${request.userEmail}.`,
+                  user: { id: auth.currentUser.uid, name: "Admin" },
+                });
+                showToast("Clearance granted", "success");
+                closeModal(modal);
+              } catch (err) {
+                showToast(err.message, "error");
+                btn.disabled = false;
+                btn.innerHTML = "Confirm";
+              }
+            });
+        }
+        if (action === "reject-renewal") {
+          const modal = showModal(
+            "Reject",
+            `Reject clearance?`,
+            `<button data-action="close-modal" class="btn btn-secondary">Cancel</button><button id="confirm-reject" class="btn btn-danger">Reject</button>`,
+          );
+          modal
+            .querySelector("#confirm-reject")
+            .addEventListener("click", async () => {
+              await updateDoc(doc(db, "subscription_requests", id), {
+                status: "rejected",
+              });
+              closeModal(modal);
+            });
+        }
+        if (action === "view-ticket") {
+          const row = target.closest(".ticket-row");
+          const msg = row.nextElementSibling;
+          row.classList.toggle("bg-white/[0.02]");
+          msg.classList.toggle("hidden");
+          const ticket = firestoreData.supportTickets.find(
+            (t) => t.id === row.dataset.id,
+          );
+          const act = msg.querySelector(".ticket-action-container");
+          if (ticket.status === "open" && act.innerHTML === "") {
+            act.innerHTML = `<button data-action="resolve-ticket" data-id="${ticket.id}" class="btn btn-sm btn-primary">Mark Resolved</button>`;
+          } else if (ticket.status !== "open") act.innerHTML = "";
+        }
+        if (action === "resolve-ticket") {
+          await updateDoc(doc(db, "support_tickets", id), {
+            status: "resolved",
+          });
+          showToast("Signal resolved");
+        }
+        if (action === "toggle-feature-flag") {
+          appState.settings.featureFlags[flagId] = e.target.checked;
+          await updateGlobalSettings({
+            featureFlags: appState.settings.featureFlags,
+          });
+        }
+        if (action === "toggle-store-enabled") {
+          e.stopPropagation();
+          await updateDoc(doc(db, "stores", storeId), {
+            isEnabled: e.target.checked,
+          });
+          await addDoc(collection(db, "global_audit_log"), {
+            type: "store_status_changed",
+            timestamp: serverTimestamp(),
+            details: `Node ${storeId} forced ${
+              e.target.checked ? "Online" : "Offline"
+            }`,
+            user: { id: auth.currentUser.uid, name: "Admin" },
+          });
+        }
+      });
+
+      document.body.addEventListener("submit", async (e) => {
+        const form = e.target;
+        if (form.id === "settings-form") {
+          e.preventDefault();
+          const d = parseInt(form.trialDays.value);
+          if (!isNaN(d)) {
+            await updateGlobalSettings({ defaultTrialDays: d });
+            showToast("Config saved");
+          }
+        }
+        if (form.id === "broadcast-form") {
+          e.preventDefault();
+          const msg = form.message.value,
+            typ = form.type.value;
+          if (!msg.trim()) return;
+          const batch = writeBatch(db);
+          firestoreData.stores.forEach((s) =>
+            batch.set(doc(collection(db, `stores/${s.id}/notifications`)), {
+              date: new Date().toISOString(),
+              message: `[SYS] ${msg}`,
+              type: typ,
+              read: false,
+              targetRoles: ["admin", "manager", "cashier"],
+            }),
+          );
+          await batch.commit();
+          await addDoc(collection(db, "global_audit_log"), {
+            type: "broadcast_sent",
+            timestamp: serverTimestamp(),
+            details: `Sent override: "${msg}"`,
+            user: { id: auth.currentUser.uid, name: "Admin" },
+          });
+          showToast("Broadcast sent");
+          form.reset();
+        }
+      });
+
+      document
+        .getElementById("global-search-input")
+        .addEventListener("input", (e) => {
+          appState.activeView = "users";
+          appState.viewStates.users.searchQuery = e.target.value;
+          appState.viewStates.users.currentPage = 1;
+          renderActiveView();
+          const us = document.getElementById("user-search");
+          if (us) us.value = e.target.value;
+        });
+
+      onAuthStateChanged(auth, (user) => {
+        const lc = document.getElementById("login-container"),
+          ac = document.getElementById("app-container"),
+          lo = document.getElementById("loading-overlay");
+        if (user && user.email === "admin@cashshilpo.com") {
+          lc.style.display = "none";
+          ac.style.display = "flex";
+          if (activeListeners.length === 0) initFirebaseListeners();
+          if (!clockInterval) {
+            updateClock();
+            clockInterval = setInterval(updateClock, 1000);
+          }
+          renderActiveView();
+        } else {
+          if (user) signOut(auth);
+          lc.style.display = "flex";
+          ac.style.display = "none";
+          lo.style.display = "none";
+          if (clockInterval) clearInterval(clockInterval);
+          clockInterval = null;
+          activeListeners.forEach((u) => u());
+          activeListeners = [];
+          processedNotificationIds.clear();
+        }
+      });
+
+      document.getElementById("login-form").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const err = document.getElementById("auth-error"),
+          btn = e.target.querySelector('button[type="submit"]'),
+          org = btn.innerHTML;
+        err.classList.add("hidden");
+        btn.innerHTML = `<span class="loader-sm border-indigo-200"></span>`;
+        btn.disabled = true;
+        signInWithEmailAndPassword(
+          auth,
+          e.target.email.value,
+          e.target.password.value,
+        ).catch(() => {
+          err.textContent = "Invalid Credentials";
+          err.classList.remove("hidden");
+          btn.innerHTML = org;
+          btn.disabled = false;
+        });
+      });
+
+      if (typeof lucide !== "undefined") lucide.createIcons();
+    </script>
+  </body>
+</html>

@@ -9,7 +9,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link
       rel="shortcut icon"
-      href="cashshilpo-official-fav.png"
+      href="The Official-Cashsilpo-Fav.png"
       type="image/x-icon"
     />
 
@@ -851,7 +851,7 @@
           ".animate-fade-in-up, " +
             ".animate-fade-in, " +
             ".animate-scale-in, " +
-            ".animate-stagger-children"
+            ".animate-stagger-children",
         );
 
         const observerOptions = {
@@ -921,7 +921,7 @@
             console.error("Anonymous sign-in failed:", error);
             showFormMessage(
               "Could not connect to support system. Please check your internet connection.",
-              "error"
+              "error",
             );
           });
         }
@@ -956,7 +956,7 @@
         if (!user) {
           showFormMessage(
             "Not connected. Please wait a moment and try again.",
-            "error"
+            "error",
           );
           return;
         }
@@ -990,13 +990,13 @@
           // 4. Add document to the 'support_tickets' collection
           const docRef = await addDoc(
             collection(db, "support_tickets"),
-            ticketData
+            ticketData,
           );
 
           // 5. Show success
           showFormMessage(
             "Your ticket has been sent! Our team will get back to you soon.",
-            "success"
+            "success",
           );
           supportForm.reset();
         } catch (error) {
@@ -1004,7 +1004,7 @@
           console.error("Error sending support ticket:", error);
           showFormMessage(
             "An error occurred. Please try again later.",
-            "error"
+            "error",
           );
         } finally {
           // 7. Reset button

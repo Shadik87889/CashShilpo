@@ -8,7 +8,7 @@
     <!-- Favicon -->
     <link
       rel="shortcut icon"
-      href="cashshilpo-official-fav.png"
+      href="The Official-Cashsilpo-Fav.png"
       type="image/x-icon"
     />
 
@@ -1239,35 +1239,35 @@
           if (isNaN(monthlyPrice)) return;
           const originalYearlyPrice = monthlyPrice * 12;
           const discountedYearlyPrice = Math.round(
-            originalYearlyPrice * (1 - YEARLY_DISCOUNT_PERCENT / 100)
+            originalYearlyPrice * (1 - YEARLY_DISCOUNT_PERCENT / 100),
           );
 
           card.querySelector(
-            ".price-monthly-value"
+            ".price-monthly-value",
           ).innerHTML = `৳${formatter.format(monthlyPrice)}`;
           card.querySelector(
-            ".price-yearly-original"
+            ".price-yearly-original",
           ).innerHTML = `৳${formatter.format(originalYearlyPrice)}`;
           card.querySelector(
-            ".price-yearly-discounted"
+            ".price-yearly-discounted",
           ).innerHTML = `৳${formatter.format(discountedYearlyPrice)}`;
           card.querySelector(
-            ".price-yearly-save"
+            ".price-yearly-save",
           ).innerHTML = `Save ${YEARLY_DISCOUNT_PERCENT}%`;
 
           const monthlyBtn = card.querySelector(
-            '.btn-renew[data-plan-id$="_monthly"]'
+            '.btn-renew[data-plan-id$="_monthly"]',
           );
           const yearlyBtn = card.querySelector(
-            '.btn-renew[data-plan-id$="_yearly"]'
+            '.btn-renew[data-plan-id$="_yearly"]',
           );
           if (monthlyBtn)
             monthlyBtn.innerHTML = `Renew Monthly (৳${formatter.format(
-              monthlyPrice
+              monthlyPrice,
             )})`;
           if (yearlyBtn)
             yearlyBtn.innerHTML = `Renew Yearly (৳${formatter.format(
-              discountedYearlyPrice
+              discountedYearlyPrice,
             )})`;
         });
       }
@@ -1275,7 +1275,7 @@
       // --- Scroll Animation Logic ---
       function setupAnimations() {
         const animatedElements = document.querySelectorAll(
-          ".animate-fade-in-up, .animate-scale-in, .animate-stagger-children"
+          ".animate-fade-in-up, .animate-scale-in, .animate-stagger-children",
         );
         const generalObserver = new IntersectionObserver(
           (entries, observer) => {
@@ -1286,7 +1286,7 @@
               }
             });
           },
-          { threshold: 0.1 }
+          { threshold: 0.1 },
         );
         animatedElements.forEach((item) => generalObserver.observe(item));
       }
@@ -1323,10 +1323,10 @@
         // This is an active, paying customer. Show "Upgrade" logic.
         if (subStatus.isValid && subStatus.status === "active") {
           document.getElementById(
-            "main-header"
+            "main-header",
           ).innerHTML = `MANAGE YOUR <span class="text-accent">SUBSCRIPTION.</span>`;
           document.getElementById(
-            "main-subheader"
+            "main-subheader",
           ).textContent = `You are currently on the ${
             plans[subStatus.planId]?.name || "current plan"
           }. Choose to upgrade your plan or switch to yearly billing to save.`;
@@ -1344,10 +1344,10 @@
             const cardPlanLevel = planHierarchy[planBase];
             const cardBadge = card.querySelector(".plan-badge");
             const monthlyBtn = card.querySelector(
-              '.btn-renew[data-plan-id$="_monthly"]'
+              '.btn-renew[data-plan-id$="_monthly"]',
             );
             const yearlyBtn = card.querySelector(
-              '.btn-renew[data-plan-id$="_yearly"]'
+              '.btn-renew[data-plan-id$="_yearly"]',
             );
 
             // --- Apply logic to both monthly and yearly buttons for this card ---
@@ -1425,7 +1425,7 @@
         // This is an expired or trial user. Show "Renew" logic.
         else {
           document.getElementById(
-            "main-header"
+            "main-header",
           ).innerHTML = `RENEW YOUR <span class="text-accent">SUBSCRIPTION.</span>`;
           let subheaderText =
             "Choose the plan that's right for you. Your account will be reactivated upon payment verification.";
@@ -1483,7 +1483,7 @@
             mobileMenu.classList.toggle("hidden");
             menuIcon.setAttribute(
               "data-lucide",
-              mobileMenu.classList.contains("hidden") ? "menu" : "x"
+              mobileMenu.classList.contains("hidden") ? "menu" : "x",
             );
             lucide.createIcons();
           });
@@ -1529,7 +1529,7 @@
         } else {
           // Fallback if params are missing (legacy link?)
           console.warn(
-            "Subscription status not found in URL. Defaulting to 'expired' view."
+            "Subscription status not found in URL. Defaulting to 'expired' view.",
           );
           updateUIForSubscription({
             isValid: false,

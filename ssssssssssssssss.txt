@@ -1,0 +1,1958 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- WORLD-CLASS SEO META TAGS -->
+    <title>
+      CashShilpo (ক্যাশশিল্প) | Best POS & Business Management Software
+    </title>
+
+    <meta
+      name="description"
+      content="CashShilpo (ক্যাশশিল্প) is the ultimate cloud-based POS and complete business management software. Seamlessly streamline sales, track real-time inventory, manage daily accounting, billing, and boost your overall business growth. Built for retail, pharmacy, grocery, restaurant, and super shops. Top choice for SMEs in Bangladesh (দোকান ও ব্যবসার হিসাব) and globally. Start your 7-day free trial today!"
+    />
+
+    <!-- MASSIVE KEYWORD LIST -->
+    <meta
+      name="keywords"
+      content="CashShilpo, cashsilpo, ক্যাশশিল্প, CashShilpo app, cash shilpo, best POS software, POS software in Bangladesh, POS BD, point of sale software, cloud POS, retail POS, inventory management system, billing software, business management software, accounting software, SME software, erp software for small business, dokan management software, dokan hisab app, babsar hisab nikash, babsar hisab app, becha kena software, hisaber khata, tally khata, kash khata, daily ledger, bakir hisab app, mudir dokan software, pharmacy software bd, supershop pos, restaurant pos bangladesh, cafe pos, fashion store pos, electronics shop billing, hardware store pos, jewelry store pos, pos software for supermarket, cheap pos software, affordable pos system, offline pos, mobile pos, android pos, ipad pos, windows pos system, best inventory software, stock management software, warehouse management, simple billing app, invoice maker, receipt generator bd, daily cash register, staff management software, retail analytics, multi-store pos, daybook app, বেস্ট পস সফটওয়্যার, সেরা পস সফটওয়্যার, দোকান ম্যানেজমেন্ট, ব্যবসার হিসাব, বেচাকেনা সফটওয়্যার, ইনভেন্টরি ম্যানেজমেন্ট, স্টক ম্যানেজমেন্ট সফটওয়্যার, মুদি দোকান হিসাব সফটওয়্যার, ফার্মেসি সফটওয়্যার, রেস্টুরেন্ট পস, সুপার শপ পস, ক্লাউড পস, অ্যাকাউন্টিং সফটওয়্যার, বিলিং সফটওয়্যার, বাকির খাতা, হিসাব খাতা, ক্যাশ খাতা, ক্যাশ বই, ক্যাশ মেমো, ইনভয়েস সফটওয়্যার, দৈনিক হিসাব, ব্যবসার হিসাব রাখার অ্যাপ, কিস্তি হিসাব, পস সিস্টেম বাংলাদেশ, ঢাকা পস সফটওয়্যার, ব্যবসার সহজ সমাধান, dokaner hisab, dokan hishab, dokan pos, best billing software in dhaka, pos for retail store, POS terminal, POS machine bd, bd best pos, cashsilpo login, cashsilpo download, shilpo pos, cash industry, business automation software bd, barcode generator, quotation management, customer management software, POS CRM, retail CRM bd, expense tracking software, payroll management pos, business insights, pos database, top 10 pos software, pos application, store management system bd, best shop management app, inventory tracker, low stock alert software, pos with offline mode, sync pos software, restaurant billing app, pharmacy inventory app, cloth store pos, shoes store pos, mobile shop pos, cosmetics pos, book store pos bd, rokomari pos, best inventory app bangladesh, inventory and billing, accounting app, business ledger, accounts payable receivable, gst pos, vat billing software bd, mushak billing, tax ready pos, NBR approved POS, modern pos, user friendly pos, Md Shadik Hossain Talukder, Md Shadik Hossain, Shadik Hossain Talukder, Shadik, Shadik Hossain, Talukder, Shadik Talukder, Shakib Talukder, Md Shadik, Shadik Hossain Shakib, Hossain, CEO of CashShilpo, Lead Developer CashShilpo, CashShilpo founder, best pos developer bd, software engineer bangladesh, top tech ceo bangladesh, Rural Peace, startup founder dhaka, b2b saas bangladesh, saas founder bangladesh, pos price in bd, point of sale terminal bangladesh, digital hisaber khata, online babsar hisab, shop management app bd, online store pos, small business pos bd, micro merchant pos, hisab pati app, becha kena tracker, inventory management software bangladesh, stock software bd, inventory app android bd, stock update software, wholesale pos, distributor pos bangladesh, retail erp bd, pos machine price in bangladesh, barcode scanner pos, thermal printer pos bd, cash drawer pos software, bluetooth printer pos, restaurant management software bd, f&b pos bangladesh, fast food pos, coffee shop pos bd, sweet shop pos, mistir dokan software, bakery pos bangladesh, bakery shop management, hardware dokan hisab, sanitary shop pos, tiles shop pos bd, mobile accessories shop pos, electronics shop hisab, motor parts shop pos, auto parts inventory software, cosmetics shop hisab bd, beauty parlor management software bd, salon pos, laundry management software bd, tailor shop hisab, darji dokan software, fashion house pos, boutique shop pos bd, lifestyle store pos, shoe shop management software bd, footwear pos, optical shop pos bd, choshmar dokan hisab, jewelry dokan software, swarnar dokan hisab bd, bookstore pos, stationery shop hisab bd, library management software, agro input shop pos, sarer dokan hisab, seed shop software bd, feed shop pos, murgir khamar hisab, poultry inventory software bd, fisheries hisab app, dairy farm accounting software, hospital pos, clinic billing software bd, diagnostic center billing, supershop billing bd, mini mart pos, convenience store pos, department store software, wholesale market pos, chawkbazar pos, islampur cloth shop software, khatunganj wholesale software, import export business software bd, lc management software, multi branch pos bd, franchise management software, offline billing app bd, auto sync pos, cross platform pos, web based pos bd, online offline pos, sdd billing, mobile hisaber khata, best app for hisab, mobile a hisab, khata pen hisab bad, digital cash memo, smart cash memo bd, bangla cash memo app, kisti hisab app, emi management software bd, samity hisab app, ngo software bd, microfinance software bangladesh, somobay somiti hisab, dps hisab app, daily collection software, daily savings app, sanchay hisab bd, rent management software, inventory tracking software, low stock alert app, out of stock alert, expiry date tracker software, medicine expiry tracker bd, pharmacy management system bangladesh, model pharmacy software, drag license pos, dghs pos, bangladesh vat software, nbr vat software, vat chalak software, mushak 6.3 software, vat return software bd, gst billing software bangladesh, gst pos bd, income tax software bd, audit ready accounting software, tally erp 9 alternative bd, quickbooks alternative bangladesh, xero alternative bd, local erp bangladesh, best erp software company in bangladesh, bangladeshi software company, dhaka software firm pos, top it company in bangladesh pos, shadik talukder pos, cashshilpo owner, cashsilpo customer care, cashshilpo hotline, free pos bangladesh, free shop app bd, lifetime free billing app, lifetime pos software, one time payment pos, monthly subscription pos bd, cheap accounting software bd, budget pos, easy to use pos, simple shop software, dokan chalano app, becha kena bd, hisab nikash bangla, tally khata app alternative, baki khata app, hal khata hisab, digital hal khata, paona dar hisab, dena paona app, customer due tracker, sms alert pos, auto sms billing, whatsapp billing bd, email invoice maker bd, free invoice generator bangladesh, quotation software bd, estimate maker app, daily sales report software, masik hisab app, bochorer hisab, profit tracker app, loss tracker, labh khoti hisab, margin calculator pos, discount management pos, promo code software bd, loyalty points app bd, customer points pos, pos with barcode, barcode maker free, qr code billing, upi pos, bkash pos integration, nagad pos, rocket payment pos, mobile banking billing, digital payment pos bd, card swipe machine pos, bank card pos, pos stand bd, pos display software, dual screen pos bd, touch screen pos software, pos terminal software bd, receipt printer software, cash box software, employee management app, staff attendance pos, sales target software, commission tracker bd, sales agent app, field force tracking, wholesale dealer software, distribution erp bd, dealer management system bangladesh, sfa software bd, distributor billing app, truck load software, delivery management pos, ecommerce pos integration, woocommerce pos sync, shopify pos bangladesh, daraz seller inventory, facebook page order management, fb page billing app, online business hisab, f-commerce pos bd, digital marketing business accounting, cloud accounting bd, accounting firm software, ca firm software bd, audit software bangladesh, babsar unnoti app, dokaner sothik hisab, dokan churi thekanor app, staff churi thekanor software, business automation bd, enterprise resource planning bangladesh, local saas bangladesh, b2b startup bangladesh, sme solutions bd, ites bangladesh, basis registered company pos, nbr approved software, vat compliant pos, mushok 6.3 pos, inventory software with vat, sales software with tax, best software for grocery shop in bangladesh, best software for pharmacy in bd, easy hisab bd, amar hisab, smart hisab, hisab khata pro, baki tracker, kisti app, somiti app, sanchay app, loan management pos, personal finance app, business finance software, accounting erp, tally bangla, kash khata bangla, babsar hisab bangla, hisab nikash app, business manager bd, digital business app, smart shop pos, shop assistant app, dokan sahojogi, bepar hisab, becha kena hisab, sothik hisab app, amar dokan app, dokan hisab pro, shop inventory bd, stock register bd, cash register bangladesh, pos machine setup, pos software download, cashshilpo free trial, cashshilpo login, cashshilpo register, how to use cashshilpo, pos tutorial bangla, pos software review bd, best pos software 2026 bangladesh, top 5 pos bangladesh, top 10 billing software bd, free inventory software for small business, point of sale system for retail stores, clothing store pos system bangladesh, cafe management software bd, restaurant billing system open source, best billing software for pc, android billing app offline, offline inventory management software, cloud pos system bd, multi store inventory management, multi branch retail software, pos for supermarket bd, super shop management software, inventory tracking spreadsheet alternative, excel accounting alternative, digital business management, automated billing system, invoice generator bangla, bangla accounting software, accounting software in bengali, business ideas bangladesh, how to manage shop in bangladesh, business tips bd, sales increasing software, profit tracking, daily ledger, ledgers app, accounts payable software bd, accounts receivable app, invoice tracker bd, digital payment tracker, business dashboard bd, real time sales tracker, data analytics for small business bd, pos api bd, point of sale integration, retail tech bangladesh, retail automation bd, ecommerce erp bangladesh, supply chain software bd, logictics software bangladesh, delivery app backend, pos with ecommerce, seamless pos, pos without internet, offline first pos, offline sync pos, local database pos, web pos, browser based pos, pos source code bd, custom pos development bangladesh, software development firm dhaka, hire pos developer bd, point of sale programmer bd, cloud architecture pos, scalable pos software, fast pos software, no lag pos, secure pos bangladesh, data backup pos, auto backup accounting software, secure business app, cloud business management, digital bangladesh software, smart bangladesh pos, made in bangladesh pos, local software product bd, babsar app, byabsar app, babsha hisab, bebsa hisab, dokaner app, daily becha kena, hisaber boi, khata kolom bad, khata bad, digital khata, kash boi, khotian, daily khotian, masik khotian, ledger book app, digital ledger, shop bookkeeping, accounting bookkeeping bd, vat bookkeeping, tax ready bookkeeping, financial reporting software bd, best tech products bd, innovative software bd, tech startup dhaka, saas startup bangladesh, best point of sale, affordable pos for small business, simple pos interface, user friendly pos bd, zero training pos, easy billing app, 1 click billing, instant invoice, pos for mac bd, pos for windows 10, pos for android tablet, ipad pos system bangladesh, mobile pos machine bd, bluetooth pos, wireless pos bd, handheld pos, smart pos device bd"
+    />
+
+    <meta name="author" content="Md Shadik Hossain" />
+    <meta name="publisher" content="CashShilpo" />
+    <meta
+      name="robots"
+      content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"
+    />
+    <meta name="theme-color" content="#000000" />
+    <meta name="application-name" content="CashShilpo" />
+    <meta name="apple-mobile-web-app-title" content="CashShilpo" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <link rel="canonical" href="https://www.cashshilpo.com/" />
+    <link rel="alternate" hreflang="en" href="https://www.cashshilpo.com/" />
+    <link rel="alternate" hreflang="bn" href="https://www.cashshilpo.com/" />
+    <link
+      rel="alternate"
+      hreflang="x-default"
+      href="https://www.cashshilpo.com/"
+    />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://www.cashshilpo.com/" />
+    <meta
+      property="og:title"
+      content="CashShilpo (ক্যাশশিল্প) | Best POS & Business Management Software"
+    />
+    <meta
+      property="og:description"
+      content="Manage your business simply and smartly. CashShilpo is the ultimate all-in-one POS, inventory, billing, and analytics software for modern businesses in Bangladesh and globally."
+    />
+    <meta
+      property="og:image"
+      content="https://www.cashshilpo.com/cashshilpo-social-preview.png"
+    />
+    <meta property="og:image:alt" content="CashShilpo POS Dashboard Preview" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="CashShilpo" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:locale:alternate" content="bn_BD" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://www.cashshilpo.com/" />
+    <meta
+      property="twitter:title"
+      content="CashShilpo | Modern POS & Business Software"
+    />
+    <meta
+      property="twitter:description"
+      content="Stop guessing, start growing. CashShilpo is the all-in-one POS designed to streamline operations, inventory, and sales."
+    />
+    <meta
+      property="twitter:image"
+      content="https://www.cashshilpo.com/cashshilpo-social-preview.png"
+    />
+
+    <meta
+      name="google-site-verification"
+      content="PsnbiN9hIMZw5Mtmr9SwF8jkQYOw_81vecfqp0S9NJc"
+    />
+
+    <!-- Schema.org JSON-LD Structured Data for Maximum SEO -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph":[
+          {
+            "@type": "SoftwareApplication",
+            "@id": "https://www.cashshilpo.com/#software",
+            "name": "CashShilpo",
+            "alternateName":[
+              "cashsilpo",
+              "ক্যাশশিল্প",
+              "CashShilpo POS",
+              "Cash Shilpo App"
+            ],
+            "url": "https://www.cashshilpo.com/",
+            "operatingSystem": "Web, Windows, macOS, Android, iOS",
+            "applicationCategory": "BusinessApplication",
+            "description": "CashShilpo is the best cloud-based POS and business management software globally and in Bangladesh. It features comprehensive inventory management, smart invoicing, billing, CRM, dokan hisab (দোকানের হিসাব), and real-time business analytics.",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD",
+              "description": "7-Day Free Trial"
+            },
+            "aggregateRating": {
+              "@type": "AggregateRating",
+              "ratingValue": "4.9",
+              "ratingCount": "1050"
+            },
+            "featureList": "POS offline/online, real-time inventory, CRM, Daybook, expense tracking, barcode generator, quotation management, AI assistant",
+            "softwareVersion": "2.0",
+            "author": {
+              "@id": "https://www.cashshilpo.com/#person"
+            }
+          },
+          {
+            "@type": "Organization",
+            "@id": "https://www.cashshilpo.com/#organization",
+            "name": "CashShilpo",
+            "alternateName": "ক্যাশশিল্প",
+            "url": "https://www.cashshilpo.com/",
+            "founder": {
+              "@id": "https://www.cashshilpo.com/#person"
+            },
+            "logo": {
+              "@type": "ImageObject",
+              "url": "https://www.cashshilpo.com/cashshilpo-official-logo.png",
+              "width": "512",
+              "height": "512"
+            },
+            "sameAs":[
+              "https://www.facebook.com/cashshilpo",
+              "https://www.linkedin.com/company/cashshilpo",
+              "https://twitter.com/cashshilpo"
+            ],
+            "description": "Leading provider of intuitive Point of Sale (POS) and business management solutions for SMEs."
+          },
+          {
+            "@type": "Person",
+            "@id": "https://www.cashshilpo.com/#person",
+            "name": "Md Shadik Hossain",
+            "alternateName":["Shadik Hossain Talukder", "মোঃ সাদিক হোসেন"],
+            "jobTitle": "Founder, CEO & Lead Developer",
+            "worksFor": {
+              "@id": "https://www.cashshilpo.com/#organization"
+            },
+            "knowsAbout":[
+              "Web Development",
+              "Software Engineering",
+              "Point of Sale Systems",
+              "Business Management",
+              "SaaS",
+              "Entrepreneurship"
+            ],
+            "affiliation": {
+              "@type": "Organization",
+              "name": "Rural Peace"
+            },
+            "url": "https://www.cashshilpo.com/",
+            "sameAs":[
+              "https://shadik.onrender.com",
+              "https://github.com/shadik-hossain"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://www.cashshilpo.com/#website",
+            "url": "https://www.cashshilpo.com/",
+            "name": "CashShilpo",
+            "publisher": {
+              "@id": "https://www.cashshilpo.com/#organization"
+            },
+            "inLanguage": ["en-US", "bn-BD"]
+          }
+        ]
+      }
+    </script>
+
+    <link
+      rel="shortcut icon"
+      href="The Official-Cashsilpo-Fav.png"
+      type="image/x-icon"
+    />
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Cormorant+Garamond:ital,wght@0,500;1,400;1,500&family=Hind+Siliguri:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@0.452.0/dist/umd/lucide.js"></script>
+
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      .font-testimonial {
+        font-family: "Cormorant Garamond", serif;
+      }
+      :root {
+        --accent-color: #39ff14;
+      }
+      .text-accent {
+        color: var(--accent-color);
+      }
+      .bg-accent {
+        background-color: var(--accent-color);
+      }
+      .border-accent {
+        border-color: var(--accent-color);
+      }
+      
+      /* --- Language & Font System --- */
+      body.lang-bn, body.lang-bn * {
+        font-family: 'Hind Siliguri', sans-serif !important;
+      }
+      /* Pure HTML Bilingual Support - Prevents layout redundancy */
+      body.lang-bn .bilingual-en { display: none !important; }
+      body:not(.lang-bn) .bilingual-bn { display: none !important; }
+
+      .marquee-container {
+        overflow: hidden;
+        display: flex;
+      }
+      .marquee-content {
+        flex-shrink: 0;
+        animation: marquee 50s linear infinite;
+      }
+      @keyframes marquee {
+        0% { transform: translateX(0%); }
+        100% { transform: translateX(-66.6667%); }
+      }
+      #logo-marquee-content {
+        animation: marquee-logos 40s linear infinite;
+        display: flex;
+      }
+      @keyframes marquee-logos {
+        0% { transform: translateX(0%); }
+        100% { transform: translateX(-100vw); }
+      }
+      .logo-cloud-item {
+        filter: grayscale(1) opacity(60%);
+        transition: all 0.3s ease;
+      }
+      .logo-cloud-item:hover {
+        filter: grayscale(0) opacity(100%);
+      }
+      .shimmer {
+        animation: shimmer 1.5s infinite;
+        background: linear-gradient(to right, #3a3a3a 8%, #4a4a4a 18%, #3a3a3a 33%);
+        background-size: 800px 104px;
+        position: relative;
+      }
+      @keyframes shimmer {
+        0% { background-position: -400px 0; }
+        100% { background-position: 400px 0; }
+      }
+      .shadow-accent-2xl {
+        box-shadow: 0 0px 40px -12px rgba(57, 255, 20, 0.4);
+      }
+      .animate-fade-in-up,
+      .animate-fade-in-left,
+      .animate-fade-in-right,
+      .animate-scale-in,
+      .animate-card,
+      .animate-slide-and-scale-left,
+      .animate-slide-and-scale-right {
+        opacity: 0;
+        transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+      }
+      .animate-fade-in-up { transform: translateY(40px); }
+      .animate-fade-in-left { transform: translateX(-40px); }
+      .animate-fade-in-right { transform: translateX(40px); }
+      .animate-scale-in { transform: scale(0.95); }
+      .animate-card { transform: translateY(30px) scale(0.98); }
+      .animate-slide-and-scale-left {
+        transition-duration: 0.8s;
+        transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        transform: translateX(-50px) scale(0.9);
+      }
+      .animate-slide-and-scale-right {
+        transition-duration: 0.8s;
+        transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        transform: translateX(50px) scale(0.9);
+      }
+      .is-visible {
+        opacity: 1;
+        transform: translateY(0) translateX(0) scale(1);
+      }
+      .animate-stagger-children.is-visible .animate-card {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+      /* Expand staggering support to max cards */
+      .animate-stagger-children.is-visible .animate-card:nth-child(1) { transition-delay: 0.1s; }
+      .animate-stagger-children.is-visible .animate-card:nth-child(2) { transition-delay: 0.2s; }
+      .animate-stagger-children.is-visible .animate-card:nth-child(3) { transition-delay: 0.3s; }
+      .animate-stagger-children.is-visible .animate-card:nth-child(4) { transition-delay: 0.4s; }
+      .animate-stagger-children.is-visible .animate-card:nth-child(5) { transition-delay: 0.5s; }
+      .animate-stagger-children.is-visible .animate-card:nth-child(6) { transition-delay: 0.6s; }
+      .hero-header h1.animate-fade-in-up.is-visible { transition-delay: 0.1s; }
+      .hero-header p.animate-fade-in-up.is-visible { transition-delay: 0.2s; }
+      .hero-header div.animate-fade-in-up.is-visible { transition-delay: 0.3s; }
+      .cta-section h2.animate-fade-in-up.is-visible { transition-delay: 0.1s; }
+      .cta-section p.animate-fade-in-up.is-visible { transition-delay: 0.2s; }
+      .cta-section div.animate-fade-in-up.is-visible { transition-delay: 0.3s; }
+      
+      .stats-overlay {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        background: radial-gradient(circle at center, rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.9)), rgba(255, 255, 255, 0.05);
+        mix-blend-mode: multiply;
+      }
+      @media (max-width: 768px) {
+        .stats-overlay {
+          background: radial-gradient(circle at center, rgba(255, 255, 255, 0.06), rgba(0, 0, 0, 0.85)), rgba(255, 255, 255, 0.01);
+        }
+      }
+      .testimonial-ticker-container {
+        overflow: hidden;
+        display: flex;
+        padding: 2rem 0;
+        background: #0a0a0a;
+        border-top: 1px solid #222;
+        border-bottom: 1px solid #222;
+      }
+      .testimonial-ticker-content {
+        display: flex;
+        flex-shrink: 0;
+        animation: marquee-testimonials 60s linear infinite;
+      }
+      .testimonial-item {
+        flex-shrink: 0;
+        width: 400px;
+        margin: 0 1.5rem;
+        padding: 1.5rem;
+        background: #111;
+        border: 1px solid #333;
+        border-radius: 1rem;
+        transition: all 0.3s ease;
+      }
+      .testimonial-item:hover {
+        border-color: var(--accent-color);
+        transform: scale(1.03) translateY(-4px);
+        background: #1a1a1a;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+      }
+      @keyframes marquee-testimonials {
+        0% { transform: translateX(0%); }
+        100% { transform: translateX(-50%); }
+      }
+      .nav-link {
+        position: relative;
+        padding-bottom: 8px;
+        overflow: hidden;
+        transition: color 0.3s ease;
+      }
+      .nav-link::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0%;
+        height: 2px;
+        background-color: var(--accent-color);
+        transition: width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      }
+      .nav-link:hover::after {
+        width: 100%;
+      }
+      .nav-link:hover {
+        color: var(--accent-color);
+      }
+      .feature-card {
+        opacity: 0;
+        transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+        transform: translateY(30px) scale(0.98);
+      }
+      #features-grid .feature-card:nth-child(n + 7) {
+        display: none;
+      }
+      #features-grid.is-expanded .feature-card:nth-child(n + 7) {
+        display: flex;
+        animation: simpleFadeInUp 0.6s ease-out forwards;
+      }
+      @keyframes simpleFadeInUp {
+        from { opacity: 0; transform: translateY(30px) scale(0.98); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+      }
+    </style>
+  </head>
+  <body class="bg-black text-white antialiased">
+    <div class="overflow-x-hidden">
+      <!-- Navigation -->
+      <nav
+        class="container mx-auto px-6 py-6 flex justify-between items-center sticky top-0 z-50 bg-black bg-opacity-80 backdrop-blur-md"
+      >
+        <!-- Logo -->
+        <a
+          href="#"
+          class="flex items-center space-x-2 text-3xl font-extrabold text-white"
+          aria-label="CashShilpo Home"
+        >
+          <img
+            src="cashshilpo-official-logo.png"
+            alt="CashShilpo Best POS Software Logo"
+            class="w-12 h-12 object-contain"
+          />
+          <span>Cash<span class="text-accent">Shilpo</span>.</span>
+        </a>
+
+        <!-- Desktop Nav -->
+        <div class="hidden md:flex space-x-8 items-center">
+          <a href="#features" class="nav-link text-gray-300">Features</a>
+          <a href="pricing" class="nav-link text-gray-300">Pricing</a>
+          <a href="support" class="nav-link text-gray-300">Support</a>
+          <a
+            href="workplace"
+            class="bg-accent text-black font-semibold px-6 py-3 rounded-full hover:bg-white hover:scale-105 transition-all duration-300 transform"
+          >
+            Get Started
+          </a>
+        </div>
+
+        <!-- Mobile Nav Button -->
+        <button
+          id="mobile-menu-button"
+          class="md:hidden p-2 rounded-md text-gray-300 hover:text-white"
+          aria-label="Toggle Menu"
+        >
+          <i data-lucide="menu" class="h-8 w-8"></i>
+        </button>
+      </nav>
+
+      <!-- Mobile Menu -->
+      <div
+        id="mobile-menu"
+        class="hidden md:hidden bg-gray-900 p-6 absolute top-24 left-0 right-0 z-40 border-b-2 border-accent"
+      >
+        <a href="#features" class="block text-gray-300 hover:text-accent py-2"
+          >Features</a
+        >
+        <a href="pricing" class="block text-gray-300 hover:text-accent py-2"
+          >Pricing</a
+        >
+        <a href="support" class="block text-gray-300 hover:text-accent py-2"
+          >Support</a
+        >
+        <a
+          href="workplace"
+          class="mt-4 block bg-accent text-black font-semibold px-6 py-3 rounded-full text-center hover:bg-white transition-all duration-300"
+        >
+          Get Started
+        </a>
+      </div>
+
+      <!-- Hero Section -->
+      <header
+        class="hero-header container mx-auto px-6 pt-24 pb-32 md:pt-32 md:pb-40 text-center"
+      >
+        <h1
+          class="text-5xl sm:text-6xl md:text-8xl font-extrabold leading-tight tracking-tighter animate-fade-in-up"
+        >
+          MANAGE YOUR BUSINESS,
+          <br class="hidden md:block" />
+          SIMPLY & <span class="text-accent">SMARTLY.</span>
+        </h1>
+        <p
+          class="text-lg md:text-xl text-gray-400 mt-8 max-w-3xl mx-auto animate-fade-in-up"
+        >
+          CashShilpo is the all-in-one POS software designed to streamline your
+          operations, manage inventory, and boost your sales. Stop guessing,
+          start growing with the world's leading business management tool.
+        </p>
+        <div class="mt-12 animate-fade-in-up">
+          <a
+            href="workplace"
+            class="bg-accent text-black font-bold text-lg px-10 py-5 rounded-full hover:bg-white hover:scale-105 transition-all duration-300 transform"
+          >
+            Start Your 7-Day Free Trial
+          </a>
+        </div>
+      </header>
+
+      <!-- Trusted By Section -->
+      <section class="py-16 bg-black">
+        <div class="container mx-auto px-6">
+          <p
+            class="text-center text-gray-500 font-semibold uppercase tracking-widest mb-8 animate-fade-in-up"
+          >
+            Trusted by businesses like yours
+          </p>
+        </div>
+
+        <div class="relative w-full overflow-hidden animate-fade-in-up">
+          <div
+            class="absolute top-0 left-0 w-48 h-full bg-gradient-to-r from-black to-transparent z-10"
+          ></div>
+          <div
+            class="absolute top-0 right-0 w-48 h-full bg-gradient-to-l from-black to-transparent z-10"
+          ></div>
+          <div class="flex" id="logo-marquee-content">
+            <div class="flex-shrink-0 flex justify-around items-center w-screen">
+              <div class="text-center text-2xl font-bold text-gray-400 logo-cloud-item px-12">BRAND.IO</div>
+              <div class="text-center text-2xl font-bold text-gray-400 logo-cloud-item px-12">ECOFOODS</div>
+              <div class="text-center text-2xl font-bold text-gray-400 logo-cloud-item px-12">FUTURA</div>
+              <div class="text-center text-2xl font-bold text-gray-400 logo-cloud-item px-12">THE HUB</div>
+              <div class="text-center text-2xl font-bold text-gray-400 logo-cloud-item px-12">LOCAL GEMS</div>
+            </div>
+            <div class="flex-shrink-0 flex justify-around items-center w-screen">
+              <div class="text-center text-2xl font-bold text-gray-400 logo-cloud-item px-12">BRAND.IO</div>
+              <div class="text-center text-2xl font-bold text-gray-400 logo-cloud-item px-12">ECOFOODS</div>
+              <div class="text-center text-2xl font-bold text-gray-400 logo-cloud-item px-12">FUTURA</div>
+              <div class="text-center text-2xl font-bold text-gray-400 logo-cloud-item px-12">THE HUB</div>
+              <div class="text-center text-2xl font-bold text-gray-400 logo-cloud-item px-12">LOCAL GEMS</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Main Software Interface Section -->
+      <section class="py-1 md:py-32">
+        <div class="container mx-auto px-6">
+          <div class="text-center max-w-3xl mx-auto mb-16 animate-fade-in-up">
+            <h2 class="text-4xl md:text-6xl font-extrabold mb-4">
+              THIS IS YOUR NEW <span class="text-accent">COMMAND CENTER.</span>
+            </h2>
+            <p class="text-lg text-gray-400">
+              One clean, powerful dashboard to control your entire business.
+              From sales to stock, it's all right here in CashShilpo.
+            </p>
+          </div>
+
+          <!-- Computer Monitor Effect -->
+          <div class="max-w-6xl mx-auto animate-scale-in">
+            <div class="bg-gray-800 rounded-t-2xl pt-2 sm:pt-4 px-2 sm:px-4 border-b-2 border-gray-900 shadow-2xl">
+              <div class="flex items-center space-x-1.5 sm:space-x-2 h-6 sm:h-8 mb-2 sm:mb-4 px-2 sm:px-0">
+                <div class="w-3 h-3 sm:w-4 sm:h-4 bg-gray-900 rounded-full"></div>
+                <div class="w-3 h-3 sm:w-4 sm:h-4 bg-gray-900 rounded-full"></div>
+                <div class="w-3 h-3 sm:w-4 sm:h-4 bg-gray-900 rounded-full"></div>
+              </div>
+              <!-- Embedded Skeleton Preview -->
+              <div class="flex h-[16rem] md:h-[620px] rounded-t-lg overflow-hidden bg-[#0f0f0f] text-gray-300 border-2 border-black">
+                <aside class="w-64 bg-[#171717] p-4 flex-col justify-between border-r border-gray-800 hidden md:flex">
+                  <div>
+                    <div class="flex items-center space-x-2 mb-8">
+                      <div class="w-8 h-8 rounded-md bg-gray-700 shimmer"></div>
+                      <div class="h-6 w-32 rounded-md bg-gray-700 shimmer"></div>
+                    </div>
+                    <ul class="space-y-4">
+                      <li class="flex items-center space-x-3 p-3 rounded-lg bg-gray-800 border border-gray-700">
+                        <div class="w-6 h-6 rounded-md bg-gray-600 shimmer"></div>
+                        <div class="h-4 w-32 rounded-md bg-gray-600 shimmer"></div>
+                      </li>
+                      <li class="flex items-center space-x-3 p-3 rounded-lg">
+                        <div class="w-6 h-6 rounded-md bg-gray-700 shimmer"></div>
+                        <div class="h-4 w-28 rounded-md bg-gray-700 shimmer"></div>
+                      </li>
+                      <li class="flex items-center space-x-3 p-3 rounded-lg">
+                        <div class="w-6 h-6 rounded-md bg-gray-700 shimmer"></div>
+                        <div class="h-4 w-24 rounded-md bg-gray-700 shimmer"></div>
+                      </li>
+                      <li class="flex items-center space-x-3 p-3 rounded-lg">
+                        <div class="w-6 h-6 rounded-md bg-gray-700 shimmer"></div>
+                        <div class="h-4 w-20 rounded-md bg-gray-700 shimmer"></div>
+                      </li>
+                    </ul>
+                  </div>
+                  <div class="flex items-center space-x-3 p-3 rounded-lg mt-8 bg-gray-800 border border-gray-700">
+                    <div class="w-10 h-10 rounded-full bg-gray-600 shimmer"></div>
+                    <div class="flex-grow">
+                      <div class="h-4 w-24 rounded-md bg-gray-600 shimmer mb-2"></div>
+                      <div class="h-3 w-16 rounded-md bg-gray-700 shimmer"></div>
+                    </div>
+                  </div>
+                </aside>
+
+                <div class="flex-1 flex flex-col min-w-0">
+                  <header class="h-16 bg-[#171717] px-4 sm:px-6 flex items-center justify-between border-b border-gray-800 flex-shrink-0">
+                    <div class="flex items-center space-x-4">
+                      <div class="w-8 h-8 rounded-md bg-gray-700 shimmer md:hidden"></div>
+                      <div class="w-32 sm:w-48 h-10 rounded-md bg-gray-700 shimmer"></div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                      <div class="w-10 h-10 rounded-md bg-gray-700 shimmer hidden sm:block"></div>
+                      <div class="w-10 h-10 rounded-md bg-gray-700 shimmer hidden sm:block"></div>
+                      <div class="w-10 h-10 rounded-full bg-gray-700 shimmer"></div>
+                    </div>
+                  </header>
+
+                  <main class="flex-1 p-3 md:p-6 overflow-y-auto bg-black min-h-0">
+                    <div class="flex space-x-4 border-b border-gray-800 pb-4 mb-6">
+                      <div class="h-8 w-24 rounded-md bg-gray-700 shimmer"></div>
+                      <div class="h-8 w-20 rounded-md bg-gray-800 shimmer hidden sm:block"></div>
+                      <div class="h-8 w-28 rounded-md bg-gray-800 shimmer hidden sm:block"></div>
+                    </div>
+
+                    <div class="flex flex-col md:flex-row justify-between md:items-center mb-6">
+                      <div class="mb-4 md:mb-0">
+                        <div class="h-6 w-48 rounded-md bg-gray-700 shimmer mb-2"></div>
+                        <div class="h-4 w-40 rounded-md bg-gray-800 shimmer"></div>
+                      </div>
+                      <div class="flex space-x-2">
+                        <div class="h-10 w-20 rounded-md bg-gray-800 shimmer"></div>
+                        <div class="h-10 w-24 rounded-md bg-gray-700 shimmer"></div>
+                      </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                      <div class="bg-[#171717] p-6 rounded-lg border border-gray-800 shimmer">
+                        <div class="h-5 w-32 rounded-md bg-gray-700 mb-4"></div>
+                        <div class="h-8 w-full max-w-40 rounded-md bg-gray-600 mb-2"></div>
+                        <div class="h-4 w-full max-w-32 rounded-md bg-gray-700"></div>
+                      </div>
+                      <div class="bg-[#171717] p-6 rounded-lg border border-gray-800 shimmer">
+                        <div class="h-5 w-32 rounded-md bg-gray-700 mb-4"></div>
+                        <div class="h-8 w-full max-w-40 rounded-md bg-gray-600 mb-2"></div>
+                        <div class="h-4 w-full max-w-32 rounded-md bg-gray-700"></div>
+                      </div>
+                      <div class="bg-[#171717] p-6 rounded-lg border border-gray-800 shimmer hidden lg:block">
+                        <div class="h-5 w-32 rounded-md bg-gray-700 mb-4"></div>
+                        <div class="h-8 w-full max-w-40 rounded-md bg-gray-600 mb-2"></div>
+                        <div class="h-4 w-full max-w-32 rounded-md bg-gray-700"></div>
+                      </div>
+                      <div class="bg-[#171717] p-6 rounded-lg border border-gray-800 shimmer hidden lg:block">
+                        <div class="h-5 w-32 rounded-md bg-gray-700 mb-4"></div>
+                        <div class="h-8 w-full max-w-40 rounded-md bg-gray-600 mb-2"></div>
+                        <div class="h-4 w-full max-w-32 rounded-md bg-gray-700"></div>
+                      </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                      <div class="lg:col-span-2 bg-[#171717] p-6 rounded-lg border border-gray-800 shimmer">
+                        <div class="h-6 w-48 rounded-md bg-gray-700 mb-6"></div>
+                        <div class="w-full h-64 rounded-lg bg-gray-700"></div>
+                      </div>
+                      <div class="bg-[#171717] p-6 rounded-lg border border-gray-800 shimmer">
+                        <div class="h-6 w-48 rounded-md bg-gray-700 mb-6"></div>
+                        <div class="space-y-4">
+                          <div class="flex justify-between items-center">
+                            <div class="h-4 w-32 rounded-md bg-gray-700"></div>
+                            <div class="h-4 w-16 rounded-md bg-gray-700"></div>
+                          </div>
+                          <div class="flex justify-between items-center">
+                            <div class="h-4 w-2/3 sm:w-48 rounded-md bg-gray-700"></div>
+                            <div class="h-4 w-1/4 sm:w-20 rounded-md bg-gray-700"></div>
+                          </div>
+                          <div class="flex justify-between items-center">
+                            <div class="h-4 w-1/2 sm:w-40 rounded-md bg-gray-700"></div>
+                            <div class="h-4 w-1/4 sm:w-12 rounded-md bg-gray-700"></div>
+                          </div>
+                        </div>
+                        <div class="h-6 w-48 rounded-md bg-gray-700 mt-8 mb-6 hidden lg:block"></div>
+                        <div class="w-40 h-40 rounded-full bg-gray-700 mx-auto hidden lg:block"></div>
+                      </div>
+                    </div>
+                  </main>
+                </div>
+              </div>
+            </div>
+            <div class="h-2 sm:h-6 bg-gray-700 w-full max-w-[14rem] sm:max-w-sm mx-auto rounded-b-md"></div>
+            <div class="h-1.5 sm:h-3 bg-gray-800 w-full max-w-[16rem] sm:max-w-md mx-auto rounded-b-lg"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Core Pillars Section -->
+      <section
+        id="features"
+        class="container mx-auto px-6 py-32 space-y-32 md:space-y-40"
+      >
+        <div class="text-center max-w-3xl mx-auto mb-20 md:mb-32 animate-fade-in-up">
+          <h2 class="text-4xl md:text-6xl font-extrabold mb-4">
+            FEATURES BUILT FOR <span class="text-accent">YOUR BUSINESS.</span>
+          </h2>
+          <p class="text-lg text-gray-400">
+            CashShilpo is built on three core pillars designed to simplify your workday and accelerate your growth.
+          </p>
+        </div>
+
+        <!-- Pillar 1: Sales -->
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-8 md:gap-16 items-center">
+          <div class="md:col-span-3 animate-slide-and-scale-left">
+            <div class="relative w-full h-auto rounded-2xl border-2 border-gray-800 shadow-lg p-4 sm:p-6 bg-gray-900 md:aspect-[3/2]">
+              <div class="h-full flex flex-col justify-between">
+                <div class="flex justify-between items-center mb-4">
+                  <div class="w-24 h-6 bg-gradient-to-r from-purple-500 to-pink-500 rounded shimmer"></div>
+                  <div class="flex space-x-2">
+                    <div class="w-8 h-8 bg-gray-700 rounded-full shimmer"></div>
+                    <div class="w-8 h-8 bg-gray-700 rounded-full shimmer"></div>
+                  </div>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4 flex-grow mb-4">
+                  <div class="bg-gradient-to-br from-green-400 to-blue-500 rounded-lg p-3 relative overflow-hidden">
+                    <div class="w-full h-12 sm:h-16 bg-white opacity-20 rounded mb-2"></div>
+                    <div class="w-3/4 h-3 sm:h-4 bg-white opacity-20 rounded"></div>
+                  </div>
+                  <div class="bg-gradient-to-br from-yellow-400 to-orange-500 rounded-lg p-3 relative overflow-hidden">
+                    <div class="w-full h-12 sm:h-16 bg-white opacity-20 rounded mb-2"></div>
+                    <div class="w-3/4 h-3 sm:h-4 bg-white opacity-20 rounded"></div>
+                  </div>
+                  <div class="bg-gradient-to-br from-red-400 to-purple-500 rounded-lg p-3 relative overflow-hidden">
+                    <div class="w-full h-12 sm:h-16 bg-white opacity-20 rounded mb-2"></div>
+                    <div class="w-3/4 h-3 sm:h-4 bg-white opacity-20 rounded"></div>
+                  </div>
+                  <div class="bg-gradient-to-br from-blue-400 to-cyan-500 rounded-lg p-3 relative overflow-hidden">
+                    <div class="w-full h-12 sm:h-16 bg-white opacity-20 rounded mb-2"></div>
+                    <div class="w-3/4 h-3 sm:h-4 bg-white opacity-20 rounded"></div>
+                  </div>
+                  <div class="bg-gradient-to-br from-pink-400 to-purple-500 rounded-lg p-3 relative overflow-hidden">
+                    <div class="w-full h-12 sm:h-16 bg-white opacity-20 rounded mb-2"></div>
+                    <div class="w-3/4 h-3 sm:h-4 bg-white opacity-20 rounded"></div>
+                  </div>
+                  <div class="bg-gradient-to-br from-green-300 to-teal-500 rounded-lg p-3 relative overflow-hidden">
+                    <div class="w-full h-12 sm:h-16 bg-white opacity-20 rounded mb-2"></div>
+                    <div class="w-3/4 h-3 sm:h-4 bg-white opacity-20 rounded"></div>
+                  </div>
+                </div>
+                <div class="flex justify-between items-center">
+                  <div class="w-24 sm:w-32 h-8 bg-gray-700 rounded shimmer"></div>
+                  <div class="w-20 sm:w-24 h-10 bg-accent rounded-full shimmer"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="md:col-span-2 md:-ml-12 lg:-ml-24 relative z-10 animate-slide-and-scale-right">
+            <span class="absolute -top-12 -left-12 md:-top-16 md:-left-16 text-8xl md:text-9xl font-extrabold text-gray-700 opacity-30 z-20">01</span>
+            <div class="relative z-10 bg-gray-900 p-8 rounded-2xl border border-gray-800 shadow-2xl">
+              <span class="text-accent font-semibold text-lg uppercase">Streamline Sales</span>
+              <h3 class="text-3xl lg:text-4xl font-extrabold mt-2 mb-4">Sell Faster, Sell Smarter.</h3>
+              <p class="text-gray-400 text-lg">
+                A blazingly fast, intuitive, and customizable checkout process.
+                Handle sales, returns, discounts, and split payments with just a
+                few taps. Top rated POS software.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pillar 2: Inventory -->
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-8 md:gap-16 items-center">
+          <div class="md:col-span-3 md:order-last animate-slide-and-scale-right">
+            <div class="relative w-full h-[26rem] md:h-auto rounded-2xl border-2 border-gray-800 shadow-lg p-4 sm:p-6 bg-gray-900 md:aspect-[3/2]">
+              <div class="h-full flex flex-col md:flex-row gap-4 overflow-y-auto md:overflow-visible">
+                <div class="flex-1 bg-gray-800 rounded-lg p-4 flex flex-col">
+                  <div class="flex justify-between items-center mb-4">
+                    <div class="w-2/5 h-6 bg-gradient-to-r from-green-400 to-teal-500 rounded shimmer"></div>
+                    <div class="w-1/3 h-8 bg-gray-700 rounded-lg shimmer"></div>
+                  </div>
+                  <div class="space-y-3 flex-grow overflow-hidden">
+                    <div class="flex items-center space-x-3 p-2 bg-gray-700 rounded-lg">
+                      <div class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-teal-400 to-green-500 rounded shimmer flex-shrink-0"></div>
+                      <div class="flex-grow space-y-2 min-w-0">
+                        <div class="h-4 w-3/4 bg-gray-600 rounded shimmer"></div>
+                        <div class="h-3 w-1/2 bg-gray-600 rounded shimmer"></div>
+                      </div>
+                    </div>
+                    <div class="flex items-center space-x-3 p-2">
+                      <div class="w-10 h-10 sm:w-12 sm:h-12 bg-gray-700 rounded shimmer flex-shrink-0"></div>
+                      <div class="flex-grow space-y-2 min-w-0">
+                        <div class="h-4 w-3/4 bg-gray-700 rounded shimmer"></div>
+                        <div class="h-3 w-1/2 bg-gray-700 rounded shimmer"></div>
+                      </div>
+                    </div>
+                    <div class="flex items-center space-x-3 p-2">
+                      <div class="w-10 h-10 sm:w-12 sm:h-12 bg-gray-700 rounded shimmer flex-shrink-0"></div>
+                      <div class="flex-grow space-y-2 min-w-0">
+                        <div class="h-4 w-3/4 bg-gray-700 rounded shimmer"></div>
+                        <div class="h-3 w-1/2 bg-gray-700 rounded shimmer"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="flex-1 bg-gray-800 rounded-lg p-4 flex flex-col">
+                  <div class="w-3/4 h-6 bg-gradient-to-r from-blue-400 to-indigo-500 rounded mb-4 shimmer"></div>
+                  <div class="w-full h-24 sm:h-32 bg-gradient-to-br from-purple-400 to-blue-500 rounded-lg mb-4 shimmer"></div>
+                  <div class="space-y-3 mb-4">
+                    <div class="h-4 w-full bg-gray-700 rounded shimmer"></div>
+                    <div class="h-4 w-5/6 bg-gray-700 rounded shimmer"></div>
+                    <div class="h-4 w-1/2 bg-gray-700 rounded shimmer"></div>
+                  </div>
+                  <div class="space-y-3">
+                    <div class="flex justify-between">
+                      <div class="h-4 w-1/2 sm:w-20 bg-gray-700 rounded shimmer"></div>
+                      <div class="h-4 w-1/4 sm:w-12 bg-gray-700 rounded shimmer"></div>
+                    </div>
+                    <div class="w-full h-3 bg-gray-700 rounded-full shimmer"></div>
+                    <div class="flex justify-between">
+                      <div class="h-4 w-2/3 sm:w-24 bg-gray-700 rounded shimmer"></div>
+                      <div class="h-4 w-1/3 sm:w-16 bg-gray-700 rounded shimmer"></div>
+                    </div>
+                    <div class="w-full h-3 bg-gray-700 rounded-full shimmer"></div>
+                  </div>
+                  <div class="w-full h-10 bg-accent rounded-full mt-auto shimmer"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="md:col-span-2 md:order-first md:-mr-12 lg:-mr-24 relative z-10 animate-slide-and-scale-left">
+            <span class="absolute -top-12 -right-12 md:-top-16 md:-right-16 text-8xl md:text-9xl font-extrabold text-gray-700 opacity-30 z-20">02</span>
+            <div class="relative z-10 bg-gray-900 p-8 rounded-2xl border border-gray-800 shadow-2xl">
+              <span class="text-accent font-semibold text-lg uppercase">Master Your Inventory</span>
+              <h3 class="text-3xl lg:text-4xl font-extrabold mt-2 mb-4">Never Run Out of Stock.</h3>
+              <p class="text-gray-400 text-lg">
+                Real-time stock tracking across all your locations. Get
+                automatic low-stock alerts, create purchase orders, and manage
+                suppliers with our advanced business management software.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pillar 3: Analytics -->
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-8 md:gap-16 items-center">
+          <div class="md:col-span-3 animate-slide-and-scale-left">
+            <div class="relative w-full h-auto rounded-2xl border-2 border-gray-800 shadow-lg p-4 sm:p-6 bg-gray-900 md:aspect-[3/2]">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 h-full">
+                <div class="col-span-1 md:col-span-2 bg-gray-800 rounded-lg p-4 flex flex-col">
+                  <div class="w-3/4 h-6 bg-gradient-to-r from-red-400 to-orange-500 rounded mb-4 shimmer"></div>
+                  <div class="flex-grow w-full h-40 bg-gradient-to-br from-yellow-300 to-orange-400 rounded-lg shimmer"></div>
+                </div>
+                <div class="col-span-1 bg-gray-800 rounded-lg p-4 flex flex-col">
+                  <div class="w-full h-6 bg-gradient-to-r from-purple-400 to-pink-500 rounded mb-4 shimmer"></div>
+                  <div class="space-y-3 flex-grow">
+                    <div class="h-4 w-4/5 bg-purple-300 opacity-70 rounded shimmer"></div>
+                    <div class="h-4 w-3/4 bg-pink-300 opacity-70 rounded shimmer"></div>
+                    <div class="h-4 w-2/3 bg-red-300 opacity-70 rounded shimmer"></div>
+                  </div>
+                  <div class="w-full h-24 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-lg mt-4 shimmer hidden md:block"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="md:col-span-2 md:-ml-12 lg:-ml-24 relative z-10 animate-slide-and-scale-right">
+            <span class="absolute -top-12 -left-12 md:-top-16 md:-left-16 text-8xl md:text-9xl font-extrabold text-gray-700 opacity-30 z-20">03</span>
+            <div class="relative z-10 bg-gray-900 p-8 rounded-2xl border border-gray-800 shadow-2xl">
+              <span class="text-accent font-semibold text-lg uppercase">Grow Your Business</span>
+              <h3 class="text-3xl lg:text-4xl font-extrabold mt-2 mb-4">Understand Your Data.</h3>
+              <p class="text-gray-400 text-lg">
+                Get detailed insights into your sales, top-performing products,
+                and customer behavior to make data-driven decisions with
+                cashsilpo.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Marquee Section -->
+      <section class="py-12 bg-gray-900 border-y-2 border-accent transform -rotate-2">
+        <div class="marquee-container">
+          <div class="marquee-content text-4xl md:text-5xl font-bold space-x-12">
+            <span class="text-accent">SELL FASTER &bull;</span>
+            <span class="text-white">TRACK INVENTORY &bull;</span>
+            <span class="text-accent">MANAGE CUSTOMERS &bull;</span>
+            <span class="text-white">BOOST YOUR SALES &bull;</span>
+            <span class="text-accent">SELL FASTER &bull;</span>
+            <span class="text-white">TRACK INVENTORY &bull;</span>
+            <span class="text-accent">MANAGE CUSTOMERS &bull;</span>
+            <span class="text-white">BOOST YOUR SALES &bull;</span>
+            <span class="text-accent">SELL FASTER &bull;</span>
+            <span class="text-white">TRACK INVENTORY &bull;</span>
+            <span class="text-accent">MANAGE CUSTOMERS &bull;</span>
+            <span class="text-white">BOOST YOUR SALES &bull;</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- All-in-One Features Grid -->
+      <section class="container mx-auto px-6 py-32">
+        <div class="text-center max-w-3xl mx-auto mb-20 animate-fade-in-up">
+          <h2 class="text-4xl md:text-6xl font-extrabold mb-4">
+            AND EVERYTHING ELSE YOU NEED.
+          </h2>
+          <p class="text-lg text-gray-400">
+            CashShilpo is a complete toolkit. We've thought of everything so you
+            don't have to. Advanced POS, tracking, and management software built
+            for you.
+          </p>
+        </div>
+
+        <div
+          id="features-grid"
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-stagger-children"
+        >
+          <!-- Feature 1 -->
+          <div class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 animate-card flex flex-col h-full" aria-label="Analytics Dashboard - সেলস এবং লাভ-ক্ষতি ড্যাশবোর্ড">
+            <div class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0">
+              <i data-lucide="layout-dashboard" class="h-8 w-8 text-black"></i>
+            </div>
+            <h3 class="text-2xl font-bold mt-6 mb-3">Analytics Dashboard</h3>
+            <p class="text-gray-400 mb-6">
+              Your complete business overview with real-time sales trends,
+              top-selling products, and detailed profit metrics. Make
+              data-driven decisions seamlessly.
+            </p>
+            <div class="mt-auto pt-4 border-t border-gray-800 text-sm text-gray-400 font-medium">
+              <span class="block text-accent/80 mb-1 text-xs uppercase tracking-wider">ব্যবসার হিসাব</span>
+              আপনার ব্যবসার রিয়েল-টাইম সেলস, লাভ-ক্ষতি এবং টপ প্রোডাক্টের বিস্তারিত ড্যাশবোর্ড। সঠিক ডেটা ভিত্তিক সিদ্ধান্ত নিন খুব সহজেই।
+            </div>
+          </div>
+
+          <!-- Feature 2 -->
+          <div class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 animate-card flex flex-col h-full" aria-label="POS Terminal - পস টার্মিনাল ও বিলিং সফটওয়্যার">
+            <div class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0">
+              <i data-lucide="scan-line" class="h-8 w-8 text-black"></i>
+            </div>
+            <h3 class="text-2xl font-bold mt-6 mb-3">POS Terminal</h3>
+            <p class="text-gray-400 mb-6">
+              A blazingly fast and intuitive checkout point of sale system with
+              smart cart management, discounts, and split payment handling.
+            </p>
+            <div class="mt-auto pt-4 border-t border-gray-800 text-sm text-gray-400 font-medium">
+              <span class="block text-accent/80 mb-1 text-xs uppercase tracking-wider">বিলিং সফটওয়্যার</span>
+              খুব দ্রুত বিলিং করার জন্য সহজ পস (POS) টার্মিনাল, যেখানে স্প্লিট পেমেন্ট, ডিসকাউন্ট এবং কার্ট ম্যানেজমেন্ট করা যায় নিমিষেই।
+            </div>
+          </div>
+
+          <!-- Feature 3 -->
+          <div class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 animate-card flex flex-col h-full" aria-label="Inventory Management - স্টক ও ইনভেন্টরি সফটওয়্যার">
+            <div class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0">
+              <i data-lucide="boxes" class="h-8 w-8 text-black"></i>
+            </div>
+            <h3 class="text-2xl font-bold mt-6 mb-3">Inventory Management</h3>
+            <p class="text-gray-400 mb-6">
+              Real-time stock tracking, variant management, precise serial
+              numbers, expiry dates, and automatic low-stock alerts.
+            </p>
+            <div class="mt-auto pt-4 border-t border-gray-800 text-sm text-gray-400 font-medium">
+              <span class="block text-accent/80 mb-1 text-xs uppercase tracking-wider">স্টক ম্যানেজমেন্ট</span>
+              রিয়েল-টাইম স্টক ট্র্যাকিং, ভেরিয়েন্ট, সিরিয়াল নম্বর এবং দোকানে স্টক কমে গেলে অটোমেটিক অ্যালার্ট বা নোটিফিকেশন।
+            </div>
+          </div>
+
+          <!-- Feature 4 -->
+          <div class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 animate-card flex flex-col h-full" aria-label="Invoice Management - ডিজিটাল ক্যাশ মেমো">
+            <div class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0">
+              <i data-lucide="file-text" class="h-8 w-8 text-black"></i>
+            </div>
+            <h3 class="text-2xl font-bold mt-6 mb-3">Invoice Management</h3>
+            <p class="text-gray-400 mb-6">
+              Create, track, and manage all your sales invoices digitally.
+              Includes seamless support for voiding invoices and handling
+              customer returns.
+            </p>
+            <div class="mt-auto pt-4 border-t border-gray-800 text-sm text-gray-400 font-medium">
+              <span class="block text-accent/80 mb-1 text-xs uppercase tracking-wider">ইনভয়েস বা মেমো</span>
+              পেশাদার ইনভয়েস বা ডিজিটাল মেমো তৈরি, ট্র্যাকিং, এবং কাস্টমার রিটার্ন বা মেমো বাতিল করার সম্পূর্ণ ম্যানেজমেন্ট সিস্টেম।
+            </div>
+          </div>
+
+          <!-- Feature 5 -->
+          <div class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 animate-card flex flex-col h-full" aria-label="Quotation Management - ব্যবসার কোটেশন মেকার">
+            <div class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0">
+              <i data-lucide="clipboard-list" class="h-8 w-8 text-black"></i>
+            </div>
+            <h3 class="text-2xl font-bold mt-6 mb-3">Quotation Management</h3>
+            <p class="text-gray-400 mb-6">
+              Send professional price quotes and estimates to clients directly.
+              Convert approved quotes into actual sales invoices with a single click.
+            </p>
+            <div class="mt-auto pt-4 border-t border-gray-800 text-sm text-gray-400 font-medium">
+              <span class="block text-accent/80 mb-1 text-xs uppercase tracking-wider">কোটেশন তৈরি</span>
+              কাস্টমারদের প্রফেশনাল কোটেশন বা প্রাইস এস্টিমেট পাঠান এবং সেটি কনফার্ম হলে এক ক্লিকেই ইনভয়েস তৈরি করে ফেলুন।
+            </div>
+          </div>
+
+          <!-- Feature 6 -->
+          <div class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 animate-card flex flex-col h-full" aria-label="Customer Management CRM - বাকির খাতা ও কাস্টমার প্রোফাইল">
+            <div class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0">
+              <i data-lucide="users" class="h-8 w-8 text-black"></i>
+            </div>
+            <h3 class="text-2xl font-bold mt-6 mb-3">Customer CRM</h3>
+            <p class="text-gray-400 mb-6">
+              Build robust customer profiles, track purchase histories, manage
+              custom credit limits, and safely handle due payments and accounts receivable.
+            </p>
+            <div class="mt-auto pt-4 border-t border-gray-800 text-sm text-gray-400 font-medium">
+              <span class="block text-accent/80 mb-1 text-xs uppercase tracking-wider">কাস্টমার ও বাকির হিসাব</span>
+              কাস্টমারদের ডাটাবেস তৈরি করুন, ডিজিটাল বাকির খাতা (due management) নিয়ন্ত্রণ করুন এবং তাদের কেনাকাটার ইতিহাস দেখুন।
+            </div>
+          </div>
+
+          <!-- Feature 7 -->
+          <div class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full" aria-label="Reports & Analytics - ব্যবসার বিস্তারিত রিপোর্ট">
+            <div class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0">
+              <i data-lucide="bar-chart-3" class="h-8 w-8 text-black"></i>
+            </div>
+            <h3 class="text-2xl font-bold mt-6 mb-3">Reports & Analytics</h3>
+            <p class="text-gray-400 mb-6">
+              Generate detailed, exportable reports on your daily sales, profit
+              & loss, inventory valuation, staff performance, and specific customer behaviors.
+            </p>
+            <div class="mt-auto pt-4 border-t border-gray-800 text-sm text-gray-400 font-medium">
+              <span class="block text-accent/80 mb-1 text-xs uppercase tracking-wider">রিপোর্ট ও বিশ্লেষণ</span>
+              আপনার ব্যবসার সেলস, প্রফিট অ্যান্ড লস (লাভ-ক্ষতি), স্টক ভ্যালুয়েশন এবং কর্মচারীদের পারফরম্যান্সের উপর বিস্তারিত রিপোর্ট।
+            </div>
+          </div>
+
+          <!-- Feature 8 -->
+          <div class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full" aria-label="Purchase Orders PO - পারচেস অর্ডার সফটওয়্যার">
+            <div class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0">
+              <i data-lucide="shopping-cart" class="h-8 w-8 text-black"></i>
+            </div>
+            <h3 class="text-2xl font-bold mt-6 mb-3">Purchase Orders (PO)</h3>
+            <p class="text-gray-400 mb-6">
+              Create and manage professional purchase orders (PO) to seamlessly
+              restock your inventory and accurately track incoming stock deliveries.
+            </p>
+            <div class="mt-auto pt-4 border-t border-gray-800 text-sm text-gray-400 font-medium">
+              <span class="block text-accent/80 mb-1 text-xs uppercase tracking-wider">পণ্য ক্রয় ও অর্ডার</span>
+              সাপ্লায়ার বা কোম্পানিকে দেয়ার জন্য পারচেস অর্ডার (PO) তৈরি করুন এবং দোকানে নতুন স্টক আসার ট্র্যাক রাখুন।
+            </div>
+          </div>
+
+          <!-- Feature 9 -->
+          <div class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full" aria-label="Supplier Management - মহাজন ও সাপ্লায়ার হিসাব">
+            <div class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0">
+              <i data-lucide="truck" class="h-8 w-8 text-black"></i>
+            </div>
+            <h3 class="text-2xl font-bold mt-6 mb-3">Supplier Management</h3>
+            <p class="text-gray-400 mb-6">
+              Manage your entire supplier database, keep track of purchase
+              history per supplier, and effortlessly monitor accounts payable to vendors.
+            </p>
+            <div class="mt-auto pt-4 border-t border-gray-800 text-sm text-gray-400 font-medium">
+              <span class="block text-accent/80 mb-1 text-xs uppercase tracking-wider">মহাজন ও ডিলার হিসাব</span>
+              সাপ্লায়ার, ডিলার বা মহাজনদের ডাটাবেস, তাদের বকেয়া পাওনা (payable) এবং পূর্বের লেনদেনের সম্পূর্ণ রেকর্ড রাখুন।
+            </div>
+          </div>
+
+          <!-- Feature 10 -->
+          <div class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full" aria-label="Expense Tracking - ব্যবসার খরচ হিসাব করার অ্যাপ">
+            <div class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0">
+              <i data-lucide="wallet" class="h-8 w-8 text-black"></i>
+            </div>
+            <h3 class="text-2xl font-bold mt-6 mb-3">Expense Tracking</h3>
+            <p class="text-gray-400 mb-6">
+              Log, monitor, and intelligently categorize all your business
+              expenses (rent, utilities, salaries) to maintain a crystal clear view of your cash flow.
+            </p>
+            <div class="mt-auto pt-4 border-t border-gray-800 text-sm text-gray-400 font-medium">
+              <span class="block text-accent/80 mb-1 text-xs uppercase tracking-wider">খরচের হিসাব</span>
+              দোকান বা ব্যবসার সমস্ত খরচ (যেমন: ভাড়া, বিদ্যুৎ বিল, যাতায়াত) ক্যাটাগরি অনুযায়ী ট্র্যাক করে ক্যাশ ফ্লো ঠিক রাখুন।
+            </div>
+          </div>
+
+          <!-- Feature 11 -->
+          <div class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full" aria-label="Staff Management - কর্মচারী ম্যানেজমেন্ট">
+            <div class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0">
+              <i data-lucide="user-cog" class="h-8 w-8 text-black"></i>
+            </div>
+            <h3 class="text-2xl font-bold mt-6 mb-3">Staff Management</h3>
+            <p class="text-gray-400 mb-6">
+              Manage individual staff accounts, invite new team members
+              securely, and track individual sales performance and commission per employee.
+            </p>
+            <div class="mt-auto pt-4 border-t border-gray-800 text-sm text-gray-400 font-medium">
+              <span class="block text-accent/80 mb-1 text-xs uppercase tracking-wider">কর্মচারী পরিচালনা</span>
+              দোকানের সেলসম্যান বা কর্মচারীদের আলাদা অ্যাকাউন্ট তৈরি করে দিন এবং কার মাধ্যমে কত সেল বা লাভ হলো তা ট্র্যাক করুন।
+            </div>
+          </div>
+
+          <!-- Feature 12 -->
+          <div class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full" aria-label="User Roles & Permissions - পস পারমিশন কন্ট্রোল">
+            <div class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0">
+              <i data-lucide="shield-check" class="h-8 w-8 text-black"></i>
+            </div>
+            <h3 class="text-2xl font-bold mt-6 mb-3">Roles & Permissions</h3>
+            <p class="text-gray-400 mb-6">
+              Exercise granular access control over what each staff member can
+              see or do within the software, from voiding invoices to hiding overall profit margins.
+            </p>
+            <div class="mt-auto pt-4 border-t border-gray-800 text-sm text-gray-400 font-medium">
+              <span class="block text-accent/80 mb-1 text-xs uppercase tracking-wider">সফটওয়্যার সিকিউরিটি</span>
+              কর্মচারীদের জন্য আলাদা পারমিশন সেট করুন। কে স্টক দেখতে পারবে, কে মেমো মুছতে পারবে বা লাভের হিসাব দেখতে পারবে তা নির্দিষ্ট করুন।
+            </div>
+          </div>
+
+          <!-- Feature 13 -->
+          <div class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full" aria-label="Loyalty Program - কাস্টমার পয়েন্ট ও রিওয়ার্ড">
+            <div class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0">
+              <i data-lucide="award" class="h-8 w-8 text-black"></i>
+            </div>
+            <h3 class="text-2xl font-bold mt-6 mb-3">Loyalty Program</h3>
+            <p class="text-gray-400 mb-6">
+              Boost customer retention dramatically with a built-in loyalty
+              points and rewards system, complete with customizable customer tiers.
+            </p>
+            <div class="mt-auto pt-4 border-t border-gray-800 text-sm text-gray-400 font-medium">
+              <span class="block text-accent/80 mb-1 text-xs uppercase tracking-wider">কাস্টমার রিটেনশন</span>
+              নিয়মিত কাস্টমারদের ধরে রাখতে পয়েন্ট ও রিওয়ার্ড সিস্টেম চালু করুন। কাস্টমার যত কিনবে, তত পয়েন্ট পাবে, যা বিক্রি বাড়াতে সহায়ক।
+            </div>
+          </div>
+
+          <!-- Feature 14 -->
+          <div class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full" aria-label="Payroll Management - বেতন ও পে-রোল হিসাব">
+            <div class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0">
+              <i data-lucide="dollar-sign" class="h-8 w-8 text-black"></i>
+            </div>
+            <h3 class="text-2xl font-bold mt-6 mb-3">Payroll Management</h3>
+            <p class="text-gray-400 mb-6">
+              Configure base pay settings, define commission rates, issue
+              bonuses, and manage staff payroll runs directly within the POS system.
+            </p>
+            <div class="mt-auto pt-4 border-t border-gray-800 text-sm text-gray-400 font-medium">
+              <span class="block text-accent/80 mb-1 text-xs uppercase tracking-wider">বেতন ম্যানেজমেন্ট</span>
+              কর্মচারীদের মাসিক বেতন, অগ্রিম টাকা, ওভারটাইম এবং বোনাসের হিসাব বা পে-রোল সিস্টেম সহজেই একই সফটওয়্যারে ম্যানেজ করুন।
+            </div>
+          </div>
+
+          <!-- Feature 15 -->
+          <div class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full" aria-label="Warranty & Claims - প্রোডাক্ট ওয়ারেন্টি ট্র্যাকার">
+            <div class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0">
+              <i data-lucide="wrench" class="h-8 w-8 text-black"></i>
+            </div>
+            <h3 class="text-2xl font-bold mt-6 mb-3">Warranty & Claims</h3>
+            <p class="text-gray-400 mb-6">
+              Easily track hardware product warranties tied to specific IMEI or
+              serial numbers, and efficiently manage customer service claims and repairs.
+            </p>
+            <div class="mt-auto pt-4 border-t border-gray-800 text-sm text-gray-400 font-medium">
+              <span class="block text-accent/80 mb-1 text-xs uppercase tracking-wider">ওয়ারেন্টি হিসাব</span>
+              মোবাইল বা ইলেকট্রনিক্সের সিরিয়াল/IMEI নম্বর দিয়ে পণ্যের ওয়ারেন্টি ট্র্যাক করুন এবং কাস্টমার সার্ভিস বা ক্লেইম ম্যানেজ করুন।
+            </div>
+          </div>
+
+          <!-- Feature 16 -->
+          <div class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full" aria-label="Barcode Generator - নিজস্ব বারকোড মেকার">
+            <div class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0">
+              <i data-lucide="barcode" class="h-8 w-8 text-black"></i>
+            </div>
+            <h3 class="text-2xl font-bold mt-6 mb-3">Barcode Generator</h3>
+            <p class="text-gray-400 mb-6">
+              Instantly create and print custom barcode and QR code labels for
+              your un-barcoded products, individually or in bulk formatting.
+            </p>
+            <div class="mt-auto pt-4 border-t border-gray-800 text-sm text-gray-400 font-medium">
+              <span class="block text-accent/80 mb-1 text-xs uppercase tracking-wider">বারকোড তৈরি ও প্রিন্ট</span>
+              যেকোনো পণ্যের জন্য নিজস্ব বারকোড তৈরি করুন এবং থার্মাল বা সাধারণ প্রিন্টার দিয়ে স্টিকার/লেবেল প্রিন্ট করুন খুব সহজেই।
+            </div>
+          </div>
+
+          <!-- Feature 17 -->
+          <div class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full" aria-label="Product Attributes - পণ্যের সাইজ ও কালার ভেরিয়েন্ট">
+            <div class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0">
+              <i data-lucide="tags" class="h-8 w-8 text-black"></i>
+            </div>
+            <h3 class="text-2xl font-bold mt-6 mb-3">Product Attributes</h3>
+            <p class="text-gray-400 mb-6">
+              Define custom product attributes (e.g., Color, Size, Brand,
+              Material) to easily categorize and manage complex clothing or shoe store variants.
+            </p>
+            <div class="mt-auto pt-4 border-t border-gray-800 text-sm text-gray-400 font-medium">
+              <span class="block text-accent/80 mb-1 text-xs uppercase tracking-wider">প্রোডাক্ট ভেরিয়েন্ট</span>
+              ফ্যাশন বা জুতোর দোকানের জন্য পণ্যের সাইজ, রঙ, মডেল বা ব্র্যান্ড অনুযায়ী আলাদা ভেরিয়েন্ট বা প্রোডাক্ট অ্যাট্রিবিউট তৈরি করুন।
+            </div>
+          </div>
+
+          <!-- Feature 18 -->
+          <div class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full" aria-label="Advanced Settings - ভ্যাট ও মেমো কাস্টমাইজেশন">
+            <div class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0">
+              <i data-lucide="settings" class="h-8 w-8 text-black"></i>
+            </div>
+            <h3 class="text-2xl font-bold mt-6 mb-3">Advanced Settings</h3>
+            <p class="text-gray-400 mb-6">
+              Fully customize your local currencies, multi-tax rates, customized
+              receipt templates, store logos, and overarching business profiles.
+            </p>
+            <div class="mt-auto pt-4 border-t border-gray-800 text-sm text-gray-400 font-medium">
+              <span class="block text-accent/80 mb-1 text-xs uppercase tracking-wider">সফটওয়্যার সেটিংস</span>
+              দেশী কারেন্সি, ভ্যাট (VAT), ট্যাক্স, কাস্টমাইজড রিসিপ্ট বা মেমো টেমপ্লেট এবং ব্যবসার নিজস্ব লোগো ও প্রোফাইল সেটআপ করুন।
+            </div>
+          </div>
+
+          <!-- Feature 19 -->
+          <div class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full" aria-label="AI Assistant - আর্টিফিশিয়াল ইন্টেলিজেন্স অ্যাসিস্ট্যান্ট">
+            <div class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0">
+              <i data-lucide="sparkles" class="h-8 w-8 text-black"></i>
+            </div>
+            <h3 class="text-2xl font-bold mt-6 mb-3">AI Assistant</h3>
+            <p class="text-gray-400 mb-6">
+              Use natural language queries to get business insights, bulk create
+              products, or perform complex administrative actions instantly via AI.
+            </p>
+            <div class="mt-auto pt-4 border-t border-gray-800 text-sm text-gray-400 font-medium">
+              <span class="block text-accent/80 mb-1 text-xs uppercase tracking-wider">কৃত্রিম বুদ্ধিমত্তা (AI)</span>
+              এআই (AI) ব্যবহার করে ব্যবসার রিপোর্ট জানুন, পণ্য অ্যাড করুন এবং সাধারণ কমান্ড দিয়ে সফটওয়্যারের কাজ করুন স্মার্টলি।
+            </div>
+          </div>
+
+          <!-- Feature 20 -->
+          <div class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full" aria-label="Multi-Store Management - একাধিক দোকান বা ব্রাঞ্চ পরিচালনা">
+            <div class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0">
+              <i data-lucide="store" class="h-8 w-8 text-black"></i>
+            </div>
+            <h3 class="text-2xl font-bold mt-6 mb-3">Multi-Store Management</h3>
+            <p class="text-gray-400 mb-6">
+              Oversee multiple store locations, franchise branches, staff, and
+              transferring inventory from a single, centralized admin dashboard.
+            </p>
+            <div class="mt-auto pt-4 border-t border-gray-800 text-sm text-gray-400 font-medium">
+              <span class="block text-accent/80 mb-1 text-xs uppercase tracking-wider">একাধিক ব্রাঞ্চ কন্ট্রোল</span>
+              আপনার একাধিক দোকান, গোডাউন বা ব্রাঞ্চ একই সফটওয়্যার এবং একটি সেন্ট্রাল ড্যাশবোর্ড থেকে সহজেই ম্যানেজ করুন।
+            </div>
+          </div>
+
+          <!-- Feature 21 -->
+          <div class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full" aria-label="Daybook - দৈনিক বেচাকেনা ও ক্যাশ খতিয়ান">
+            <div class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0">
+              <i data-lucide="book-open-check" class="h-8 w-8 text-black"></i>
+            </div>
+            <h3 class="text-2xl font-bold mt-6 mb-3">Daybook</h3>
+            <p class="text-gray-400 mb-6">
+              View a comprehensive daily summary of all sales, recorded
+              expenses, bank deposits, and overall cash flow balance in one dedicated place.
+            </p>
+            <div class="mt-auto pt-4 border-t border-gray-800 text-sm text-gray-400 font-medium">
+              <span class="block text-accent/80 mb-1 text-xs uppercase tracking-wider">দৈনিক খতিয়ান বা ক্যাশবুক</span>
+              প্রতিদিনের বেচাকেনা, আনুষঙ্গিক খরচ এবং ক্যাশ ফ্লো-এর সম্পূর্ণ সারসংক্ষেপ বা ডিজিটাল ডে-বুক এক নজরে দেখুন।
+            </div>
+          </div>
+
+          <!-- Feature 22 -->
+          <div class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full" aria-label="Subscription Management - সফটওয়্যার প্যাকেজ ও সাবস্ক্রিপশন">
+            <div class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0">
+              <i data-lucide="crown" class="h-8 w-8 text-black"></i>
+            </div>
+            <h3 class="text-2xl font-bold mt-6 mb-3">Subscription Management</h3>
+            <p class="text-gray-400 mb-6">
+              Easily manage your SaaS plan, view your usage quotas, process
+              digital payments, and seamlessly upgrade your subscription anytime.
+            </p>
+            <div class="mt-auto pt-4 border-t border-gray-800 text-sm text-gray-400 font-medium">
+              <span class="block text-accent/80 mb-1 text-xs uppercase tracking-wider">অ্যাকাউন্ট ম্যানেজমেন্ট</span>
+              আপনার সফটওয়্যার সাবস্ক্রিপশন স্ট্যাটাস, পেমেন্ট হিস্ট্রি এবং প্যাকেজ আপগ্রেড খুব সহজেই নিজের ড্যাশবোর্ড থেকে নিয়ন্ত্রণ করুন।
+            </div>
+          </div>
+
+          <!-- Feature 23 (Previously Injected dynamically) -->
+          <div class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full">
+            <div class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-black"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+            </div>
+            <h3 class="text-2xl font-bold mt-6 mb-3">System Language</h3>
+            <p class="text-gray-400">Toggle between English and Bengali interface.</p>
+          </div>
+
+          <!-- Feature 24 (Previously Injected dynamically) -->
+          <div class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full">
+            <div class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-black"><circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
+            </div>
+            <h3 class="text-2xl font-bold mt-6 mb-3">Interface Theme</h3>
+            <p class="text-gray-400">Select a look and feel for your workspace.</p>
+          </div>
+
+          <!-- Feature 25 (Previously Injected dynamically) -->
+          <div class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full">
+            <div class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-black"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+            </div>
+            <h3 class="text-2xl font-bold mt-6 mb-3">Visual Command Center</h3>
+            <p class="text-gray-400">Personalize your CashShilpo experience.</p>
+          </div>
+
+          <!-- Feature 26 (Previously Injected dynamically) -->
+          <div class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full">
+            <div class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-black"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            </div>
+            <h3 class="text-2xl font-bold mt-6 mb-3">POS Layout</h3>
+            <p class="text-gray-400">Customize your point of sale screen for maximum speed and comfort.</p>
+          </div>
+
+          <!-- Feature 27 (Previously Injected dynamically) -->
+          <div class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full">
+            <div class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-black"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+            </div>
+            <h3 class="text-2xl font-bold mt-6 mb-3">Advanced EMI System</h3>
+            <p class="text-gray-400">Offer flexible installment plans to customers and track EMI payments automatically.</p>
+          </div>
+
+          <!-- Feature 28 (Previously Injected dynamically) -->
+          <div class="feature-card bg-gray-900 p-8 rounded-2xl border border-gray-800 hover:border-accent transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full">
+            <div class="bg-accent h-16 w-16 rounded-full flex items-center justify-center flex-shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-black"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+            </div>
+            <h3 class="text-2xl font-bold mt-6 mb-3">Smart Actions & Automation</h3>
+            <p class="text-gray-400">Let AI handle the routine tasks. Enable smart automations to boost efficiency and drive sales.</p>
+          </div>
+        </div>
+
+        <div class="text-center mt-16 animate-fade-in-up">
+          <button
+            id="see-more-features"
+            class="bg-gray-800 text-accent font-semibold px-8 py-4 rounded-full border-2 border-accent hover:bg-accent hover:text-black transition-all duration-300"
+          >
+            See All 28 Features
+          </button>
+        </div>
+      </section>
+
+      <!-- Advanced Stats Section -->
+      <section
+        class="relative h-[600px] md:h-[100vh] flex items-center justify-center text-center overflow-hidden"
+      >
+        <img
+          src="our_servieces_overview.png"
+          alt="CashShilpo software impact globally and locally"
+          onerror="this.src='https://placehold.co/1920x700/333/888?text=Image+Missing'"
+          class="absolute top-0 left-0 w-full h-full object-cover"
+          style="filter: brightness(0.4) saturate(0.8); z-index: 0;"
+        />
+        <div class="stats-overlay"></div>
+        <div class="relative z-10 flex flex-col items-center justify-center h-full max-w-2xl mx-auto px-4">
+          <p class="text-lg md:text-xl text-gray-300 mb-2 uppercase tracking-widest animate-fade-in-up">
+            This past month
+          </p>
+          <h2 class="text-4xl sm:text-5xl md:text-6xl font-extrabold leading-tight tracking-tighter mb-8 animate-fade-in-up" style="transition-delay: 0.1s;">
+            We served <span class="text-accent">100+</span>
+          </h2>
+          <div class="bg-blue-600 text-white px-12 py-6 rounded-2xl mb-8 shadow-accent-2xl animate-scale-in" style="transition-delay: 0.2s;">
+            <h3 class="text-6xl md:text-8xl font-extrabold">Clients</h3>
+          </div>
+        </div>
+      </section>
+
+      <!-- CEO and Lead Developer Section -->
+      <section id="leadership" class="container mx-auto px-6 py-24 md:py-32">
+        <div class="relative w-full rounded-3xl bg-[#0a0a0a] border border-gray-800 p-8 md:p-12 lg:p-16 overflow-hidden shadow-2xl animate-fade-in-up">
+          <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: radial-gradient(var(--accent-color) 1px, transparent 1px); background-size: 32px 32px;"></div>
+          <div class="absolute -top-32 -right-32 w-96 h-96 bg-accent opacity-10 rounded-full blur-[100px] pointer-events-none"></div>
+
+          <div class="relative z-10 flex flex-col lg:flex-row gap-12 lg:gap-20 items-center">
+            <!-- Image Column -->
+            <div class="w-full lg:w-5/12 flex justify-center lg:justify-start">
+              <div class="relative group">
+                <div class="absolute -inset-1 bg-gradient-to-r from-accent to-blue-600 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+                <div class="relative w-64 h-64 md:w-80 md:h-80 rounded-2xl overflow-hidden border border-gray-700 bg-gray-900">
+                  <img
+                    src="cashshilpo-founder.jpg"
+                    alt="Md Shadik Hossain - CEO & Lead Developer"
+                    onerror="this.src='https://placehold.co/500x500/111/39ff14?text=SH'"
+                    class="w-full h-full object-cover filter brightness-90 group-hover:brightness-110 transition-all duration-500 scale-100 group-hover:scale-105"
+                  />
+                </div>
+                <div class="absolute bottom-6 -right-6 md:-right-8 bg-black border border-gray-700 rounded-xl p-4 shadow-xl flex items-center space-x-4 animate-fade-in-left" style="transition-delay: 0.3s;">
+                  <div class="bg-accent/20 p-2 rounded-lg">
+                    <i data-lucide="code-2" class="w-6 h-6 text-accent"></i>
+                  </div>
+                  <div>
+                    <p class="text-xs text-gray-400 uppercase tracking-wider font-bold">Tech Leader</p>
+                    <p class="text-sm text-white font-medium">Full-Stack Dev</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Content Column -->
+            <div class="w-full lg:w-7/12">
+              <div class="inline-flex items-center space-x-2 bg-gray-900 border border-gray-800 px-4 py-1.5 rounded-full mb-6">
+                <span class="w-2 h-2 rounded-full bg-accent animate-pulse"></span>
+                <span class="text-sm font-semibold uppercase tracking-wider text-gray-300">The Architect</span>
+              </div>
+
+              <h2 class="text-4xl md:text-5xl font-extrabold text-white mb-2">
+                Md Shadik <span class="text-accent">Hossain</span>
+              </h2>
+              <p class="text-xl text-gray-400 font-medium mb-8">
+                Founder, CEO & Lead Developer
+              </p>
+
+              <!-- Bilingual Bio Container -->
+              <div class="space-y-6">
+                <!-- English Text -->
+                <div class="bilingual-en">
+                  <p class="text-gray-300 text-lg leading-relaxed">
+                    <strong class="text-white">Md Shadik Hossain</strong> is the
+                    Founder and CEO of <strong class="text-white">CashShilpo</strong>. He is a web
+                    developer and digital product creator focused on building
+                    modern tools that help small and medium businesses manage
+                    sales, inventory, and operations more efficiently. Alongside
+                    CashShilpo, he also founded the non-profit initiative
+                    <strong class="text-accent">Rural Peace</strong> and works
+                    on projects that combine technology, entrepreneurship, and social impact.
+                  </p>
+                </div>
+
+                <!-- Bangla Text -->
+                <div class="bilingual-bn bg-gray-900/50 border-l-4 border-accent p-5 rounded-r-lg">
+                  <p class="text-gray-400 text-md md:text-lg leading-relaxed font-medium">
+                    <strong class="text-gray-200">মোঃ সাদিক হোসেন</strong> হলেন
+                    <strong class="text-gray-200">ক্যাশশিল্প</strong>-এর
+                    প্রতিষ্ঠাতা এবং সিইও। তিনি একজন ওয়েব ডেভেলপার এবং ডিজিটাল
+                    প্রোডাক্ট ক্রিয়েটর, যিনি ক্ষুদ্র ও মাঝারি ব্যবসাগুলোর জন্য
+                    আধুনিক টুলস তৈরি করতে কাজ করছেন, যাতে তারা আরও সহজে
+                    বেচাকেনা, ইনভেন্টরি এবং দৈনন্দিন হিসাব পরিচালনা করতে পারে।
+                    ক্যাশশিল্পের পাশাপাশি, তিনি
+                    <strong class="text-accent">রুরাল পিস (Rural Peace)</strong>
+                    নামক একটি অলাভজনক উদ্যোগও প্রতিষ্ঠা করেছেন এবং প্রযুক্তি,
+                    উদ্যোক্তা উন্নয়ন ও সামাজিক প্রভাবের সমন্বয়ে বিভিন্ন প্রজেক্ট নিয়ে কাজ করছেন।
+                  </p>
+                </div>
+              </div>
+
+              <div class="mt-8 flex flex-wrap gap-4">
+                <a href="#" class="flex items-center space-x-2 bg-accent text-black px-6 py-3 rounded-lg hover:bg-white hover:scale-105 transition-all duration-300 font-bold">
+                  <i data-lucide="linkedin" class="h-5 w-5"></i>
+                  <span>Connect with Shadik</span>
+                </a>
+                <a href="https://shadik.onrender.com" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-2 bg-transparent border border-gray-700 text-white px-6 py-3 rounded-lg hover:border-accent hover:text-accent transition-all duration-300 font-medium">
+                  <i data-lucide="globe" class="h-5 w-5"></i>
+                  <span class="bilingual-en">Personal Website</span>
+                  <span class="bilingual-bn">পার্সোনাল ওয়েবসাইট</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Testimonial Section -->
+      <section id="support" class="container mx-auto px-6 py-32">
+        <div class="bg-gray-900 border border-accent rounded-2xl p-12 md:p-16 text-center max-w-4xl mx-auto shadow-xl animate-scale-in">
+          <p class="text-3xl md:text-4xl font-medium leading-tight font-testimonial italic" style="font-weight: 500;">
+            "CashShilpo completely changed how we run our cafe. Inventory is no
+            longer a nightmare, and I can check my sales from home. It's the
+            best POS software decision we ever made."
+          </p>
+          <p class="text-accent font-bold mt-8 text-xl">Rina Ahmed</p>
+          <p class="text-gray-500">Owner, The Cozy Corner Cafe</p>
+        </div>
+      </section>
+
+      <!-- Testimonial Ticker -->
+      <section class="py-16 md:py-24">
+        <div class="text-center max-w-3xl mx-auto mb-12 px-6 animate-fade-in-up">
+          <h2 class="text-3xl md:text-5xl font-extrabold mb-4">
+            MORE VOICES. <span class="text-accent">MORE SUCCESS.</span>
+          </h2>
+          <p class="text-lg text-gray-400">
+            See what other business owners are saying about CashShilpo POS software.
+          </p>
+        </div>
+
+        <div class="testimonial-ticker-container relative">
+          <div class="absolute top-0 left-0 w-24 md:w-48 h-full bg-gradient-to-r from-black to-transparent z-10"></div>
+          <div class="absolute top-0 right-0 w-24 md:w-48 h-full bg-gradient-to-l from-black to-transparent z-10"></div>
+          <div class="testimonial-ticker-content z-0">
+            <div class="testimonial-item">
+              <p class="text-gray-300 mb-4 font-testimonial text-lg" style="font-style: italic; font-weight: 400;">
+                "The multi-store sync is a lifesaver. I manage three locations
+                from one dashboard. It's ridiculously simple."
+              </p>
+              <p class="text-accent font-bold">Mike T.</p>
+              <p class="text-gray-500 text-sm">Urban Gear</p>
+            </div>
+            <div class="testimonial-item">
+              <p class="text-gray-300 mb-4 font-testimonial text-lg" style="font-style: italic; font-weight: 400;">
+                "I love the offline mode. Our internet can be spotty, but we
+                never miss a sale. It just syncs up when we're back."
+              </p>
+              <p class="text-accent font-bold">Sara K.</p>
+              <p class="text-gray-500 text-sm">Beachside Books</p>
+            </div>
+            <div class="testimonial-item">
+              <p class="text-gray-300 mb-4 font-testimonial text-lg" style="font-style: italic; font-weight: 400;">
+                "The analytics are powerful. I finally understand what my
+                best-selling products are and when my busiest hours hit."
+              </p>
+              <p class="text-accent font-bold">David Chen</p>
+              <p class="text-gray-500 text-sm">EcoFoods</p>
+            </div>
+            <div class="testimonial-item">
+              <p class="text-gray-300 mb-4 font-testimonial text-lg" style="font-style: italic; font-weight: 400;">
+                "24/7 support actually means 24/7. I had an issue at 2 AM, and
+                someone helped me solve it immediately. Unbelievable."
+              </p>
+              <p class="text-accent font-bold">Fatima Al-Jaber</p>
+              <p class="text-gray-500 text-sm">The Night Owl Bakery</p>
+            </div>
+
+            <!-- Duplicate for smooth marquee -->
+            <div class="testimonial-item">
+              <p class="text-gray-300 mb-4 font-testimonial text-lg" style="font-style: italic; font-weight: 400;">
+                "The multi-store sync is a lifesaver. I manage three locations
+                from one dashboard. It's ridiculously simple."
+              </p>
+              <p class="text-accent font-bold">Mike T.</p>
+              <p class="text-gray-500 text-sm">Urban Gear</p>
+            </div>
+            <div class="testimonial-item">
+              <p class="text-gray-300 mb-4 font-testimonial text-lg" style="font-style: italic; font-weight: 400;">
+                "I love the offline mode. Our internet can be spotty, but we
+                never miss a sale. It just syncs up when we're back."
+              </p>
+              <p class="text-accent font-bold">Sara K.</p>
+              <p class="text-gray-500 text-sm">Beachside Books</p>
+            </div>
+            <div class="testimonial-item">
+              <p class="text-gray-300 mb-4 font-testimonial text-lg" style="font-style: italic; font-weight: 400;">
+                "The analytics are powerful. I finally understand what my
+                best-selling products are and when my busiest hours hit."
+              </p>
+              <p class="text-accent font-bold">David Chen</p>
+              <p class="text-gray-500 text-sm">EcoFoods</p>
+            </div>
+            <div class="testimonial-item">
+              <p class="text-gray-300 mb-4 font-testimonial text-lg" style="font-style: italic; font-weight: 400;">
+                "24/7 support actually means 24/7. I had an issue at 2 AM, and
+                someone helped me solve it immediately. Unbelievable."
+              </p>
+              <p class="text-accent font-bold">Fatima Al-Jaber</p>
+              <p class="text-gray-500 text-sm">The Night Owl Bakery</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Final CTA Section -->
+      <section
+        id="start"
+        class="cta-section container mx-auto px-6 py-32 text-center"
+      >
+        <h2 class="text-5xl md:text-7xl font-extrabold leading-tight tracking-tighter animate-fade-in-up">
+          READY TO <span class="text-accent">GROW</span>
+          <br />
+          YOUR BUSINESS?
+        </h2>
+        <p class="text-lg md:text-xl text-gray-400 mt-8 max-w-2xl mx-auto animate-fade-in-up">
+          Stop guessing. Start selling smarter with CashShilpo, the industry's
+          top POS and business management software. Get started with a free,
+          no-obligation demo today.
+        </p>
+        <div class="mt-12 animate-fade-in-up">
+          <a
+            href="#"
+            class="bg-accent text-black font-bold text-lg px-10 py-5 rounded-full hover:bg-white hover:scale-105 transition-all duration-300 transform"
+          >
+            Start Your 7-Day Free Trial
+          </a>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="bg-gray-900 border-t border-gray-800 mt-20">
+        <div class="container mx-auto px-6 py-20">
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-12">
+            <div class="md:col-span-12 lg:col-span-5">
+              <a href="#" class="text-3xl font-extrabold text-white">
+                Cash<span class="text-accent">Shilpo</span>.
+              </a>
+              <p class="text-gray-400 mt-6 pr-8 text-lg">
+                Empowering businesses worldwide with simple, smart, and powerful
+                POS solutions.
+              </p>
+            </div>
+
+            <div class="md:col-span-12 lg:col-span-7">
+              <div class="grid grid-cols-2 md:grid-cols-3 gap-8">
+                <div>
+                  <h4 class="text-white font-bold text-lg mb-6 uppercase tracking-wider">Product</h4>
+                  <ul class="space-y-4">
+                    <li><a href="#features" class="text-gray-400 hover:text-accent transition-colors duration-300">Features</a></li>
+                    <li><a href="pricing" class="text-gray-400 hover:text-accent transition-colors duration-300">Pricing</a></li>
+                    <li><a href="support" class="text-gray-400 hover:text-accent transition-colors duration-300">Support</a></li>
+                    <li><a href="#start" class="text-gray-400 hover:text-accent transition-colors duration-300">Start Free Trial</a></li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 class="text-white font-bold text-lg mb-6 uppercase tracking-wider">Company</h4>
+                  <ul class="space-y-4">
+                    <li><a href="about" class="text-gray-400 hover:text-accent transition-colors duration-300">About Us</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-accent transition-colors duration-300">Blog</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-accent transition-colors duration-300">Careers</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-accent transition-colors duration-300">Contact</a></li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 class="text-white font-bold text-lg mb-6 uppercase tracking-wider">Legal</h4>
+                  <ul class="space-y-4">
+                    <li><a href="#" class="text-gray-400 hover:text-accent transition-colors duration-300">Privacy Policy</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-accent transition-colors duration-300">Terms of Service</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-accent transition-colors duration-300">Cookie Policy</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-16 pt-16 border-t border-gray-800 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+            <div>
+              <h3 class="text-2xl md:text-3xl font-bold text-white">Subscribe to our newsletter</h3>
+              <p class="text-gray-400 mt-2 text-lg">
+                Get the latest updates, feature releases, and business
+                management tips sent straight to your inbox.
+              </p>
+            </div>
+            <form class="flex flex-col sm:flex-row gap-4 w-full">
+              <label for="email-subscribe" class="sr-only">Email address</label>
+              <input
+                type="email"
+                id="email-subscribe"
+                placeholder="Enter your email"
+                class="flex-grow w-full px-5 py-4 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent"
+                required
+              />
+              <button
+                type="submit"
+                class="bg-accent text-black font-bold text-lg px-8 py-4 rounded-lg hover:bg-white hover:scale-105 transition-all duration-300 transform flex-shrink-0"
+              >
+                Subscribe
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <div class="bg-black py-8">
+          <div class="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center text-center md:text-left">
+            <p class="text-gray-500 mb-4 md:mb-0">
+              &copy; 2026 CashShilpo. All rights reserved.
+            </p>
+            <div class="flex space-x-6">
+              <a href="#" class="text-gray-400 hover:text-accent transform hover:scale-125 transition-all duration-300" aria-label="Instagram">
+                <i data-lucide="instagram" class="h-6 w-6"></i>
+              </a>
+              <a href="#" class="text-gray-400 hover:text-accent transform hover:scale-125 transition-all duration-300" aria-label="Twitter">
+                <i data-lucide="twitter" class="h-6 w-6"></i>
+              </a>
+              <a href="#" class="text-gray-400 hover:text-accent transform hover:scale-125 transition-all duration-300" aria-label="LinkedIn">
+                <i data-lucide="linkedin" class="h-6 w-6"></i>
+              </a>
+              <a href="#" class="text-gray-400 hover:text-accent transform hover:scale-125 transition-all duration-300" aria-label="Facebook">
+                <i data-lucide="facebook" class="h-6 w-6"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <!-- Floating Translation Toggle Button -->
+    <button
+      id="lang-toggle-btn"
+      onclick="toggleLanguage()"
+      class="fixed bottom-6 right-6 z-[9999] bg-black text-accent border-2 border-accent px-5 py-2.5 rounded-full font-bold text-sm shadow-[0_4px_20px_rgba(57,255,20,0.3)] hover:bg-accent hover:text-black hover:scale-105 transition-all duration-300 flex items-center gap-2"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-globe">
+        <circle cx="12" cy="12" r="10" />
+        <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+        <path d="M2 12h20" />
+      </svg>
+      <span id="lang-toggle-text">বাং</span>
+    </button>
+
+    <!-- Inline Bilingual System Scripts -->
+    <script>
+      // Single Source of Truth for Translations (0 Redundancy)
+      const DICTIONARY = {
+        "System Language": "সিস্টেম ল্যাঙ্গুয়েজ",
+        "Toggle between English and Bengali interface.": "যখন খুশি ইংরেজি থেকে বাংলায় সুইচ করুন। আপনার ব্যবসার ভাষা হোক আপনার নিজের ভাষায়।",
+        "Interface Theme": "ইন্টারফেস থিম",
+        "Select a look and feel for your workspace.": "আপনার পছন্দমতো ডার্ক বা লাইট থিম বেছে নিন। কাজের পরিবেশ হোক চোখের জন্য আরামদায়ক।",
+        "Visual Command Center": "ভিজুয়াল কমান্ড সেন্টার",
+        "Personalize your CashShilpo experience.": "ক্যাশশিল্পোকে সাজিয়ে নিন একদম আপনার মনের মতো করে। এটি শুধু সফটওয়্যার নয়, আপনার পার্সোনাল অ্যাসিস্ট্যান্ট।",
+        "POS Layout": "POS লেআউট কাস্টমাইজেশন",
+        "Customize your point of sale screen for maximum speed and comfort.": "বিক্রয় স্ক্রিনটি সাজান এমনভাবে, যেন কাস্টমার হ্যান্ডেল করা যায় চোখের পলকে।",
+        "Advanced EMI System": "অ্যাডভান্সড কিস্তি (EMI) সুবিধা",
+        "Offer flexible installment plans to customers and track EMI payments automatically.": "কাস্টমারকে দিন সহজ কিস্তিতে পণ্য কেনার সুযোগ। সফটওয়্যারই রাখবে কিস্তির পাই-টু-পাই হিসাব।",
+        "Smart Actions & Automation": "স্মার্ট অটোমেশন ও AI",
+        "Let AI handle the routine tasks. Enable smart automations to boost efficiency and drive sales.": "রুটিন কাজগুলো ছেড়ে দিন AI-এর হাতে। সময় বাঁচান, বিক্রি বাড়ান এবং ব্যবসায় আনুন আধুনিকতার ছোঁয়া।",
+        "Features": "ফিচারসমূহ",
+        "Pricing": "প্যাকেজসমূহ",
+        "Support": "হেল্পলাইন",
+        "Get Started": "যাত্রা শুরু করুন",
+        "Start Free Trial": "ফ্রি ট্রায়াল চালু করুন",
+        "Start Your 7-Day Free Trial": "৭ দিনের জন্য ফ্রি ব্যবহার করুন",
+        "Company": "প্রতিষ্ঠান",
+        "Legal": "আইনি তথ্যাদি",
+        "Product": "প্রোডাক্ট",
+        "About Us": "আমাদের গল্প",
+        "Blog": "ব্লগ",
+        "Careers": "ক্যারিয়ার",
+        "Contact": "যোগাযোগ করুন",
+        "Privacy Policy": "গোপনীয়তা নীতি",
+        "Terms of Service": "শর্তাবলী",
+        "Cookie Policy": "কুকি পলিসি",
+        "Subscribe to our newsletter": "আমাদের নিউজলেটারে যুক্ত হোন",
+        "Subscribe": "সাবস্ক্রাইব",
+        "Enter your email": "আপনার ইমেইল লিখুন",
+        "All rights reserved.": "সর্বস্বত্ব সংরক্ষিত।",
+        "MANAGE YOUR BUSINESS,": "আপনার ব্যবসার পূর্ণ নিয়ন্ত্রণ নিন,",
+        "SIMPLY &": "খুব সহজে ও",
+        "SMARTLY.": " স্মার্ট প্রযুক্তিতে ।",
+        "CashShilpo is the all-in-one POS software designed to streamline your operations, manage inventory, and boost your sales. Stop guessing, start growing with the world's leading business management tool.": "ক্যাশশিল্পো—আপনার ব্যবসার এক কমপ্লিট সলিউশন। ইনভেন্টরি থেকে সেলস, সবকিছু সামলান এক নিমিষেই। অনুমান নয়, সঠিক তথ্যের ভিত্তিতে ব্যবসার গ্রোথ নিশ্চিত করুন আজই।",
+        "Trusted by businesses like yours": "আপনার মতো হাজারো সফল উদ্যোক্তার আস্থার প্রতীক",
+        "THIS IS YOUR NEW": "এটিই আপনার ব্যবসার ",
+        "COMMAND CENTER.": "ডিজিটাল পাওয়ারহাউজ।",
+        "One clean, powerful dashboard to control your entire business. From sales to stock, it's all right here in CashShilpo.": "একটি শক্তিশালী ড্যাশবোর্ড, যা দিয়ে পুরো ব্যবসা পরিচালনা করা এখন পানির মতো সহজ। বিক্রি থেকে স্টক—সবকিছুর হিসাব এখন চোখের সামনে।",
+        "FEATURES BUILT FOR": "আপনার ব্যবসার অগ্রগতির জন্য ",
+        "YOUR BUSINESS.": "তৈরি বিশেষ ফিচারসমূহ।",
+        "CashShilpo is built on three core pillars designed to simplify your workday and accelerate your growth.": "ক্যাশশিল্পো এমনভাবে তৈরি করা হয়েছে যা আপনার প্রতিদিনের কাজকে করবে সহজ এবং ব্যবসার গতি বাড়াবে বহুগুণ।",
+        "Streamline Sales": "বিক্রয় হোক চোখের পলকে",
+        "Sell Faster, Sell Smarter.": "দ্রুত বিক্রি করুন, নির্ভুল হিসাব রাখুন।",
+        "A blazingly fast, intuitive, and customizable checkout process. Handle sales, returns, discounts, and split payments with just a few taps. Top rated POS software.": "বিদ্যুৎগতিতে চেকআউট করার অভিজ্ঞতা। সেলস, রিটার্ন, ডিসকাউন্ট কিংবা বকেয়া—সব সামলান মাত্র কয়েক ক্লিকেই।",
+        "Master Your Inventory": "ইনভেন্টরি এখন আপনার হাতের মুঠোয়",
+        "Never Run Out of Stock.": "স্টক শেষ হওয়ার আগেই জানুন।",
+        "Real-time stock tracking across all your locations. Get automatic low-stock alerts, create purchase orders, and manage suppliers with our advanced business management software.": "আপনার সকল শোরুমের রিয়েল-টাইম স্টক আপডেট। স্টক ফুরিয়ে যাওয়ার আগেই অটোমেটিক অ্যালার্ট পান এবং সাপ্লায়ার ম্যানেজ করুন স্মার্টলি।",
+        "Grow Your Business": "ব্যবসার পরিধি বাড়ান",
+        "Understand Your Data.": "ব্যবসার নাড়িনক্ষত্র জানুন।",
+        "Get detailed insights into your sales, top-performing products, and customer behavior to make data-driven decisions with cashsilpo.": "কোন পণ্যটি বেশি চলছে? লাভ কেমন হচ্ছে? ব্যবসার সব গোপন তথ্য জেনে সঠিক সিদ্ধান্ত নিন এবং মুনাফা বাড়ান।",
+        "SELL FASTER •": "দ্রুত বিক্রি করুন •",
+        "TRACK INVENTORY •": "স্টক ট্র্যাক করুন •",
+        "MANAGE CUSTOMERS •": "কাস্টমার ধরে রাখুন •",
+        "BOOST YOUR SALES •": "বিক্রয় বৃদ্ধি করুন •",
+        "AND EVERYTHING ELSE YOU NEED.": "এবং আরও যা যা আপনার প্রয়োজন—সব আছে এখানে।",
+        "CashShilpo is a complete toolkit. We've thought of everything so you don't have to. Advanced POS, tracking, and management software built for you.": "ক্যাশশিল্পো একটি স্বয়ংসম্পূর্ণ টুলকিট। আপনার ব্যবসার প্রতিটি খুঁটিনাটি প্রয়োজনের কথা ভেবেই আমরা এটি সাজিয়েছি।",
+        "Analytics Dashboard": "অ্যানালিটিক্স ড্যাশবোর্ড",
+        "Your complete business overview with real-time sales trends, top-selling products, and detailed profit metrics. Make data-driven decisions seamlessly.": "এক নজরে পুরো ব্যবসার হালচাল, লাভ-ক্ষতি এবং সেরা পণ্যের রিপোর্ট।",
+        "POS Terminal": "আধুনিক পজ টার্মিনাল",
+        "A blazingly fast and intuitive checkout point of sale system with smart cart management, discounts, and split payment handling.": "দ্রুততম চেকআউট সিস্টেম, যা কাস্টমারের অপেক্ষার সময় কমিয়ে আনে শূন্যের কোঠায়।",
+        "Inventory Management": "ইনভেন্টরি ম্যানেজমেন্ট",
+        "Real-time stock tracking, variant management, precise serial numbers, expiry dates, and automatic low-stock alerts.": "স্টক চুরি বা হারিয়ে যাওয়া রোধ করুন রিয়েল-টাইম ট্র্যাকিং ও সিরিয়াল নম্বরের মাধ্যমে।",
+        "Invoice Management": "ইনভয়েস ম্যানেজমেন্ট",
+        "Create, track, and manage all your sales invoices digitally. Includes seamless support for voiding invoices and handling customer returns.": "প্রফেশনাল ইনভয়েস তৈরি করুন এবং রিটার্ন বা ভয়েড করুন কোনো ঝামেলা ছাড়াই।",
+        "Quotation Management": "কোটেশন ম্যানেজমেন্ট",
+        "Send professional price quotes and estimates to clients directly. Convert approved quotes into actual sales invoices with a single click.": "ক্লায়েন্টদের প্রফেশনাল কোটেশন পাঠান এবং এক ক্লিকেই তা বিক্রয়ে রূপান্তর করুন।",
+        "Customer CRM": "কাস্টমার ম্যানেজমেন্ট (CRM)",
+        "Build robust customer profiles, track purchase histories, manage custom credit limits, and safely handle due payments and accounts receivable.": "কাস্টমারের কেনাকাটার ইতিহাস ও বকেয়া বা বাকি খাতার হিসাব রাখুন খুব সহজে।",
+        "Reports & Analytics": "রিপোর্ট ও অ্যানালিটিক্স",
+        "Generate detailed, exportable reports on your daily sales, profit & loss, inventory valuation, staff performance, and specific customer behaviors.": "দিনশেষে বা মাসশেষে লাভের সঠিক হিসাব এবং কর্মীদের কাজের মূল্যায়ন রিপোর্ট।",
+        "Purchase Orders (PO)": "পারচেজ অর্ডার (PO)",
+        "Create and manage professional purchase orders (PO) to seamlessly restock your inventory and accurately track incoming stock deliveries.": "দোকানের মাল ফুরিয়ে যাওয়ার আগেই সাপ্লায়ারকে অর্ডার দিন এবং ইনকামিং স্টক ট্র্যাক করুন।",
+        "Supplier Management": "সাপ্লায়ার ম্যানেজমেন্ট",
+        "Manage your entire supplier database, keep track of purchase history per supplier, and effortlessly monitor accounts payable to vendors.": "সকল সাপ্লায়ারের তালিকা ও তাদের সাথে লেনদেনের সঠিক ইতিহাস সংরক্ষণ করুন।",
+        "Expense Tracking": "খরচের হিসাব (Expense)",
+        "Log, monitor, and intelligently categorize all your business expenses (rent, utilities, salaries) to maintain a crystal clear view of your cash flow.": "দোকান ভাড়া থেকে চা-নাস্তা—ব্যবসায়ের প্রতিটি পয়সার খরচের হিসাব রাখুন স্বচ্ছভাবে।",
+        "Staff Management": "স্টাফ ম্যানেজমেন্ট",
+        "Manage individual staff accounts, invite new team members securely, and track individual sales performance and commission per employee.": "কর্মীদের জন্য আলাদা একাউন্ট তৈরি করুন এবং কে কেমন বিক্রি করছে তা মনিটর করুন।",
+        "Roles & Permissions": "নিরাপত্তা ও পারমিশন",
+        "Exercise granular access control over what each staff member can see or do within the software, from voiding invoices to hiding overall profit margins.": "কোন কর্মী কী দেখতে পারবে বা করতে পারবে, তার পূর্ণ নিয়ন্ত্রণ রাখুন নিজের হাতে।",
+        "Loyalty Program": "লয়ালটি প্রোগ্রাম",
+        "Boost customer retention dramatically with a built-in loyalty points and rewards system, complete with customizable customer tiers.": "পয়েন্ট এবং রিওয়ার্ড দিয়ে কাস্টমারকে বারবার আপনার দোকানে ফিরিয়ে আনুন।",
+        "Payroll Management": "বেতন ও হাজিরা",
+        "Configure base pay settings, define commission rates, issue bonuses, and manage staff payroll runs directly within the POS system.": "সিস্টেম থেকেই কর্মীদের বেতন, বোনাস এবং ওভারটাইমের হিসাব করুন নির্ভুলভাবে।",
+        "Warranty & Claims": "ওয়ারেন্টি ও ক্লেইম",
+        "Easily track hardware product warranties tied to specific IMEI or serial numbers, and efficiently manage customer service claims and repairs.": "ওয়ারেন্টি কার্ড হারানোর ভয় নেই; সিরিয়াল নম্বর দিয়েই ওয়ারেন্টি ট্র্যাক করুন।",
+        "Barcode Generator": "বারকোড জেনারেটর",
+        "Instantly create and print custom barcode and QR code labels for your un-barcoded products, individually or in bulk formatting.": "নিজের দোকানের নামে পণ্যের বারকোড তৈরি এবং প্রিন্ট করুন খুব সহজেই।",
+        "Product Attributes": "প্রোডাক্ট ভেরিয়েন্ট",
+        "Define custom product attributes (e.g., Color, Size, Brand, Material) to easily categorize and manage complex clothing or shoe store variants.": "রঙ, সাইজ বা ব্র্যান্ড অনুযায়ী পণ্যের ভেরিয়েন্ট সাজান এবং খুঁজে বের করুন।",
+        "Advanced Settings": "অ্যাডভান্সড সেটিংস",
+        "Fully customize your local currencies, multi-tax rates, customized receipt templates, store logos, and overarching business profiles.": "আপনার পছন্দমতো ভ্যাট, কারেন্সি এবং রিসিটের ডিজাইন কাস্টমাইজ করুন।",
+        "AI Assistant": "স্মার্ট AI অ্যাসিস্ট্যান্ট",
+        "Use natural language queries to get business insights, bulk create products, or perform complex administrative actions instantly via AI.": "মুখে বা লিখে কমান্ড দিন, AI আপনার হয়ে রিপোর্ট তৈরি বা কাজ করে দেবে মুহূর্তেই।",
+        "Multi-Store Management": "মাল্টি-স্টোর ম্যানেজমেন্ট",
+        "Oversee multiple store locations, franchise branches, staff, and transferring inventory from a single, centralized admin dashboard.": "এক জায়গায় বসেই দেশের যেকোনো প্রান্তে থাকা আপনার একাধিক শোরুম নিয়ন্ত্রণ করুন।",
+        "Daybook": "দৈনিক খতিয়ান (Daybook)",
+        "View a comprehensive daily summary of all sales, recorded expenses, bank deposits, and overall cash flow balance in one dedicated place.": "দিনশেষে ক্যাশ বক্সে কত টাকা থাকার কথা, তা এক ক্লিকেই মিলিয়ে নিন।",
+        "Subscription Management": "সাবস্ক্রিপশন ম্যানেজমেন্ট",
+        "Subscription Admin": "সাবস্ক্রিপশন অ্যাডমিন",
+        "Easily manage your SaaS plan, view your usage quotas, process digital payments, and seamlessly upgrade your subscription anytime.": "আপনার প্যাকেজ বা প্ল্যান ম্যানেজ করুন এবং প্রয়োজন অনুযায়ী আপগ্রেড করুন।",
+        "See All 28 Features": "সবগুলো ২৮টি ফিচার দেখুন",
+        "See Less Features": "ফিচারগুলো লুকান",
+        "This past month": "গত এক মাসে",
+        "We served": "আমরা সেবা দিয়েছি ",
+        "Clients": "সন্তুষ্ট ক্লায়েন্ট",
+        "100+": " ১০০+",
+        "MORE VOICES.": "গ্রাহকদের মতামত। ",
+        "MORE SUCCESS.": "সাফল্যের গল্প।",
+        "See what other business owners are saying about CashShilpo POS software.": "দেখুন সফল ব্যবসায়ীরা ক্যাশশিল্পো সম্পর্কে কী বলছেন।",
+        '"CashShilpo completely changed how we run our cafe. Inventory is no longer a nightmare, and I can check my sales from home. It\'s the best POS software decision we ever made."': '"ক্যাশশিল্পো আমাদের ক্যাফে চালানোর পদ্ধতিই বদলে দিয়েছে। ইনভেন্টরি নিয়ে এখন আর টেনশন নেই, বাসায় বসেই বিক্রির আপডেট পাই। এটা আমার ব্যবসার সেরা বিনিয়োগ।"',
+        "Owner, The Cozy Corner Cafe": "স্বত্বাধিকারী, দ্য কোজি কর্নার ক্যাফে",
+        '"The multi-store sync is a lifesaver. I manage three locations from one dashboard. It\'s ridiculously simple."': '"মাল্টি-স্টোর ফিচারটা আমার জীবন সহজ করে দিয়েছে। এক ড্যাশবোর্ড থেকেই আমি তিনটি শোরুম চালাই। অবিশ্বাস্য রকম সহজ!"',
+        '"I love the offline mode. Our internet can be spotty, but we never miss a sale. It just syncs up when we\'re back."': '"এর অফলাইন মোডটি দারুণ। ইন্টারনেট না থাকলেও বেচাকেনা থামে না, ইন্টারনেট এলেই অটোমেটিক সিঙ্ক হয়ে যায়।"',
+        '"The analytics are powerful. I finally understand what my best-selling products are and when my busiest hours hit."': '"এর রিপোর্টগুলো খুব কাজের। আমি এখন জানি আমার কোন পণ্যটি হট কেকের মতো বিক্রি হচ্ছে এবং কখন কাস্টমারের চাপ বেশি থাকে।"',
+        '"24/7 support actually means 24/7. I had an issue at 2 AM, and someone helped me solve it immediately. Unbelievable."': '"২৪/৭ সাপোর্ট মানে সত্যিই ২৪/৭। রাত ২টায় সমস্যায় পড়েছিলাম এবং তারা সাথে সাথেই সমাধান করে দিয়েছে। অকল্পনীয় সার্ভিস!"',
+        "READY TO": "প্রস্তুত আপনার ",
+        "GROW": "ব্যবসা",
+        "YOUR BUSINESS?": "বড় করতে?",
+        "Stop guessing. Start selling smarter with CashShilpo, the industry's top POS and business management software. Get started with a free, no-obligation demo today.": "আর দেরি কেন? ক্যাশশিল্পোর সাথে আপনার ব্যবসার স্মার্ট যাত্রা শুরু করুন আজই। কোনো টাকা ছাড়াই ডেমো দেখুন।",
+        "Empowering businesses worldwide with simple, smart, and powerful POS solutions.": "সহজ ও শক্তিশালী প্রযুক্তির ছোঁয়ায় আমরা বদলে দিচ্ছি ব্যবসার ধরণ।",
+        "Get the latest updates, feature releases, and business management tips sent straight to your inbox.": "ব্যবসা বৃদ্ধির টিপস এবং নতুন ফিচারের আপডেট পেতে আমাদের সাথে যুক্ত থাকুন।",
+        "© 2026 CashShilpo. All rights reserved.": "© ২০২৬ ক্যাশশিল্পো। সর্বস্বত্ব সংরক্ষিত।"
+      };
+
+      const STORAGE_KEY = "cashshilpo_lang_pref";
+      let currentLang = localStorage.getItem(STORAGE_KEY) || "bn";
+
+      function translatePage(targetLang) {
+        document.documentElement.lang = targetLang; // SEO Enhancement
+        const body = document.body;
+
+        if (targetLang === "bn") {
+          body.classList.add("lang-bn");
+          walkAndTranslate(body, "toBangla");
+        } else {
+          body.classList.remove("lang-bn");
+          walkAndTranslate(body, "toEnglish");
+        }
+
+        const btnText = document.getElementById("lang-toggle-text");
+        if (btnText) btnText.innerHTML = targetLang === "en" ? "বাং" : "EN";
+
+        localStorage.setItem(STORAGE_KEY, targetLang);
+        currentLang = targetLang;
+      }
+
+      function walkAndTranslate(node, direction) {
+        // Translation ignores scripts, styles, native dual-language blocks, and icons
+        if (
+          ["SCRIPT", "STYLE", "NOSCRIPT"].includes(node.tagName) ||
+          node.id === "lang-toggle-btn" ||
+          (node.classList && node.classList.contains("lucide")) ||
+          (node.classList && (node.classList.contains("bilingual-en") || node.classList.contains("bilingual-bn")))
+        ) {
+          return;
+        }
+
+        // Handle Text Nodes
+        if (node.nodeType === 3) {
+          const rawText = node.nodeValue;
+          const cleanKey = rawText.replace(/\s+/g, " ").trim();
+
+          if (!cleanKey) return;
+
+          if (direction === "toBangla") {
+            if (DICTIONARY[cleanKey]) {
+              if (!node._originalText) node._originalText = rawText;
+              node.nodeValue = DICTIONARY[cleanKey];
+            }
+          } else {
+            if (node._originalText) {
+              node.nodeValue = node._originalText;
+              delete node._originalText;
+            }
+          }
+          return;
+        }
+
+        // Handle Inputs & Textareas Placeholders
+        if (node.tagName === "INPUT" || node.tagName === "TEXTAREA") {
+          const val = node.getAttribute("placeholder");
+          if (val) {
+            const cleanVal = val.trim();
+            if (direction === "toBangla") {
+              if (DICTIONARY[cleanVal]) {
+                if (!node._original_placeholder) node._original_placeholder = val;
+                node.setAttribute("placeholder", DICTIONARY[cleanVal]);
+              }
+            } else {
+              if (node._original_placeholder) {
+                node.setAttribute("placeholder", node._original_placeholder);
+                delete node._original_placeholder;
+              }
+            }
+          }
+        }
+
+        node.childNodes.forEach((child) => walkAndTranslate(child, direction));
+      }
+
+      function toggleLanguage() {
+        const newLang = currentLang === "en" ? "bn" : "en";
+        translatePage(newLang);
+      }
+
+      // UX & Interaction Scripts
+      document.addEventListener("DOMContentLoaded", () => {
+        // Setup initial language seamlessly
+        translatePage(currentLang);
+        
+        // Initialize Icons
+        lucide.createIcons();
+
+        // Mobile Menu Toggle
+        const menuButton = document.getElementById("mobile-menu-button");
+        const mobileMenu = document.getElementById("mobile-menu");
+        menuButton.addEventListener("click", () => {
+          mobileMenu.classList.toggle("hidden");
+        });
+
+        // Smooth Scroll anchors
+        document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+          anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            if (!mobileMenu.classList.contains("hidden")) {
+              mobileMenu.classList.add("hidden");
+            }
+            const targetId = this.getAttribute("href");
+            if(targetId === '#') return;
+            const targetElement = document.querySelector(targetId);
+            if (targetElement) {
+              targetElement.scrollIntoView({ behavior: "smooth" });
+            }
+          });
+        });
+
+        // "See All Features" Expander Function
+        const seeMoreBtn = document.getElementById("see-more-features");
+        const featuresGrid = document.getElementById("features-grid");
+
+        if (seeMoreBtn && featuresGrid) {
+          seeMoreBtn.addEventListener("click", () => {
+            const isExpanded = featuresGrid.classList.toggle("is-expanded");
+            if (isExpanded) {
+              seeMoreBtn.textContent = currentLang === 'en' ? "See Less Features" : "ফিচারগুলো লুকান";
+              const hiddenCards = featuresGrid.querySelectorAll(".feature-card:nth-child(n+7)");
+              hiddenCards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.05}s`;
+              });
+            } else {
+              seeMoreBtn.textContent = currentLang === 'en' ? "See All 28 Features" : "সবগুলো ২৮টি ফিচার দেখুন";
+              const featureSection = featuresGrid.closest("section");
+              if (featureSection) {
+                featureSection.scrollIntoView({ behavior: "smooth" });
+              }
+            }
+          });
+        }
+
+        // Intersection Observers for Scroll Animations
+        const animatedElements = document.querySelectorAll(".animate-fade-in-up, .animate-fade-in-left, .animate-fade-in-right, .animate-scale-in, .animate-stagger-children, .animate-slide-and-scale-left, .animate-slide-and-scale-right");
+        const generalObserverOptions = { root: null, rootMargin: "0px", threshold: 0.15 };
+        const generalObserver = new IntersectionObserver((entries, observer) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("is-visible");
+              observer.unobserve(entry.target);
+            }
+          });
+        }, generalObserverOptions);
+
+        animatedElements.forEach((item) => {
+          generalObserver.observe(item);
+        });
+      });
+    </script>
+  </body>
+</html>
