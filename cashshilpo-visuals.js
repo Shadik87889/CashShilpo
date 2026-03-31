@@ -181,7 +181,16 @@
   const renderControlPanel = (container) => {
     // Remove existing panel if any
     const existing = document.getElementById("visual-engine-panel");
-    if (existing) existing.remove();
+    let targetParent = container;
+    let nextSibling = null;
+    let didExist = false;
+
+    if (existing) {
+      didExist = true;
+      targetParent = existing.parentNode || container;
+      nextSibling = existing.nextSibling;
+      existing.remove();
+    }
 
     const panel = document.createElement("div");
     panel.id = "visual-engine-panel";
@@ -332,7 +341,7 @@
                     }')">
                         ${opt.label}
                     </button>
-                `
+                `,
                   )
                   .join("")}
             </div>
@@ -373,7 +382,7 @@
                         style="background-color: ${c};" 
                         onclick="window.updateCashShilpoVisual('accent', '${c}')">
                     </button>
-                `
+                `,
                   )
                   .join("")}
                 <div class="relative group">
@@ -407,13 +416,13 @@
                     ${createSection(
                       "Brand Identity",
                       "paint-bucket",
-                      colorPickerHTML
+                      colorPickerHTML,
                     )}
                     
                     ${createSection(
                       "Display Scale",
                       "monitor",
-                      createSlider("uiScale", 80, 120, "%", "Zoom Level")
+                      createSlider("uiScale", 80, 120, "%", "Zoom Level"),
                     )}
 
                     ${createSection(
@@ -423,7 +432,7 @@
                         { label: "Modern", value: "inter" },
                         { label: "Serif", value: "serif" },
                         { label: "Mono", value: "mono" },
-                      ])
+                      ]),
                     )}
                 </div>
 
@@ -438,16 +447,16 @@
                           0,
                           40,
                           "px",
-                          "Blur Intensity"
+                          "Blur Intensity",
                         )}
                         ${createSlider(
                           "glassOpacity",
                           0.1,
                           1.0,
                           "",
-                          "Bg Opacity"
+                          "Bg Opacity",
                         )}
-                    `
+                    `,
                     )}
 
                     ${createSection(
@@ -471,7 +480,7 @@
                                 ])}
                             </div>
                         </div>
-                    `
+                    `,
                     )}
                 </div>
             </div>
@@ -485,7 +494,7 @@
                      { label: "Clean", value: "none" },
                      { label: "Dots", value: "dots" },
                      { label: "Grid", value: "grid" },
-                   ])
+                   ]),
                  )}
                  ${createSection(
                    "Effects & Depth",
@@ -505,19 +514,28 @@
                                 onchange="window.updateCashShilpoVisual('animations', this.checked)">
                             <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent"></div>
                         </label>
-                    </div>`
+                    </div>`,
                  )}
             </div>
         `;
 
-    // Inject into the settings form logic
-    const header = container.querySelector("h1");
-    if (header) {
-      header.insertAdjacentElement("afterend", panel);
+    // Inject into the settings form logic with exact DOM placement preservation
+    if (didExist) {
+      if (nextSibling) {
+        targetParent.insertBefore(panel, nextSibling);
+      } else {
+        targetParent.appendChild(panel);
+      }
       lucide.createIcons();
     } else {
-      container.prepend(panel);
-      lucide.createIcons();
+      const header = container.querySelector("h1");
+      if (header) {
+        header.insertAdjacentElement("afterend", panel);
+        lucide.createIcons();
+      } else {
+        container.prepend(panel);
+        lucide.createIcons();
+      }
     }
   };
 

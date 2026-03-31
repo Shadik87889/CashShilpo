@@ -1,764 +1,994 @@
 /**
- * CashShilpo World-Class Invoice Templates Library
- * This file defines 10 premium receipt/invoice templates.
- * * FIXES:
- * 1. Removed auto-injection logic to prevent duplicate templates in the UI.
- * 2. Added high-specificity CSS to override the main app's "force black & white" print settings.
+ * CashShilpo Advanced Invoice Templates & Custom Builder
+ * Features:
+ * 1. Introduces 3 beautiful predefined templates (Elegant, Corporate, Minimalist).
+ * 2. Injects a highly advanced "Custom Invoice Builder" with logo uploads, color pickers, and layout toggles.
+ * 3. Safely hooks into the 'Templates' tab created by cashshilpo-settings-tab.js (No UI conflicts).
  */
 
 (function () {
-  console.log("Initializing World-Class Invoice Templates...");
+  console.log("CashShilpo: Advanced Invoice Templates & Builder Loaded");
 
-  // --- Helper: Robust Currency Formatter ---
-  const formatCurrency = (amount, currencyCode = "USD") => {
-    if (
-      typeof window.currencyUtils !== "undefined" &&
-      window.currencyUtils.format
-    ) {
-      return window.currencyUtils.format(amount, currencyCode);
-    }
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: currencyCode,
-    }).format(amount);
-  };
+  const CONFIG_KEY = "cashshilpo_custom_invoice_config";
 
-  // --- Helper: Date Formatter ---
-  const formatDate = (dateString) => {
-    if (!dateString) return "";
-    return new Date(dateString).toLocaleDateString(undefined, {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-  };
-
-  // --- FIX: HIGH SPECIFICITY PRINT STYLE OVERRIDE ---
-  // We use ID repetition (#printable-content#printable-content) to boost specificity
-  // and defeat the default app's "!important" black-and-white print reset.
-  const printStyleFix = document.createElement("style");
-  printStyleFix.innerHTML = `
-        @media print {
-            body {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-            
-            /* Reset specific to the print container */
-            #printable-content#printable-content {
-                background-color: white !important;
-                color: inherit !important;
-            }
-            
-            /* Restore visibility for all elements */
-            #printable-content#printable-content * {
-                color-adjust: exact !important;
-                -webkit-print-color-adjust: exact !important;
-                background-color: inherit;
-                color: inherit;
-                text-shadow: inherit;
-                box-shadow: inherit;
-            }
-
-            /* --- Specific Template Overrides --- */
-
-            /* Creative Pop Backgrounds */
-            #printable-content#printable-content .bg-yellow-50 { background-color: #fefce8 !important; }
-            #printable-content#printable-content .bg-pink-400 { background-color: #f472b6 !important; opacity: 1 !important; } /* Removed opacity for clearer print */
-            #printable-content#printable-content .bg-purple-400 { background-color: #c084fc !important; opacity: 1 !important; }
-            #printable-content#printable-content .bg-purple-100 { background-color: #f3e8ff !important; }
-            
-            /* Creative Pop Text Colors */
-            #printable-content#printable-content .text-pink-500 { color: #ec4899 !important; }
-            #printable-content#printable-content .text-purple-600 { color: #9333ea !important; }
-            #printable-content#printable-content .text-purple-500 { color: #a855f7 !important; }
-            
-            /* Gradient Text Fix */
-            #printable-content#printable-content .bg-clip-text {
-                -webkit-background-clip: text !important;
-                background-clip: text !important;
-                /* If browser supports gradient text in print */
-                background-image: linear-gradient(to right, #ec4899, #9333ea) !important; 
-                color: #db2777 !important; /* Fallback color */
-            }
-
-            /* Corporate Blue & Others */
-            #printable-content#printable-content .bg-blue-800 { background-color: #1e40af !important; color: white !important; }
-            #printable-content#printable-content .bg-blue-900 { background-color: #1e3a8a !important; color: white !important; }
-            #printable-content#printable-content .bg-blue-50 { background-color: #eff6ff !important; }
-            #printable-content#printable-content .text-blue-900 { color: #1e3a8a !important; }
-            #printable-content#printable-content .border-blue-800 { border-color: #1e40af !important; }
-
-            /* Dark Mode / Tech Digital */
-            #printable-content#printable-content .bg-gray-900 { background-color: #111827 !important; color: white !important; }
-            #printable-content#printable-content .bg-gray-800 { background-color: #1f2937 !important; color: white !important; }
-            #printable-content#printable-content .bg-black { background-color: #000000 !important; color: #4ade80 !important; }
-            #printable-content#printable-content .text-green-400 { color: #4ade80 !important; }
-            
-            /* Cafe Style */
-            #printable-content#printable-content .bg-[#fffcf5] { background-color: #fffcf5 !important; }
-            #printable-content#printable-content .text-amber-900 { color: #78350f !important; }
-            
-            /* Structure helpers */
-            #printable-content#printable-content .grid { display: grid !important; }
-            #printable-content#printable-content .flex { display: flex !important; }
+  // --- Inject Custom CSS for Builder ---
+  const style = document.createElement("style");
+  style.innerHTML = `
+        .builder-section {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 1.25rem;
         }
+        .builder-section-title {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            font-weight: 700;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+        .logo-upload-box {
+            border: 2px dashed var(--border-color-strong);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        .logo-upload-box:hover {
+            border-color: var(--accent);
+        }
+        .logo-preview-img {
+            max-height: 80px;
+            max-width: 100%;
+            object-fit: contain;
+            margin: 0 auto;
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: var(--border-color-strong); border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }
     `;
-  document.head.appendChild(printStyleFix);
+  document.head.appendChild(style);
 
-  // --- 10 NEW TEMPLATES ---
-  const newTemplates = {
-    corporate_blue: {
-      name: "Corporate Blue",
-      preview: `<div class="w-full h-full bg-white border border-gray-200 flex flex-col"><div class="h-4 bg-blue-800 w-full"></div><div class="p-2 space-y-1"><div class="flex justify-between"><div class="w-8 h-2 bg-gray-300"></div><div class="w-4 h-2 bg-gray-300"></div></div><div class="mt-2 space-y-1"><div class="w-full h-1 bg-gray-100"></div><div class="w-full h-1 bg-gray-100"></div></div></div><div class="mt-auto p-2 border-t border-gray-100"><div class="w-1/2 h-2 bg-blue-800 ml-auto"></div></div></div>`,
-      getBody: (invoice) => {
-        const currency = invoice.currency || "USD";
-        return `
-                <div id="receipt-content" class="font-sans text-gray-800 p-8 max-w-3xl mx-auto border border-gray-200 shadow-lg bg-white relative">
-                    <div class="flex justify-between items-end border-b-4 border-blue-800 pb-6">
-                        <div>
-                            <h1 class="text-3xl font-bold text-blue-900 uppercase tracking-widest">Invoice</h1>
-                            <p class="text-sm text-gray-500 mt-1">#${
-                              invoice.id
-                            }</p>
-                        </div>
-                        <div class="text-right">
-                            <h2 class="text-xl font-bold text-gray-900">CashShilpo Store</h2>
-                            <p class="text-sm text-gray-600">123 Business Rd, Tech City</p>
-                            <p class="text-sm text-gray-600">contact@cashshilpo.com</p>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-8 py-8">
-                        <div>
-                            <p class="text-xs font-bold text-gray-400 uppercase mb-1">Bill To</p>
-                            <p class="font-bold text-gray-800 text-lg">${
-                              invoice.customerName
-                            }</p>
-                            ${
-                              invoice.customer
-                                ? `<p class="text-sm text-gray-600">${
-                                    invoice.customer.address || ""
-                                  }</p>`
-                                : ""
-                            }
-                            ${
-                              invoice.customer
-                                ? `<p class="text-sm text-gray-600">${
-                                    invoice.customer.phone || ""
-                                  }</p>`
-                                : ""
-                            }
-                        </div>
-                        <div class="text-right">
-                            <div class="mb-2"><span class="text-xs font-bold text-gray-400 uppercase mr-4">Date</span> <span class="font-bold">${formatDate(
-                              invoice.date,
-                            )}</span></div>
-                            <div class="mb-2"><span class="text-xs font-bold text-gray-400 uppercase mr-4">Status</span> <span class="font-bold ${
-                              invoice.status === "Paid"
-                                ? "text-green-600"
-                                : "text-red-600"
-                            }">${invoice.status}</span></div>
-                        </div>
-                    </div>
-                    <table class="w-full text-sm mb-8">
-                        <thead class="bg-blue-50 text-blue-900 uppercase text-xs font-bold">
-                            <tr><th class="py-3 px-4 text-left">Item</th><th class="py-3 px-4 text-center">Qty</th><th class="py-3 px-4 text-right">Price</th><th class="py-3 px-4 text-right">Total</th></tr>
-                        </thead>
-                        <tbody class="divide-y divide-blue-100">
-                            ${invoice.items
-                              .map(
-                                (item) =>
-                                  `<tr><td class="py-3 px-4 font-medium">${
-                                    item.name
-                                  }</td><td class="py-3 px-4 text-center">${
-                                    item.qty
-                                  }</td><td class="py-3 px-4 text-right">${formatCurrency(
-                                    item.price,
-                                    currency,
-                                  )}</td><td class="py-3 px-4 text-right font-bold">${formatCurrency(
-                                    item.price * item.qty,
-                                    currency,
-                                  )}</td></tr>`,
-                              )
-                              .join("")}
-                        </tbody>
-                    </table>
-                    <div class="flex justify-end">
-                        <div class="w-1/2 space-y-2 border-t border-gray-200 pt-4">
-                            <div class="flex justify-between text-sm"><span>Subtotal</span><span>${formatCurrency(
-                              invoice.subtotalInBaseCurrency,
-                              currency,
-                            )}</span></div>
-                            <div class="flex justify-between text-sm"><span>Tax</span><span>${formatCurrency(
-                              invoice.taxInBaseCurrency,
-                              currency,
-                            )}</span></div>
-                            <div class="flex justify-between text-xl font-bold text-blue-900 border-t-2 border-blue-900 pt-2"><span>Total</span><span>${formatCurrency(
-                              invoice.totalInBaseCurrency,
-                              currency,
-                            )}</span></div>
-                        </div>
-                    </div>
-                    <div class="mt-12 pt-6 border-t border-gray-200 text-center text-xs text-gray-500">
-                        <p>Thank you for your business. Please contact us for any support queries.</p>
-                    </div>
-                </div>`;
-      },
-    },
-    minimalist_mono: {
-      name: "Minimalist Mono",
-      preview: `<div class="w-full h-full bg-white border border-gray-200 p-3 flex flex-col justify-between font-mono text-[6px]"><div class="space-y-2"><div>INVOICE #001</div><div class="h-px bg-black w-full"></div><div>ITEM 1 ... $10</div><div>ITEM 2 ... $20</div></div><div class="text-right font-bold">TOTAL $30</div></div>`,
-      getBody: (invoice) => {
-        const currency = invoice.currency || "USD";
-        return `
-                <div id="receipt-content" class="font-mono text-gray-900 p-10 max-w-2xl mx-auto bg-white border border-gray-900">
-                    <div class="text-center mb-8">
-                        <h1 class="text-4xl font-bold tracking-tighter">INVOICE</h1>
-                        <p class="text-sm mt-2">${invoice.id}</p>
-                    </div>
-                    <div class="flex justify-between mb-8 text-sm">
-                        <div>
-                            <p class="font-bold">FROM:</p>
-                            <p>CashShilpo Inc.</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="font-bold">TO:</p>
-                            <p>${invoice.customerName}</p>
-                        </div>
-                    </div>
-                    <div class="border-t-2 border-b-2 border-gray-900 py-4 mb-8">
-                        <table class="w-full text-sm">
-                            <thead><tr class="text-left"><th class="pb-2">ITEM</th><th class="text-right pb-2">COST</th></tr></thead>
-                            <tbody>
-                                ${invoice.items
-                                  .map(
-                                    (item) =>
-                                      `<tr><td class="py-1">${item.qty} x ${
-                                        item.name
-                                      }</td><td class="text-right py-1">${formatCurrency(
-                                        item.price * item.qty,
-                                        currency,
-                                      )}</td></tr>`,
-                                  )
-                                  .join("")}
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="flex justify-between items-center text-xl font-bold">
-                        <span>TOTAL DUE</span>
-                        <span>${formatCurrency(
-                          invoice.totalInBaseCurrency,
-                          currency,
-                        )}</span>
-                    </div>
-                    <div class="mt-12 text-xs text-center border-t border-gray-300 pt-4">
-                        <p>THANK YOU.</p>
-                    </div>
-                </div>`;
-      },
-    },
+  // --- 1. Helpers for Currency and Store Details ---
+  function formatMoney(amount, currencyCode = "USD") {
+    try {
+      return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: currencyCode,
+      }).format(amount || 0);
+    } catch (e) {
+      return `${Number(amount || 0).toFixed(2)}`;
+    }
+  }
+
+  function getStoreDetails() {
+    let config = {};
+    try {
+      config = JSON.parse(localStorage.getItem(CONFIG_KEY)) || {};
+    } catch (e) {}
+
+    const domStoreName =
+      document.getElementById("brand-name")?.innerText || "My Store";
+    const domLogo = document.querySelector("#sidebar img")?.src || "";
+
+    return {
+      name: config.storeName || domStoreName,
+      address: config.storeAddress || "",
+      contact: config.storeContact || "",
+      taxId: config.taxId || "",
+      logoUrl: config.logoUrl || domLogo,
+      footerText: config.footerText || "Thank you for your business!",
+    };
+  }
+
+  function getInvoiceStatusBadge(status) {
+    if (status === "Paid")
+      return `<span style="background: #dcfce7; color: #166534; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; text-transform: uppercase;">Paid</span>`;
+    if (status === "Due" || status === "Partial")
+      return `<span style="background: #fef08a; color: #9a3412; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; text-transform: uppercase;">${status}</span>`;
+    if (status === "Void")
+      return `<span style="background: #fee2e2; color: #991b1b; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; text-transform: uppercase;">Void</span>`;
+    if (status === "Return")
+      return `<span style="background: #dbeafe; color: #1e40af; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; text-transform: uppercase;">Return</span>`;
+    return `<span style="background: #e5e7eb; color: #374151; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; text-transform: uppercase;">${status}</span>`;
+  }
+
+  // --- 2. Define Advanced Templates ---
+  window.invoiceTemplates = {
     elegant_serif: {
       name: "Elegant Serif",
-      preview: `<div class="w-full h-full bg-[#fcfbf9] border border-[#e5e0d8] p-3 font-serif flex flex-col items-center"><div class="w-8 h-8 rounded-full border border-gray-400 mb-2"></div><div class="h-px w-1/2 bg-gray-300 mb-2"></div><div class="w-full space-y-1 text-[5px] text-center"><div>Item A</div><div>Item B</div></div></div>`,
+      preview: `<div class="bg-[#faf9f6] p-4 font-serif text-[8px] leading-tight text-gray-800 border border-gray-200 shadow-sm flex flex-col h-full"><div class="text-center border-b border-gray-300 pb-2 mb-2"><h1 class="text-lg font-bold text-gray-900" style="font-family: 'Playfair Display', serif;">ELEGANT</h1><p class="text-[6px] italic text-gray-500">EST. 2024</p></div><div class="flex justify-between border-b border-gray-200 pb-1 mb-1"><span class="italic">Item</span><span>Price</span></div><div class="flex-grow"></div><div class="flex justify-between font-bold mt-2 pt-1 border-t border-gray-300"><span class="italic">TOTAL</span><span>$0.00</span></div></div>`,
+      getBody: (invoice) => generateElegantTemplate(invoice),
+    },
+    corporate_modern: {
+      name: "Corporate Blue",
+      preview: `<div class="bg-white p-4 font-sans text-[8px] leading-tight text-gray-800 border-t-4 border-blue-600 shadow-sm flex flex-col h-full"><div class="flex justify-between items-start mb-2"><h1 class="font-bold text-blue-700 text-sm">CORP</h1><div class="text-right text-[6px] text-gray-400">INV-001</div></div><div class="bg-gray-100 p-1 mb-2 text-[6px] text-gray-600">Details block</div><div class="flex-grow"></div><div class="flex justify-between font-bold text-blue-900 border-t border-blue-200 pt-1"><span>DUE</span><span>$0.00</span></div></div>`,
+      getBody: (invoice) => generateCorporateTemplate(invoice),
+    },
+    minimalist_dark: {
+      name: "Minimalist Dark",
+      preview: `<div class="bg-gray-900 p-4 font-sans text-[8px] leading-tight text-gray-300 shadow-sm flex flex-col h-full"><div class="text-white font-bold tracking-widest uppercase mb-2 text-center text-xs border-b border-gray-700 pb-1">MINIMAL</div><div class="flex justify-between pb-1 mb-1 text-[6px] text-gray-500"><span>ITEM</span><span>AMT</span></div><div class="flex-grow"></div><div class="flex justify-between text-white mt-2 border-t border-gray-700 pt-1 font-bold"><span>TOTAL</span><span>$0.00</span></div></div>`,
+      getBody: (invoice) => generateMinimalistTemplate(invoice),
+    },
+    custom_user: {
+      name: "My Custom Template",
+      preview: `<div class="bg-white p-4 font-sans text-[8px] leading-tight text-gray-800 border-2 border-dashed border-cyan-500 flex items-center justify-center h-full bg-cyan-50"><span class="text-cyan-600 font-bold text-center tracking-widest">MY<br>CUSTOM<br>TEMPLATE</span></div>`,
       getBody: (invoice) => {
-        const currency = invoice.currency || "USD";
-        return `
-                <div id="receipt-content" class="font-serif text-gray-800 p-10 max-w-3xl mx-auto bg-[#fcfbf9] shadow-xl" style="font-family: 'Georgia', 'Times New Roman', serif;">
-                    <div class="text-center mb-10">
-                        <div class="inline-block border-2 border-gray-800 p-4 mb-4"><h1 class="text-2xl tracking-widest uppercase">CashShilpo</h1></div>
-                        <p class="text-sm italic text-gray-600">Excellence in every transaction</p>
-                    </div>
-                    <div class="flex justify-between mb-10 border-t border-b border-gray-200 py-6">
-                        <div>
-                            <p class="text-xs uppercase tracking-wide text-gray-500">Invoice For</p>
-                            <p class="text-lg mt-1">${invoice.customerName}</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-xs uppercase tracking-wide text-gray-500">Invoice No.</p>
-                            <p class="text-lg mt-1 font-mono">${invoice.id.slice(
-                              -8,
-                            )}</p>
-                            <p class="text-xs text-gray-500 mt-1">${formatDate(
-                              invoice.date,
-                            )}</p>
-                        </div>
-                    </div>
-                    <table class="w-full text-sm mb-10">
-                        <thead><tr class="border-b border-gray-800"><th class="py-2 text-left font-normal italic text-gray-600">Description</th><th class="py-2 text-center font-normal italic text-gray-600">Quantity</th><th class="py-2 text-right font-normal italic text-gray-600">Amount</th></tr></thead>
-                        <tbody>
-                            ${invoice.items
-                              .map(
-                                (item) =>
-                                  `<tr class="border-b border-gray-100"><td class="py-4">${
-                                    item.name
-                                  }</td><td class="py-4 text-center">${
-                                    item.qty
-                                  }</td><td class="py-4 text-right">${formatCurrency(
-                                    item.price * item.qty,
-                                    currency,
-                                  )}</td></tr>`,
-                              )
-                              .join("")}
-                        </tbody>
-                    </table>
-                    <div class="flex justify-end">
-                        <div class="text-right">
-                            <p class="text-sm text-gray-600 mb-1">Total</p>
-                            <p class="text-3xl font-bold">${formatCurrency(
-                              invoice.totalInBaseCurrency,
-                              currency,
-                            )}</p>
-                        </div>
-                    </div>
-                    <div class="mt-16 text-center">
-                        <p class="text-sm italic text-gray-500">Thank you for your patronage.</p>
-                    </div>
-                </div>`;
+        let config = {};
+        try {
+          config = JSON.parse(localStorage.getItem(CONFIG_KEY)) || {};
+        } catch (e) {}
+        config.primaryColor = config.primaryColor || "#06b6d4";
+        config.fontFamily = config.fontFamily || "'Inter', sans-serif";
+        config.storeName = config.storeName || getStoreDetails().name;
+        return generateHTMLFromConfig(invoice, config);
       },
     },
-    bold_dark: {
-      name: "Bold Dark",
-      preview: `<div class="w-full h-full bg-gray-900 border border-gray-700 p-2 flex flex-col"><div class="text-white font-bold text-[8px] mb-2">INVOICE</div><div class="bg-gray-800 h-10 w-full rounded"></div><div class="mt-auto text-right text-green-400 font-bold text-[8px]">$50.00</div></div>`,
-      getBody: (invoice) => {
-        const currency = invoice.currency || "USD";
-        return `
-                <div id="receipt-content" class="bg-gray-900 text-gray-300 p-10 max-w-3xl mx-auto font-sans antialiased">
-                    <div class="flex justify-between items-start mb-12">
-                        <h1 class="text-5xl font-black text-white tracking-tighter">INVOICE</h1>
-                        <div class="text-right">
-                            <p class="text-gray-500 uppercase tracking-widest text-xs mb-1">Total Due</p>
-                            <p class="text-4xl font-bold text-green-400">${formatCurrency(
-                              invoice.dueAmount || 0,
-                              currency,
-                            )}</p>
-                        </div>
+  };
+
+  // --- 3. Template Render Functions ---
+  function generateElegantTemplate(invoice) {
+    const store = getStoreDetails();
+    const currency = invoice.currency || "USD";
+    const f = (val) => formatMoney(val, currency);
+
+    const itemsHTML = (invoice.items || [])
+      .map(
+        (item) => `
+            <tr>
+                <td style="padding: 12px 0; border-bottom: 1px solid #eaeaea;">
+                    <div style="font-weight: 600; color: #222;">${
+                      item.name
+                    }</div>
+                    <div style="font-size: 11px; color: #888; font-family: 'Inter', sans-serif;">${
+                      item.id || ""
+                    } ${
+          item.serialNumber ? `(SN: ${item.serialNumber})` : ""
+        }</div>
+                </td>
+                <td style="padding: 12px 0; border-bottom: 1px solid #eaeaea; text-align: center;">${
+                  item.qty || 1
+                }</td>
+                <td style="padding: 12px 0; border-bottom: 1px solid #eaeaea; text-align: right;">${f(
+                  item.price,
+                )}</td>
+                <td style="padding: 12px 0; border-bottom: 1px solid #eaeaea; text-align: right; font-weight: 600;">${f(
+                  (item.qty || 1) * item.price,
+                )}</td>
+            </tr>
+        `,
+      )
+      .join("");
+
+    return `
+        <div id="receipt-content" style="font-family: 'Playfair Display', Georgia, serif; padding: 40px; max-width: 800px; margin: 0 auto; background: #faf9f6; color: #333; line-height: 1.6;">
+            <div style="text-align: center; margin-bottom: 40px;">
+                <h1 style="font-size: 32px; font-weight: 700; color: #111; letter-spacing: 2px; margin: 0;">${
+                  store.name
+                }</h1>
+                <p style="font-size: 12px; color: #666; font-style: italic; margin-top: 5px;">${
+                  store.address
+                } | ${store.contact}</p>
+                <div style="margin: 20px auto 0; width: 50px; height: 1px; background: #ccc;"></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 40px; font-family: 'Inter', sans-serif; font-size: 12px;">
+                <div>
+                    <p style="text-transform: uppercase; color: #999; font-size: 10px; letter-spacing: 1px; margin-bottom: 5px;">Billed To</p>
+                    <p style="font-size: 14px; color: #222; font-weight: 600;">${
+                      invoice.customerName || "Walk-in Customer"
+                    }</p>
+                </div>
+                <div style="text-align: right;">
+                    <p style="margin: 2px 0;"><strong>Invoice No:</strong> ${
+                      invoice.id
+                    }</p>
+                    <p style="margin: 2px 0;"><strong>Date:</strong> ${new Date(
+                      invoice.date,
+                    ).toLocaleDateString()}</p>
+                    <p style="margin: 6px 0 0 0;">${getInvoiceStatusBadge(
+                      invoice.status,
+                    )}</p>
+                </div>
+            </div>
+            <table style="width: 100%; border-collapse: collapse; font-family: 'Inter', sans-serif; font-size: 13px; margin-bottom: 40px;">
+                <thead>
+                    <tr style="border-bottom: 2px solid #222;">
+                        <th style="padding: 10px 0; text-align: left; font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 1px;">Description</th>
+                        <th style="padding: 10px 0; text-align: center; font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 1px;">Qty</th>
+                        <th style="padding: 10px 0; text-align: right; font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 1px;">Rate</th>
+                        <th style="padding: 10px 0; text-align: right; font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 1px;">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>${itemsHTML}</tbody>
+            </table>
+            <div style="display: flex; justify-content: flex-end; font-family: 'Inter', sans-serif;">
+                <div style="width: 300px;">
+                    <div style="display: flex; justify-content: space-between; padding: 6px 0; color: #666; font-size: 13px;"><span>Subtotal:</span><span>${f(
+                      invoice.subtotalInBaseCurrency,
+                    )}</span></div>
+                    <div style="display: flex; justify-content: space-between; padding: 6px 0; color: #666; font-size: 13px;"><span>Tax:</span><span>${f(
+                      invoice.taxInBaseCurrency,
+                    )}</span></div>
+                    <div style="display: flex; justify-content: space-between; padding: 15px 0; border-top: 1px solid #ccc; border-bottom: 1px solid #ccc; margin-top: 10px; font-size: 18px; font-weight: 700; color: #111;">
+                        <span>Total Due:</span><span>${f(
+                          invoice.totalInBaseCurrency,
+                        )}</span>
                     </div>
-                    <div class="grid grid-cols-2 gap-10 mb-12">
-                        <div class="bg-gray-800 p-6 rounded-lg">
-                            <p class="text-xs font-bold text-gray-500 uppercase mb-2">Billed To</p>
-                            <p class="text-xl font-bold text-white">${
-                              invoice.customerName
-                            }</p>
-                        </div>
-                        <div class="bg-gray-800 p-6 rounded-lg">
-                            <p class="text-xs font-bold text-gray-500 uppercase mb-2">Details</p>
-                            <div class="flex justify-between mb-1"><span>ID:</span> <span class="text-white font-mono">${invoice.id.slice(
-                              -6,
-                            )}</span></div>
-                            <div class="flex justify-between"><span>Date:</span> <span class="text-white">${formatDate(
-                              invoice.date,
-                            )}</span></div>
-                        </div>
+                </div>
+            </div>
+            <div style="margin-top: 60px; text-align: center; font-style: italic; color: #888; font-size: 13px;">
+                <p>${store.footerText.replace(/\n/g, "<br>")}</p>
+            </div>
+        </div>`;
+  }
+
+  function generateCorporateTemplate(invoice) {
+    const store = getStoreDetails();
+    const currency = invoice.currency || "USD";
+    const f = (val) => formatMoney(val, currency);
+
+    const itemsHTML = (invoice.items || [])
+      .map(
+        (item, idx) => `
+            <tr style="background-color: ${
+              idx % 2 === 0 ? "#f8fafc" : "#ffffff"
+            };">
+                <td style="padding: 10px; color: #1e293b; font-weight: 500;">${
+                  item.name
+                } <span style="display:block; font-size:10px; color:#64748b; font-weight:normal;">${
+          item.id || ""
+        }</span></td>
+                <td style="padding: 10px; text-align: center; color: #475569;">${
+                  item.qty || 1
+                }</td>
+                <td style="padding: 10px; text-align: right; color: #475569;">${f(
+                  item.price,
+                )}</td>
+                <td style="padding: 10px; text-align: right; color: #0f172a; font-weight: 600;">${f(
+                  (item.qty || 1) * item.price,
+                )}</td>
+            </tr>
+        `,
+      )
+      .join("");
+
+    return `
+        <div id="receipt-content" style="font-family: 'Inter', Arial, sans-serif; padding: 0; max-width: 800px; margin: 0 auto; background: #ffffff; border: 1px solid #e2e8f0; line-height: 1.5;">
+            <div style="background-color: #1e3a8a; padding: 30px; color: #ffffff; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h1 style="font-size: 28px; font-weight: 800; margin: 0; letter-spacing: 1px;">${
+                      store.name
+                    }</h1>
+                    <p style="font-size: 12px; color: #bfdbfe; margin-top: 4px;">${
+                      store.contact
+                    }</p>
+                </div>
+                <div style="text-align: right;">
+                    <h2 style="font-size: 32px; font-weight: 900; margin: 0; color: #60a5fa; text-transform: uppercase;">INVOICE</h2>
+                    <p style="font-size: 14px; font-weight: 600; margin-top: 5px;">#${
+                      invoice.id
+                    }</p>
+                </div>
+            </div>
+            <div style="padding: 30px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 30px;">
+                    <div style="width: 45%;">
+                        <p style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 5px;">Invoice To</p>
+                        <p style="font-size: 16px; font-weight: 700; color: #0f172a; margin: 0;">${
+                          invoice.customerName || "Walk-in Customer"
+                        }</p>
                     </div>
-                    <div class="bg-gray-800 rounded-lg overflow-hidden mb-8">
-                        <table class="w-full text-left">
-                            <thead class="bg-gray-700 text-gray-400 uppercase text-xs"><tr><th class="p-4">Item</th><th class="p-4 text-center">Qty</th><th class="p-4 text-right">Price</th></tr></thead>
-                            <tbody class="divide-y divide-gray-700">
-                                ${invoice.items
-                                  .map(
-                                    (item) =>
-                                      `<tr><td class="p-4 text-white font-medium">${
-                                        item.name
-                                      }</td><td class="p-4 text-center">${
-                                        item.qty
-                                      }</td><td class="p-4 text-right">${formatCurrency(
-                                        item.price,
-                                        currency,
-                                      )}</td></tr>`,
-                                  )
-                                  .join("")}
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="flex justify-end text-xl">
-                        <div class="space-y-2 w-64">
-                            <div class="flex justify-between text-gray-400 text-base"><span>Subtotal</span><span>${formatCurrency(
-                              invoice.subtotalInBaseCurrency,
-                              currency,
-                            )}</span></div>
-                            <div class="flex justify-between font-bold text-white border-t border-gray-700 pt-2"><span>Total</span><span>${formatCurrency(
-                              invoice.totalInBaseCurrency,
-                              currency,
-                            )}</span></div>
-                        </div>
-                    </div>
-                </div>`;
-      },
-    },
-    compact_thermal_plus: {
-      name: "Thermal Plus",
-      preview: `<div class="w-full h-full bg-white border border-gray-300 p-2 font-mono text-[5px] text-center"><div class="font-bold text-[6px]">STORE NAME</div><div>*** RECEIPT ***</div><div class="my-1 text-left">Item A ... 10.00</div><div class="border-t border-dashed border-gray-400 pt-1 font-bold">TOTAL: 10.00</div></div>`,
-      getBody: (invoice) => {
-        const currency = invoice.currency || "USD";
-        return `
-                <div id="receipt-content" style="width: 350px; margin: 0 auto; background: #fff; padding: 15px; font-family: 'Courier New', Courier, monospace; color: #000;">
-                    <div style="text-align: center; margin-bottom: 10px;">
-                        <h2 style="font-size: 20px; font-weight: 800; margin: 0;">CASHSHILPO</h2>
-                        <p style="font-size: 12px; margin: 2px 0;">Retail & Supply Co.</p>
-                        <p style="font-size: 10px; margin-top: 5px;">--------------------------------</p>
-                    </div>
-                    <div style="font-size: 12px; margin-bottom: 10px;">
-                        <p><strong>Inv #:</strong> ${invoice.id}</p>
-                        <p><strong>Date:</strong> ${new Date(
+                    <div style="width: 45%; background: #f8fafc; padding: 15px; border-radius: 6px; border: 1px solid #e2e8f0;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;"><span style="color: #64748b; font-size: 12px;">Date:</span><span style="color: #0f172a; font-weight: 600; font-size: 12px;">${new Date(
                           invoice.date,
-                        ).toLocaleString()}</p>
-                        <p><strong>Customer:</strong> ${
-                          invoice.customerName
-                        }</p>
+                        ).toLocaleDateString()}</span></div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;"><span style="color: #64748b; font-size: 12px;">Status:</span><span>${getInvoiceStatusBadge(
+                          invoice.status,
+                        )}</span></div>
+                        <div style="display: flex; justify-content: space-between;"><span style="color: #64748b; font-size: 12px;">Cashier:</span><span style="color: #0f172a; font-weight: 600; font-size: 12px;">${
+                          invoice.cashierName
+                        }</span></div>
                     </div>
-                    <table style="width: 100%; font-size: 12px; border-collapse: collapse; margin-bottom: 10px;">
-                        <thead>
-                            <tr style="border-bottom: 1px dashed #000;">
-                                <th style="text-align: left; padding: 5px 0;">Item</th>
-                                <th style="text-align: center; width: 30px; padding: 5px 0;">Q</th>
-                                <th style="text-align: right; padding: 5px 0;">Amt</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${invoice.items
-                              .map(
-                                (item) =>
-                                  `<tr><td style="padding: 3px 0;">${
-                                    item.name
-                                  }</td><td style="text-align: center;">${
-                                    item.qty
-                                  }</td><td style="text-align: right;">${formatCurrency(
-                                    item.price * item.qty,
-                                    currency,
-                                  )}</td></tr>`,
-                              )
-                              .join("")}
-                        </tbody>
-                    </table>
-                    <div style="border-top: 1px dashed #000; padding-top: 5px; font-size: 12px;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 2px;"><span>Subtotal:</span><span>${formatCurrency(
+                </div>
+                <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 30px;">
+                    <thead>
+                        <tr style="background-color: #1e3a8a; color: #ffffff;">
+                            <th style="padding: 12px 10px; text-align: left; font-weight: 600;">Description</th>
+                            <th style="padding: 12px 10px; text-align: center; font-weight: 600;">Qty</th>
+                            <th style="padding: 12px 10px; text-align: right; font-weight: 600;">Unit Price</th>
+                            <th style="padding: 12px 10px; text-align: right; font-weight: 600;">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>${itemsHTML}</tbody>
+                </table>
+                <div style="display: flex; justify-content: flex-end;">
+                    <div style="width: 320px; background: #f8fafc; padding: 20px; border-radius: 6px; border: 1px solid #e2e8f0;">
+                        <div style="display: flex; justify-content: space-between; padding-bottom: 8px; color: #64748b; font-size: 13px;"><span>Subtotal</span><span style="color: #0f172a; font-weight: 600;">${f(
                           invoice.subtotalInBaseCurrency,
-                          currency,
                         )}</span></div>
-                        <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 14px; margin-top: 5px;"><span>TOTAL:</span><span>${formatCurrency(
-                          invoice.totalInBaseCurrency,
-                          currency,
+                        <div style="display: flex; justify-content: space-between; padding-bottom: 8px; color: #64748b; font-size: 13px;"><span>Tax</span><span style="color: #0f172a; font-weight: 600;">${f(
+                          invoice.taxInBaseCurrency,
                         )}</span></div>
-                    </div>
-                    <div style="text-align: center; margin-top: 15px; font-size: 10px;">
-                        <p>*** THANK YOU FOR VISITING ***</p>
-                        <svg id="barcode-placeholder" style="width: 100%; height: 30px; margin-top: 5px; background: #eee;"></svg>
-                    </div>
-                </div>`;
-      },
-    },
-    modern_grid: {
-      name: "Modern Grid",
-      preview: `<div class="w-full h-full bg-gray-50 border border-gray-200 p-2 grid grid-cols-2 gap-1"><div class="bg-white rounded"></div><div class="bg-white rounded"></div><div class="col-span-2 bg-white h-8 rounded mt-1"></div></div>`,
-      getBody: (invoice) => {
-        const currency = invoice.currency || "USD";
-        return `
-                <div id="receipt-content" class="bg-gray-100 p-8 max-w-3xl mx-auto font-sans">
-                    <div class="bg-white rounded-xl shadow-sm p-8 mb-6">
-                        <div class="flex justify-between items-center mb-6">
-                            <div class="bg-indigo-100 text-indigo-700 px-4 py-2 rounded-lg font-bold text-xl tracking-wide">INVOICE</div>
-                            <div class="text-right">
-                                <p class="text-gray-400 text-xs uppercase font-bold">Total Amount</p>
-                                <p class="text-3xl font-bold text-indigo-900">${formatCurrency(
-                                  invoice.totalInBaseCurrency,
-                                  currency,
-                                )}</p>
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-3 gap-4 text-sm">
-                            <div class="bg-gray-50 p-4 rounded-lg border border-gray-100">
-                                <p class="text-gray-400 text-xs font-bold uppercase mb-1">From</p>
-                                <p class="font-bold text-gray-800">CashShilpo HQ</p>
-                            </div>
-                            <div class="bg-gray-50 p-4 rounded-lg border border-gray-100">
-                                <p class="text-gray-400 text-xs font-bold uppercase mb-1">To</p>
-                                <p class="font-bold text-gray-800">${
-                                  invoice.customerName
-                                }</p>
-                            </div>
-                            <div class="bg-gray-50 p-4 rounded-lg border border-gray-100">
-                                <p class="text-gray-400 text-xs font-bold uppercase mb-1">Info</p>
-                                <p class="font-bold text-gray-800">#${invoice.id.slice(
-                                  -6,
-                                )}</p>
-                                <p class="text-gray-500 text-xs">${formatDate(
-                                  invoice.date,
-                                )}</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-                        <div class="grid grid-cols-12 bg-gray-50 border-b border-gray-100 p-4 text-xs font-bold text-gray-400 uppercase">
-                            <div class="col-span-6">Description</div>
-                            <div class="col-span-2 text-center">Qty</div>
-                            <div class="col-span-2 text-right">Price</div>
-                            <div class="col-span-2 text-right">Total</div>
-                        </div>
-                        ${invoice.items
-                          .map(
-                            (item) => `
-                        <div class="grid grid-cols-12 p-4 border-b border-gray-50 items-center text-sm">
-                            <div class="col-span-6 font-medium text-gray-800">${
-                              item.name
-                            }</div>
-                            <div class="col-span-2 text-center text-gray-500 bg-gray-50 rounded-full py-1">${
-                              item.qty
-                            }</div>
-                            <div class="col-span-2 text-right text-gray-600">${formatCurrency(
-                              item.price,
-                              currency,
-                            )}</div>
-                            <div class="col-span-2 text-right font-bold text-gray-800">${formatCurrency(
-                              item.price * item.qty,
-                              currency,
-                            )}</div>
-                        </div>`,
-                          )
-                          .join("")}
-                    </div>
-                </div>`;
-      },
-    },
-    creative_color: {
-      name: "Creative Pop",
-      preview: `<div class="w-full h-full bg-yellow-50 border border-yellow-200 p-2 relative overflow-hidden"><div class="absolute -top-4 -right-4 w-12 h-12 bg-pink-400 rounded-full"></div><div class="text-pink-600 font-bold text-[8px] relative z-10">INVOICE</div></div>`,
-      getBody: (invoice) => {
-        const currency = invoice.currency || "USD";
-        return `
-                <div id="receipt-content" class="bg-yellow-50 p-10 max-w-3xl mx-auto font-sans relative overflow-hidden">
-                    <!-- Background Circles -->
-                    <div class="absolute top-0 right-0 w-64 h-64 bg-pink-400 rounded-full transform translate-x-1/3 -translate-y-1/3 z-0"></div>
-                    <div class="absolute bottom-0 left-0 w-40 h-40 bg-purple-400 rounded-full transform -translate-x-1/3 translate-y-1/3 z-0"></div>
-                    
-                    <div class="relative z-10">
-                        <h1 class="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600 mb-2" style="-webkit-text-fill-color: transparent;">HELLO.</h1>
-                        <p class="text-xl font-bold text-gray-700 mb-12">Here is your invoice receipt.</p>
-                        
-                        <div class="bg-white/90 backdrop-blur-sm rounded-2xl p-8 shadow-sm border border-white mb-8">
-                            <table class="w-full">
-                                <thead>
-                                    <tr class="text-left text-gray-400 text-xs uppercase tracking-wider">
-                                        <th class="pb-4">What you bought</th>
-                                        <th class="pb-4 text-right">Cost</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="text-lg font-medium text-gray-800">
-                                    ${invoice.items
-                                      .map(
-                                        (item) => `
-                                    <tr class="border-t border-dashed border-gray-300">
-                                        <td class="py-4">
-                                            ${item.name}
-                                            <span class="text-xs text-purple-600 bg-purple-100 px-2 py-1 rounded-full ml-2">x${
-                                              item.qty
-                                            }</span>
-                                        </td>
-                                        <td class="py-4 text-right">${formatCurrency(
-                                          item.price * item.qty,
-                                          currency,
-                                        )}</td>
-                                    </tr>`,
-                                      )
-                                      .join("")}
-                                </tbody>
-                            </table>
-                        </div>
-                        
-                        <div class="flex justify-between items-center">
-                            <div class="text-sm text-gray-500 font-medium">
-                                <p>Date: ${formatDate(invoice.date)}</p>
-                                <p>Ref: #${invoice.id.slice(0, 8)}</p>
-                            </div>
-                            <div class="text-right">
-                                <span class="block text-sm font-bold text-pink-500 uppercase tracking-wide">Total Paid</span>
-                                <span class="block text-5xl font-black text-gray-900">${formatCurrency(
-                                  invoice.totalInBaseCurrency,
-                                  currency,
-                                )}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>`;
-      },
-    },
-    service_focused: {
-      name: "Service Pro",
-      preview: `<div class="w-full h-full bg-white border border-gray-300 flex flex-col"><div class="bg-gray-800 text-white p-1 text-[6px]">SERVICES RENDERED</div><div class="p-2 space-y-1"><div class="h-1 bg-gray-200 w-full"></div><div class="h-1 bg-gray-200 w-2/3"></div></div></div>`,
-      getBody: (invoice) => {
-        const currency = invoice.currency || "USD";
-        return `
-                <div id="receipt-content" class="font-sans text-gray-700 max-w-3xl mx-auto bg-white border border-gray-300">
-                    <div class="bg-gray-800 text-white p-10">
-                        <h1 class="text-2xl font-light uppercase tracking-[0.2em] mb-1">Statement of Service</h1>
-                        <p class="text-gray-400 text-sm">Invoice #${
-                          invoice.id
-                        }</p>
-                    </div>
-                    <div class="p-10">
-                        <div class="flex mb-10">
-                            <div class="w-1/2 pr-4">
-                                <h3 class="text-xs font-bold text-gray-400 uppercase border-b border-gray-200 pb-2 mb-2">Client</h3>
-                                <p class="font-bold text-lg text-gray-900">${
-                                  invoice.customerName
-                                }</p>
-                            </div>
-                            <div class="w-1/2 pl-4">
-                                <h3 class="text-xs font-bold text-gray-400 uppercase border-b border-gray-200 pb-2 mb-2">Provider</h3>
-                                <p class="font-medium">CashShilpo Services</p>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-10">
-                            <h3 class="text-xs font-bold text-gray-400 uppercase border-b border-gray-200 pb-2 mb-4">Breakdown</h3>
-                            ${invoice.items
-                              .map(
-                                (item) => `
-                            <div class="flex justify-between items-start mb-4">
-                                <div>
-                                    <p class="font-bold text-gray-900">${
-                                      item.name
-                                    }</p>
-                                    <p class="text-xs text-gray-500">Qty/Hours: ${
-                                      item.qty
-                                    } @ ${formatCurrency(
-                                  item.price,
-                                  currency,
-                                )}</p>
-                                </div>
-                                <p class="font-medium">${formatCurrency(
-                                  item.price * item.qty,
-                                  currency,
-                                )}</p>
-                            </div>`,
-                              )
-                              .join("")}
-                        </div>
-                        
-                        <div class="bg-gray-50 p-6 rounded text-right">
-                            <p class="text-lg">Amount Due: <span class="font-bold text-gray-900">${formatCurrency(
-                              invoice.dueAmount || 0,
-                              currency,
-                            )}</span></p>
-                            <p class="text-sm text-gray-500 mt-1">Total Billed: ${formatCurrency(
+                        <div style="display: flex; justify-content: space-between; padding-top: 12px; margin-top: 4px; border-top: 2px solid #cbd5e1; font-size: 18px; font-weight: 800; color: #1e3a8a;">
+                            <span>Grand Total</span><span>${f(
                               invoice.totalInBaseCurrency,
-                              currency,
-                            )}</p>
-                        </div>
-                    </div>
-                </div>`;
-      },
-    },
-    tech_digital: {
-      name: "Tech Digital",
-      preview: `<div class="w-full h-full bg-black text-green-400 font-mono p-2 text-[5px] border border-green-900"><div>> INVOICE_LOADED</div><div class="mt-2 text-white">TOTAL: [100.00]</div></div>`,
-      getBody: (invoice) => {
-        const currency = invoice.currency || "USD";
-        return `
-                <div id="receipt-content" class="bg-black text-green-400 p-8 max-w-2xl mx-auto font-mono text-sm border border-green-900 shadow-2xl shadow-green-900/20">
-                    <p class="mb-4 text-green-600">/* SYSTEM INVOICE GENERATED */</p>
-                    <div class="border border-green-800 p-6 mb-6 relative">
-                        <div class="absolute top-0 left-0 bg-black px-2 -mt-2.5 ml-4 text-green-600 text-xs">METADATA</div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div><span class="text-gray-500">ID:</span> <span class="text-white">${
-                              invoice.id
-                            }</span></div>
-                            <div><span class="text-gray-500">TS:</span> <span class="text-white">${new Date(
-                              invoice.date,
-                            ).toISOString()}</span></div>
-                            <div><span class="text-gray-500">USER:</span> <span class="text-white">${
-                              invoice.customerName
-                            }</span></div>
-                        </div>
-                    </div>
-                    <table class="w-full mb-6">
-                        <thead>
-                            <tr class="text-gray-600 border-b border-gray-800">
-                                <th class="text-left py-2">PKG</th>
-                                <th class="text-right py-2">VAL</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${invoice.items
-                              .map(
-                                (item) => `
-                            <tr>
-                                <td class="py-2"><span class="text-green-500">></span> ${
-                                  item.name
-                                } <span class="text-gray-600 text-xs">[x${
-                                  item.qty
-                                }]</span></td>
-                                <td class="text-right py-2 text-white">${formatCurrency(
-                                  item.price * item.qty,
-                                  currency,
-                                )}</td>
-                            </tr>`,
-                              )
-                              .join("")}
-                        </tbody>
-                    </table>
-                    <div class="text-right border-t-2 border-green-600 pt-4">
-                        <p class="text-2xl font-bold text-white"><span class="text-green-600 animate-pulse">_</span>${formatCurrency(
-                          invoice.totalInBaseCurrency,
-                          currency,
-                        )}</p>
-                    </div>
-                </div>`;
-      },
-    },
-    cafe_style: {
-      name: "Cafe Style",
-      preview: `<div class="w-full h-full bg-[#fffcf5] border border-orange-100 p-2 text-center text-[6px] font-serif text-amber-900"><div>Coffee & Co.</div><div class="my-1 border-t border-b border-orange-200 py-1">Latte $5</div></div>`,
-      getBody: (invoice) => {
-        const currency = invoice.currency || "USD";
-        return `
-                <div id="receipt-content" class="bg-[#fffcf5] text-amber-900 p-12 max-w-xl mx-auto font-serif text-center border-t-8 border-amber-800 shadow-md">
-                    <h1 class="text-4xl italic font-bold mb-2">CashShilpo Cafe</h1>
-                    <p class="text-sm text-amber-700 uppercase tracking-widest mb-8">Fresh & Quality</p>
-                    <div class="border-t border-b border-amber-200 py-2 mb-8 text-xs flex justify-between px-8">
-                        <span>Table: 04</span>
-                        <span>Date: ${formatDate(invoice.date)}</span>
-                        <span>Server: ${invoice.cashierName}</span>
-                    </div>
-                    <div class="space-y-4 px-8 mb-8 text-left">
-                        ${invoice.items
-                          .map(
-                            (item) => `
-                        <div class="flex justify-between items-baseline relative">
-                            <div class="bg-[#fffcf5] relative z-10 pr-2 font-bold">${
-                              item.name
-                            } <span class="font-normal text-xs text-amber-600">x${
-                              item.qty
-                            }</span></div>
-                            <div class="flex-grow border-b border-dotted border-amber-300 absolute w-full bottom-1"></div>
-                            <div class="bg-[#fffcf5] relative z-10 pl-2">${formatCurrency(
-                              item.price * item.qty,
-                              currency,
-                            )}</div>
-                        </div>`,
-                          )
-                          .join("")}
-                    </div>
-                    <div class="bg-amber-100/50 p-6 rounded-lg mx-8">
-                        <div class="flex justify-between text-lg font-bold">
-                            <span>Total</span>
-                            <span>${formatCurrency(
-                              invoice.totalInBaseCurrency,
-                              currency,
                             )}</span>
                         </div>
                     </div>
-                    <div class="mt-10 text-xs text-amber-600">
-                        <p>~ Thank you for dining with us ~</p>
-                        <p>Wifi: cafe_guest / Pass: coffee123</p>
-                    </div>
-                </div>`;
-      },
-    },
-  };
+                </div>
+                <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b; text-align: center;">
+                    <strong>${store.name}</strong> • ${store.address}<br>
+                    ${store.footerText.replace(/\n/g, " • ")}
+                </div>
+            </div>`;
+  }
 
-  // Expose templates to global scope for the main app to pick up
-  window.invoiceTemplates = newTemplates;
-  if (window.receiptTemplates) {
-    Object.assign(window.receiptTemplates, newTemplates);
+  function generateMinimalistTemplate(invoice) {
+    const store = getStoreDetails();
+    const currency = invoice.currency || "USD";
+    const f = (val) => formatMoney(val, currency);
+
+    const itemsHTML = (invoice.items || [])
+      .map(
+        (item) => `
+            <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #333;">
+                <div style="flex: 1;">
+                    <div style="color: #fff; font-weight: 500; font-size: 13px;">${
+                      item.name
+                    }</div>
+                    <div style="color: #666; font-size: 11px; font-family: monospace;">${
+                      item.id || ""
+                    } x${item.qty || 1}</div>
+                </div>
+                <div style="color: #fff; font-weight: 600; font-size: 13px; font-family: monospace;">
+                    ${f((item.qty || 1) * item.price)}
+                </div>
+            </div>
+        `,
+      )
+      .join("");
+
+    return `
+        <div id="receipt-content" style="font-family: 'Inter', sans-serif; padding: 40px; max-width: 600px; margin: 0 auto; background: #111; color: #eee; line-height: 1.5;">
+            <div style="text-align: center; margin-bottom: 40px;">
+                <div style="font-size: 10px; letter-spacing: 4px; color: #666; text-transform: uppercase; margin-bottom: 10px;">Receipt</div>
+                <h1 style="font-size: 24px; font-weight: 400; color: #fff; margin: 0; letter-spacing: 1px;">${
+                  store.name
+                }</h1>
+                <p style="font-size: 12px; color: #888; margin-top: 10px; font-family: monospace;">${
+                  invoice.id
+                } • ${new Date(invoice.date).toLocaleDateString()}</p>
+            </div>
+            
+            <div style="margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid #333;">
+                <p style="font-size: 11px; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">Billed To</p>
+                <p style="font-size: 14px; color: #fff;">${
+                  invoice.customerName || "Walk-in Customer"
+                }</p>
+            </div>
+
+            <div style="margin-bottom: 30px;">
+                ${itemsHTML}
+            </div>
+
+            <div style="display: flex; justify-content: space-between; font-size: 13px; color: #888; padding: 5px 0;">
+                <span>Subtotal</span>
+                <span style="font-family: monospace;">${f(
+                  invoice.subtotalInBaseCurrency,
+                )}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 13px; color: #888; padding: 5px 0;">
+                <span>Tax</span>
+                <span style="font-family: monospace;">${f(
+                  invoice.taxInBaseCurrency,
+                )}</span>
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid #444;">
+                <span style="font-size: 14px; color: #aaa; text-transform: uppercase; letter-spacing: 1px;">Total</span>
+                <span style="font-size: 24px; color: #fff; font-weight: 300; font-family: monospace;">${f(
+                  invoice.totalInBaseCurrency,
+                )}</span>
+            </div>
+
+            <div style="margin-top: 50px; text-align: center; color: #555; font-size: 11px;">
+                <p>${store.footerText.replace(/\n/g, "<br>")}</p>
+            </div>
+        </div>`;
+  }
+
+  function generateHTMLFromConfig(invoice, config) {
+    const color = config.primaryColor || "#06b6d4";
+    const textColor = config.textColor || "#1e293b";
+    const font = config.fontFamily || "'Inter', sans-serif";
+    const currency = invoice.currency || "USD";
+    const f = (val) => formatMoney(val, currency);
+
+    const isSplit = config.headerLayout === "split";
+    const isCenter = config.headerLayout === "center";
+
+    let headerHTML = "";
+    if (isSplit) {
+      headerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; border-bottom: 3px solid ${color}; padding-bottom: 20px;">
+                    <div style="width: 50%;">
+                        ${
+                          config.showLogo && config.logoUrl
+                            ? `<img src="${config.logoUrl}" style="max-height: 60px; margin-bottom: 10px;">`
+                            : ""
+                        }
+                        <h1 style="font-size: 28px; font-weight: 800; margin: 0; color: ${color};">${
+        config.storeName
+      }</h1>
+                        <p style="font-size: 12px; color: #64748b; margin: 5px 0 0 0;">${
+                          config.storeAddress
+                        }</p>
+                        <p style="font-size: 12px; color: #64748b; margin: 2px 0 0 0;">${
+                          config.storeContact
+                        }</p>
+                        ${
+                          config.taxId
+                            ? `<p style="font-size: 12px; color: #64748b; margin: 2px 0 0 0;">VAT/BIN: ${config.taxId}</p>`
+                            : ""
+                        }
+                    </div>
+                    <div style="width: 50%; text-align: right;">
+                        <h2 style="font-size: 32px; font-weight: 900; margin: 0; color: #cbd5e1; text-transform: uppercase;">INVOICE</h2>
+                        <p style="font-size: 14px; font-weight: 700; color: ${textColor}; margin: 5px 0;">#${
+        invoice.id
+      }</p>
+                        <p style="font-size: 12px; color: #64748b; margin: 2px 0;">Date: ${new Date(
+                          invoice.date,
+                        ).toLocaleDateString()}</p>
+                        <div style="margin-top: 8px;">${getInvoiceStatusBadge(
+                          invoice.status,
+                        )}</div>
+                    </div>
+                </div>
+            `;
+    } else {
+      headerHTML = `
+                <div style="text-align: ${
+                  isCenter ? "center" : config.headerLayout
+                }; margin-bottom: 30px; border-bottom: 3px solid ${color}; padding-bottom: 20px;">
+                    ${
+                      config.showLogo && config.logoUrl
+                        ? `<img src="${config.logoUrl}" style="max-height: 60px; margin-bottom: 15px; display: inline-block;">`
+                        : ""
+                    }
+                    <h1 style="font-size: 32px; font-weight: 800; margin: 0; color: ${color};">${
+        config.storeName
+      }</h1>
+                    <p style="font-size: 13px; color: #64748b; margin: 8px 0 0 0;">${
+                      config.storeAddress
+                    } | ${config.storeContact}</p>
+                    ${
+                      config.taxId
+                        ? `<p style="font-size: 13px; color: #64748b; margin: 4px 0 0 0; font-weight: 500;">VAT/BIN: ${config.taxId}</p>`
+                        : ""
+                    }
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 30px; background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                    <div>
+                        <p style="font-size: 11px; color: #94a3b8; text-transform: uppercase; font-weight: 700; margin: 0 0 5px 0;">Billed To</p>
+                        <p style="font-size: 16px; font-weight: 700; margin: 0; color: ${textColor};">${
+        invoice.customerName || "Walk-in Customer"
+      }</p>
+                    </div>
+                    <div style="text-align: right;">
+                        <p style="font-size: 11px; color: #94a3b8; text-transform: uppercase; font-weight: 700; margin: 0 0 5px 0;">Invoice Details</p>
+                        <p style="font-size: 14px; margin: 0 0 4px 0; color: ${textColor};"><strong>INV#:</strong> <span style="font-family: monospace;">${
+        invoice.id
+      }</span></p>
+                        <p style="font-size: 13px; margin: 0 0 4px 0; color: #64748b;">Date: ${new Date(
+                          invoice.date,
+                        ).toLocaleDateString()}</p>
+                        <p style="margin: 0;">${getInvoiceStatusBadge(
+                          invoice.status,
+                        )}</p>
+                    </div>
+                </div>
+            `;
+    }
+
+    const itemsHTML = (invoice.items || [])
+      .map((item, idx) => {
+        const bg =
+          config.stripedRows && idx % 2 !== 0 ? "#f8fafc" : "transparent";
+        const borderB = config.showBorders ? "1px solid #e2e8f0" : "none";
+        return `
+            <tr style="background-color: ${bg};">
+                <td style="padding: 12px 10px; border-bottom: ${borderB}; color: ${textColor};">
+                    <div style="font-weight: 600;">${item.name}</div>
+                    ${
+                      config.showSku
+                        ? `<div style="font-size: 11px; color: #64748b; font-family: monospace;">${
+                            item.id || ""
+                          } ${
+                            item.serialNumber
+                              ? `(SN: ${item.serialNumber})`
+                              : ""
+                          }</div>`
+                        : ""
+                    }
+                </td>
+                <td style="padding: 12px 10px; border-bottom: ${borderB}; text-align: center; color: #475569;">${
+          item.qty || 1
+        }</td>
+                <td style="padding: 12px 10px; border-bottom: ${borderB}; text-align: right; color: #475569; font-family: monospace;">${f(
+          item.price,
+        )}</td>
+                <td style="padding: 12px 10px; border-bottom: ${borderB}; text-align: right; font-weight: 600; color: ${textColor}; font-family: monospace;">${f(
+          (item.qty || 1) * item.price,
+        )}</td>
+            </tr>
+            `;
+      })
+      .join("");
+
+    return `
+        <div id="receipt-content" style="font-family: ${font}; padding: 40px; max-width: 800px; margin: 0 auto; background: #ffffff; color: ${textColor}; line-height: 1.6; position: relative;">
+            
+            ${
+              config.showWatermark && config.logoUrl
+                ? `<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: ${
+                    config.watermarkOpacity || "0.05"
+                  }; pointer-events: none; z-index: 0;"><img src="${
+                    config.logoUrl
+                  }" style="width: 400px; height: auto; filter: grayscale(100%);"></div>`
+                : ""
+            }
+            
+            <div style="position: relative; z-index: 1;">
+                
+                ${headerHTML}
+
+                ${
+                  isSplit
+                    ? `
+                <div style="margin-bottom: 30px; background: #f8fafc; padding: 15px 20px; border-left: 4px solid ${color};">
+                    <p style="font-size: 11px; color: #94a3b8; text-transform: uppercase; font-weight: 700; margin: 0 0 5px 0;">Billed To</p>
+                    <p style="font-size: 16px; font-weight: 700; margin: 0; color: ${textColor};">${
+                        invoice.customerName || "Walk-in Customer"
+                      }</p>
+                </div>
+                `
+                    : ""
+                }
+
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 40px; font-size: 14px;">
+                    <thead>
+                        <tr>
+                            <th style="padding: 12px 10px; text-align: left; font-weight: 700; color: #ffffff; background-color: ${color}; border-radius: 6px 0 0 6px;">Description</th>
+                            <th style="padding: 12px 10px; text-align: center; font-weight: 700; color: #ffffff; background-color: ${color};">Qty</th>
+                            <th style="padding: 12px 10px; text-align: right; font-weight: 700; color: #ffffff; background-color: ${color};">Unit Price</th>
+                            <th style="padding: 12px 10px; text-align: right; font-weight: 700; color: #ffffff; background-color: ${color}; border-radius: 0 6px 6px 0;">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${itemsHTML}
+                    </tbody>
+                </table>
+
+                <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                    <div style="width: 45%; font-size: 11px; color: #64748b;">
+                        ${
+                          config.termsText
+                            ? `<strong>Terms & Conditions:</strong><br><span style="white-space: pre-wrap;">${config.termsText}</span>`
+                            : ""
+                        }
+                    </div>
+                    <div style="width: 350px;">
+                        <div style="display: flex; justify-content: space-between; padding: 8px 10px; font-size: 14px; color: #475569; border-bottom: 1px solid #e2e8f0;">
+                            <span>Subtotal:</span>
+                            <span style="font-family: monospace;">${f(
+                              invoice.subtotalInBaseCurrency,
+                            )}</span>
+                        </div>
+                        ${
+                          config.showTax
+                            ? `
+                        <div style="display: flex; justify-content: space-between; padding: 8px 10px; font-size: 14px; color: #475569; border-bottom: 1px solid #e2e8f0;">
+                            <span>Tax:</span>
+                            <span style="font-family: monospace;">${f(
+                              invoice.taxInBaseCurrency,
+                            )}</span>
+                        </div>`
+                            : ""
+                        }
+                        <div style="display: flex; justify-content: space-between; padding: 15px 10px; font-size: 20px; font-weight: 800; color: #ffffff; background-color: ${color}; border-radius: 6px; margin-top: 15px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
+                            <span>Total Due:</span>
+                            <span style="font-family: monospace;">${f(
+                              invoice.totalInBaseCurrency,
+                            )}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 50px; text-align: center; font-size: 12px; color: #64748b; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+                    <p style="white-space: pre-wrap; margin: 0; font-weight: 500;">${
+                      config.footerText
+                    }</p>
+                </div>
+            </div>
+        </div>
+        `;
+  }
+
+  // --- 4. Injection & Observer Logic ---
+  // We strictly listen for the #tab-content-templates container generated by cashshilpo-settings-tab.js
+
+  function injectAdvancedCustomBuilder(container, isBangla) {
+    // Prevent duplicate injection
+    if (document.getElementById("advanced-template-builder")) return;
+
+    const config = getStoreDetails();
+
+    const builderDiv = document.createElement("div");
+    builderDiv.id = "advanced-template-builder";
+    builderDiv.className = "builder-section mt-8";
+
+    builderDiv.innerHTML = `
+        <h2 class="text-xl font-bold text-text-primary mb-2 flex items-center gap-2">
+            <i data-lucide="pen-tool" class="text-cyan-400"></i> ${
+              isBangla
+                ? "কাস্টম ইনভয়েস বিল্ডার"
+                : "Advanced Custom Invoice Builder"
+            }
+        </h2>
+        <p class="text-sm text-text-secondary mb-6">${
+          isBangla
+            ? 'নিজস্ব লোগো, রং এবং লেআউট দিয়ে আপনার টেমপ্লেট ডিজাইন করুন। টেমপ্লেট সিলেক্টর থেকে "My Custom Template" বেছে নিন।'
+            : 'Design your perfect invoice with custom logos, branding colors, and detailed layout controls. Select "My Custom Template" from the options above.'
+        }</p>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <!-- Left: Controls -->
+            <div class="lg:col-span-5 space-y-6 max-h-[800px] overflow-y-auto pr-2 custom-scrollbar">
+                
+                <!-- Logo Upload -->
+                <div>
+                    <div class="builder-section-title">Brand Logo</div>
+                    <label class="logo-upload-box block">
+                        <input type="file" id="ct-logoUpload" accept="image/*" class="hidden">
+                        <img id="ct-logoPreview" src="${
+                          config.logoUrl || ""
+                        }" class="logo-preview-img ${
+      config.logoUrl ? "" : "hidden"
+    } mb-2">
+                        <div id="ct-logoPlaceholder" class="${
+                          config.logoUrl ? "hidden" : ""
+                        }">
+                            <i data-lucide="upload-cloud" class="w-8 h-8 mx-auto text-text-secondary mb-2"></i>
+                            <p class="text-sm text-text-secondary">Click to upload logo</p>
+                        </div>
+                        <input type="hidden" id="ct-logoBase64" value="${
+                          config.logoUrl || ""
+                        }">
+                    </label>
+                </div>
+
+                <!-- Brand Info -->
+                <div>
+                    <div class="builder-section-title">Company Information</div>
+                    <div class="space-y-3">
+                        <div><label class="block text-xs text-text-secondary mb-1">Company Name</label><input type="text" id="ct-storeName" value="${
+                          config.name
+                        }" class="form-input w-full text-sm"></div>
+                        <div><label class="block text-xs text-text-secondary mb-1">Address</label><input type="text" id="ct-storeAddress" value="${
+                          config.address
+                        }" class="form-input w-full text-sm"></div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div><label class="block text-xs text-text-secondary mb-1">Contact</label><input type="text" id="ct-storeContact" value="${
+                              config.contact
+                            }" class="form-input w-full text-sm"></div>
+                            <div><label class="block text-xs text-text-secondary mb-1">VAT/Tax ID</label><input type="text" id="ct-taxId" value="${
+                              config.taxId
+                            }" class="form-input w-full text-sm"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Styling -->
+                <div>
+                    <div class="builder-section-title">Styling & Typography</div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs text-text-secondary mb-1">Primary Color</label>
+                            <div class="flex items-center gap-2">
+                                <input type="color" id="ct-primaryColor" value="${
+                                  config.primaryColor || "#06b6d4"
+                                }" class="h-8 w-10 p-0 border-0 bg-transparent cursor-pointer rounded">
+                                <span class="text-xs font-mono text-text-secondary uppercase" id="ct-colorVal">${
+                                  config.primaryColor || "#06b6d4"
+                                }</span>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-text-secondary mb-1">Text Color</label>
+                            <input type="color" id="ct-textColor" value="${
+                              config.textColor || "#1e293b"
+                            }" class="h-8 w-10 p-0 border-0 bg-transparent cursor-pointer rounded">
+                        </div>
+                        <div class="col-span-2">
+                            <label class="block text-xs text-text-secondary mb-1">Font Family</label>
+                            <select id="ct-fontFamily" class="form-select w-full text-sm">
+                                <option value="'Inter', sans-serif" ${
+                                  (config.fontFamily || "").includes("Inter")
+                                    ? "selected"
+                                    : ""
+                                }>Inter (Modern Sans)</option>
+                                <option value="'Playfair Display', serif" ${
+                                  (config.fontFamily || "").includes("Playfair")
+                                    ? "selected"
+                                    : ""
+                                }>Playfair (Elegant Serif)</option>
+                                <option value="'Courier New', monospace" ${
+                                  (config.fontFamily || "").includes("Courier")
+                                    ? "selected"
+                                    : ""
+                                }>Courier (Classic Mono)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Layout Toggles -->
+                <div>
+                    <div class="builder-section-title">Layout Options</div>
+                    <div class="space-y-2">
+                        <div>
+                            <label class="block text-xs text-text-secondary mb-1">Header Layout</label>
+                            <select id="ct-headerLayout" class="form-select w-full text-sm mb-3">
+                                <option value="split" ${
+                                  config.headerLayout === "split"
+                                    ? "selected"
+                                    : ""
+                                }>Split (Left & Right)</option>
+                                <option value="left" ${
+                                  config.headerLayout === "left"
+                                    ? "selected"
+                                    : ""
+                                }>Aligned Left</option>
+                                <option value="center" ${
+                                  config.headerLayout === "center"
+                                    ? "selected"
+                                    : ""
+                                }>Aligned Center</option>
+                            </select>
+                        </div>
+                        <label class="flex items-center justify-between p-2 rounded bg-bg-secondary cursor-pointer">
+                            <span class="text-sm">Show Header Logo</span>
+                            <input type="checkbox" id="ct-showLogo" class="form-checkbox h-4 w-4 text-cyan-500 rounded" ${
+                              config.showLogo !== false ? "checked" : ""
+                            }>
+                        </label>
+                        <label class="flex items-center justify-between p-2 rounded bg-bg-secondary cursor-pointer">
+                            <span class="text-sm">Show Logo Watermark</span>
+                            <input type="checkbox" id="ct-showWatermark" class="form-checkbox h-4 w-4 text-cyan-500 rounded" ${
+                              config.showWatermark ? "checked" : ""
+                            }>
+                        </label>
+                        <label class="flex items-center justify-between p-2 rounded bg-bg-secondary cursor-pointer">
+                            <span class="text-sm">Striped Table Rows</span>
+                            <input type="checkbox" id="ct-stripedRows" class="form-checkbox h-4 w-4 text-cyan-500 rounded" ${
+                              config.stripedRows !== false ? "checked" : ""
+                            }>
+                        </label>
+                        <label class="flex items-center justify-between p-2 rounded bg-bg-secondary cursor-pointer">
+                            <span class="text-sm">Show Table Borders</span>
+                            <input type="checkbox" id="ct-showBorders" class="form-checkbox h-4 w-4 text-cyan-500 rounded" ${
+                              config.showBorders !== false ? "checked" : ""
+                            }>
+                        </label>
+                        <label class="flex items-center justify-between p-2 rounded bg-bg-secondary cursor-pointer">
+                            <span class="text-sm">Show Tax Row</span>
+                            <input type="checkbox" id="ct-showTax" class="form-checkbox h-4 w-4 text-cyan-500 rounded" ${
+                              config.showTax !== false ? "checked" : ""
+                            }>
+                        </label>
+                        <label class="flex items-center justify-between p-2 rounded bg-bg-secondary cursor-pointer">
+                            <span class="text-sm">Show Item SKUs</span>
+                            <input type="checkbox" id="ct-showSku" class="form-checkbox h-4 w-4 text-cyan-500 rounded" ${
+                              config.showSku !== false ? "checked" : ""
+                            }>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Extra Texts -->
+                <div>
+                    <div class="builder-section-title">Extra Content</div>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs text-text-secondary mb-1">Terms & Conditions</label>
+                            <textarea id="ct-termsText" class="form-textarea w-full h-16 text-sm" placeholder="Returns accepted within 30 days...">${
+                              config.termsText || ""
+                            }</textarea>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-text-secondary mb-1">Footer Note</label>
+                            <textarea id="ct-footerText" class="form-textarea w-full h-16 text-sm" placeholder="Thank you for your business!">${
+                              config.footerText || ""
+                            }</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" id="ct-saveBuilderBtn" class="btn btn-primary w-full shadow-lg shadow-cyan-500/20 py-3 text-sm tracking-wide"><i data-lucide="save" class="w-4 h-4 mr-2"></i> Save Template Design</button>
+            </div>
+
+            <!-- Right: Live Preview -->
+            <div class="lg:col-span-7 bg-[#cbd5e1] rounded-xl border border-border-color p-4 flex items-start justify-center overflow-hidden relative shadow-inner h-[800px]">
+                <div class="absolute top-2 right-2 bg-black/50 text-white text-[10px] px-2 py-1 rounded font-mono uppercase tracking-widest z-10 backdrop-blur-sm">Live Preview</div>
+                <div id="ct-livePreview" class="w-[800px] origin-top shadow-2xl transition-all" style="transform: scale(0.65);"></div>
+            </div>
+        </div>
+    `;
+
+    // Attempt to place it before the "Save Changes" button wrapper, if it exists
+    const saveBtnWrap = container.querySelector(".flex.justify-end");
+    if (saveBtnWrap) {
+      container.insertBefore(builderDiv, saveBtnWrap);
+    } else {
+      container.appendChild(builderDiv);
+    }
+
+    if (window.lucide) window.lucide.createIcons();
+    bindBuilderEvents(builderDiv, isBangla);
+  }
+
+  function bindBuilderEvents(container, isBangla) {
+    const previewEl = container.querySelector("#ct-livePreview");
+    const inputs = container.querySelectorAll("input, select, textarea");
+
+    const updatePreview = () => {
+      const tempConfig = {
+        storeName: document.getElementById("ct-storeName").value,
+        storeAddress: document.getElementById("ct-storeAddress").value,
+        storeContact: document.getElementById("ct-storeContact").value,
+        taxId: document.getElementById("ct-taxId").value,
+        primaryColor: document.getElementById("ct-primaryColor").value,
+        textColor: document.getElementById("ct-textColor").value,
+        fontFamily: document.getElementById("ct-fontFamily").value,
+        headerLayout: document.getElementById("ct-headerLayout").value,
+        showLogo: document.getElementById("ct-showLogo").checked,
+        showWatermark: document.getElementById("ct-showWatermark").checked,
+        stripedRows: document.getElementById("ct-stripedRows").checked,
+        showBorders: document.getElementById("ct-showBorders").checked,
+        showTax: document.getElementById("ct-showTax").checked,
+        showSku: document.getElementById("ct-showSku").checked,
+        termsText: document.getElementById("ct-termsText").value,
+        footerText: document.getElementById("ct-footerText").value,
+        logoUrl: document.getElementById("ct-logoBase64").value,
+      };
+
+      const mockInvoice = {
+        id: "INV-2026",
+        date: new Date().toISOString(),
+        customerName: "Alex Morgan",
+        status: "Paid",
+        currency: "USD",
+        subtotalInBaseCurrency: 350.0,
+        taxInBaseCurrency: 35.0,
+        totalInBaseCurrency: 385.0,
+        items: [
+          { name: "Mechanical Keyboard", id: "SKU-112", qty: 1, price: 150 },
+          { name: "Ergonomic Mouse", id: "SKU-115", qty: 2, price: 100 },
+        ],
+      };
+
+      previewEl.innerHTML = generateHTMLFromConfig(mockInvoice, tempConfig);
+    };
+
+    // Logo Upload Logic to Base64
+    const logoUpload = document.getElementById("ct-logoUpload");
+    logoUpload.addEventListener("change", function (e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (evt) {
+          const b64 = evt.target.result;
+          document.getElementById("ct-logoBase64").value = b64;
+          const previewImg = document.getElementById("ct-logoPreview");
+          previewImg.src = b64;
+          previewImg.classList.remove("hidden");
+          document.getElementById("ct-logoPlaceholder").classList.add("hidden");
+          updatePreview();
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Bind all inputs
+    inputs.forEach((input) => {
+      input.addEventListener("input", () => {
+        if (input.id === "ct-primaryColor") {
+          document.getElementById("ct-colorVal").textContent = input.value;
+        }
+        updatePreview();
+      });
+    });
+
+    // Save Logic
+    document
+      .getElementById("ct-saveBuilderBtn")
+      .addEventListener("click", () => {
+        const finalConfig = {
+          storeName: document.getElementById("ct-storeName").value,
+          storeAddress: document.getElementById("ct-storeAddress").value,
+          storeContact: document.getElementById("ct-storeContact").value,
+          taxId: document.getElementById("ct-taxId").value,
+          primaryColor: document.getElementById("ct-primaryColor").value,
+          textColor: document.getElementById("ct-textColor").value,
+          fontFamily: document.getElementById("ct-fontFamily").value,
+          headerLayout: document.getElementById("ct-headerLayout").value,
+          showLogo: document.getElementById("ct-showLogo").checked,
+          showWatermark: document.getElementById("ct-showWatermark").checked,
+          stripedRows: document.getElementById("ct-stripedRows").checked,
+          showBorders: document.getElementById("ct-showBorders").checked,
+          showTax: document.getElementById("ct-showTax").checked,
+          showSku: document.getElementById("ct-showSku").checked,
+          termsText: document.getElementById("ct-termsText").value,
+          footerText: document.getElementById("ct-footerText").value,
+          logoUrl: document.getElementById("ct-logoBase64").value,
+        };
+        localStorage.setItem(CONFIG_KEY, JSON.stringify(finalConfig));
+
+        // Toasts if available, fallback to alert
+        if (typeof showToast === "function") {
+          showToast(
+            isBangla
+              ? "কাস্টম টেমপ্লেট সেভ করা হয়েছে!"
+              : "Custom Template Saved Successfully!",
+            "success",
+          );
+        } else {
+          alert(
+            isBangla
+              ? "কাস্টম টেমপ্লেট সেভ করা হয়েছে!"
+              : "Custom Template Saved Successfully!",
+          );
+        }
+        updatePreview();
+      });
+
+    // Initialize preview
+    updatePreview();
+  }
+
+  // --- 5. Observer to hook into the Templates tab seamlessly ---
+  const tabObserver = new MutationObserver(() => {
+    const templatesPane = document.getElementById("tab-content-templates");
+    if (
+      templatesPane &&
+      !document.getElementById("advanced-template-builder")
+    ) {
+      const isBangla = document.body.classList.contains("lang-bn");
+      injectAdvancedCustomBuilder(templatesPane, isBangla);
+    }
+  });
+
+  tabObserver.observe(document.body, { childList: true, subtree: true });
+
+  // Fallback initial check if the tab already exists when this script runs
+  const existingTemplatesPane = document.getElementById(
+    "tab-content-templates",
+  );
+  if (
+    existingTemplatesPane &&
+    !document.getElementById("advanced-template-builder")
+  ) {
+    injectAdvancedCustomBuilder(
+      existingTemplatesPane,
+      document.body.classList.contains("lang-bn"),
+    );
   }
 })();

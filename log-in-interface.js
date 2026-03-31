@@ -1,5 +1,5 @@
 (function () {
-  console.log("Premium Login Interface: v3.3 Stable Loaded (Styles Scoped)");
+  console.log("Premium Login Interface: v3.4 Stable Loaded (Strictly Scoped)");
 
   // --- 1. CONFIGURATION ---
   const CONFIG = {
@@ -10,10 +10,12 @@
   };
 
   // --- 2. CSS STYLES ---
+  // CRITICAL FIX: Every selector is strictly bound to #login-container and renamed
+  // to avoid colliding with main app classes like .form-pane or .glass-card.
   const STYLES = `
           /* --- Core Layout Reset --- */
           #login-container {
-              display: flex; /* REMOVED !important to allow JS to hide it */
+              display: flex;
               padding: 0 !important;
               background-color: #000 !important;
               overflow: hidden !important;
@@ -22,7 +24,7 @@
               z-index: 100 !important;
           }
 
-          /* CRITICAL FIX: Ensure container hides when inline style is set to none */
+          /* Ensure container hides when inline style is set to none */
           #login-container[style*="display: none"] {
               display: none !important;
               z-index: -1 !important;
@@ -42,7 +44,7 @@
           }
   
           /* --- Split Layout Grid --- */
-          .split-layout {
+          #login-container .login-split-layout {
               display: grid;
               grid-template-columns: 1fr;
               height: 100vh;
@@ -51,13 +53,13 @@
               background-color: #000;
           }
           @media (min-width: 1024px) {
-              .split-layout {
+              #login-container .login-split-layout {
                   grid-template-columns: 1.2fr 1fr; /* 55% Visual, 45% Form */
               }
           }
   
           /* --- Left Pane: Visuals --- */
-          .visual-pane {
+          #login-container .login-visual-pane {
               position: relative;
               background-color: #050505;
               overflow: hidden;
@@ -67,12 +69,12 @@
               padding: 4rem;
           }
           @media (min-width: 1024px) {
-              .visual-pane {
+              #login-container .login-visual-pane {
                   display: flex;
               }
           }
           
-          .visual-bg {
+          #login-container .login-visual-bg {
               position: absolute;
               inset: 0;
               background-image: url('${CONFIG.bgImage}');
@@ -80,44 +82,44 @@
               background-position: center;
               opacity: 0.4;
               transition: transform 10s ease-in-out;
-              animation: slowZoom 20s infinite alternate;
+              animation: loginSlowZoom 20s infinite alternate;
           }
-          @keyframes slowZoom {
+          @keyframes loginSlowZoom {
               from { transform: scale(1); }
               to { transform: scale(1.1); }
           }
   
-          .visual-overlay {
+          #login-container .login-visual-overlay {
               position: absolute;
               inset: 0;
               background: linear-gradient(to bottom, rgba(0,0,0,0.2), #000);
               backdrop-filter: blur(1px);
           }
   
-          .visual-content {
+          #login-container .login-visual-content {
               position: relative;
               z-index: 10;
               color: white;
           }
   
-          .brand-tag {
+          #login-container .login-brand-tag {
               display: inline-flex;
               align-items: center;
               gap: 0.75rem;
               margin-bottom: 2rem;
           }
-          .brand-tag img {
+          #login-container .login-brand-tag img {
               width: 48px;
               height: 48px;
               filter: drop-shadow(0 0 15px rgba(56, 189, 248, 0.5));
           }
-          .brand-tag span {
+          #login-container .login-brand-tag span {
               font-size: 1.5rem;
               font-weight: 800;
               letter-spacing: -0.03em;
           }
   
-          .hero-text h2 {
+          #login-container .login-hero-text h2 {
               font-size: 3.5rem;
               font-weight: 800;
               line-height: 1.1;
@@ -126,7 +128,7 @@
               -webkit-text-fill-color: transparent;
               margin-bottom: 1.5rem;
           }
-          .hero-text p {
+          #login-container .login-hero-text p {
               font-size: 1.125rem;
               color: #94a3b8;
               max-width: 80%;
@@ -134,7 +136,7 @@
           }
   
           /* Floating UI Elements */
-          .glass-card {
+          #login-container .login-glass-card {
               background: rgba(255, 255, 255, 0.03);
               backdrop-filter: blur(16px);
               border: 1px solid rgba(255, 255, 255, 0.05);
@@ -142,15 +144,15 @@
               padding: 1.5rem;
               margin-top: 4rem;
               max-width: 400px;
-              animation: float 6s ease-in-out infinite;
+              animation: loginFloat 6s ease-in-out infinite;
           }
-          @keyframes float {
+          @keyframes loginFloat {
               0%, 100% { transform: translateY(0); }
               50% { transform: translateY(-10px); }
           }
   
           /* --- Right Pane: Form --- */
-          .form-pane {
+          #login-container .login-form-pane {
               position: relative;
               display: flex;
               flex-direction: column;
@@ -159,34 +161,34 @@
               padding: 2rem;
               background-color: #0a0a0a;
               overflow-y: auto;
-              z-index: 20; /* Ensure form is above background */
+              z-index: 20;
           }
   
-          .form-wrapper {
+          #login-container .login-form-wrapper {
               width: 100%;
               max-width: 420px;
-              animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+              animation: loginSlideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1);
           }
-          @keyframes slideUpFade {
+          @keyframes loginSlideUpFade {
               from { opacity: 0; transform: translateY(20px); }
               to { opacity: 1; transform: translateY(0); }
           }
   
           /* Form Styling Overrides */
-          .form-pane h1 {
+          #login-container .login-form-pane h1 {
               font-size: 2rem !important;
               font-weight: 700 !important;
               color: white !important;
               margin-bottom: 0.5rem !important;
               text-align: left !important;
           }
-          .form-pane p.text-text-secondary {
+          #login-container .login-form-pane p.text-text-secondary {
               text-align: left !important;
               margin-bottom: 2.5rem !important;
               color: #64748b !important;
           }
   
-          .form-pane .form-input {
+          #login-container .login-form-pane .form-input {
               background-color: #121212 !important;
               border: 1px solid #27272a !important;
               color: white !important;
@@ -195,12 +197,12 @@
               font-size: 1rem !important;
               transition: all 0.2s ease;
           }
-          .form-pane .form-input:focus {
+          #login-container .login-form-pane .form-input:focus {
               background-color: #000 !important;
               border-color: #3b82f6 !important;
               box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15) !important;
           }
-          .form-pane label {
+          #login-container .login-form-pane label {
               font-size: 0.875rem !important;
               font-weight: 600 !important;
               color: #a1a1aa !important;
@@ -208,7 +210,6 @@
           }
   
           /* --- Premium Button with Loading Effect --- */
-          /* SCOPED to login-container to prevent affecting main app buttons */
           #login-container .btn-primary {
               position: relative;
               background: #fff !important;
@@ -250,14 +251,14 @@
               border: 2px solid #000;
               border-top-color: transparent;
               border-radius: 50%;
-              animation: spin 0.8s linear infinite;
+              animation: loginSpin 0.8s linear infinite;
               opacity: 1;
           }
-          @keyframes spin {
+          @keyframes loginSpin {
               to { transform: rotate(360deg); }
           }
   
-          /* Links - SCOPED to prevent affecting main app links */
+          /* Links */
           #login-container a {
               color: #3b82f6 !important;
               font-weight: 600;
@@ -269,18 +270,18 @@
           }
 
           /* Hide original logo in form if present to avoid duplication */
-          .form-pane .text-center.mb-8 {
+          #login-container .login-form-pane .text-center.mb-8 {
               display: none !important; 
           }
           
           /* Custom Scrollbar for form pane */
-          .form-pane::-webkit-scrollbar {
+          #login-container .login-form-pane::-webkit-scrollbar {
               width: 6px;
           }
-          .form-pane::-webkit-scrollbar-track {
+          #login-container .login-form-pane::-webkit-scrollbar-track {
               background: #0a0a0a;
           }
-          .form-pane::-webkit-scrollbar-thumb {
+          #login-container .login-form-pane::-webkit-scrollbar-thumb {
               background: #27272a;
               border-radius: 3px;
           }
@@ -312,32 +313,32 @@
     // Guard: Only proceed if the original form exists
     if (!originalFormWrapper || !authFormContainer) return;
 
-    console.log("Transforming Login Layout...");
+    console.log("Transforming Login Layout with Strict Isolation...");
 
     // 1. Create the new Split Layout Root
     const splitRoot = document.createElement("div");
     splitRoot.id = "split-layout-root";
-    splitRoot.className = "split-layout";
+    splitRoot.className = "login-split-layout"; // UPDATED SCOPED CLASS
 
     // 2. Create Left Pane: Visuals
     const visualPane = document.createElement("div");
-    visualPane.className = "visual-pane";
+    visualPane.className = "login-visual-pane"; // UPDATED SCOPED CLASS
     visualPane.innerHTML = `
-          <div class="visual-bg"></div>
-          <div class="visual-overlay"></div>
-          <div class="visual-content h-full flex flex-col justify-between relative z-10">
-              <div class="brand-tag">
+          <div class="login-visual-bg"></div>
+          <div class="login-visual-overlay"></div>
+          <div class="login-visual-content h-full flex flex-col justify-between relative z-10">
+              <div class="login-brand-tag">
                   <img src="${
                     CONFIG.logoUrl
                   }" alt="Logo" onerror="this.style.display='none'">
                   <span>${CONFIG.brandName}</span>
               </div>
               
-              <div class="hero-text">
+              <div class="login-hero-text">
                   <h2>Future of<br>Retail Management.</h2>
                   <p class="mt-4">${CONFIG.tagline}</p>
                   
-                  <div class="glass-card">
+                  <div class="login-glass-card">
                       <div class="flex items-center gap-3 mb-2">
                           <div class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-black font-bold">
                               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
@@ -356,14 +357,13 @@
 
     // 3. Create Right Pane: Form
     const formPane = document.createElement("div");
-    formPane.className = "form-pane";
+    formPane.className = "login-form-pane"; // UPDATED SCOPED CLASS (Fixes main app conflict)
 
     // Wrap the form for animation
     const formWrapper = document.createElement("div");
-    formWrapper.className = "form-wrapper";
+    formWrapper.className = "login-form-wrapper"; // UPDATED SCOPED CLASS
 
     // Move the actual form container into our wrapper
-    // NOTE: We append CHILD to prevent losing event listeners
     formWrapper.appendChild(authFormContainer);
     formPane.appendChild(formWrapper);
 
@@ -371,8 +371,7 @@
     splitRoot.appendChild(visualPane);
     splitRoot.appendChild(formPane);
 
-    // 6. Safe Swap: Clear Login Container and Append New Root
-    // We do this carefully to ensure no flash of black screen
+    // 6. Safe Swap
     loginContainer.innerHTML = "";
     loginContainer.appendChild(splitRoot);
 
@@ -382,19 +381,14 @@
 
   // --- 5. SMART LOADING LOGIC ---
   function attachSmartListeners(container) {
-    // --- A. Button Click Handler ---
     container.addEventListener("click", (e) => {
       const btn = e.target.closest('button[type="submit"]');
       if (btn) {
         const form = btn.closest("form");
-        // Only show loading if form is valid
         if (form && form.checkValidity()) {
           btn.classList.add("loading");
-
-          // Safety: Auto-remove loading after 15s in case network hangs indefinitely
           setTimeout(() => {
             if (btn.classList.contains("loading")) {
-              console.warn("Loading timeout reached, resetting button state.");
               btn.classList.remove("loading");
             }
           }, 15000);
@@ -402,8 +396,6 @@
       }
     });
 
-    // --- B. Error Message Observer ---
-    // Watches the error element. If text appears or 'hidden' class is removed, stop loading.
     const errorObserver = new MutationObserver((mutations) => {
       const errorElement = container.querySelector("#auth-error");
       const submitBtn = container.querySelector('button[type="submit"]');
@@ -416,14 +408,12 @@
         const isVisible = !errorElement.classList.contains("hidden");
         const hasText = errorElement.textContent.trim().length > 0;
 
-        // If error is visible and has text, stop loading immediately
         if (isVisible && hasText) {
           submitBtn.classList.remove("loading");
         }
       }
     });
 
-    // Attach observer to the container to catch when the error element might be re-rendered
     errorObserver.observe(container, {
       childList: true,
       subtree: true,
@@ -431,8 +421,6 @@
       attributeFilter: ["class", "style"],
     });
 
-    // --- C. Input Change Listener ---
-    // If user starts typing again (fixing a mistake), remove loading state
     container.addEventListener("input", (e) => {
       const submitBtn = container.querySelector('button[type="submit"]');
       if (submitBtn && submitBtn.classList.contains("loading")) {
@@ -442,19 +430,14 @@
   }
 
   // --- 6. INITIALIZATION OBSERVER ---
-  // Watches the body for the appearance of #login-container
   const observer = new MutationObserver((mutations) => {
     const loginContainer = document.getElementById("login-container");
-
-    // If login container exists and is visible
     if (loginContainer && loginContainer.style.display !== "none") {
-      // Only transform if we detect the standard card structure inside AND haven't transformed yet
       if (
         loginContainer.querySelector(".w-full.max-w-md") &&
         !document.getElementById("split-layout-root")
       ) {
         injectStyles();
-        // Use a small delay to ensure DOM is settled
         requestAnimationFrame(() => transformLayout());
       }
     }
@@ -465,7 +448,6 @@
     subtree: true,
   });
 
-  // Manual trigger in case it's already there on load
   injectStyles();
   transformLayout();
 })();

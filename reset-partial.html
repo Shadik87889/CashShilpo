@@ -1108,8 +1108,7 @@
     <script src="banks-fun.js"></script>
     <script src="cashshilpo-visuals.js"></script>
     <script src="log-in-interface.js"></script>
-    <script src="cashshilpo-advanced-tax.js"></script>
-    <script src="templates-invoice.js"></script>
+    <!-- <script src="templates-invoice.js"></script> -->
     <script src="cashshilpo-settings-tab.js"></script>
     <script src="cashshilpo-tooltips.js"></script>
     <script src="cashshilpo-voice-os.js"></script>
@@ -6791,17 +6790,12 @@ if (checkPermission('canManageLoyalty')) { // Ensure only authorized users liste
                                 <label for="email" class="block text-sm font-medium text-text-secondary">Email address</label>
                                 <input id="email" name="email" type="email" autocomplete="email" required class="form-input w-full mt-1">
                             </div>
-                          <div>
-                                <div class="flex justify-between items-center mb-1">
+                           <div>
+                                <div class="flex justify-between items-center">
                                     <label for="password" class="block text-sm font-medium text-text-secondary">Password</label>
-                                    <a href="#" id="forgot-password-link" class="text-xs font-medium text-accent hover:underline">Forgot password?</a>
+                                    <a href="#" id="show-forgot-password-form" class="text-xs font-medium text-accent hover:underline" tabindex="-1">Forgot Password?</a>
                                 </div>
-                                <div class="relative">
-                                    <input id="password" name="password" type="password" autocomplete="current-password" required class="form-input w-full pr-10">
-                                    <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center text-text-secondary hover:text-text-primary toggle-password-btn">
-                                        <i data-lucide="eye" class="w-5 h-5"></i>
-                                    </button>
-                                </div>
+                                <input id="password" name="password" type="password" autocomplete="current-password" required class="form-input w-full mt-1">
                             </div>
                             <p id="auth-error" class="text-red-400 text-sm hidden"></p>
                             <div>
@@ -6814,7 +6808,7 @@ if (checkPermission('canManageLoyalty')) { // Ensure only authorized users liste
                     `;
                     const form = formContainer.querySelector('#login-form');
                     const errorEl = formContainer.querySelector('#auth-error');
-                  form.addEventListener('submit', async (e) => {
+                    form.addEventListener('submit', async (e) => {
                         e.preventDefault();
                         errorEl.classList.add('hidden');
                         try {
@@ -6824,78 +6818,99 @@ if (checkPermission('canManageLoyalty')) { // Ensure only authorized users liste
                             console.error("Login error:", error);
                             errorEl.textContent = error.message.replace('Firebase: ', '');
                             errorEl.classList.remove('hidden');
-                            const submitBtn = form.querySelector('button[type="submit"]');
-                            if (submitBtn) submitBtn.classList.remove('loading');
                         }
                     });
-               formContainer.querySelector('#show-signup-form').addEventListener('click', (e) => {
+                    formContainer.querySelector('#show-signup-form').addEventListener('click', (e) => {
                         e.preventDefault();
                         showSignupForm();
                     });
-
-                    formContainer.querySelector('#forgot-password-link').addEventListener('click', (e) => {
+                    formContainer.querySelector('#show-forgot-password-form').addEventListener('click', (e) => {
                         e.preventDefault();
                         showForgotPasswordForm();
                     });
-
-                    const toggleBtn = formContainer.querySelector('.toggle-password-btn');
-                    const passInput = formContainer.querySelector('#password');
-                    toggleBtn.addEventListener('click', () => {
-                        const type = passInput.getAttribute('type') === 'password' ? 'text' : 'password';
-                        passInput.setAttribute('type', type);
-                        toggleBtn.innerHTML = type === 'password' ? '<i data-lucide="eye" class="w-5 h-5"></i>' : '<i data-lucide="eye-off" class="w-5 h-5"></i>';
-                        lucide.createIcons();
-                    });
                 };
-
-                const showForgotPasswordForm = () => {
+const showForgotPasswordForm = () => {
                     formContainer.innerHTML = `
                         <div class="text-center">
-                            <h1 class="text-2xl font-bold text-text-primary">Reset Password</h1>
-                            <p class="text-text-secondary">Enter your email to receive a reset link.</p>
+                            <div class="w-16 h-16 bg-blue-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-blue-500/20">
+                                <i data-lucide="shield-check" class="w-8 h-8 text-blue-400"></i>
+                            </div>
+                            <h1 class="text-2xl font-bold text-text-primary">Secure Password Recovery</h1>
+                            <p class="text-text-secondary mt-2 text-sm">Enter your email address and we'll send you an encrypted link to securely reset your password.</p>
                         </div>
-                        <form id="forgot-password-form" class="space-y-4">
+                        <form id="forgot-password-form" class="space-y-4 mt-6">
                             <div>
                                 <label for="reset-email" class="block text-sm font-medium text-text-secondary">Email address</label>
-                                <input id="reset-email" name="email" type="email" required class="form-input w-full mt-1">
+                                <input id="reset-email" name="email" type="email" autocomplete="email" required class="form-input w-full mt-1" placeholder="admin@example.com">
                             </div>
                             <p id="reset-error" class="text-red-400 text-sm hidden"></p>
+                            <p id="reset-success" class="text-green-400 text-sm hidden bg-green-500/10 p-3 rounded-lg border border-green-500/20"></p>
                             <div>
-                                <button type="submit" class="btn btn-primary w-full text-base py-3">Send Reset Link</button>
+                                <button type="submit" id="reset-submit-btn" class="btn btn-primary w-full text-base py-3">Send Secure Reset Link</button>
                             </div>
                         </form>
-                        <div class="text-center text-sm text-text-secondary">
-                            Remembered your password? <a href="#" id="back-to-login" class="font-medium text-accent hover:underline">Log in</a>
+                        <div class="text-center text-sm text-text-secondary mt-6">
+                            Remember your password? <a href="#" id="back-to-login" class="font-medium text-accent hover:underline">Return to Login</a>
                         </div>
                     `;
                     lucide.createIcons();
-                    
+
                     const form = formContainer.querySelector('#forgot-password-form');
                     const errorEl = formContainer.querySelector('#reset-error');
-                    
+                    const successEl = formContainer.querySelector('#reset-success');
+                    const submitBtn = formContainer.querySelector('#reset-submit-btn');
+
                     form.addEventListener('submit', async (e) => {
                         e.preventDefault();
                         errorEl.classList.add('hidden');
-                        const email = form.email.value;
+                        successEl.classList.add('hidden');
+                        
+                        const email = form.email.value.trim();
+                        if (!email) return;
+
+                        // SECURITY: Rate Limiting & Cooldown to prevent spam
+                        const lastSent = localStorage.getItem('last_reset_sent_' + email);
+                        if (lastSent && (Date.now() - parseInt(lastSent)) < 60000) {
+                            errorEl.textContent = "Please wait 60 seconds before requesting another reset link.";
+                            errorEl.classList.remove('hidden');
+                            return;
+                        }
+
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML = '<div class="loader-sm"></div> Verifying...';
+
                         try {
                             await sendPasswordResetEmail(auth, email);
-                            showToast('Password reset link sent to your email!', 'success');
-                            showLoginForm();
+                            localStorage.setItem('last_reset_sent_' + email, Date.now().toString());
+                            
+                            // SECURITY: Anti-Enumeration (We don't reveal if the email is registered or not to hackers)
+                            successEl.innerHTML = `<i data-lucide="check-circle" class="inline w-4 h-4 mr-1"></i> If an account exists for <b>${email}</b>, a secure reset link has been sent. Please check your inbox and spam folder.`;
+                            successEl.classList.remove('hidden');
+                            form.email.value = '';
+                            lucide.createIcons();
                         } catch (error) {
-                            console.error("Reset error:", error);
-                            errorEl.textContent = error.message.replace('Firebase: ', '');
-                            errorEl.classList.remove('hidden');
-                            const submitBtn = form.querySelector('button[type="submit"]');
-                            if(submitBtn) submitBtn.classList.remove('loading');
+                            console.error("Password reset error:", error);
+                            // Even on error, we mask the "user-not-found" error to prevent email enumeration
+                            if (error.code === 'auth/user-not-found') {
+                                localStorage.setItem('last_reset_sent_' + email, Date.now().toString());
+                                successEl.innerHTML = `<i data-lucide="check-circle" class="inline w-4 h-4 mr-1"></i> If an account exists for <b>${email}</b>, a secure reset link has been sent. Please check your inbox and spam folder.`;
+                                successEl.classList.remove('hidden');
+                                lucide.createIcons();
+                            } else {
+                                errorEl.textContent = error.message.replace('Firebase: ', '');
+                                errorEl.classList.remove('hidden');
+                            }
+                        } finally {
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = 'Send Secure Reset Link';
                         }
                     });
 
                     formContainer.querySelector('#back-to-login').addEventListener('click', (e) => {
                         e.preventDefault();
-                        showLoginForm();
+                        showLoginForm(); 
                     });
                 };
-
                 const showSignupForm = () => {
                     formContainer.innerHTML = `
                         <div class="text-center">
@@ -6915,14 +6930,9 @@ if (checkPermission('canManageLoyalty')) { // Ensure only authorized users liste
                                 <label for="email" class="block text-sm font-medium text-text-secondary">Email address</label>
                                 <input id="email" name="email" type="email" autocomplete="email" required class="form-input w-full mt-1">
                             </div>
-                           <div>
+                            <div>
                                 <label for="password" class="block text-sm font-medium text-text-secondary">Password</label>
-                                <div class="relative mt-1">
-                                    <input id="password" name="password" type="password" autocomplete="new-password" required class="form-input w-full pr-10">
-                                    <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center text-text-secondary hover:text-text-primary toggle-password-btn">
-                                        <i data-lucide="eye" class="w-5 h-5"></i>
-                                    </button>
-                                </div>
+                                <input id="password" name="password" type="password" autocomplete="new-password" required class="form-input w-full mt-1">
                             </div>
                             <p id="auth-error" class="text-red-400 text-sm hidden"></p>
                             <div>
@@ -6936,11 +6946,9 @@ if (checkPermission('canManageLoyalty')) { // Ensure only authorized users liste
                     const form = formContainer.querySelector('#signup-form');
                     const errorEl = formContainer.querySelector('#auth-error');
 
-            form.addEventListener('submit', async (e) => {
+                    form.addEventListener('submit', async (e) => {
                         e.preventDefault();
                         errorEl.classList.add('hidden');
-                        window.isSigningUp = true; // Prevent onAuthStateChanged race condition
-                        
                         const businessName = form.businessName.value;
                         const fullName = form.name.value;
                         const email = form.email.value;
@@ -6954,40 +6962,22 @@ if (checkPermission('canManageLoyalty')) { // Ensure only authorized users liste
                             // It's good practice to set the display name in Auth as well
                             await updateProfile(user, { displayName: fullName });
                             
-                            // 2. Create the store and all associated data
+// 2. Create the store and all associated data
                             await createNewStoreForUser(user, businessName);
 
-                            // Signup is complete. onAuthStateChanged will now pick up the logged-in user and proceed.
-                            showToast('Account created successfully! Welcome.', 'success');
+                            // Signup is complete. The polling in onAuthStateChanged will automatically catch the new data and fade into the dashboard.
+                            showToast('Account created successfully! Preparing your workspace...', 'success');
                             
-                            // Force a reload to ensure the onAuthStateChanged listener runs with a clean state and all user data available.
-                            setTimeout(() => {
-                                window.location.reload();
-                            }, 1000);
-
                         } catch (error) {
                             console.error("Signup error:", error);
                             errorEl.textContent = error.message.replace('Firebase: ', '');
                             errorEl.classList.remove('hidden');
-                            window.isSigningUp = false; // Release lock so user can try again
-                            
-                            const submitBtn = form.querySelector('button[type="submit"]');
-                            if (submitBtn) submitBtn.classList.remove('loading');
                         }
                     });
 
-                formContainer.querySelector('#show-login-form').addEventListener('click', (e) => {
+                    formContainer.querySelector('#show-login-form').addEventListener('click', (e) => {
                         e.preventDefault();
                         showLoginForm();
-                    });
-
-                    const toggleBtn = formContainer.querySelector('.toggle-password-btn');
-                    const passInput = formContainer.querySelector('#password');
-                    toggleBtn.addEventListener('click', () => {
-                        const type = passInput.getAttribute('type') === 'password' ? 'text' : 'password';
-                        passInput.setAttribute('type', type);
-                        toggleBtn.innerHTML = type === 'password' ? '<i data-lucide="eye" class="w-5 h-5"></i>' : '<i data-lucide="eye-off" class="w-5 h-5"></i>';
-                        lucide.createIcons();
                     });
                 };
                 
@@ -7470,63 +7460,90 @@ function initBarcodeGenerator(pane) {
     // --- Initial Render ---
     renderAll();
 }
-           // --- REWRITTEN: AUTHENTICATION & APP START ---
+// --- REWRITTEN: AUTHENTICATION & APP START ---
+            // This is the new "main gate" that handles multi-tenancy.
+         // --- REWRITTEN: AUTHENTICATION & APP START ---
             // This is the new "main gate" that handles multi-tenancy.
             onAuthStateChanged(auth, async (user) => {
-                if (window.isSigningUp) return; // Prevent race conditions during signup
-
-                const mainAppContainer = document.getElementById('app-container');
+                const mainAppContainer = document.querySelector('.flex.h-screen.bg-bg-primary');
                 const loginContainer = document.getElementById('login-container');
                 const loadingOverlay = document.getElementById('loading-overlay');
 
                 if (user) {
                     console.log("User is signed in:", user.uid);
                     
+                    // Show loading overlay securely without hiding its parent container
+                    if (loadingOverlay) loadingOverlay.style.display = 'flex';
+                    if (loginContainer) loginContainer.style.display = 'none';
+
                     // --- KEY FIX: Detach any potential lingering listeners from a previous session ---
                     detachAllListeners();
 
-                    // 1. Find which store this user belongs to.
+                 // 1. Find which store this user belongs to.
                     const userProfileRef = doc(db, 'users', user.uid);
 
+                    // --- ULTIMATE FIX: Safely poll for the profile document AND staff document with try/catch ---
+                    // This prevents the script from crashing during the Firebase token sync gap
+                    let userProfileSnap = null;
+                    let isSignupComplete = false;
+                    
+                    console.log(`[Auth] Waiting for database sync...`);
+                    for (let i = 0; i < 20; i++) {
+                        try {
+                            userProfileSnap = await getDoc(userProfileRef);
+                            if (userProfileSnap && userProfileSnap.exists()) {
+                                const data = userProfileSnap.data();
+                                const cStoreId = data.currentStoreId;
+                                
+                                // If we have a storeId, ensure the staff document ALSO exists before proceeding
+                                // This ensures Step 2 of the signup process has fully completed
+                                if (cStoreId) {
+                                    const staffRefDoc = doc(db, 'stores', cStoreId, 'staff', user.uid);
+                                    const staffSnap = await getDoc(staffRefDoc);
+                                    if (staffSnap && staffSnap.exists()) {
+                                        isSignupComplete = true;
+                                        break; // Both profile and staff doc exist!
+                                    }
+                                }
+                            }
+                        } catch (e) {
+                            // Ignore transient permission errors during the millisecond gap of token sync
+                        }
+                        await new Promise(res => setTimeout(res, 500)); // Wait 500ms before next retry
+                    }
+
+                    if (!isSignupComplete || !userProfileSnap || !userProfileSnap.exists()) {
+                        console.error(`User ${user.uid} is authenticated but database sync timed out. Forcing sign out.`);
+                        await signOut(auth);
+                        return;
+                    }
+
                     // --- NEW: REAL-TIME USER SUBSCRIPTION LISTENER ---
-                    // This is the primary gatekeeper for app access.
                     const unsubUserProfile = onSnapshot(userProfileRef, (userDocSnap) => {
-                        if (!appState.firebaseReady) return; // Don't run on initial load, only on subsequent changes.
+                        if (!appState.firebaseReady) return;
 
                         if (userDocSnap.exists()) {
                             const userData = userDocSnap.data();
-                            appState.session.userProfileData = userData; // Keep session data in sync
+                            appState.session.userProfileData = userData;
                             const subscriptionCheck = checkSubscriptionStatus(userData);
                             const isCurrentlyLocked = !!document.getElementById('lock-screen-overlay');
                             const lockScreenTitleEl = document.querySelector('#lock-screen-overlay h1');
                             const isStoreDisabledLock = lockScreenTitleEl && lockScreenTitleEl.textContent === 'Store Disabled';
 
-                            // If the subscription becomes invalid, lock the screen (unless it's already locked for a store issue)
                             if (!subscriptionCheck.isValid && !isStoreDisabledLock) {
                                 if (!isCurrentlyLocked) {
-                                    showLockScreen(subscriptionCheck.status, subscriptionCheck.details);
+                                    showLockScreen(subscriptionCheck.status, subscriptionCheck.planId, subscriptionCheck.details);
                                 }
-                            } 
-                            // If the subscription becomes valid again, reload the app.
-                            else if (subscriptionCheck.isValid && isCurrentlyLocked && !isStoreDisabledLock) {
+                            } else if (subscriptionCheck.isValid && isCurrentlyLocked && !isStoreDisabledLock) {
                                 window.location.reload();
                             }
                         }
                     });
                     activeListeners.push(unsubUserProfile);
-                    // --- END NEW LISTENER ---
-
-
-                    const userProfileSnap = await getDoc(userProfileRef);
-
-                    if (!userProfileSnap.exists()) {
-                        // This can happen if signup failed midway. It's safer to sign them out.
-                        console.error(`User ${user.uid} is authenticated but has no user profile document. Forcing sign out.`);
-                        await signOut(auth);
-                        return; // onAuthStateChanged will be re-triggered with user=null
-                    }
                     
                     const userProfileData = userProfileSnap.data();
+
+                    
                     appState.session.userProfileData = userProfileData; // Store the whole profile
                     const potentialStoresFromProfile = userProfileData.stores || [];
                     let storeId = userProfileData.currentStoreId;
@@ -7537,14 +7554,14 @@ function initBarcodeGenerator(pane) {
                         return;
                     }
                     
-                    // --- MODIFICATION START ---
+                // --- MODIFICATION START ---
                     // Fetch full store docs to get the isEnabled flag for the UI switcher.
-                    const allUserStoreDocs = await Promise.all(potentialStoresFromProfile.map(s => getDoc(doc(db, 'stores', s.id))));
-                    const allUserStores = allUserStoreDocs.map(d => d.exists() ? { id: d.id, ...d.data() } : null).filter(Boolean);
+                    const allUserStoreDocs = await Promise.all(potentialStoresFromProfile.map(s => getDoc(doc(db, 'stores', s.id)).catch(e => null)));
+                    const allUserStores = allUserStoreDocs.map(d => d && d.exists() ? { id: d.id, ...d.data() } : null).filter(Boolean);
                     appState.session.availableStores = allUserStores; // This list is for the switcher UI.
 
                     // Now, determine which stores are actually usable for login/switching
-                    const staffStatusPromises = allUserStores.map(store => getDoc(doc(db, 'stores', store.id, 'staff', user.uid)));
+                    const staffStatusPromises = allUserStores.map(store => getDoc(doc(db, 'stores', store.id, 'staff', user.uid)).catch(e => null));
                     const staffStatusSnapshots = await Promise.all(staffStatusPromises);
 
                     const activeAndEnabledStores = allUserStores.filter((store, index) => {
@@ -7586,11 +7603,29 @@ function initBarcodeGenerator(pane) {
                     // 2. Now that we have the storeId, setup all Firebase references.
                     setupFirebaseRefs(storeId);
                     
-                    // 3. Fetch the user's staff profile from *within their store*.
+// 3. Fetch the user's staff profile from *within their store*.
                     const userStaffDocRef = doc(staffRef, user.uid);
-                    const userStaffDocSnap = await getDoc(userStaffDocRef);
+                    let userStaffDocSnap = null;
+                    
+                    try {
+                        userStaffDocSnap = await getDoc(userStaffDocRef);
+                    } catch (err) {
+                        console.warn("[Auth] Transient staff read error:", err.message);
+                    }
 
-                    if (!userStaffDocSnap.exists()) {
+                    // --- ULTIMATE FIX: Safely poll for the staff document ---
+                    if (!userStaffDocSnap || !userStaffDocSnap.exists()) {
+                        console.log(`[Auth] Staff profile not found immediately. Waiting for database sync...`);
+                        for (let i = 0; i < 15; i++) {
+                            await new Promise(res => setTimeout(res, 500));
+                            try {
+                                userStaffDocSnap = await getDoc(userStaffDocRef);
+                                if (userStaffDocSnap && userStaffDocSnap.exists()) break;
+                            } catch (e) {}
+                        }
+                    }
+
+                    if (!userStaffDocSnap || !userStaffDocSnap.exists()) {
                         console.error(`User ${user.uid} has a profile but no staff record in store ${storeId}. Forcing sign out.`);
                         await signOut(auth);
                         return;
@@ -7705,11 +7740,11 @@ function initBarcodeGenerator(pane) {
                         }
                     // --- MODIFICATION END: Removed setTimeout wrapper ---
 
-                } else {
+} else {
                     // No user is signed in. Show the login/signup screen.
                     console.log("No user signed in. Detaching listeners and rendering login screen.");
                     
-                    // --- NEW: Clear lock state on logout ---
+                    // Clear lock state on logout
                     isAppLocked = false;
                     if (lockScreenInterval) {
                         clearInterval(lockScreenInterval);
@@ -7717,20 +7752,21 @@ function initBarcodeGenerator(pane) {
                     }
                     const existingOverlay = document.getElementById('lock-screen-overlay');
                     if (existingOverlay) existingOverlay.remove();
-                    // --- END NEW ---
 
-                    // --- KEY FIX: DETACH LISTENERS ON SIGN OUT ---
+                    // Detach listeners
                     detachAllListeners();
 
                     // Reset session state for a clean slate
                     appState.session.storeId = null;
                     appState.session.currentUser = null;
                     appState.session.userRole = null;
+                    appState.session.userPermissions = {};
                     
-                    await renderLoginScreen(); // This populates the container
+                    await renderLoginScreen(); // Populates the login container
 
+                    // FIX: Ensure loading overlay is hidden, but DO NOT hide the main app container
+                    // because the loading overlay lives inside it! The login container will visually cover the app.
                     if (loadingOverlay) loadingOverlay.style.display = 'none';
-                    if (mainAppContainer) mainAppContainer.style.display = 'none';
                     if (loginContainer) {
                         // Make login-container a full-screen, dedicated page
                         loginContainer.style.display = 'flex';
@@ -7740,7 +7776,7 @@ function initBarcodeGenerator(pane) {
                         loginContainer.style.right = '0';
                         loginContainer.style.bottom = '0';
                         loginContainer.style.zIndex = '100';
-                        loginContainer.style.backgroundColor = 'var(--bg-primary, #101827)';
+                        loginContainer.style.backgroundColor = 'var(--bg-primary, #0a0a0a)';
                         loginContainer.style.alignItems = 'center';
                         loginContainer.style.justifyContent = 'center';
                     }
@@ -13655,27 +13691,31 @@ function openReceivePOStockModal(poId) {
                                 actionMenuItems.push(`<div class="action-menu-item" data-action="view-staff-performance" data-id="${member.id}"><i data-lucide="bar-chart-2" class="w-4 h-4"></i><span>View Performance</span></div>`);
                             }
 
-                            // Admin-specific direct management actions
+// Admin-specific direct management actions
                             if (loggedInRole === 'admin' && loggedInUser.uid !== member.id && member.role !== 'admin') {
                                 actionMenuItems.push('<div class="h-px bg-border-color my-1"></div>');
                                 actionMenuItems.push(`<div class="action-menu-item" data-action="edit-staff" data-id="${member.id}"><i data-lucide="edit" class="w-4 h-4"></i><span>Edit Role/Status</span></div>`);
                                 
+                                // NEW: Send Password Reset
+                                actionMenuItems.push(`<div class="action-menu-item" data-action="send-password-reset" data-id="${member.id}" data-email="${member.email}" data-name="${member.name}"><i data-lucide="key-round" class="w-4 h-4 text-blue-400"></i><span>Reset Password</span></div>`);
+
                                 const currentStatus = member.status || 'active';
                                 const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
                                 const toggleActionText = newStatus === 'inactive' ? 'Deactivate' : 'Activate';
                                 const toggleActionIcon = newStatus === 'inactive' ? 'user-x' : 'user-check';
                                 actionMenuItems.push(`<div class="action-menu-item" data-action="toggle-staff-status" data-id="${member.id}" data-new-status="${newStatus}"><i data-lucide="${toggleActionIcon}" class="w-4 h-4"></i><span>${toggleActionText} Account</span></div>`);
 
-                          actionMenuItems.push('<div class="h-px bg-border-color my-1"></div>');
-                                actionMenuItems.push(`<div class="action-menu-item" data-action="send-password-reset" data-email="${member.email}" data-name="${member.name}"><i data-lucide="key-round" class="w-4 h-4 text-blue-400"></i><span class="text-blue-400">Send Password Reset</span></div>`);
+                                actionMenuItems.push('<div class="h-px bg-border-color my-1"></div>');
                                 actionMenuItems.push(`<div class="action-menu-item danger" data-action="delete-staff" data-id="${member.id}"><i data-lucide="trash-2" class="w-4 h-4"></i><span>Delete Staff</span></div>`);
                             }
                              
-                             // Manager-specific request actions for cashiers
+                          // Manager-specific request actions for cashiers
                             if (loggedInRole === 'manager' && member.role === 'cashier') {
                                 if(canEditCashier) {
                                     actionMenuItems.push(`<div class="action-menu-item" data-action="edit-staff" data-id="${member.id}"><i data-lucide="edit" class="w-4 h-4"></i><span>Edit Name</span></div>`);
                                 }
+                                // NEW: Send Password Reset
+                                actionMenuItems.push(`<div class="action-menu-item" data-action="send-password-reset" data-id="${member.id}" data-email="${member.email}" data-name="${member.name}"><i data-lucide="key-round" class="w-4 h-4 text-blue-400"></i><span>Reset Password</span></div>`);
                                 if (canRequestDeactivation && (member.status || 'active') === 'active') {
                                     actionMenuItems.push(`<div class="action-menu-item danger" data-action="request-deactivation" data-id="${member.id}"><i data-lucide="user-x" class="w-4 h-4"></i><span>Request Deactivation</span></div>`);
                                 }
@@ -20023,7 +20063,60 @@ async function openReceivePaymentModal(customerId) {
                         }
                     });
                 }
+if (action === 'send-password-reset') {
+                    const staffEmail = actionTarget.dataset.email;
+                    const staffName = actionTarget.dataset.name;
 
+                    if (!staffEmail) {
+                        showToast("Staff email not found.", "error");
+                        return;
+                    }
+
+                    const modal = showModal(
+                        'Reset Staff Password',
+                        `<div class="space-y-4">
+                            <div class="w-16 h-16 bg-blue-500/10 rounded-full flex items-center justify-center mx-auto mb-2">
+                                <i data-lucide="shield-alert" class="w-8 h-8 text-blue-400"></i>
+                            </div>
+                            <p class="text-center">Are you sure you want to send a secure password reset link to <strong>${staffName}</strong>?</p>
+                            <div class="bg-bg-tertiary p-3 rounded-lg border border-border-color text-sm text-text-secondary text-center">
+                                The reset link will be sent directly to: <br><strong class="text-text-primary font-mono mt-1 block">${staffEmail}</strong>
+                            </div>
+                        </div>`,
+                        `<button data-action="close-modal" class="btn btn-secondary">Cancel</button>
+                         <button id="confirm-reset-password" class="btn btn-primary">Send Reset Link</button>`
+                    );
+                    lucide.createIcons();
+
+                    modal.querySelector('#confirm-reset-password').addEventListener('click', async () => {
+                        const btn = modal.querySelector('#confirm-reset-password');
+                        btn.disabled = true;
+                        btn.innerHTML = '<div class="loader-sm"></div> Sending...';
+                        try {
+                            await sendPasswordResetEmail(auth, staffEmail);
+                            showToast(`Secure password reset link sent to ${staffEmail}.`, 'success');
+                            
+                            // Advanced Security Audit Log: Track who triggered the reset
+                            await addDoc(auditLogRef, {
+                                type: 'password_reset_sent',
+                                timestamp: new Date().toISOString(),
+                                details: `Sent password reset email to staff: ${staffName} (${staffEmail}).`,
+                                user: {
+                                    id: appState.session.currentUser.uid,
+                                    name: appState.session.currentUser.name
+                                }
+                            });
+
+                            closeModal(modal);
+                        } catch (error) {
+                            console.error("Error sending reset email:", error);
+                            showToast(`Failed to send reset link: ${error.message}`, 'error');
+                            btn.disabled = false;
+                            btn.textContent = 'Send Reset Link';
+                        }
+                    });
+                    return;
+                }
                 if (action === 'delete-staff') {
                     if (!checkPermission('canManageStaff')) {
                         showToast("You don't have permission to delete staff.", "error");
@@ -20049,72 +20142,6 @@ async function openReceivePaymentModal(customerId) {
                             console.error(error);
                         }
                     });
-                }
-
-               if (action === 'send-password-reset') {
-                    if (appState.session.userRole !== 'admin') {
-                        showToast("Only administrators can send password reset emails.", "error");
-                        return;
-                    }
-                    const email = actionTarget.dataset.email;
-                    const name = actionTarget.dataset.name;
-                    
-                    const modal = showModal(
-                        'Reset Password',
-                        `<p>Are you sure you want to send a password reset email to <strong>${name}</strong> (${email})?</p>`,
-                        `<button data-action="close-modal" class="btn btn-secondary">Cancel</button><button id="confirm-reset-password" class="btn btn-primary">Send Email</button>`
-                    );
-                    modal.querySelector('#confirm-reset-password').addEventListener('click', async () => {
-                        try {
-                            const confirmBtn = modal.querySelector('#confirm-reset-password');
-                            confirmBtn.disabled = true;
-                            confirmBtn.innerHTML = `<div class="loader-sm"></div> Sending...`;
-                            
-                            await sendPasswordResetEmail(auth, email);
-                            showToast(`Password reset email sent to ${name}.`, 'success');
-                            closeModal(modal);
-                        } catch (error) {
-                            showToast('Failed to send reset email.', 'error');
-                            console.error(error);
-                            const confirmBtn = modal.querySelector('#confirm-reset-password');
-                            confirmBtn.disabled = false;
-                            confirmBtn.innerHTML = `Send Email`;
-                        }
-                    });
-                    return;
-                }
-
-               if (action === 'send-password-reset') {
-                    if (appState.session.userRole !== 'admin') {
-                        showToast("Only administrators can send password reset emails.", "error");
-                        return;
-                    }
-                    const email = actionTarget.dataset.email;
-                    const name = actionTarget.dataset.name;
-                    
-                    const modal = showModal(
-                        'Reset Password',
-                        `<p>Are you sure you want to send a password reset email to <strong>${name}</strong> (${email})?</p>`,
-                        `<button data-action="close-modal" class="btn btn-secondary">Cancel</button><button id="confirm-reset-password" class="btn btn-primary">Send Email</button>`
-                    );
-                    modal.querySelector('#confirm-reset-password').addEventListener('click', async () => {
-                        try {
-                            const confirmBtn = modal.querySelector('#confirm-reset-password');
-                            confirmBtn.disabled = true;
-                            confirmBtn.innerHTML = `<div class="loader-sm"></div> Sending...`;
-                            
-                            await sendPasswordResetEmail(auth, email);
-                            showToast(`Password reset email sent to ${name}.`, 'success');
-                            closeModal(modal);
-                        } catch (error) {
-                            showToast('Failed to send reset email.', 'error');
-                            console.error(error);
-                            const confirmBtn = modal.querySelector('#confirm-reset-password');
-                            confirmBtn.disabled = false;
-                            confirmBtn.innerHTML = `Send Email`;
-                        }
-                    });
-                    return;
                 }
 
                 if (action === 'approve-staff') {
@@ -23033,30 +23060,13 @@ const receiptTemplates = {
                                     ${currentUserRole === 'admin' ? `<option value="manager">Manager</option><option value="admin">Administrator</option>` : ''}
                                 </select>
                             </div>
-                           <div>
-                                <label class="block text-sm font-medium mb-1">Password</label>
-                                <div class="relative">
-                                    <input type="password" name="password" class="form-input w-full pr-10" required placeholder="Min. 6 characters">
-                                    <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center text-text-secondary hover:text-text-primary toggle-password-btn">
-                                        <i data-lucide="eye" class="w-5 h-5"></i>
-                                    </button>
-                                </div>
-                            </div>
+                            <div><label class="block text-sm font-medium mb-1">Password</label><input type="password" name="password" class="form-input w-full" required placeholder="Min. 6 characters"></div>
                         </div>
                         <p id="invite-error" class="text-red-400 text-sm hidden"></p>
                     </form>`;
                 const footer = `<button data-action="close-modal" class="btn btn-secondary">Cancel</button><button type="submit" form="invite-staff-form" class="btn btn-primary">Create Account</button>`;
-               const modal = showModal('Invite New Staff Member', content, footer, { size: 'max-w-3xl' });
+                const modal = showModal('Invite New Staff Member', content, footer, { size: 'max-w-3xl' });
                 
-                const toggleBtn = modal.querySelector('.toggle-password-btn');
-                const passInput = modal.querySelector('input[name="password"]');
-                toggleBtn.addEventListener('click', () => {
-                    const type = passInput.getAttribute('type') === 'password' ? 'text' : 'password';
-                    passInput.setAttribute('type', type);
-                    toggleBtn.innerHTML = type === 'password' ? '<i data-lucide="eye" class="w-5 h-5"></i>' : '<i data-lucide="eye-off" class="w-5 h-5"></i>';
-                    lucide.createIcons();
-                });
-
                 modal.querySelector('#invite-staff-form').addEventListener('submit', async (ev) => {
                     ev.preventDefault();
                     const errorEl = modal.querySelector('#invite-error');
@@ -23137,29 +23147,12 @@ const receiptTemplates = {
                             <div><label class="block text-sm font-medium mb-1">Full Name</label><input type="text" name="name" class="form-input w-full" required></div>
                              <div><label class="block text-sm font-medium mb-1">Phone</label><input type="tel" name="phone" class="form-input w-full"></div>
                         </div>
-                   <div><label class="block text-sm font-medium mb-1">Email</label><input type="email" name="email" class="form-input w-full" required></div>
-                        <div>
-                            <label class="block text-sm font-medium mb-1">Temporary Password</label>
-                            <div class="relative">
-                                <input type="password" name="password" class="form-input w-full pr-10" required placeholder="Min. 6 characters">
-                                <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center text-text-secondary hover:text-text-primary toggle-password-btn">
-                                    <i data-lucide="eye" class="w-5 h-5"></i>
-                                </button>
-                            </div>
-                        </div>
+                        <div><label class="block text-sm font-medium mb-1">Email</label><input type="email" name="email" class="form-input w-full" required></div>
+                        <div><label class="block text-sm font-medium mb-1">Temporary Password</label><input type="password" name="password" class="form-input w-full" required placeholder="Min. 6 characters"></div>
                         <p id="invite-error" class="text-red-400 text-sm hidden"></p>
                     </form>`;
                 const footer = `<button data-action="close-modal" class="btn btn-secondary">Cancel</button><button type="submit" form="invite-cashier-form" class="btn btn-primary">Send Invitation</button>`;
-             const modal = showModal('Invite New Cashier', content, footer, { size: 'max-w-2xl' });
-
-                const toggleBtn = modal.querySelector('.toggle-password-btn');
-                const passInput = modal.querySelector('input[name="password"]');
-                toggleBtn.addEventListener('click', () => {
-                    const type = passInput.getAttribute('type') === 'password' ? 'text' : 'password';
-                    passInput.setAttribute('type', type);
-                    toggleBtn.innerHTML = type === 'password' ? '<i data-lucide="eye" class="w-5 h-5"></i>' : '<i data-lucide="eye-off" class="w-5 h-5"></i>';
-                    lucide.createIcons();
-                });
+                const modal = showModal('Invite New Cashier', content, footer, { size: 'max-w-2xl' });
 
                 modal.querySelector('#invite-cashier-form').addEventListener('submit', async (ev) => {
                     ev.preventDefault();
