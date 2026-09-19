@@ -3185,28 +3185,27 @@ const playNotificationSound = () => {
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
     if (!audioContext) return;
 
-    // Professional POS Scanner Beep (Sharp, high-pitch)
     const oscillator = audioContext.createOscillator();
     const gainNode = audioContext.createGain();
 
     oscillator.connect(gainNode);
     gainNode.connect(audioContext.destination);
 
-    // Rapid attack and decay for a crisp beep
+    // Ultra-fast attack and smooth decay for a realistic, piercing scanner beep
     gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-    gainNode.gain.linearRampToValueAtTime(0.5, audioContext.currentTime + 0.01);
-    gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.1);
+    gainNode.gain.linearRampToValueAtTime(1, audioContext.currentTime + 0.01);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.15);
 
-    // Square wave gives that electronic scanner character
-    oscillator.type = 'square'; 
-    oscillator.frequency.setValueAtTime(2500, audioContext.currentTime); 
+    // Sine wave at 2800Hz matches the exact pitch of industry-standard zebra scanners
+    oscillator.type = 'sine'; 
+    oscillator.frequency.setValueAtTime(2800, audioContext.currentTime); 
     
     oscillator.start(audioContext.currentTime);
-    oscillator.stop(audioContext.currentTime + 0.1);
+    oscillator.stop(audioContext.currentTime + 0.15);
 
-    // Fire native vibration for tactile feedback
+    // Sharp, instantaneous tactile feedback
     if (navigator.vibrate) {
-        navigator.vibrate(50);
+        navigator.vibrate(30); 
     }
 };
 
@@ -9247,10 +9246,11 @@ function initBarcodeGenerator(pane) {
                     }
                 });
 
-                // FIX: Use a simple click listener instead of pointer/mousedown which conflicted
-                resultsDiv.addEventListener('click', e => {
+                // FIX: Use mousedown AND touchstart to fire before input blur hides the div!
+                const handleSearchSelect = (e) => {
                     const itemDiv = e.target.closest('[data-add-id]');
                     if(itemDiv) {
+                        e.preventDefault(); // Prevents input blur from executing instantly
                         const product = firestoreData.products.find(p => p.id === itemDiv.dataset.addId);
                         if(product) {
                             addProductToActiveCart(product);
@@ -9259,7 +9259,9 @@ function initBarcodeGenerator(pane) {
                             searchInput.blur(); // Dismiss keyboard
                         }
                     }
-                });
+                };
+                resultsDiv.addEventListener('mousedown', handleSearchSelect);
+                resultsDiv.addEventListener('touchstart', handleSearchSelect, { passive: false });
 
                 // Hide search results if clicked outside
                 const hideSearchListener = (e) => {
@@ -9270,7 +9272,10 @@ function initBarcodeGenerator(pane) {
                 document.addEventListener('click', hideSearchListener);
 
                 // --- Robust ZXing Scanner Logic ---
-                let codeReader = new ZXing.BrowserMultiFormatReader();
+                if (!window.mposCodeReader) {
+                    window.mposCodeReader = new ZXing.BrowserMultiFormatReader();
+                }
+                const codeReader = window.mposCodeReader;
 
                 const stopScanner = () => {
                     codeReader.reset();
@@ -9297,12 +9302,19 @@ function initBarcodeGenerator(pane) {
                 const startScanner = async () => {
                     fallback.classList.add('hidden');
                     try {
-                        // Undefined tells ZXing to pick the default environment (back) camera
-                        codeReader.decodeFromVideoDevice(undefined, 'mpos-reader', (result, err) => {
+                        // Force back camera for robust autofocus and performance
+                        const constraints = {
+                            video: { facingMode: "environment" }
+                        };
+                        
+                        codeReader.decodeFromConstraints(constraints, 'mpos-reader', (result, err) => {
                             if (result) {
                                 const decodedText = result.getText();
                                 const now = Date.now();
-                                if (decodedText === mobileLastScannedCode && now - mobileLastScanTime < 1500) return;
+                                
+                                // REDUCED DEBOUNCE to 400ms to allow rapid scanning of multiple quantities
+                                if (decodedText === mobileLastScannedCode && now - mobileLastScanTime < 400) return;
+                                
                                 mobileLastScannedCode = decodedText;
                                 mobileLastScanTime = now;
 
@@ -9973,18 +9985,23 @@ function openVariantSelectorModal(parentProduct) {
 }
 
 
-// --- REPLACED FUNCTION: addProductToActiveCart ---
-            const addProductToActiveCart = (product) => {
+const addProductToActiveCart = (product) => {
                 // This function is now a gateway that checks for variants
                 if (product.hasVariants) {
                     openVariantSelectorModal(product);
                     return; // Stop here, the modal will handle adding the actual variant.
                 }
 
-                // Original logic for non-variant products
                 const activeSale = posState.sales.find(s => s.id === posState.activeSaleId);
                 if (!activeSale) { showToast('No active sale selected.', 'error'); return; }
-                if(product.stock <= 0 && product.productType === 'physical') { showToast(`${product.name} is out of stock.`, 'error'); return; }
+                
+                const isPhysical = product.productType === 'physical';
+                const stock = product.stock || 0;
+
+                if(isPhysical && stock <= 0) { 
+                    showToast(`${product.name} is out of stock.`, 'error'); 
+                    return; 
+                }
 
                 if (product.isSerialized) {
                     const availableSerials = product.serials || [];
@@ -10006,7 +10023,8 @@ function openVariantSelectorModal(parentProduct) {
                             return;
                         }
                         activeSale.cart.push({ ...product, qty: 1, serialNumber: selectedSerial });
-                        posFullRender(workspaceContent.querySelector('.view-pane'));
+                        const viewPane = document.querySelector('#workspace-content .view-pane');
+                        if (viewPane) posFullRender(viewPane);
                         closeModal(modal);
                     });
                     return;
@@ -10014,18 +10032,19 @@ function openVariantSelectorModal(parentProduct) {
 
                 const existingItem = activeSale.cart.find(item => item.id === product.id);
                 if(existingItem) {
-                    if(existingItem.qty < product.stock) {
+                    if(!isPhysical || existingItem.qty < stock) {
                         existingItem.qty++;
                     } else {
-                        showToast(`No more stock available for ${product.name}.`, 'warning');
+                        showToast(`Only ${stock} units available for ${product.name}.`, 'warning');
                         return;
                     }
                 } else {
                     activeSale.cart.push({ ...product, qty: 1 });
                 }
-                posFullRender(workspaceContent.querySelector('.view-pane'));
+                
+                const viewPane = document.querySelector('#workspace-content .view-pane');
+                if (viewPane) posFullRender(viewPane);
             };
-            
             const initClassicPOS = (pane) => {
                 posClassicLayoutRender(pane);
 
