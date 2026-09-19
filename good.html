@@ -3181,9 +3181,17 @@ const printElement = (elementId) => {
     document.body.removeChild(printContainer);
     document.head.removeChild(printStyles);
 };
+let globalAudioContext = null;
 const playNotificationSound = () => {
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    if (!audioContext) return;
+    if (!globalAudioContext) {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        globalAudioContext = new AudioCtx();
+    }
+    if (globalAudioContext.state === 'suspended') {
+        globalAudioContext.resume();
+    }
+    const audioContext = globalAudioContext;
 
     const oscillator = audioContext.createOscillator();
     const gainNode = audioContext.createGain();
@@ -3900,9 +3908,9 @@ function handleCustomerExport() {
                     const decodedText = result.getText();
                     closeScanner();
                     playNotificationSound();
-                    const product = firestoreData.products.find(p => p.barcode === decodedText || p.id === decodedText);
+                   const product = firestoreData.products.find(p => p.barcode === decodedText || p.id === decodedText);
                     if (product) {
-                        addProductToActiveCart(product);
+                        window.addProductToActiveCart(product);
                         showToast(`Added: ${product.name}`, 'success');
                         const floatCart = document.getElementById('mobile-floating-cart');
                         if(floatCart && window.innerWidth < 1024) {
@@ -10045,6 +10053,8 @@ const addProductToActiveCart = (product) => {
                 const viewPane = document.querySelector('#workspace-content .view-pane');
                 if (viewPane) posFullRender(viewPane);
             };
+            window.addProductToActiveCart = addProductToActiveCart;
+
             const initClassicPOS = (pane) => {
                 posClassicLayoutRender(pane);
 
@@ -10589,7 +10599,11 @@ const addProductToActiveCart = (product) => {
                 }
             };
             
-        function initPOS(pane) {
+        function posFullRender(pane) {
+                if (pane) initPOS(pane);
+            }
+
+            function initPOS(pane) {
                 if (posState.sales.length === 0) {
                     const newSaleId = `sale_${Date.now()}`;
                     posState.sales.push({ id: newSaleId, name: `Sale ${posState.saleCounter++}`, cart: [], customer: null, status: 'active', discount: { type: 'percent', value: 0 } });
