@@ -3849,62 +3849,78 @@ function handleCustomerExport() {
             }
         };
 // --- NATIVE FULLSCREEN CAMERA SCANNER FUNCTION ---
-        window.openCameraScanner = () => {
+    window.openCameraScanner = () => {
+            if (document.getElementById('native-scanner-view')) return;
+
             const content = `
-                <div class="fixed inset-0 z-[200] bg-black flex flex-col" id="native-scanner-view">
+                <div class="fixed inset-0 z-[300] bg-black flex flex-col" id="native-scanner-view">
                     <div class="flex justify-between items-center p-5 bg-gradient-to-b from-black/80 to-transparent z-10 absolute top-0 left-0 right-0 pt-[max(1.25rem,env(safe-area-inset-top))]">
                         <h2 class="text-white font-bold text-xl drop-shadow-md">Scan Barcode</h2>
                         <button data-action="close-scanner" class="p-3 bg-white/20 rounded-full text-white backdrop-blur-md active:scale-90 transition-transform">
                             <i data-lucide="x" class="w-6 h-6 pointer-events-none"></i>
                         </button>
                     </div>
-                    <div id="reader" class="flex-grow w-full h-full object-cover"></div>
+                    <div class="flex-grow w-full h-full relative flex items-center justify-center overflow-hidden">
+                        <div id="reader" class="absolute inset-0 w-full h-full object-cover"></div>
+                        <div class="absolute w-64 h-40 border-2 border-accent/70 rounded-xl shadow-[0_0_0_4000px_rgba(0,0,0,0.6)] pointer-events-none z-10 flex items-center justify-center">
+                            <div class="w-full h-0.5 bg-accent/50 animate-pulse"></div>
+                        </div>
+                    </div>
                     <div class="absolute bottom-12 left-0 right-0 flex justify-center z-10 pb-[env(safe-area-inset-bottom)]">
                         <div class="bg-black/60 text-white px-6 py-3 rounded-full backdrop-blur-md text-sm font-medium border border-white/10 shadow-2xl flex items-center gap-2">
-                            <i data-lucide="scan-line" class="w-5 h-5 text-accent"></i> Point camera at barcode
+                            <i data-lucide="scan-line" class="w-5 h-5 text-accent"></i> Align barcode within the frame
                         </div>
                     </div>
                 </div>
             `;
             
-            const scannerDiv = document.createElement('div');
-            scannerDiv.innerHTML = content;
-            document.body.appendChild(scannerDiv);
+            document.body.insertAdjacentHTML('beforeend', content);
             lucide.createIcons();
 
-            const html5QrcodeScanner = new Html5QrcodeScanner(
-                "reader", { fps: 10, qrbox: {width: 250, height: 150}, aspectRatio: window.innerHeight / window.innerWidth }, false
-            );
-            
-           const closeScanner = () => {
-                try {
-                    html5QrcodeScanner.clear();
-                } catch(e) {
-                    console.error("Scanner clear error", e);
+            const html5QrCode = new Html5Qrcode("reader");
+            const scannerDiv = document.getElementById('native-scanner-view');
+
+            const closeScanner = () => {
+                if (html5QrCode.isScanning) {
+                    html5QrCode.stop().then(() => {
+                        html5QrCode.clear();
+                        scannerDiv.remove();
+                    }).catch(err => {
+                        console.error("Failed to stop scanner", err);
+                        scannerDiv.remove();
+                    });
+                } else {
+                    scannerDiv.remove();
                 }
-                scannerDiv.remove();
             };
 
             scannerDiv.querySelector('[data-action="close-scanner"]').addEventListener('click', closeScanner);
 
-            html5QrcodeScanner.render((decodedText) => {
-                closeScanner();
-                playNotificationSound();
-                const product = firestoreData.products.find(p => p.barcode === decodedText || p.id === decodedText);
-                if(product) {
-                    addProductToActiveCart(product);
-                    showToast(`Added: ${product.name}`, 'success');
-                    
-                    // Flash the floating cart on mobile
-                    const floatCart = document.getElementById('mobile-floating-cart');
-                    if(floatCart && window.innerWidth < 1024) {
-                        floatCart.classList.add('scale-105', 'ring-4', 'ring-accent');
-                        setTimeout(() => floatCart.classList.remove('scale-105', 'ring-4', 'ring-accent'), 400);
+            const config = { fps: 15, qrbox: { width: 250, height: 150 }, aspectRatio: window.innerHeight / window.innerWidth };
+
+            html5QrCode.start({ facingMode: "environment" }, config,
+                (decodedText, decodedResult) => {
+                    closeScanner();
+                    playNotificationSound();
+                    const product = firestoreData.products.find(p => p.barcode === decodedText || p.id === decodedText);
+                    if (product) {
+                        addProductToActiveCart(product);
+                        showToast(`Added: ${product.name}`, 'success');
+                        const floatCart = document.getElementById('mobile-floating-cart');
+                        if(floatCart && window.innerWidth < 1024) {
+                            floatCart.classList.add('scale-105', 'ring-4', 'ring-accent');
+                            setTimeout(() => floatCart.classList.remove('scale-105', 'ring-4', 'ring-accent'), 400);
+                        }
+                    } else {
+                        showToast(`No product found: ${decodedText}`, 'error');
                     }
-                } else {
-                    showToast(`No product found: ${decodedText}`, 'error');
-                }
-            }, () => {});
+                },
+                (errorMessage) => { /* Ignore constant scan frame errors */ }
+            ).catch((err) => {
+                console.error("Error starting scanner", err);
+                showToast("Camera access denied or unavailable.", "error");
+                closeScanner();
+            });
         };
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -6478,8 +6494,7 @@ function handleCustomerExport() {
                 lucide.createIcons();
                 saveState(); // Save state on every render
             };
-
-            // Mobile menu toggler for the Bottom Nav "More" button
+// Mobile menu toggler for the Bottom Nav "More" button
             document.addEventListener('click', e => {
                 if (e.target.closest('[data-action="toggle-mobile-sidebar"]')) {
                     toggleMobileSidebar();
@@ -6487,6 +6502,14 @@ function handleCustomerExport() {
                 const mobileNavBtn = e.target.closest('[data-mobile-nav]');
                 if (mobileNavBtn) {
                     openOrSwitchTab(mobileNavBtn.dataset.mobileNav);
+                    // Automatically open the camera scanner when clicking POS on mobile
+                    if (mobileNavBtn.dataset.mobileNav === 'pos') {
+                        setTimeout(() => {
+                            if (typeof window.openCameraScanner === 'function') {
+                                window.openCameraScanner();
+                            }
+                        }, 400);
+                    }
                 }
             });
 
@@ -9151,10 +9174,10 @@ const posModernLayoutRender = (pane) => {
                     <button onclick="openCameraScanner()" class="lg:hidden btn btn-primary w-12 h-12 rounded-2xl shadow-lg shrink-0 flex items-center justify-center active:scale-90 transition-transform p-0" title="Scan">
                         <i data-lucide="scan" class="w-6 h-6 text-white"></i>
                     </button>
-                    <div class="relative flex-grow">
+                   <div class="relative flex-grow">
                         <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-secondary"></i>
                         <input type="text" id="pos-modern-search" placeholder="Scan or search Products..." class="w-full h-12 form-input pl-12 text-base rounded-2xl shadow-inner focus:ring-accent bg-bg-secondary border-none" autocomplete="off">
-                        <div id="pos-search-results" class="absolute top-full left-0 right-0 mt-2 border border-border-color rounded-xl shadow-2xl z-30 hidden max-h-60 overflow-y-auto bg-bg-secondary"></div>
+                        <div id="pos-search-results" class="absolute top-[calc(100%+8px)] left-0 right-0 border border-border-color rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] z-[150] hidden max-h-80 overflow-y-auto bg-bg-secondary"></div>
                     </div>
                     <button onclick="openCameraScanner()" class="hidden lg:flex btn btn-primary w-12 h-12 rounded-2xl shadow-lg shrink-0 items-center justify-center p-0" title="Scan with Camera">
                         <i data-lucide="scan" class="w-6 h-6 text-white"></i>
@@ -9936,10 +9959,10 @@ function openVariantSelectorModal(parentProduct) {
                         renderProducts(activeCategory);
                     }
 
-                    const collapseBtn = e.target.closest('[data-action="toggle-category-collapse"]');
+                  const collapseBtn = e.target.closest('[data-action="toggle-category-collapse"]');
                     if (collapseBtn) {
                         e.preventDefault();
-                        const group = collapseBtn.parentElement;
+                        const group = collapseBtn.closest('.category-group');
                         const groupId = group.dataset.groupId;
                         const isClosing = group.classList.contains('is-open');
                         
@@ -10268,14 +10291,13 @@ function openPaymentModal() {
     }
     // --- END NEW ---
 
-    const content = `<div class="grid grid-cols-1 md:grid-cols-2 gap-6 -m-6 p-0">
-        <!-- Left Side: Keypad & Info -->
-        <div class="bg-[var(--bg-secondary)]/50 p-6 rounded-l-xl flex flex-col">
-            <div class="flex-1 space-y-4">
-                <p class="text-text-secondary">Total Due</p>
-                <p class="text-6xl font-bold text-text-primary font-mono tracking-tighter">${currencyUtils.format(totalBase, appState.currentCurrency, { currencyDisplay: 'symbol' })}</p>
-                                <!-- NEW: Totals Breakdown -->
-                <div class="space-y-1 text-sm pt-2">
+   const content = `<div class="flex flex-col md:grid md:grid-cols-2 gap-0 md:gap-6 h-[85vh] md:h-auto overflow-hidden md:overflow-visible -m-6 bg-bg-primary md:bg-transparent rounded-xl">
+        <!-- Top/Left Side: Info & Quick Cash -->
+        <div class="bg-[var(--bg-secondary)] p-4 md:p-6 md:rounded-l-xl flex flex-col shadow-md md:shadow-none z-10 shrink-0 border-b md:border-b-0 border-border-color">
+            <div class="space-y-2 mb-4">
+                <p class="text-text-secondary text-sm md:text-base">Total Due</p>
+                <p class="text-4xl md:text-6xl font-bold text-text-primary font-mono tracking-tighter">${currencyUtils.format(totalBase, appState.currentCurrency, { currencyDisplay: 'symbol' })}</p>
+                <div class="space-y-1 text-xs md:text-sm pt-2">
                     <div class="flex justify-between text-text-secondary"><span>Subtotal:</span><span class="font-mono">${currencyUtils.format(subtotalBase)}</span></div>
                     ${persistentDiscountAmountBase > 0 ? `
                         <div class="flex justify-between text-purple-400">
@@ -10291,64 +10313,56 @@ function openPaymentModal() {
                     ` : ''}
                     <div class="flex justify-between text-text-secondary"><span>Tax:</span><span class="font-mono">${currencyUtils.format(taxBase)}</span></div>
                 </div>
-                <!-- END NEW -->
-                <div id="payment-status-display" class="h-16"></div>
-                <div class="space-y-2 pt-2" id="payment-splits-container"></div>
             </div>
-            <div class="grid grid-cols-4 gap-2">
+            
+            <div id="payment-status-display" class="h-14 md:h-16 mb-2 flex flex-col justify-end"></div>
+            <div class="space-y-2 pt-2 mb-4 overflow-y-auto max-h-32" id="payment-splits-container"></div>
+            
+            <div class="grid grid-cols-4 gap-2 mt-auto">
                 ${quickCashButtons.map(val => { 
                     const amount = val === 'Exact' ? totalCurrent.toFixed(2) : val.toFixed(2);
                     const amountInBase = val === 'Exact' ? (totalBase) : (val / currencyUtils.get().rate);
-
                     const useCompact = val > 99999 && val !== 'Exact';
-                    const display = val === 'Exact' ? 'Exact' : currencyUtils.format(
-                        amountInBase,
-                        appState.currentCurrency,
-                        {
-                            notation: useCompact ? 'compact' : 'standard',
-                            maximumFractionDigits: useCompact ? 1 : 0
-                        }
-                    );
-
-                    let textSize = 'text-lg';
-                    if (display.length > 8) textSize = 'text-sm';
-                    else if (display.length > 6) textSize = 'text-base';
-
-                    return `<button data-payment-action="quick-cash" data-amount="${amount}" class="keypad-btn rounded-md h-12 ${textSize} font-semibold px-1 flex items-center justify-center">${display}</button>`
+                    const display = val === 'Exact' ? 'Exact' : currencyUtils.format(amountInBase, appState.currentCurrency, { notation: useCompact ? 'compact' : 'standard', maximumFractionDigits: useCompact ? 1 : 0 });
+                    let textSize = 'text-sm md:text-lg';
+                    if (display.length > 8) textSize = 'text-xs md:text-sm';
+                    else if (display.length > 6) textSize = 'text-xs md:text-base';
+                    return `<button data-payment-action="quick-cash" data-amount="${amount}" class="keypad-btn rounded-lg h-10 md:h-12 ${textSize} font-semibold px-1 flex items-center justify-center">${display}</button>`
                 }).join('')}
             </div>
         </div>
-        <!-- Right Side: Actions -->
-        <div class="p-6 flex flex-col">
-            <div class="grid grid-cols-2 gap-3 mb-4">
-                <button data-payment-action="set-method" data-method="Cash" class="payment-method-btn btn btn-secondary h-16 flex-col gap-1 active"><i data-lucide="dollar-sign" class="w-6 h-6"></i>Cash</button>
-                <button data-payment-action="set-method" data-method="Card" class="payment-method-btn btn btn-secondary h-16 flex-col gap-1"><i data-lucide="credit-card" class="w-6 h-6"></i>Card</button>
+        
+        <!-- Bottom/Right Side: Actions & Keypad -->
+        <div class="p-4 md:p-6 flex flex-col overflow-y-auto flex-grow pb-24 md:pb-6">
+            <div class="grid grid-cols-2 gap-2 md:gap-3 mb-3 md:mb-4 shrink-0">
+                <button data-payment-action="set-method" data-method="Cash" class="payment-method-btn btn btn-secondary h-12 md:h-16 flex-col gap-1 active"><i data-lucide="dollar-sign" class="w-5 h-5 md:w-6 md:h-6"></i><span class="text-xs md:text-sm">Cash</span></button>
+                <button data-payment-action="set-method" data-method="Card" class="payment-method-btn btn btn-secondary h-12 md:h-16 flex-col gap-1"><i data-lucide="credit-card" class="w-5 h-5 md:w-6 md:h-6"></i><span class="text-xs md:text-sm">Card</span></button>
             </div>
-            <div class="grid grid-cols-2 gap-3 mb-4">
-                 <button data-payment-action="set-method" data-method="Mobile Banking" class="payment-method-btn btn btn-secondary h-16 flex-col gap-1"><i data-lucide="smartphone" class="w-6 h-6"></i>M-Banking</button>
-                 <button data-payment-action="set-method" data-method="Add to Due" class="payment-method-btn btn btn-secondary h-16 flex-col gap-1" ${!activeSale.customer ? 'disabled' : ''} title="${!activeSale.customer ? 'Select a customer to enable due payment' : ''}"><i data-lucide="file-plus-2" class="w-6 h-6"></i>Add to Due</button>
-            </div>
-
-            <div id="mobile-banking-view" class="hidden my-4">
-                <p class="text-sm text-center text-text-secondary mb-3">Select Mobile Banking Service</p>
-                <div class="grid grid-cols-2 gap-3">
-                    <button data-payment-action="set-mobile-method" data-method="bKash" class="btn btn-secondary h-16">bKash</button>
-                    <button data-payment-action="set-mobile-method" data-method="Nagad" class="btn btn-secondary h-16">Nagad</button>
-                    <button data-payment-action="set-mobile-method" data-method="Rocket" class="btn btn-secondary h-16">Rocket</button>
-                    <button data-payment-action="set-mobile-method" data-method="Upay" class="btn btn-secondary h-16">Upay</button>
-                </div>
+            <div class="grid grid-cols-2 gap-2 md:gap-3 mb-3 md:mb-4 shrink-0">
+                 <button data-payment-action="set-method" data-method="Mobile Banking" class="payment-method-btn btn btn-secondary h-12 md:h-16 flex-col gap-1"><i data-lucide="smartphone" class="w-5 h-5 md:w-6 md:h-6"></i><span class="text-xs md:text-sm">M-Bank</span></button>
+                 <button data-payment-action="set-method" data-method="Add to Due" class="payment-method-btn btn btn-secondary h-12 md:h-16 flex-col gap-1" ${!activeSale.customer ? 'disabled' : ''} title="${!activeSale.customer ? 'Select a customer to enable due payment' : ''}"><i data-lucide="file-plus-2" class="w-5 h-5 md:w-6 md:h-6"></i><span class="text-xs md:text-sm">To Due</span></button>
             </div>
 
-            <div id="payment-entry-view">
-                <div class="relative mb-4">
-                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-mono text-text-secondary">${currencyUtils.get().symbol}</span>
-                    <input type="text" id="payment-input" class="form-input w-full text-right text-4xl font-mono p-4 pr-6 bg-transparent" value="${paymentState.remaining.toFixed(2)}" readonly>
+            <div id="mobile-banking-view" class="hidden my-2 md:my-4 shrink-0">
+                <p class="text-xs md:text-sm text-center text-text-secondary mb-2 md:mb-3">Select Mobile Banking Service</p>
+                <div class="grid grid-cols-2 gap-2 md:gap-3">
+                    <button data-payment-action="set-mobile-method" data-method="bKash" class="btn btn-secondary h-10 md:h-16 text-xs md:text-base">bKash</button>
+                    <button data-payment-action="set-mobile-method" data-method="Nagad" class="btn btn-secondary h-10 md:h-16 text-xs md:text-base">Nagad</button>
+                    <button data-payment-action="set-mobile-method" data-method="Rocket" class="btn btn-secondary h-10 md:h-16 text-xs md:text-base">Rocket</button>
+                    <button data-payment-action="set-mobile-method" data-method="Upay" class="btn btn-secondary h-10 md:h-16 text-xs md:text-base">Upay</button>
                 </div>
-                <div class="grid grid-cols-3 gap-2 flex-1">
-                    ${['1', '2', '3', '4', '5', '6', '7', '8', '9', '00', '0', '.'].map(key => `<button data-payment-action="keypad" data-key="${key}" class="keypad-btn rounded-md text-2xl font-mono h-12">${key}</button>`).join('')}
-                    <button data-payment-action="keypad" data-key="del" class="keypad-btn rounded-md text-2xl font-mono h-12 flex items-center justify-center"><i data-lucide="delete" class="w-6 h-6 pointer-events-none"></i></button>
+            </div>
+
+            <div id="payment-entry-view" class="flex flex-col flex-grow shrink-0 mt-auto md:mt-0">
+                <div class="relative mb-3 md:mb-4">
+                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-xl md:text-2xl font-mono text-text-secondary">${currencyUtils.get().symbol}</span>
+                    <input type="text" id="payment-input" class="form-input w-full text-right text-3xl md:text-4xl font-mono p-3 md:p-4 pr-4 md:pr-6 bg-transparent" value="${paymentState.remaining.toFixed(2)}" readonly>
                 </div>
-                <button id="add-payment-btn" data-payment-action="add-payment" class="btn btn-primary w-full mt-4 text-lg py-4">Add Payment</button>
+                <div class="grid grid-cols-3 gap-1.5 md:gap-2 shrink-0">
+                    ${['1', '2', '3', '4', '5', '6', '7', '8', '9', '00', '0', '.'].map(key => `<button data-payment-action="keypad" data-key="${key}" class="keypad-btn rounded-lg text-xl md:text-2xl font-mono h-12 md:h-12">${key}</button>`).join('')}
+                    <button data-payment-action="keypad" data-key="del" class="keypad-btn rounded-lg text-xl md:text-2xl font-mono h-12 md:h-12 flex items-center justify-center"><i data-lucide="delete" class="w-5 h-5 md:w-6 md:h-6 pointer-events-none"></i></button>
+                </div>
+                <button id="add-payment-btn" data-payment-action="add-payment" class="btn btn-primary w-full mt-3 md:mt-4 text-base md:text-lg py-3 md:py-4 shrink-0 shadow-lg shadow-accent-glow">Add Payment</button>
             </div>
         </div>
     </div>`;
