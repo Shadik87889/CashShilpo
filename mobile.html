@@ -9038,11 +9038,30 @@ function initBarcodeGenerator(pane) {
             }
 
 // -----------------------------------------------------------------------------
-            // MOBILE-FIRST BARCODE POS & WRAPPER (PERFECT VIEWPORT FIT)
+            // ULTIMATE MOBILE-FIRST BARCODE POS & WRAPPER
             // -----------------------------------------------------------------------------
             let mobilePosScanner = null;
             let mobileLastScannedCode = '';
             let mobileLastScanTime = 0;
+            let isScannerTransitioning = false;
+
+            // Highly realistic, satisfying barcode scanner beep
+            const playBarcodeBeep = () => {
+                try {
+                    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.type = 'square'; // Square wave gives it that electronic laser sound
+                    osc.frequency.setValueAtTime(1400, ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(2000, ctx.currentTime + 0.05);
+                    gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+                    osc.start(ctx.currentTime);
+                    osc.stop(ctx.currentTime + 0.1);
+                } catch (e) { console.error("Audio beep error:", e); }
+            };
 
             function updateMobilePOS(pane) {
                 const listEl = pane.querySelector('#mpos-cart-list');
@@ -9078,130 +9097,137 @@ function initBarcodeGenerator(pane) {
                 chargeBtn.disabled = cartCount === 0;
 
                 listEl.innerHTML = activeSale.cart.length ? activeSale.cart.map(item => `
-                    <div class="bg-bg-secondary p-3.5 rounded-2xl flex items-center gap-3 border border-border-color shadow-sm relative overflow-hidden active:scale-[0.98] transition-transform cursor-pointer">
-                        <div class="flex-grow overflow-hidden pr-2 pointer-events-none">
-                            <p class="font-bold text-text-primary text-sm leading-tight mb-1 truncate">${item.name}</p>
-                            <p class="font-mono text-xs text-text-secondary">${currencyUtils.format(item.price)} × ${item.qty} = <span class="text-accent font-bold text-sm">${currencyUtils.format(item.price * item.qty)}</span></p>
+                    <div class="bg-bg-tertiary/40 backdrop-blur-md p-4 rounded-[1.25rem] flex items-center gap-4 border border-white/5 shadow-sm relative overflow-hidden active:scale-[0.98] transition-all cursor-pointer group">
+                        <div class="flex-grow overflow-hidden pr-2">
+                            <p class="font-bold text-text-primary text-[15px] leading-tight mb-1.5 truncate">${item.name}</p>
+                            <p class="font-mono text-xs text-text-secondary">${currencyUtils.format(item.price)} × ${item.qty} = <span class="text-accent font-bold text-[13px]">${currencyUtils.format(item.price * item.qty)}</span></p>
                         </div>
-                        <div class="flex items-center gap-1.5 shrink-0 bg-bg-primary rounded-xl p-1 border border-border-color z-10">
+                        <div class="flex items-center gap-1.5 shrink-0 bg-bg-primary rounded-xl p-1 border border-white/10 z-10 shadow-inner">
                             <button data-action="decrement-qty" data-id="${item.id}" data-serial="${item.serialNumber || ''}" class="w-9 h-9 flex items-center justify-center text-text-primary hover:bg-bg-secondary rounded-lg active:bg-border-color transition-colors"><i data-lucide="minus" class="w-4 h-4 pointer-events-none"></i></button>
-                            <span class="font-bold text-base w-7 text-center">${item.qty}</span>
+                            <span class="font-bold text-base w-6 text-center font-mono">${item.qty}</span>
                             <button data-action="increment-qty" data-id="${item.id}" data-serial="${item.serialNumber || ''}" class="w-9 h-9 flex items-center justify-center text-text-primary hover:bg-bg-secondary rounded-lg active:bg-border-color transition-colors"><i data-lucide="plus" class="w-4 h-4 pointer-events-none"></i></button>
                         </div>
-                        <button data-action="remove-from-cart" data-id="${item.id}" data-serial="${item.serialNumber || ''}" class="absolute top-2 left-2 bg-danger text-white rounded-full p-1.5 shadow-lg active:scale-90 border-2 border-bg-secondary hidden z-20"><i data-lucide="x" class="w-3 h-3 pointer-events-none"></i></button>
+                        <button data-action="remove-from-cart" data-id="${item.id}" data-serial="${item.serialNumber || ''}" class="absolute top-2 left-2 bg-red-500/90 text-white rounded-full p-2 shadow-xl active:scale-90 hidden z-20 border border-white/20"><i data-lucide="trash-2" class="w-4 h-4 pointer-events-none"></i></button>
                     </div>
                 `).join('') : `
-                    <div class="flex flex-col items-center justify-center h-full text-text-secondary opacity-60">
-                        <div class="w-16 h-16 rounded-full bg-bg-secondary flex items-center justify-center mb-3"><i data-lucide="shopping-basket" class="w-8 h-8"></i></div>
-                        <p class="text-lg font-bold text-text-primary">Cart is empty</p>
+                    <div class="flex flex-col items-center justify-center h-48 text-text-secondary opacity-50">
+                        <div class="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center mb-4"><i data-lucide="scan-line" class="w-10 h-10 text-text-secondary"></i></div>
+                        <p class="text-lg font-bold text-text-primary tracking-wide">Cart is empty</p>
                     </div>
                 `;
 
                 customerEl.innerHTML = activeSale.customer ? `
-                    <div class="flex items-center justify-between bg-blue-500/10 border border-blue-500/30 rounded-xl p-3 shadow-sm mb-3">
+                    <div class="flex items-center justify-between bg-gradient-to-r from-blue-900/40 to-blue-800/20 border border-blue-500/30 rounded-2xl p-3 shadow-md mb-4 backdrop-blur-md">
                         <div class="flex items-center gap-3 overflow-hidden">
-                            <div class="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center shrink-0"><i data-lucide="user" class="w-4 h-4 text-blue-400 pointer-events-none"></i></div>
-                            <div class="overflow-hidden"><p class="font-bold text-xs text-blue-100 truncate">${activeSale.customer.name}</p></div>
+                            <div class="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center shrink-0 border border-blue-400/30"><i data-lucide="user" class="w-5 h-5 text-blue-400 pointer-events-none"></i></div>
+                            <div class="overflow-hidden"><p class="font-bold text-sm text-blue-100 truncate">${activeSale.customer.name}</p><p class="text-[10px] text-blue-300 font-mono tracking-widest uppercase mt-0.5">Linked Customer</p></div>
                         </div>
-                        <button data-action="remove-customer-from-sale" class="p-1.5 text-red-400 hover:bg-red-400/20 rounded-full shrink-0 active:scale-90"><i data-lucide="x" class="w-4 h-4 pointer-events-none"></i></button>
+                        <button data-action="remove-customer-from-sale" class="w-10 h-10 flex items-center justify-center text-red-400 bg-red-500/10 hover:bg-red-500/20 rounded-full shrink-0 active:scale-90 transition-transform"><i data-lucide="x" class="w-5 h-5 pointer-events-none"></i></button>
                     </div>
                 ` : `
-                    <button data-action="add-customer-to-sale" class="w-full flex items-center justify-center gap-2 py-3 mb-3 bg-bg-tertiary hover:bg-border-color text-text-secondary hover:text-text-primary rounded-xl text-xs font-bold active:scale-[0.98] transition-all border border-border-color">
-                        <i data-lucide="user-plus" class="w-4 h-4"></i> Link Customer
+                    <button data-action="add-customer-to-sale" class="w-full flex items-center justify-center gap-3 py-3.5 mb-4 bg-white/5 hover:bg-white/10 text-text-secondary hover:text-white rounded-2xl text-sm font-bold active:scale-[0.98] transition-all border border-dashed border-white/20 shadow-sm">
+                        <i data-lucide="user-plus" class="w-5 h-5"></i> Link Customer to Sale
                     </button>
                 `;
                 lucide.createIcons();
             }
 
             function initMobilePOS(pane) {
-                // Layout Master Fix: Perfectly bound the POS between the app header and bottom navigation
                 pane.style.position = 'fixed';
                 pane.style.top = 'calc(65px + env(safe-area-inset-top))';
-                pane.style.bottom = 'calc(85px + env(safe-area-inset-bottom))'; 
-                pane.style.left = '0.5rem';
-                pane.style.right = '0.5rem';
-                pane.style.borderRadius = '1.25rem';
+                pane.style.bottom = 'calc(65px + env(safe-area-inset-bottom))'; 
+                pane.style.left = '0';
+                pane.style.right = '0';
                 pane.style.zIndex = '35';
-                pane.style.boxShadow = '0 10px 40px rgba(0,0,0,0.8)';
-                pane.style.border = '1px solid var(--border-color)';
-                pane.className = 'flex flex-col bg-bg-primary overflow-hidden';
+                pane.className = 'flex flex-col bg-black overflow-hidden'; // Base is black for seamless camera integration
 
                 if (!document.getElementById('mpos-styles')) {
                     document.head.insertAdjacentHTML('beforeend', `<style id="mpos-styles">
-                        @keyframes mposScanLine { 0% { top: 0; } 50% { top: 100%; } 100% { top: 0; } }
-                        .mpos-scan-line { position: absolute; animation: mposScanLine 2s ease-in-out infinite; }
+                        @keyframes mposScanLine { 0% { transform: translateY(-50px); opacity: 0; } 10% { opacity: 1; } 50% { transform: translateY(50px); } 90% { opacity: 1; } 100% { transform: translateY(-50px); opacity: 0; } }
+                        .mpos-scan-line { position: absolute; left: 10%; right: 10%; height: 2px; background: #007bff; box-shadow: 0 0 20px 2px #007bff; top: 50%; animation: mposScanLine 2.5s cubic-bezier(0.4, 0, 0.2, 1) infinite; z-index: 15; }
+                        .mpos-glass-panel { background: rgba(18, 18, 18, 0.85); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border-top: 1px solid rgba(255, 255, 255, 0.1); }
                     </style>`);
                 }
 
                 pane.innerHTML = `
-                    <!-- Top Half: Scanner & Search -->
-                    <div class="relative w-full shrink-0 shadow-md flex flex-col z-20 border-b border-border-color bg-bg-secondary" id="mpos-top-section">
-                        <!-- Search Bar -->
-                        <div class="p-3">
-                            <div class="relative flex items-center gap-2">
-                                <div class="relative flex-grow">
-                                    <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-text-secondary"></i>
-                                    <input type="text" id="mpos-search" placeholder="Search product name or SKU..." class="w-full bg-bg-primary border border-border-color text-white rounded-xl pl-10 pr-4 py-3 shadow-inner focus:ring-2 focus:ring-accent outline-none font-medium text-sm">
-                                    <div id="mpos-search-results" class="absolute top-full left-0 right-0 mt-2 bg-bg-secondary border border-border-color rounded-xl shadow-2xl hidden max-h-[40vh] overflow-y-auto z-[150]"></div>
+                    <!-- CAMERA BACKDROP (Top half of screen) -->
+                    <div class="absolute top-0 left-0 w-full h-[55%] bg-bg-tertiary z-0 flex items-center justify-center overflow-hidden" id="mpos-camera-backdrop">
+                        <div id="mpos-reader" class="w-full h-full object-cover opacity-0 transition-opacity duration-500"></div>
+                        
+                        <!-- Premium Viewfinder Overlay -->
+                        <div id="mpos-scanner-overlay" class="absolute inset-0 pointer-events-none flex flex-col items-center justify-center z-10 hidden">
+                            <div class="w-64 h-40 relative">
+                                <!-- Corner Brackets -->
+                                <div class="absolute -top-2 -left-2 w-8 h-8 border-t-4 border-l-4 border-white rounded-tl-xl shadow-[0_0_10px_rgba(0,0,0,0.5)]"></div>
+                                <div class="absolute -top-2 -right-2 w-8 h-8 border-t-4 border-r-4 border-white rounded-tr-xl shadow-[0_0_10px_rgba(0,0,0,0.5)]"></div>
+                                <div class="absolute -bottom-2 -left-2 w-8 h-8 border-b-4 border-l-4 border-white rounded-bl-xl shadow-[0_0_10px_rgba(0,0,0,0.5)]"></div>
+                                <div class="absolute -bottom-2 -right-2 w-8 h-8 border-b-4 border-r-4 border-white rounded-br-xl shadow-[0_0_10px_rgba(0,0,0,0.5)]"></div>
+                                <!-- Laser -->
+                                <div class="mpos-scan-line"></div>
+                            </div>
+                            <div class="mt-8 px-4 py-1.5 bg-black/40 backdrop-blur-md rounded-full border border-white/10 flex items-center gap-2 shadow-lg">
+                                <div class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                                <span class="text-white text-[10px] font-bold tracking-widest uppercase">Scanning</span>
+                            </div>
+                        </div>
+
+                        <!-- Fallback / Error UI -->
+                        <div id="mpos-fallback" class="absolute inset-0 bg-bg-primary flex flex-col items-center justify-center text-center p-6 z-20">
+                            <div class="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mb-4 border border-red-500/20 shadow-inner">
+                                <i data-lucide="camera-off" class="w-8 h-8 text-red-400"></i>
+                            </div>
+                            <h3 class="text-white font-bold text-lg mb-1">Camera Unavailable</h3>
+                            <p class="text-text-secondary text-xs mb-6 max-w-[250px]">Secure connection required. Use the search bar below.</p>
+                            <button id="mpos-retry-camera" class="bg-white/10 hover:bg-white/20 text-white font-bold text-xs py-2.5 px-6 rounded-full border border-white/20 active:scale-95 transition-all">Retry Camera</button>
+                        </div>
+                    </div>
+
+                    <!-- FLOATING SEARCH BAR -->
+                    <div class="absolute top-4 left-4 right-4 z-30 flex items-center gap-2">
+                        <div class="relative flex-grow">
+                            <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/50"></i>
+                            <input type="text" id="mpos-search" placeholder="Search products..." class="w-full bg-black/40 backdrop-blur-xl border border-white/10 text-white rounded-2xl pl-12 pr-4 py-4 shadow-[0_10px_30px_rgba(0,0,0,0.5)] focus:ring-2 focus:ring-accent outline-none font-medium text-sm placeholder-white/50 transition-all">
+                            <div id="mpos-search-results" class="absolute top-full left-0 right-0 mt-2 bg-bg-secondary/95 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl hidden max-h-[40vh] overflow-y-auto z-[150]"></div>
+                        </div>
+                        <button id="toggle-scanner-btn" class="w-[52px] h-[52px] bg-black/40 backdrop-blur-xl border border-white/10 text-white rounded-2xl flex shrink-0 items-center justify-center shadow-[0_10px_30px_rgba(0,0,0,0.5)] active:scale-95 transition-all">
+                            <i data-lucide="camera" class="w-6 h-6 pointer-events-none"></i>
+                        </button>
+                    </div>
+
+                    <!-- CART BOTTOM SHEET -->
+                    <div class="absolute bottom-0 left-0 w-full h-[55%] mpos-glass-panel rounded-t-[2.5rem] shadow-[0_-20px_50px_rgba(0,0,0,0.8)] z-40 flex flex-col pt-2 transition-transform duration-300 transform translate-y-0" id="mpos-cart-section">
+                        <!-- Drag Handle -->
+                        <div class="w-12 h-1.5 bg-white/20 rounded-full mx-auto mb-4"></div>
+                        
+                        <!-- Customer -->
+                        <div class="px-5 shrink-0" id="mpos-customer-area"></div>
+
+                        <!-- Cart List -->
+                        <div id="mpos-cart-list" class="flex-1 overflow-y-auto px-5 space-y-3 pb-[100px]">
+                            <!-- Items go here -->
+                        </div>
+
+                        <!-- Checkout Bar -->
+                        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-bg-primary via-bg-primary/95 to-transparent pt-12 pb-4 px-5 pointer-events-none z-50">
+                            <div class="w-full bg-white/5 backdrop-blur-2xl border border-white/10 rounded-[2rem] p-2.5 shadow-[0_20px_50px_rgba(0,0,0,0.9)] pointer-events-auto flex items-center justify-between">
+                                <div class="pl-4 py-1 flex flex-col justify-center">
+                                    <span class="text-[10px] uppercase font-bold text-white/50 tracking-widest mb-0.5">Total</span>
+                                    <span id="mpos-total" class="text-[28px] font-black text-white font-mono leading-none tracking-tight">$0.00</span>
                                 </div>
-                                <button id="toggle-scanner-btn" class="w-12 h-12 bg-accent text-white rounded-xl flex shrink-0 items-center justify-center shadow-lg active:scale-95 transition-transform" title="Toggle Scanner">
-                                    <i data-lucide="scan-barcode" class="w-6 h-6 pointer-events-none"></i>
+                                <button id="mpos-charge-btn" data-action="process-payment" class="bg-gradient-to-r from-accent to-blue-500 hover:from-blue-500 hover:to-accent text-white px-8 h-14 rounded-[1.5rem] font-bold text-lg tracking-wider shadow-[0_5px_20px_rgba(0,123,255,0.5)] active:scale-95 transition-all disabled:opacity-50 disabled:active:scale-100 flex items-center justify-center gap-2 border border-white/20">
+                                    PAY <i data-lucide="arrow-right" class="w-5 h-5"></i>
                                 </button>
                             </div>
-                        </div>
-
-                        <!-- Camera Viewfinder (Expandable) -->
-                        <div id="mpos-scanner-wrapper" class="relative w-full h-[200px] min-h-[150px] bg-black overflow-hidden transition-all duration-300 hidden">
-                            <div id="mpos-reader" class="w-full h-full object-cover"></div>
-                            
-                            <!-- Overlay UI -->
-                            <div id="mpos-scanner-overlay" class="absolute inset-0 pointer-events-none flex flex-col items-center justify-center z-10 hidden">
-                                <div class="w-3/4 max-w-[280px] aspect-[21/9] border-2 border-white/30 rounded-xl relative overflow-hidden bg-white/5 backdrop-blur-[2px]">
-                                    <div class="absolute -top-1 -left-1 w-6 h-6 border-t-4 border-l-4 border-accent rounded-tl-xl"></div>
-                                    <div class="absolute -top-1 -right-1 w-6 h-6 border-t-4 border-r-4 border-accent rounded-tr-xl"></div>
-                                    <div class="absolute -bottom-1 -left-1 w-6 h-6 border-b-4 border-l-4 border-accent rounded-bl-xl"></div>
-                                    <div class="absolute -bottom-1 -right-1 w-6 h-6 border-b-4 border-r-4 border-accent rounded-br-xl"></div>
-                                    <div class="w-full h-[2px] bg-accent shadow-[0_0_15px_rgba(0,123,255,1)] mpos-scan-line"></div>
-                                </div>
-                            </div>
-
-                            <!-- Fallback / Error UI -->
-                            <div id="mpos-fallback" class="absolute inset-0 bg-bg-primary/95 backdrop-blur-md flex flex-col items-center justify-center text-center p-4 z-20">
-                                <div class="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mb-3 border border-red-500/20 shadow-inner">
-                                    <i data-lucide="camera-off" class="w-6 h-6 text-red-400"></i>
-                                </div>
-                                <h3 class="text-white font-bold text-base mb-1" id="mpos-fallback-title">Camera Unavailable</h3>
-                                <p class="text-text-secondary text-xs mb-4 max-w-[250px]" id="mpos-fallback-desc">Are you on a secure connection (HTTPS)?</p>
-                                <button id="mpos-retry-camera" class="bg-white text-black font-bold text-xs py-2 px-6 rounded-full shadow-lg active:scale-95 transition-transform">Retry Camera</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- MIDDLE: Cart List (Flex-1 allows it to scroll perfectly) -->
-                    <div id="mpos-cart-list" class="flex-1 overflow-y-auto bg-bg-primary p-3 space-y-3">
-                        <!-- Items go here -->
-                    </div>
-
-                    <!-- BOTTOM: Checkout Action Bar (Shrink-0 keeps it fixed at bottom) -->
-                    <div class="shrink-0 bg-bg-secondary/95 backdrop-blur-xl border-t border-border-color p-3 shadow-[0_-10px_20px_rgba(0,0,0,0.5)] z-30">
-                        <div id="mpos-customer-area" class="mb-2"></div>
-                        <div class="flex items-center gap-3">
-                            <div class="flex flex-col justify-center px-1 shrink-0">
-                                <span class="text-[10px] text-text-secondary uppercase font-bold tracking-widest mb-0.5">Total</span>
-                                <span id="mpos-total" class="text-2xl font-black font-mono text-white leading-none tracking-tight">$0.00</span>
-                            </div>
-                            <button id="mpos-charge-btn" data-action="process-payment" class="flex-1 bg-gradient-to-r from-accent to-blue-600 text-white h-14 rounded-xl text-lg font-black tracking-widest shadow-lg active:scale-95 transition-transform disabled:opacity-50 disabled:active:scale-100 flex items-center justify-center gap-2 border border-white/20">
-                                PAY <i data-lucide="arrow-right" class="w-5 h-5"></i>
-                            </button>
                         </div>
                     </div>
 
                     <!-- Success Flash Overlay -->
-                    <div id="mpos-flash" class="absolute inset-0 bg-accent/95 backdrop-blur-md z-[200] flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-200 rounded-[1.25rem]">
-                        <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-2xl mb-4">
+                    <div id="mpos-flash" class="absolute inset-0 bg-accent/90 backdrop-blur-md z-[200] flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-200">
+                        <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-[0_0_50px_rgba(255,255,255,0.5)] mb-6 transform scale-110">
                             <i data-lucide="check" class="w-12 h-12 text-accent"></i>
                         </div>
-                        <p id="mpos-flash-text" class="text-white font-bold text-2xl px-6 text-center drop-shadow-lg"></p>
+                        <h2 id="mpos-flash-text" class="text-3xl font-black text-white text-center px-4 tracking-wide drop-shadow-lg"></h2>
+                        <p class="text-white/80 font-bold tracking-widest uppercase text-sm mt-2">Added to Cart</p>
                     </div>
                 `;
 
@@ -9210,7 +9236,7 @@ function initBarcodeGenerator(pane) {
 
                 const searchInput = pane.querySelector('#mpos-search');
                 const resultsDiv = pane.querySelector('#mpos-search-results');
-                const scannerWrapper = pane.querySelector('#mpos-scanner-wrapper');
+                const readerElement = pane.querySelector('#mpos-reader');
                 const overlay = pane.querySelector('#mpos-scanner-overlay');
                 const fallback = pane.querySelector('#mpos-fallback');
                 const toggleScannerBtn = pane.querySelector('#toggle-scanner-btn');
@@ -9219,19 +9245,22 @@ function initBarcodeGenerator(pane) {
 
                 // --- Live Search Logic ---
                 searchInput.addEventListener('input', e => {
-                    const q = e.target.value.toLowerCase();
+                    const q = e.target.value.toLowerCase().trim();
                     if(q.length < 2) { resultsDiv.classList.add('hidden'); return; }
-                    const hits = firestoreData.products.filter(p => !p.parentSKU && (p.name.toLowerCase().includes(q) || p.id.toLowerCase().includes(q) || (p.barcode && p.barcode.toLowerCase().includes(q)))).slice(0, 6);
+                    const hits = firestoreData.products.filter(p => !p.parentSKU && (p.name.toLowerCase().includes(q) || p.id.toLowerCase().includes(q) || (p.barcode && String(p.barcode).toLowerCase().includes(q)))).slice(0, 6);
                     if (hits.length) {
                         resultsDiv.innerHTML = hits.map(p => `
-                            <div class="p-3 border-b border-border-color last:border-b-0 flex justify-between items-center active:bg-bg-tertiary cursor-pointer" data-add-id="${p.id}">
-                                <div class="pr-2"><p class="font-bold text-sm text-text-primary pointer-events-none">${p.name}</p><p class="text-xs text-text-secondary font-mono pointer-events-none mt-0.5">${p.id}</p></div>
-                                <p class="font-mono text-accent font-bold text-base pointer-events-none shrink-0">${currencyUtils.format(p.price)}</p>
+                            <div class="p-4 border-b border-white/5 last:border-b-0 flex justify-between items-center hover:bg-white/5 active:bg-white/10 cursor-pointer transition-colors" data-add-id="${p.id}">
+                                <div class="pr-3 overflow-hidden">
+                                    <p class="font-bold text-sm text-white pointer-events-none truncate">${p.name}</p>
+                                    <p class="text-[10px] text-text-secondary font-mono pointer-events-none mt-1 tracking-wider uppercase">${p.id}</p>
+                                </div>
+                                <p class="font-mono text-accent font-bold text-base pointer-events-none shrink-0 bg-accent/10 px-2 py-1 rounded-lg">${currencyUtils.format(p.price)}</p>
                             </div>
                         `).join('');
                         resultsDiv.classList.remove('hidden');
                     } else {
-                        resultsDiv.innerHTML = `<p class="text-center text-text-secondary py-4 text-sm font-medium">No products found.</p>`;
+                        resultsDiv.innerHTML = `<p class="text-center text-text-secondary py-6 text-sm font-medium">No products found.</p>`;
                         resultsDiv.classList.remove('hidden');
                     }
                 });
@@ -9242,6 +9271,7 @@ function initBarcodeGenerator(pane) {
                         const product = firestoreData.products.find(p => p.id === itemDiv.dataset.addId);
                         if(product) {
                             addProductToActiveCart(product);
+                            updateMobilePOS(pane);
                             searchInput.value = '';
                             resultsDiv.classList.add('hidden');
                             searchInput.blur();
@@ -9249,39 +9279,64 @@ function initBarcodeGenerator(pane) {
                     }
                 });
 
-                // --- Robust Scanner Logic ---
+                // --- Bulletproof Scanner Logic ---
                 const stopScanner = async () => {
+                    if (isScannerTransitioning) return;
+                    isScannerTransitioning = true;
                     if (mobilePosScanner && mobilePosScanner.isScanning) {
                         try {
                             await mobilePosScanner.stop();
                             mobilePosScanner.clear();
-                        } catch (e) { console.error(e); }
+                        } catch (e) { console.error("Scanner stop error:", e); }
                     }
+                    readerElement.classList.remove('opacity-100');
+                    readerElement.classList.add('opacity-0');
                     overlay.classList.add('hidden');
+                    fallback.classList.remove('hidden');
+                    isScannerTransitioning = false;
                 };
 
                 const startScanner = () => {
+                    if (isScannerTransitioning) return;
                     if (mobilePosScanner && mobilePosScanner.isScanning) return;
+                    isScannerTransitioning = true;
                     
                     fallback.classList.add('hidden');
+                    overlay.classList.add('hidden'); // Hide UI until fully started
+                    readerElement.classList.remove('opacity-100');
+                    readerElement.classList.add('opacity-0');
+
                     if (!mobilePosScanner) mobilePosScanner = new Html5Qrcode("mpos-reader");
 
-                    // Flexible aspect ratio to fit the new fixed container safely
-                    const config = { fps: 15, qrbox: { width: 250, height: 100 }, aspectRatio: 2 };
+                    // Optimized config for real retail scanning
+                    const config = { 
+                        fps: 30, // Faster scanning
+                        qrbox: { width: window.innerWidth * 0.7, height: 120 }, 
+                        aspectRatio: window.innerWidth / (window.innerHeight * 0.5) 
+                    };
                     
                     mobilePosScanner.start({ facingMode: "environment" }, config,
                         (decodedText) => {
                             const now = Date.now();
-                            if (decodedText === mobileLastScannedCode && now - mobileLastScanTime < 1500) return;
-                            mobileLastScannedCode = decodedText;
+                            // Standardize barcode to prevent loose match errors
+                            const scannedCode = String(decodedText).trim().toLowerCase();
+
+                            // Debounce
+                            if (scannedCode === mobileLastScannedCode && now - mobileLastScanTime < 1000) return;
+                            mobileLastScannedCode = scannedCode;
                             mobileLastScanTime = now;
 
                             if (document.querySelector('.modal-overlay:not(.opacity-0)')) return;
 
-                            const product = firestoreData.products.find(p => p.barcode === decodedText || p.id === decodedText);
+                            // Robust matching
+                            const product = firestoreData.products.find(p => 
+                                String(p.barcode).trim().toLowerCase() === scannedCode || 
+                                String(p.id).trim().toLowerCase() === scannedCode
+                            );
+
                             if (product) {
-                                playNotificationSound();
-                                if (navigator.vibrate) navigator.vibrate([40, 40]);
+                                playBarcodeBeep();
+                                if (navigator.vibrate) navigator.vibrate(40);
                                 
                                 addProductToActiveCart(product);
                                 updateMobilePOS(pane); 
@@ -9292,17 +9347,20 @@ function initBarcodeGenerator(pane) {
                                 setTimeout(() => flash.classList.add('opacity-0'), 600);
 
                             } else {
-                                if (navigator.vibrate) navigator.vibrate([150, 50, 150]);
+                                if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
                                 showToast(`Unrecognized Barcode: ${decodedText}`, 'error');
                             }
                         },
                         () => {} // Suppress constant frame errors
                     ).then(() => {
+                        readerElement.classList.remove('opacity-0');
+                        readerElement.classList.add('opacity-100');
                         overlay.classList.remove('hidden');
+                        isScannerTransitioning = false;
                     }).catch((err) => {
                         console.error("Scanner failed:", err);
                         stopScanner();
-                        fallback.classList.remove('hidden');
+                        isScannerTransitioning = false;
                     });
                 };
 
@@ -9311,16 +9369,14 @@ function initBarcodeGenerator(pane) {
                 toggleScannerBtn.addEventListener('click', () => {
                     if (mobilePosScanner && mobilePosScanner.isScanning) {
                         stopScanner();
-                        scannerWrapper.classList.add('hidden');
-                        toggleScannerBtn.classList.remove('bg-red-500');
-                        toggleScannerBtn.classList.add('bg-accent');
-                        toggleScannerBtn.innerHTML = '<i data-lucide="scan-barcode" class="w-6 h-6 pointer-events-none"></i>';
+                        toggleScannerBtn.classList.remove('bg-red-500/80');
+                        toggleScannerBtn.classList.add('bg-black/40');
+                        toggleScannerBtn.innerHTML = '<i data-lucide="camera" class="w-6 h-6 pointer-events-none"></i>';
                     } else {
-                        scannerWrapper.classList.remove('hidden');
                         startScanner();
-                        toggleScannerBtn.classList.remove('bg-accent');
-                        toggleScannerBtn.classList.add('bg-red-500');
-                        toggleScannerBtn.innerHTML = '<i data-lucide="x" class="w-6 h-6 pointer-events-none"></i>';
+                        toggleScannerBtn.classList.remove('bg-black/40');
+                        toggleScannerBtn.classList.add('bg-red-500/80');
+                        toggleScannerBtn.innerHTML = '<i data-lucide="camera-off" class="w-6 h-6 pointer-events-none"></i>';
                     }
                     lucide.createIcons();
                 });
@@ -9338,7 +9394,7 @@ function initBarcodeGenerator(pane) {
                 });
                 observer.observe(document.body, { childList: true, subtree: true });
                 
-                // Allow deleting from cart via clicking the item (reveals X)
+                // Swipe-to-delete simulation (Click to reveal X)
                 pane.addEventListener('click', e => {
                     const cartItem = e.target.closest('.bg-bg-secondary');
                     if (cartItem && !e.target.closest('button')) {
@@ -9347,13 +9403,12 @@ function initBarcodeGenerator(pane) {
                     }
                 });
 
-                // Open scanner automatically if it's the first render
-                setTimeout(() => toggleScannerBtn.click(), 100);
+                // Start automatically
+                setTimeout(startScanner, 200);
             }
 
             const posFullRender = (pane) => {
                 if (!pane) return;
-                // If on mobile, route to the mind-blowing mobile POS
                 if (window.innerWidth < 1024) {
                     initMobilePOS(pane);
                 } else if (appState.settings.posLayout === 'modern') {
