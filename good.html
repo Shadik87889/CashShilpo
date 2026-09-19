@@ -770,8 +770,8 @@
       #reader video { border-radius: 0 !important; object-fit: cover !important; width: 100% !important; height: 100% !important; }
       #reader { border: none !important; width: 100% !important; height: 100% !important; }
     </style>
-    <!-- HTML5 QR Code Scanner -->
-    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <!-- ZXing Enterprise Barcode Scanner -->
+    <script src="https://unpkg.com/@zxing/library@latest/umd/index.min.js"></script>
   </head>
   <body class="bg-dots">
     <div
@@ -3869,7 +3869,8 @@ function handleCustomerExport() {
                         </button>
                     </div>
                     <div class="flex-grow w-full h-full relative flex items-center justify-center overflow-hidden bg-black" id="scanner-wrapper">
-                        <div id="reader" class="absolute inset-0 w-full h-full object-cover"></div>
+                        <!-- USING NATIVE VIDEO TAG FOR ZXING -->
+                        <video id="global-reader" class="absolute inset-0 w-full h-full object-cover" autoplay muted playsinline></video>
                         <div class="absolute w-64 h-40 border-4 border-accent rounded-xl shadow-[0_0_0_4000px_rgba(0,0,0,0.85)] pointer-events-none z-10 flex items-center justify-center">
                             <div class="w-full h-1 bg-accent/70 animate-pulse shadow-[0_0_15px_rgba(0,123,255,1)]"></div>
                         </div>
@@ -3885,29 +3886,19 @@ function handleCustomerExport() {
             document.body.insertAdjacentHTML('beforeend', content);
             lucide.createIcons();
 
-            const html5QrCode = new Html5Qrcode("reader");
+            const codeReader = new ZXing.BrowserMultiFormatReader();
             const scannerDiv = document.getElementById('native-scanner-view');
 
             const closeScanner = () => {
-                if (html5QrCode.isScanning) {
-                    html5QrCode.stop().then(() => {
-                        html5QrCode.clear();
-                        scannerDiv.remove();
-                    }).catch(err => {
-                        console.error("Failed to stop scanner", err);
-                        scannerDiv.remove();
-                    });
-                } else {
-                    scannerDiv.remove();
-                }
+                codeReader.reset();
+                scannerDiv.remove();
             };
 
             scannerDiv.querySelector('[data-action="close-scanner"]').addEventListener('click', closeScanner);
 
-            const config = { fps: 15, qrbox: { width: 250, height: 150 }, aspectRatio: window.innerHeight / window.innerWidth };
-
-            html5QrCode.start({ facingMode: "environment" }, config,
-                (decodedText, decodedResult) => {
+            codeReader.decodeFromVideoDevice(undefined, 'global-reader', (result, err) => {
+                if (result) {
+                    const decodedText = result.getText();
                     closeScanner();
                     playNotificationSound();
                     const product = firestoreData.products.find(p => p.barcode === decodedText || p.id === decodedText);
@@ -3922,10 +3913,9 @@ function handleCustomerExport() {
                     } else {
                         showToast(`No product found: ${decodedText}`, 'error');
                     }
-                },
-                (errorMessage) => { /* Ignore constant scan frame errors */ }
-            ).catch((err) => {
-                console.error("Error starting scanner", err);
+                }
+            }).catch((err) => {
+                console.error("Scanner failed:", err);
                 const wrapper = document.getElementById('scanner-wrapper');
                 if (wrapper) {
                     wrapper.innerHTML = `
@@ -3943,7 +3933,6 @@ function handleCustomerExport() {
                 }
             });
         };
-
         document.addEventListener('DOMContentLoaded', () => {
             // --- NEW: STORE SWITCHER LOGIC ---
             const renderStoreSwitcher = () => {
@@ -9129,7 +9118,6 @@ function initBarcodeGenerator(pane) {
                     return;
                 }
 
-                // Layout Master Fix: Perfectly bound the POS between the app header and bottom navigation
                 pane.style.position = 'fixed';
                 pane.style.top = 'calc(65px + env(safe-area-inset-top))';
                 pane.style.bottom = 'calc(85px + env(safe-area-inset-bottom))'; 
@@ -9151,7 +9139,7 @@ function initBarcodeGenerator(pane) {
                         }
                         .mpos-scan-line { position: absolute; animation: mposScanLine 1.5s linear infinite; }
                         .mpos-scanner-open { height: 260px !important; opacity: 1 !important; border-bottom: 1px solid var(--border-color); }
-                        #mpos-reader video { object-fit: cover !important; border-radius: 0 0 1.25rem 1.25rem; }
+                        #mpos-reader { object-fit: cover !important; border-radius: 0 0 1.25rem 1.25rem; }
                     </style>`);
                 }
 
@@ -9163,7 +9151,6 @@ function initBarcodeGenerator(pane) {
                             <div class="relative flex items-center gap-2">
                                 <div class="relative flex-grow">
                                     <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-text-secondary"></i>
-                                    <!-- Using text-base (16px) to prevent iOS auto-zoom -->
                                     <input type="text" id="mpos-search" placeholder="Search product or SKU..." class="w-full bg-bg-primary border border-border-color text-white rounded-xl pl-10 pr-4 py-3 shadow-inner focus:ring-2 focus:ring-accent outline-none font-medium text-base transition-shadow">
                                     <div id="mpos-search-results" class="absolute top-full left-0 right-0 mt-2 bg-bg-secondary border border-border-color rounded-xl shadow-2xl hidden max-h-[40vh] overflow-y-auto z-[150]"></div>
                                 </div>
@@ -9175,17 +9162,16 @@ function initBarcodeGenerator(pane) {
 
                         <!-- Camera Viewfinder (Expandable smoothly) -->
                         <div id="mpos-scanner-wrapper" class="relative w-full h-0 opacity-0 overflow-hidden transition-all duration-300 bg-black flex-shrink-0 z-10">
-                            <div id="mpos-reader" class="w-full h-full"></div>
+                            <!-- NATIVE VIDEO TAG FOR ZXING -->
+                            <video id="mpos-reader" class="w-full h-full object-cover" autoplay muted playsinline></video>
                             
                             <!-- Beautiful Overlay UI -->
                             <div id="mpos-scanner-overlay" class="absolute inset-0 pointer-events-none flex flex-col items-center justify-center z-10 hidden">
                                 <div class="w-[70%] aspect-[4/3] max-w-[280px] border border-white/20 rounded-2xl relative overflow-hidden bg-white/5 backdrop-blur-[1px] shadow-[0_0_0_9999px_rgba(0,0,0,0.6)]">
-                                    <!-- Corner Accents -->
                                     <div class="absolute -top-0.5 -left-0.5 w-8 h-8 border-t-4 border-l-4 border-accent rounded-tl-2xl"></div>
                                     <div class="absolute -top-0.5 -right-0.5 w-8 h-8 border-t-4 border-r-4 border-accent rounded-tr-2xl"></div>
                                     <div class="absolute -bottom-0.5 -left-0.5 w-8 h-8 border-b-4 border-l-4 border-accent rounded-bl-2xl"></div>
                                     <div class="absolute -bottom-0.5 -right-0.5 w-8 h-8 border-b-4 border-r-4 border-accent rounded-br-2xl"></div>
-                                    <!-- Laser Line -->
                                     <div class="w-[90%] left-[5%] h-[3px] bg-red-500 rounded-full shadow-[0_0_15px_3px_rgba(239,68,68,0.8)] mpos-scan-line"></div>
                                 </div>
                                 <p class="text-white/80 text-xs font-medium mt-4 tracking-widest bg-black/50 px-4 py-1.5 rounded-full backdrop-blur-md border border-white/10">ALIGN BARCODE IN FRAME</p>
@@ -9203,12 +9189,10 @@ function initBarcodeGenerator(pane) {
                         </div>
                     </div>
 
-                    <!-- MIDDLE: Cart List (Flex-1 allows it to scroll perfectly) -->
-                    <div id="mpos-cart-list" class="flex-1 overflow-y-auto bg-bg-primary p-3 space-y-3 relative z-0">
-                        <!-- Items go here -->
-                    </div>
+                    <!-- MIDDLE: Cart List -->
+                    <div id="mpos-cart-list" class="flex-1 overflow-y-auto bg-bg-primary p-3 space-y-3 relative z-0"></div>
 
-                    <!-- BOTTOM: Checkout Action Bar (Shrink-0 keeps it fixed at bottom) -->
+                    <!-- BOTTOM: Checkout Action Bar -->
                     <div class="shrink-0 bg-bg-secondary/95 backdrop-blur-xl border-t border-border-color p-3 shadow-[0_-10px_30px_rgba(0,0,0,0.6)] z-30 rounded-b-[1.25rem]">
                         <div id="mpos-customer-area" class="mb-3"></div>
                         <div class="flex items-center gap-3">
@@ -9252,7 +9236,7 @@ function initBarcodeGenerator(pane) {
                     if (hits.length) {
                         resultsDiv.innerHTML = hits.map(p => `
                             <div class="p-3 border-b border-border-color last:border-b-0 flex justify-between items-center active:bg-bg-tertiary cursor-pointer transition-colors" data-add-id="${p.id}">
-                                <div class="pr-2"><p class="font-bold text-base text-text-primary pointer-events-none line-clamp-1">${p.name}</p><p class="text-sm text-text-secondary font-mono pointer-events-none mt-0.5">${p.id}</p></div>
+                                <div class="pr-2"><p class="font-bold text-sm text-text-primary pointer-events-none line-clamp-1">${p.name}</p><p class="text-xs text-text-secondary font-mono pointer-events-none mt-0.5">${p.id}</p></div>
                                 <p class="font-mono text-accent font-bold text-base pointer-events-none shrink-0">${currencyUtils.format(p.price)}</p>
                             </div>
                         `).join('');
@@ -9263,31 +9247,33 @@ function initBarcodeGenerator(pane) {
                     }
                 });
 
-                // Use mousedown/touchstart to prevent blur from destroying the target before click fires
-                const handleSearchSelect = (e) => {
+                // FIX: Use a simple click listener instead of pointer/mousedown which conflicted
+                resultsDiv.addEventListener('click', e => {
                     const itemDiv = e.target.closest('[data-add-id]');
                     if(itemDiv) {
-                        e.preventDefault(); // Prevents input blur
                         const product = firestoreData.products.find(p => p.id === itemDiv.dataset.addId);
                         if(product) {
                             addProductToActiveCart(product);
                             searchInput.value = '';
                             resultsDiv.classList.add('hidden');
-                            searchInput.blur();
+                            searchInput.blur(); // Dismiss keyboard
                         }
                     }
-                };
-                resultsDiv.addEventListener('mousedown', handleSearchSelect);
-                resultsDiv.addEventListener('touchstart', handleSearchSelect, { passive: false });
+                });
 
-                // --- Robust Scanner Logic ---
-                const stopScanner = async () => {
-                    if (mobilePosScanner && mobilePosScanner.isScanning) {
-                        try {
-                            await mobilePosScanner.stop();
-                            mobilePosScanner.clear();
-                        } catch (e) { console.error("Error stopping scanner:", e); }
+                // Hide search results if clicked outside
+                const hideSearchListener = (e) => {
+                    if (pane.contains(searchInput) && !searchInput.contains(e.target) && !resultsDiv.contains(e.target)) {
+                        resultsDiv.classList.add('hidden');
                     }
+                };
+                document.addEventListener('click', hideSearchListener);
+
+                // --- Robust ZXing Scanner Logic ---
+                let codeReader = new ZXing.BrowserMultiFormatReader();
+
+                const stopScanner = () => {
+                    codeReader.reset();
                     overlay.classList.add('hidden');
                 };
 
@@ -9308,49 +9294,38 @@ function initBarcodeGenerator(pane) {
                     }, 800);
                 };
 
-                const startScanner = () => {
-                    if (mobilePosScanner && mobilePosScanner.isScanning) return;
-                    
+                const startScanner = async () => {
                     fallback.classList.add('hidden');
-                    if (!mobilePosScanner) mobilePosScanner = new Html5Qrcode("mpos-reader");
+                    try {
+                        // Undefined tells ZXing to pick the default environment (back) camera
+                        codeReader.decodeFromVideoDevice(undefined, 'mpos-reader', (result, err) => {
+                            if (result) {
+                                const decodedText = result.getText();
+                                const now = Date.now();
+                                if (decodedText === mobileLastScannedCode && now - mobileLastScanTime < 1500) return;
+                                mobileLastScannedCode = decodedText;
+                                mobileLastScanTime = now;
 
-                    // Config optimized for wide device support and reliability
-                    const config = { 
-                        fps: 10,
-                        qrbox: { width: 250, height: 150 }, 
-                        aspectRatio: 1.0, 
-                        disableFlip: false
-                    };
-                    
-                    mobilePosScanner.start({ facingMode: "environment" }, config,
-                        (decodedText) => {
-                            const now = Date.now();
-                            // Prevent double scanning same item instantly (debounce 1.5s)
-                            if (decodedText === mobileLastScannedCode && now - mobileLastScanTime < 1500) return;
-                            mobileLastScannedCode = decodedText;
-                            mobileLastScanTime = now;
+                                if (document.querySelector('.modal-overlay:not(.opacity-0)')) return;
 
-                            if (document.querySelector('.modal-overlay:not(.opacity-0)')) return;
-
-                            const product = firestoreData.products.find(p => p.barcode === decodedText || p.id === decodedText);
-                            if (product) {
-                                playNotificationSound();
-                                addProductToActiveCart(product);
-                                updateMobilePOS(pane); 
-                                showSuccessFlash(product.name);
-                            } else {
-                                if (navigator.vibrate) navigator.vibrate([100, 50, 100]); // Error vibration
-                                showToast(`Unrecognized Barcode: ${decodedText}`, 'error');
+                                const product = firestoreData.products.find(p => p.barcode === decodedText || p.id === decodedText);
+                                if (product) {
+                                    playNotificationSound();
+                                    addProductToActiveCart(product);
+                                    updateMobilePOS(pane); 
+                                    showSuccessFlash(product.name);
+                                } else {
+                                    if (navigator.vibrate) navigator.vibrate([100, 50, 100]); 
+                                    showToast(`Unrecognized Barcode: ${decodedText}`, 'error');
+                                }
                             }
-                        },
-                        () => {} // Suppress constant frame scanning logs
-                    ).then(() => {
+                        });
                         overlay.classList.remove('hidden');
-                    }).catch((err) => {
-                        console.error("Scanner failed to start:", err);
+                    } catch (err) {
+                        console.error("ZXing Scanner failed:", err);
                         stopScanner();
                         fallback.classList.remove('hidden');
-                    });
+                    }
                 };
 
                 pane.querySelector('#mpos-retry-camera').addEventListener('click', startScanner);
@@ -9361,29 +9336,26 @@ function initBarcodeGenerator(pane) {
                     if (isClosing) {
                         stopScanner();
                         scannerWrapper.classList.remove('mpos-scanner-open');
-                        // Reset button style
                         toggleScannerBtn.className = 'w-12 h-12 bg-gradient-to-br from-accent to-blue-600 text-white rounded-xl flex shrink-0 items-center justify-center shadow-[0_4px_15px_rgba(0,123,255,0.4)] active:scale-90 transition-all duration-200';
                         toggleScannerBtn.innerHTML = '<i data-lucide="scan-barcode" class="w-6 h-6 pointer-events-none"></i>';
                     } else {
                         scannerWrapper.classList.add('mpos-scanner-open');
-                        // Red close button style
                         toggleScannerBtn.className = 'w-12 h-12 bg-gradient-to-br from-red-500 to-red-600 text-white rounded-xl flex shrink-0 items-center justify-center shadow-[0_4px_15px_rgba(239,68,68,0.4)] active:scale-90 transition-all duration-200';
                         toggleScannerBtn.innerHTML = '<i data-lucide="x" class="w-6 h-6 pointer-events-none"></i>';
                         
-                        // Wait for CSS height transition to finish so Html5Qrcode calculates correct canvas size
-                        setTimeout(() => {
-                            startScanner();
-                        }, 350);
+                        // Wait for CSS slide down before capturing video dimensions
+                        setTimeout(() => { startScanner(); }, 350);
                     }
                     lucide.createIcons();
                 });
 
-                // Auto-cleanup memory leak protection
+                // Auto-cleanup memory leak & external listeners protection
                 const observer = new MutationObserver((mutations) => {
                     mutations.forEach((mutation) => {
                         mutation.removedNodes.forEach((node) => {
                             if (node === pane || (node.contains && node.contains(pane))) {
                                 stopScanner();
+                                document.removeEventListener('click', hideSearchListener);
                                 observer.disconnect();
                             }
                         });
@@ -9403,17 +9375,6 @@ function initBarcodeGenerator(pane) {
                 // Open scanner automatically if it's the first render
                 setTimeout(() => toggleScannerBtn.click(), 100);
             }
-            const posFullRender = (pane) => {
-                if (!pane) return;
-                // If on mobile, route to the mind-blowing mobile POS
-                if (window.innerWidth < 1024) {
-                    initMobilePOS(pane);
-                } else if (appState.settings.posLayout === 'modern') {
-                    posModernLayoutRender(pane);
-                } else {
-                    posClassicLayoutRender(pane);
-                }
-            };
 const posModernLayoutRender = (pane) => {
     if (!pane) return;
     const term = getCurrentProfile().terminology;
