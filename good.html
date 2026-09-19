@@ -2,7 +2,7 @@
 <html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
     <title>CashShilpo - AI Powered Universal POS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="shortcut icon" href="The Official-Cashsilpo-Fav.png" type="image/x-icon">
@@ -9121,7 +9121,14 @@ function initBarcodeGenerator(pane) {
                 lucide.createIcons();
             }
 
-  function initMobilePOS(pane) {
+ function initMobilePOS(pane) {
+                // PREVENT RE-RENDER: If the UI is already built, just update the data.
+                // This keeps the scanner running and the search bar active!
+                if (pane.querySelector('#mpos-top-section')) {
+                    updateMobilePOS(pane);
+                    return;
+                }
+
                 // Layout Master Fix: Perfectly bound the POS between the app header and bottom navigation
                 pane.style.position = 'fixed';
                 pane.style.top = 'calc(65px + env(safe-area-inset-top))';
@@ -9156,7 +9163,8 @@ function initBarcodeGenerator(pane) {
                             <div class="relative flex items-center gap-2">
                                 <div class="relative flex-grow">
                                     <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-text-secondary"></i>
-                                    <input type="text" id="mpos-search" placeholder="Search product or SKU..." class="w-full bg-bg-primary border border-border-color text-white rounded-xl pl-10 pr-4 py-3 shadow-inner focus:ring-2 focus:ring-accent outline-none font-medium text-sm transition-shadow">
+                                    <!-- Using text-base (16px) to prevent iOS auto-zoom -->
+                                    <input type="text" id="mpos-search" placeholder="Search product or SKU..." class="w-full bg-bg-primary border border-border-color text-white rounded-xl pl-10 pr-4 py-3 shadow-inner focus:ring-2 focus:ring-accent outline-none font-medium text-base transition-shadow">
                                     <div id="mpos-search-results" class="absolute top-full left-0 right-0 mt-2 bg-bg-secondary border border-border-color rounded-xl shadow-2xl hidden max-h-[40vh] overflow-y-auto z-[150]"></div>
                                 </div>
                                 <button id="toggle-scanner-btn" class="w-12 h-12 bg-gradient-to-br from-accent to-blue-600 text-white rounded-xl flex shrink-0 items-center justify-center shadow-[0_4px_15px_rgba(0,123,255,0.4)] active:scale-90 transition-all duration-200" title="Toggle Scanner">
@@ -9244,7 +9252,7 @@ function initBarcodeGenerator(pane) {
                     if (hits.length) {
                         resultsDiv.innerHTML = hits.map(p => `
                             <div class="p-3 border-b border-border-color last:border-b-0 flex justify-between items-center active:bg-bg-tertiary cursor-pointer transition-colors" data-add-id="${p.id}">
-                                <div class="pr-2"><p class="font-bold text-sm text-text-primary pointer-events-none line-clamp-1">${p.name}</p><p class="text-xs text-text-secondary font-mono pointer-events-none mt-0.5">${p.id}</p></div>
+                                <div class="pr-2"><p class="font-bold text-base text-text-primary pointer-events-none line-clamp-1">${p.name}</p><p class="text-sm text-text-secondary font-mono pointer-events-none mt-0.5">${p.id}</p></div>
                                 <p class="font-mono text-accent font-bold text-base pointer-events-none shrink-0">${currencyUtils.format(p.price)}</p>
                             </div>
                         `).join('');
@@ -9255,9 +9263,11 @@ function initBarcodeGenerator(pane) {
                     }
                 });
 
-                resultsDiv.addEventListener('click', e => {
+                // Use mousedown/touchstart to prevent blur from destroying the target before click fires
+                const handleSearchSelect = (e) => {
                     const itemDiv = e.target.closest('[data-add-id]');
                     if(itemDiv) {
+                        e.preventDefault(); // Prevents input blur
                         const product = firestoreData.products.find(p => p.id === itemDiv.dataset.addId);
                         if(product) {
                             addProductToActiveCart(product);
@@ -9266,7 +9276,9 @@ function initBarcodeGenerator(pane) {
                             searchInput.blur();
                         }
                     }
-                });
+                };
+                resultsDiv.addEventListener('mousedown', handleSearchSelect);
+                resultsDiv.addEventListener('touchstart', handleSearchSelect, { passive: false });
 
                 // --- Robust Scanner Logic ---
                 const stopScanner = async () => {
@@ -9302,16 +9314,12 @@ function initBarcodeGenerator(pane) {
                     fallback.classList.add('hidden');
                     if (!mobilePosScanner) mobilePosScanner = new Html5Qrcode("mpos-reader");
 
-                    // Config optimized for speed and clarity
+                    // Config optimized for wide device support and reliability
                     const config = { 
-                        fps: 30, // High FPS for rapid scanning
+                        fps: 10,
                         qrbox: { width: 250, height: 150 }, 
                         aspectRatio: 1.0, 
-                        disableFlip: false,
-                        videoConstraints: {
-                            facingMode: "environment",
-                            focusMode: "continuous"
-                        }
+                        disableFlip: false
                     };
                     
                     mobilePosScanner.start({ facingMode: "environment" }, config,
@@ -9326,7 +9334,7 @@ function initBarcodeGenerator(pane) {
 
                             const product = firestoreData.products.find(p => p.barcode === decodedText || p.id === decodedText);
                             if (product) {
-                                playNotificationSound(); // Fast, sharp beep
+                                playNotificationSound();
                                 addProductToActiveCart(product);
                                 updateMobilePOS(pane); 
                                 showSuccessFlash(product.name);
@@ -9358,10 +9366,14 @@ function initBarcodeGenerator(pane) {
                         toggleScannerBtn.innerHTML = '<i data-lucide="scan-barcode" class="w-6 h-6 pointer-events-none"></i>';
                     } else {
                         scannerWrapper.classList.add('mpos-scanner-open');
-                        startScanner();
                         // Red close button style
                         toggleScannerBtn.className = 'w-12 h-12 bg-gradient-to-br from-red-500 to-red-600 text-white rounded-xl flex shrink-0 items-center justify-center shadow-[0_4px_15px_rgba(239,68,68,0.4)] active:scale-90 transition-all duration-200';
                         toggleScannerBtn.innerHTML = '<i data-lucide="x" class="w-6 h-6 pointer-events-none"></i>';
+                        
+                        // Wait for CSS height transition to finish so Html5Qrcode calculates correct canvas size
+                        setTimeout(() => {
+                            startScanner();
+                        }, 350);
                     }
                     lucide.createIcons();
                 });
@@ -9388,8 +9400,9 @@ function initBarcodeGenerator(pane) {
                     }
                 });
 
+                // Open scanner automatically if it's the first render
+                setTimeout(() => toggleScannerBtn.click(), 100);
             }
-
             const posFullRender = (pane) => {
                 if (!pane) return;
                 // If on mobile, route to the mind-blowing mobile POS
