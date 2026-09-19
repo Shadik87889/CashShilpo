@@ -1,0 +1,1480 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lappy Valley | Modern E-Commerce</title>
+
+    <!-- Modern, legible, commercial fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['"Plus Jakarta Sans"', "sans-serif"],
+            },
+            colors: {
+              brand: {
+                50: "#eef2ff",
+                100: "#e0e7ff",
+                500: "#6366f1",
+                600: "#4f46e5", // Deep Indigo (Primary)
+                900: "#312e81",
+              },
+              accent: {
+                red: "#ef4444", // Catchy red for discounts
+                orange: "#f97316",
+              },
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      body {
+        background-color: #f8fafc;
+      }
+      .hide-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      .hide-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+
+      /* Smooth micro-interactions */
+      .product-card {
+        transition: all 0.3s ease;
+      }
+      .product-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+          0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      }
+      .product-img {
+        transition: transform 0.5s ease;
+      }
+      .product-card:hover .product-img {
+        transform: scale(1.08);
+      }
+    </style>
+  </head>
+  <body
+    class="text-slate-800 antialiased overflow-x-hidden selection:bg-brand-500 selection:text-white"
+  >
+    <!-- Top Info Bar -->
+    <div class="bg-slate-900 text-slate-300 text-[12px] font-medium py-2">
+      <div
+        class="max-w-[1400px] mx-auto px-4 flex justify-between items-center"
+      >
+        <div class="flex gap-4">
+          <a
+            href="#"
+            class="flex items-center gap-1.5 hover:text-white transition"
+            ><span class="w-2 h-2 rounded-full bg-accent-red"></span> YouTube</a
+          >
+          <a href="#" class="hover:text-white transition">Reviews</a>
+        </div>
+        <div>
+          Hotline:
+          <a
+            href="tel:+8801901643834"
+            class="text-white font-bold tracking-wide"
+            >+880 1901 643834</a
+          >
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Catchy Header -->
+    <nav class="bg-brand-600 sticky top-0 z-50 shadow-lg">
+      <div class="max-w-[1400px] mx-auto px-4">
+        <div class="flex justify-between items-center h-20 gap-6">
+          <!-- Provided Logo -->
+          <a href="#" class="flex-shrink-0">
+            <img
+              src="https://lappyvalley.com/storage/product/Logo.svg"
+              alt="Lappy Valley"
+              class="h-9 w-auto"
+            />
+          </a>
+
+          <!-- Huge UX-Optimized Search Bar -->
+          <div class="hidden lg:flex flex-1 max-w-3xl">
+            <div
+              class="flex w-full bg-white rounded-lg shadow-inner overflow-hidden border-2 border-transparent focus-within:border-brand-300 transition-colors"
+            >
+              <select
+                class="bg-slate-50 pl-4 pr-2 py-3.5 text-sm font-semibold text-slate-600 outline-none border-r border-slate-200 cursor-pointer hidden xl:block hover:bg-slate-100"
+              >
+                <option>All Categories</option>
+              </select>
+              <input
+                type="text"
+                placeholder="I am shopping for..."
+                class="w-full px-4 py-3.5 outline-none text-sm text-slate-800 placeholder-slate-400 font-medium"
+              />
+              <button
+                class="bg-slate-900 text-white px-8 font-bold text-sm hover:bg-slate-800 transition-colors"
+              >
+                Search
+              </button>
+            </div>
+          </div>
+
+          <!-- Action Icons -->
+          <div class="flex items-center gap-6 text-white">
+            <a
+              href="#"
+              class="hidden lg:flex flex-col items-center hover:text-brand-100 transition gap-1"
+            >
+              <svg
+                class="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"
+                ></path>
+              </svg>
+              <span class="text-[11px] font-bold tracking-wide">Offers</span>
+            </a>
+            <a
+              href="#"
+              class="flex flex-col items-center hover:text-brand-100 transition gap-1 relative"
+            >
+              <div class="relative">
+                <svg
+                  class="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                  ></path>
+                </svg>
+                <span
+                  class="absolute -top-1.5 -right-2 bg-accent-orange text-white text-[10px] font-bold h-4 w-4 rounded-full flex items-center justify-center shadow-sm"
+                  >0</span
+                >
+              </div>
+              <span class="text-[11px] font-bold tracking-wide hidden lg:block"
+                >Cart</span
+              >
+            </a>
+            <a
+              href="#"
+              class="hidden lg:flex flex-col items-center hover:text-brand-100 transition gap-1"
+            >
+              <svg
+                class="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                ></path>
+              </svg>
+              <span class="text-[11px] font-bold tracking-wide">Account</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Category Navigation (White bar below header) -->
+      <div class="bg-white border-b border-slate-200 shadow-sm hidden lg:block">
+        <div
+          class="max-w-[1400px] mx-auto px-4 flex items-center gap-8 py-3 text-[13px] font-bold text-slate-600"
+        >
+          <a
+            href="#"
+            class="hover:text-brand-600 transition flex items-center gap-1"
+            ><svg
+              class="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 6h16M4 12h16M4 18h16"
+              ></path>
+            </svg>
+            All Categories</a
+          >
+          <a href="#" class="hover:text-brand-600 transition">USA Variant</a>
+          <a href="#" class="hover:text-brand-600 transition">Brand New</a>
+          <a href="#" class="hover:text-brand-600 transition text-accent-red"
+            >Pre-Owned (used)</a
+          >
+          <a href="#" class="text-brand-600 border-b-2 border-brand-600 pb-0.5"
+            >Gaming Laptop</a
+          >
+          <a href="#" class="hover:text-brand-600 transition">UAE Variant</a>
+          <a href="#" class="hover:text-brand-600 transition">Student Laptop</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Engaging Hero Banner -->
+    <section class="max-w-[1400px] mx-auto px-4 py-6">
+      <div
+        class="bg-slate-900 rounded-2xl p-8 md:p-12 relative overflow-hidden flex flex-col md:flex-row items-center justify-between min-h-[400px] shadow-xl"
+      >
+        <!-- Background Accent -->
+        <div
+          class="absolute top-0 right-0 w-full h-full bg-gradient-to-l from-brand-600/40 to-transparent"
+        ></div>
+
+        <div class="z-10 w-full md:w-1/2">
+          <span
+            class="bg-accent-red text-white text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-md mb-4 inline-block"
+            >New Arrival</span
+          >
+          <h1
+            class="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-tight mb-4 tracking-tight"
+          >
+            GAMING LAPTOP
+          </h1>
+          <p
+            class="text-slate-300 font-medium text-sm md:text-base leading-relaxed mb-8 max-w-md"
+          >
+            Asus ROG zephyrus G16 14th Gen Core ultra 9 185H 32-2TB SSD RTX 4090
+            16 GB GPU
+          </p>
+          <button
+            class="bg-white text-slate-900 font-bold text-sm px-8 py-3.5 rounded-lg shadow-lg hover:bg-slate-100 transition-colors flex items-center gap-2 w-fit"
+          >
+            Shop Now
+            <svg
+              class="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M14 5l7 7m0 0l-7 7m7-7H3"
+              ></path>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Floating Laptop -->
+        <div
+          class="relative mt-8 md:mt-0 w-full md:w-1/2 flex justify-end z-10"
+        >
+          <img
+            src="https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=800&q=80"
+            alt="ROG Zephyrus"
+            class="w-[90%] object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
+          />
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 1: New Arrival -->
+    <section class="max-w-[1400px] mx-auto px-4 py-12">
+      <div
+        class="flex items-end justify-between mb-8 border-b border-slate-200 pb-3"
+      >
+        <h2
+          class="text-2xl md:text-3xl font-black tracking-tight text-slate-900 border-l-4 border-brand-600 pl-3"
+        >
+          New Arrival
+        </h2>
+        <a
+          href="#"
+          class="text-sm font-bold text-brand-600 hover:text-brand-800 transition"
+          >See All &rarr;</a
+        >
+      </div>
+
+      <div
+        class="flex overflow-x-auto hide-scrollbar snap-x snap-mandatory gap-5 pb-6 md:grid md:grid-cols-3 lg:grid-cols-5"
+      >
+        <!-- Product 1 -->
+        <div
+          class="snap-start min-w-[260px] md:min-w-0 product-card bg-white rounded-2xl p-4 border border-slate-200 flex flex-col h-full relative cursor-pointer"
+        >
+          <div
+            class="absolute top-4 left-4 bg-accent-red text-white text-[11px] font-bold px-2 py-1 rounded z-10"
+          >
+            -5%
+          </div>
+          <div
+            class="bg-slate-50 rounded-xl aspect-[4/3] p-4 mb-4 flex items-center justify-center overflow-hidden"
+          >
+            <img
+              src="https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?auto=format&fit=crop&w=400&q=80"
+              class="object-contain product-img mix-blend-multiply w-full h-full"
+            />
+          </div>
+          <h3
+            class="text-sm font-bold text-slate-800 leading-snug mb-4 line-clamp-2"
+          >
+            HP EliteBook 850 G8 Core i5-11th gen 8GB-256GB Pre-Owned AAA+
+          </h3>
+          <div class="mt-auto flex flex-col gap-3">
+            <div>
+              <div
+                class="text-xs text-slate-400 line-through font-semibold mb-0.5"
+              >
+                58,500 ৳
+              </div>
+              <div class="text-lg font-black text-brand-600">55,500 ৳</div>
+            </div>
+            <!-- UX Upgrade: Full width recognizable Add to Cart button -->
+            <button
+              class="w-full bg-slate-100 hover:bg-brand-600 text-slate-700 hover:text-white text-sm font-bold py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2"
+            >
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                ></path>
+              </svg>
+              Add to Cart
+            </button>
+          </div>
+        </div>
+
+        <!-- Product 2 -->
+        <div
+          class="snap-start min-w-[260px] md:min-w-0 product-card bg-white rounded-2xl p-4 border border-slate-200 flex flex-col h-full relative cursor-pointer"
+        >
+          <div
+            class="absolute top-4 left-4 bg-accent-red text-white text-[11px] font-bold px-2 py-1 rounded z-10"
+          >
+            -7%
+          </div>
+          <div
+            class="bg-slate-50 rounded-xl aspect-[4/3] p-4 mb-4 flex items-center justify-center overflow-hidden"
+          >
+            <img
+              src="https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=400&q=80"
+              class="object-contain product-img mix-blend-multiply w-full h-full"
+            />
+          </div>
+          <h3
+            class="text-sm font-bold text-slate-800 leading-snug mb-4 line-clamp-2"
+          >
+            Apple MacBook Pro M5 10-Core CPU 10-Core GPU 16GB-512GB Open Boxed
+            With original Box
+          </h3>
+          <div class="mt-auto flex flex-col gap-3">
+            <div>
+              <div
+                class="text-xs text-slate-400 line-through font-semibold mb-0.5"
+              >
+                230,500 ৳
+              </div>
+              <div class="text-lg font-black text-brand-600">215,000 ৳</div>
+            </div>
+            <button
+              class="w-full bg-slate-100 hover:bg-brand-600 text-slate-700 hover:text-white text-sm font-bold py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2"
+            >
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                ></path>
+              </svg>
+              Add to Cart
+            </button>
+          </div>
+        </div>
+
+        <!-- Product 3 -->
+        <div
+          class="snap-start min-w-[260px] md:min-w-0 product-card bg-white rounded-2xl p-4 border border-slate-200 flex flex-col h-full relative cursor-pointer"
+        >
+          <div
+            class="absolute top-4 left-4 bg-accent-red text-white text-[11px] font-bold px-2 py-1 rounded z-10"
+          >
+            -8%
+          </div>
+          <div
+            class="bg-slate-50 rounded-xl aspect-[4/3] p-4 mb-4 flex items-center justify-center overflow-hidden"
+          >
+            <img
+              src="https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=400&q=80"
+              class="object-contain product-img mix-blend-multiply w-full h-full"
+            />
+          </div>
+          <h3
+            class="text-sm font-bold text-slate-800 leading-snug mb-4 line-clamp-2"
+          >
+            HP EliteBook 840 G8 Core i5-11th gen 8GB-256GB Pre-owned AAA+
+          </h3>
+          <div class="mt-auto flex flex-col gap-3">
+            <div>
+              <div
+                class="text-xs text-slate-400 line-through font-semibold mb-0.5"
+              >
+                47,500 ৳
+              </div>
+              <div class="text-lg font-black text-brand-600">43,500 ৳</div>
+            </div>
+            <button
+              class="w-full bg-slate-100 hover:bg-brand-600 text-slate-700 hover:text-white text-sm font-bold py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2"
+            >
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                ></path>
+              </svg>
+              Add to Cart
+            </button>
+          </div>
+        </div>
+
+        <!-- Product 4 -->
+        <div
+          class="snap-start min-w-[260px] md:min-w-0 product-card bg-white rounded-2xl p-4 border border-slate-200 flex flex-col h-full relative cursor-pointer"
+        >
+          <div
+            class="absolute top-4 left-4 bg-accent-red text-white text-[11px] font-bold px-2 py-1 rounded z-10"
+          >
+            -7%
+          </div>
+          <div
+            class="bg-slate-50 rounded-xl aspect-[4/3] p-4 mb-4 flex items-center justify-center overflow-hidden"
+          >
+            <img
+              src="https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=400&q=80"
+              class="object-contain product-img mix-blend-multiply w-full h-full"
+            />
+          </div>
+          <h3
+            class="text-sm font-bold text-slate-800 leading-snug mb-4 line-clamp-2"
+          >
+            Dell Latitude 5330 Core i5-1245U 16-256 GB Pre-owned AAA+
+          </h3>
+          <div class="mt-auto flex flex-col gap-3">
+            <div>
+              <div
+                class="text-xs text-slate-400 line-through font-semibold mb-0.5"
+              >
+                60,500 ৳
+              </div>
+              <div class="text-lg font-black text-brand-600">56,500 ৳</div>
+            </div>
+            <button
+              class="w-full bg-slate-100 hover:bg-brand-600 text-slate-700 hover:text-white text-sm font-bold py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2"
+            >
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                ></path>
+              </svg>
+              Add to Cart
+            </button>
+          </div>
+        </div>
+
+        <!-- Product 5 -->
+        <div
+          class="snap-start min-w-[260px] md:min-w-0 product-card bg-white rounded-2xl p-4 border border-slate-200 flex flex-col h-full relative cursor-pointer"
+        >
+          <div
+            class="absolute top-4 left-4 bg-accent-red text-white text-[11px] font-bold px-2 py-1 rounded z-10"
+          >
+            -5%
+          </div>
+          <div
+            class="bg-slate-50 rounded-xl aspect-[4/3] p-4 mb-4 flex items-center justify-center overflow-hidden"
+          >
+            <img
+              src="https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?auto=format&fit=crop&w=400&q=80"
+              class="object-contain product-img mix-blend-multiply w-full h-full"
+            />
+          </div>
+          <h3
+            class="text-sm font-bold text-slate-800 leading-snug mb-4 line-clamp-2"
+          >
+            HP OmniBook 7 Laptop 16-az0001nx Intel Core(TM) 5 210H 16GB-512GB
+            Pre-Owned AAA+
+          </h3>
+          <div class="mt-auto flex flex-col gap-3">
+            <div>
+              <div
+                class="text-xs text-slate-400 line-through font-semibold mb-0.5"
+              >
+                92,500 ৳
+              </div>
+              <div class="text-lg font-black text-brand-600">87,500 ৳</div>
+            </div>
+            <button
+              class="w-full bg-slate-100 hover:bg-brand-600 text-slate-700 hover:text-white text-sm font-bold py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2"
+            >
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                ></path>
+              </svg>
+              Add to Cart
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: Student Budgeted Laptop -->
+    <section class="bg-slate-100 border-y border-slate-200">
+      <div class="max-w-[1400px] mx-auto px-4 py-16">
+        <div class="text-center mb-10">
+          <h2
+            class="text-3xl md:text-4xl font-black tracking-tight text-slate-900 mb-2"
+          >
+            Student Budgeted Laptop
+          </h2>
+          <p class="text-slate-500 font-medium">The best we offer is here</p>
+        </div>
+
+        <div
+          class="flex overflow-x-auto hide-scrollbar snap-x snap-mandatory gap-5 pb-6 md:grid md:grid-cols-3 lg:grid-cols-5"
+        >
+          <!-- Student Product 1 -->
+          <div
+            class="snap-start min-w-[260px] md:min-w-0 product-card bg-white rounded-2xl p-4 border border-slate-200 flex flex-col h-full relative"
+          >
+            <div
+              class="absolute top-4 left-4 bg-accent-red text-white text-[11px] font-bold px-2 py-1 rounded z-10"
+            >
+              -7%
+            </div>
+            <div
+              class="p-4 mb-2 flex items-center justify-center h-40 overflow-hidden"
+            >
+              <img
+                src="https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=400&q=80"
+                class="object-contain product-img mix-blend-multiply h-full"
+              />
+            </div>
+            <h3
+              class="text-sm font-bold text-slate-800 leading-snug mb-4 line-clamp-2"
+            >
+              Dell Latitude 5330 Core i5-1245U 16-256 GB Pre-owned AAA+
+            </h3>
+            <div class="mt-auto flex flex-col gap-3">
+              <div>
+                <div
+                  class="text-xs text-slate-400 line-through font-semibold mb-0.5"
+                >
+                  60,500 ৳
+                </div>
+                <div class="text-lg font-black text-brand-600">56,500 ৳</div>
+              </div>
+              <button
+                class="w-full bg-slate-100 hover:bg-brand-600 text-slate-700 hover:text-white text-sm font-bold py-2.5 rounded-lg transition-colors"
+              >
+                Add to Cart
+              </button>
+            </div>
+          </div>
+
+          <!-- Student Product 2 -->
+          <div
+            class="snap-start min-w-[260px] md:min-w-0 product-card bg-white rounded-2xl p-4 border border-slate-200 flex flex-col h-full relative"
+          >
+            <div
+              class="absolute top-4 left-4 bg-accent-red text-white text-[11px] font-bold px-2 py-1 rounded z-10"
+            >
+              -3%
+            </div>
+            <div
+              class="p-4 mb-2 flex items-center justify-center h-40 overflow-hidden"
+            >
+              <img
+                src="https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=400&q=80"
+                class="object-contain product-img mix-blend-multiply h-full"
+              />
+            </div>
+            <h3
+              class="text-sm font-bold text-slate-800 leading-snug mb-4 line-clamp-2"
+            >
+              HP Dragonfly G4 13.5-inch Core i5-1345U 16-512 GB Pre-owned touch
+              AAA+
+            </h3>
+            <div class="mt-auto flex flex-col gap-3">
+              <div>
+                <div
+                  class="text-xs text-slate-400 line-through font-semibold mb-0.5"
+                >
+                  95,000 ৳
+                </div>
+                <div class="text-lg font-black text-brand-600">92,000 ৳</div>
+              </div>
+              <button
+                class="w-full bg-slate-100 hover:bg-brand-600 text-slate-700 hover:text-white text-sm font-bold py-2.5 rounded-lg transition-colors"
+              >
+                Add to Cart
+              </button>
+            </div>
+          </div>
+
+          <!-- Student Product 3 -->
+          <div
+            class="snap-start min-w-[260px] md:min-w-0 product-card bg-white rounded-2xl p-4 border border-slate-200 flex flex-col h-full relative"
+          >
+            <div
+              class="absolute top-4 left-4 bg-accent-red text-white text-[11px] font-bold px-2 py-1 rounded z-10"
+            >
+              -6%
+            </div>
+            <div
+              class="p-4 mb-2 flex items-center justify-center h-40 overflow-hidden"
+            >
+              <img
+                src="https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?auto=format&fit=crop&w=400&q=80"
+                class="object-contain product-img mix-blend-multiply h-full"
+              />
+            </div>
+            <h3
+              class="text-sm font-bold text-slate-800 leading-snug mb-4 line-clamp-2"
+            >
+              Lenovo X1 Carbon Core i7-8th Gen 16-256 GB Pre-owned AAA+
+            </h3>
+            <div class="mt-auto flex flex-col gap-3">
+              <div>
+                <div
+                  class="text-xs text-slate-400 line-through font-semibold mb-0.5"
+                >
+                  50,500 ৳
+                </div>
+                <div class="text-lg font-black text-brand-600">47,500 ৳</div>
+              </div>
+              <button
+                class="w-full bg-slate-100 hover:bg-brand-600 text-slate-700 hover:text-white text-sm font-bold py-2.5 rounded-lg transition-colors"
+              >
+                Add to Cart
+              </button>
+            </div>
+          </div>
+
+          <!-- Student Product 4 -->
+          <div
+            class="snap-start min-w-[260px] md:min-w-0 product-card bg-white rounded-2xl p-4 border border-slate-200 flex flex-col h-full relative"
+          >
+            <div
+              class="absolute top-4 left-4 bg-accent-red text-white text-[11px] font-bold px-2 py-1 rounded z-10"
+            >
+              -6%
+            </div>
+            <div
+              class="p-4 mb-2 flex items-center justify-center h-40 overflow-hidden"
+            >
+              <img
+                src="https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?auto=format&fit=crop&w=400&q=80"
+                class="object-contain product-img mix-blend-multiply h-full"
+              />
+            </div>
+            <h3
+              class="text-sm font-bold text-slate-800 leading-snug mb-4 line-clamp-2"
+            >
+              HP EliteBoo 645-G9 AMD Ryzen 7 PRO 5875U 8-256 GB Pre-owned AAA+
+            </h3>
+            <div class="mt-auto flex flex-col gap-3">
+              <div>
+                <div
+                  class="text-xs text-slate-400 line-through font-semibold mb-0.5"
+                >
+                  50,500 ৳
+                </div>
+                <div class="text-lg font-black text-brand-600">47,500 ৳</div>
+              </div>
+              <button
+                class="w-full bg-slate-100 hover:bg-brand-600 text-slate-700 hover:text-white text-sm font-bold py-2.5 rounded-lg transition-colors"
+              >
+                Add to Cart
+              </button>
+            </div>
+          </div>
+
+          <!-- Student Product 5 -->
+          <div
+            class="snap-start min-w-[260px] md:min-w-0 product-card bg-white rounded-2xl p-4 border border-slate-200 flex flex-col h-full relative"
+          >
+            <div
+              class="absolute top-4 left-4 bg-accent-red text-white text-[11px] font-bold px-2 py-1 rounded z-10"
+            >
+              -7%
+            </div>
+            <div
+              class="p-4 mb-2 flex items-center justify-center h-40 overflow-hidden"
+            >
+              <img
+                src="https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?auto=format&fit=crop&w=400&q=80"
+                class="object-contain product-img mix-blend-multiply h-full"
+              />
+            </div>
+            <h3
+              class="text-sm font-bold text-slate-800 leading-snug mb-4 line-clamp-2"
+            >
+              Lenovo Thikpad X1 Carbon Core i5-8th Gen 8-256 GB Used AAA+
+            </h3>
+            <div class="mt-auto flex flex-col gap-3">
+              <div>
+                <div
+                  class="text-xs text-slate-400 line-through font-semibold mb-0.5"
+                >
+                  45,500 ৳
+                </div>
+                <div class="text-lg font-black text-brand-600">42,500 ৳</div>
+              </div>
+              <button
+                class="w-full bg-slate-100 hover:bg-brand-600 text-slate-700 hover:text-white text-sm font-bold py-2.5 rounded-lg transition-colors"
+              >
+                Add to Cart
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: Gaming Laptop -->
+    <section class="max-w-[1400px] mx-auto px-4 py-16">
+      <div class="flex flex-col items-center mb-10 text-center">
+        <h2
+          class="text-3xl md:text-4xl font-black tracking-tight text-slate-900 mb-2"
+        >
+          Attractive Gaming Laptop
+        </h2>
+        <p class="text-slate-500 font-medium">
+          The best product we offer is here
+        </p>
+      </div>
+
+      <div
+        class="flex overflow-x-auto hide-scrollbar snap-x snap-mandatory gap-5 pb-6 md:grid md:grid-cols-3 lg:grid-cols-5"
+      >
+        <!-- Out of Stock Gaming Product -->
+        <div
+          class="snap-start min-w-[260px] md:min-w-0 bg-white rounded-2xl p-4 border border-slate-200 flex flex-col h-full relative opacity-70"
+        >
+          <div
+            class="absolute top-4 left-4 bg-slate-800 text-white text-[11px] font-bold px-2.5 py-1 rounded z-10"
+          >
+            Out Of Stock
+          </div>
+          <div
+            class="absolute top-4 right-4 bg-accent-red text-white text-[11px] font-bold px-2 py-1 rounded z-10"
+          >
+            -4%
+          </div>
+          <div class="p-4 mb-4 flex items-center justify-center h-40">
+            <img
+              src="https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=400&q=80"
+              class="object-contain mix-blend-multiply h-full grayscale"
+            />
+          </div>
+          <h3
+            class="text-sm font-bold text-slate-500 leading-snug mb-4 line-clamp-3"
+          >
+            Lenovo LOQ 15APH8 Gaming Laptop Ryzen 7 7840HS 16/512GB SSD Used
+            AAA+
+          </h3>
+          <div class="mt-auto flex flex-col gap-3">
+            <div>
+              <div
+                class="text-xs text-slate-400 line-through font-semibold mb-0.5"
+              >
+                90,000/- ৳
+              </div>
+              <div class="text-lg font-black text-slate-600">86,500/- ৳</div>
+            </div>
+            <button
+              disabled
+              class="w-full bg-slate-100 text-slate-400 text-sm font-bold py-2.5 rounded-lg cursor-not-allowed"
+            >
+              Add to Cart
+            </button>
+          </div>
+        </div>
+
+        <!-- Gaming Product 2 -->
+        <div
+          class="snap-start min-w-[260px] md:min-w-0 product-card bg-white rounded-2xl p-4 border border-slate-200 flex flex-col h-full relative cursor-pointer"
+        >
+          <div
+            class="absolute top-4 left-4 bg-accent-red text-white text-[11px] font-bold px-2 py-1 rounded z-10"
+          >
+            -3%
+          </div>
+          <div
+            class="p-4 mb-4 flex items-center justify-center h-40 overflow-hidden"
+          >
+            <img
+              src="https://images.unsplash.com/photo-1593640408182-31c70c8268f5?auto=format&fit=crop&w=400&q=80"
+              class="object-contain product-img mix-blend-multiply h-full"
+            />
+          </div>
+          <h3
+            class="text-sm font-bold text-slate-800 leading-snug mb-4 line-clamp-3"
+          >
+            Acer Nitro V15 ANV15-52-57BB Intel Core i5-13420H 16-512 GB NVIDIA
+            GeForce RTX 5050 with 8GB Graphics 15.6" FHD Gaming Laptop
+          </h3>
+          <div class="mt-auto flex flex-col gap-3">
+            <div>
+              <div
+                class="text-xs text-slate-400 line-through font-semibold mb-0.5"
+              >
+                140,000 ৳
+              </div>
+              <div class="text-lg font-black text-brand-600">135,500 ৳</div>
+            </div>
+            <button
+              class="w-full bg-slate-100 hover:bg-brand-600 text-slate-700 hover:text-white text-sm font-bold py-2.5 rounded-lg transition-colors"
+            >
+              Add to Cart
+            </button>
+          </div>
+        </div>
+
+        <!-- Gaming Product 3 -->
+        <div
+          class="snap-start min-w-[260px] md:min-w-0 product-card bg-white rounded-2xl p-4 border border-slate-200 flex flex-col h-full relative cursor-pointer"
+        >
+          <div
+            class="absolute top-4 left-4 bg-accent-red text-white text-[11px] font-bold px-2 py-1 rounded z-10"
+          >
+            -9%
+          </div>
+          <div
+            class="p-4 mb-4 flex items-center justify-center h-40 overflow-hidden"
+          >
+            <img
+              src="https://images.unsplash.com/photo-1593640495253-23196b27a87f?auto=format&fit=crop&w=400&q=80"
+              class="object-contain product-img mix-blend-multiply h-full"
+            />
+          </div>
+          <h3
+            class="text-sm font-bold text-slate-800 leading-snug mb-4 line-clamp-3"
+          >
+            HP VICTUS 15-FB3093DX AMD Ryzen 7 7445HS 16-512 GB NVIDIA GeForce
+            RTX 4050 With 6GB Graphic 15.6" Gaming Laptop Certified Refurbished
+          </h3>
+          <div class="mt-auto flex flex-col gap-3">
+            <div>
+              <div
+                class="text-xs text-slate-400 line-through font-semibold mb-0.5"
+              >
+                115,500 ৳
+              </div>
+              <div class="text-lg font-black text-brand-600">105,500 ৳</div>
+            </div>
+            <button
+              class="w-full bg-slate-100 hover:bg-brand-600 text-slate-700 hover:text-white text-sm font-bold py-2.5 rounded-lg transition-colors"
+            >
+              Add to Cart
+            </button>
+          </div>
+        </div>
+
+        <!-- Out of Stock Gaming Product -->
+        <div
+          class="snap-start min-w-[260px] md:min-w-0 bg-white rounded-2xl p-4 border border-slate-200 flex flex-col h-full relative opacity-70"
+        >
+          <div
+            class="absolute top-4 left-4 bg-slate-800 text-white text-[11px] font-bold px-2.5 py-1 rounded z-10"
+          >
+            Out Of Stock
+          </div>
+          <div
+            class="absolute top-4 right-4 bg-accent-red text-white text-[11px] font-bold px-2 py-1 rounded z-10"
+          >
+            -7%
+          </div>
+          <div class="p-4 mb-4 flex items-center justify-center h-40">
+            <img
+              src="https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=400&q=80"
+              class="object-contain mix-blend-multiply h-full grayscale"
+            />
+          </div>
+          <h3
+            class="text-sm font-bold text-slate-500 leading-snug mb-4 line-clamp-3"
+          >
+            ASUS TUF Gaming A16 (2024) FA607NUG-WH73 Ryzen 7-7445HS RTX 4050 6
+            GB GPU 16-512 GB Brand New
+          </h3>
+          <div class="mt-auto flex flex-col gap-3">
+            <div>
+              <div
+                class="text-xs text-slate-400 line-through font-semibold mb-0.5"
+              >
+                140,500 ৳
+              </div>
+              <div class="text-lg font-black text-slate-600">130,500 ৳</div>
+            </div>
+            <button
+              disabled
+              class="w-full bg-slate-100 text-slate-400 text-sm font-bold py-2.5 rounded-lg cursor-not-allowed"
+            >
+              Add to Cart
+            </button>
+          </div>
+        </div>
+
+        <!-- Out of Stock Gaming Product -->
+        <div
+          class="snap-start min-w-[260px] md:min-w-0 bg-white rounded-2xl p-4 border border-slate-200 flex flex-col h-full relative opacity-70"
+        >
+          <div
+            class="absolute top-4 left-4 bg-slate-800 text-white text-[11px] font-bold px-2.5 py-1 rounded z-10"
+          >
+            Out Of Stock
+          </div>
+          <div
+            class="absolute top-4 right-4 bg-accent-red text-white text-[11px] font-bold px-2 py-1 rounded z-10"
+          >
+            -3%
+          </div>
+          <div class="p-4 mb-4 flex items-center justify-center h-40">
+            <img
+              src="https://images.unsplash.com/photo-1593640495253-23196b27a87f?auto=format&fit=crop&w=400&q=80"
+              class="object-contain mix-blend-multiply h-full grayscale"
+            />
+          </div>
+          <h3
+            class="text-sm font-bold text-slate-500 leading-snug mb-4 line-clamp-3"
+          >
+            HP Victus 15-fa2082wm Intel Core i5-13420H RTX 4050 With 6GB 15.6"
+            Gaming Laptop Brand New
+          </h3>
+          <div class="mt-auto flex flex-col gap-3">
+            <div>
+              <div
+                class="text-xs text-slate-400 line-through font-semibold mb-0.5"
+              >
+                130,000 ৳
+              </div>
+              <div class="text-lg font-black text-slate-600">125,500 ৳</div>
+            </div>
+            <button
+              disabled
+              class="w-full bg-slate-100 text-slate-400 text-sm font-bold py-2.5 rounded-lg cursor-not-allowed"
+            >
+              Add to Cart
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-center mt-6">
+        <button
+          class="bg-[#9c1642] hover:bg-brand-600 text-white font-bold py-3.5 px-10 rounded-lg transition-colors shadow-md hover:shadow-lg"
+        >
+          See More Products
+        </button>
+      </div>
+    </section>
+
+    <!-- Why Choose Us Grid -->
+    <section class="bg-white border-y border-slate-200">
+      <div class="max-w-[1400px] mx-auto px-4 py-16">
+        <h2 class="text-3xl font-black text-center text-slate-900 mb-12">
+          Why Choose Us?
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
+          <!-- Box 1 -->
+          <div
+            class="bg-slate-50 border border-slate-100 p-6 rounded-2xl text-center hover:shadow-md transition-shadow"
+          >
+            <div
+              class="w-14 h-14 mx-auto bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-4"
+            >
+              <svg
+                class="w-7 h-7"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                ></path>
+              </svg>
+            </div>
+            <h4 class="text-[15px] font-bold text-[#9c1642] mb-2">
+              Wide Varieties
+            </h4>
+            <p class="text-xs text-slate-600 font-medium leading-relaxed">
+              We have a wide collection of laptops from different brands. We
+              have brand new and pre-owned laptops in our collection.
+            </p>
+          </div>
+          <!-- Box 2 -->
+          <div
+            class="bg-slate-50 border border-slate-100 p-6 rounded-2xl text-center hover:shadow-md transition-shadow"
+          >
+            <div
+              class="w-14 h-14 mx-auto bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-4"
+            >
+              <svg
+                class="w-7 h-7"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.963 11.963 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                ></path>
+              </svg>
+            </div>
+            <h4 class="text-[15px] font-bold text-[#9c1642] mb-2">
+              Trusted and Reliable
+            </h4>
+            <p class="text-xs text-slate-600 font-medium leading-relaxed">
+              We are trusted and reliable shop. We provide you with the best
+              services and good quality products.
+            </p>
+          </div>
+          <!-- Box 3 -->
+          <div
+            class="bg-slate-50 border border-slate-100 p-6 rounded-2xl text-center hover:shadow-md transition-shadow"
+          >
+            <div
+              class="w-14 h-14 mx-auto bg-indigo-100 text-brand-600 rounded-full flex items-center justify-center mb-4"
+            >
+              <svg
+                class="w-7 h-7"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                ></path>
+              </svg>
+            </div>
+            <h4 class="text-[15px] font-bold text-[#9c1642] mb-2">
+              Best Service
+            </h4>
+            <p class="text-xs text-slate-600 font-medium leading-relaxed">
+              We provide you with the best after sell services. Any problem, you
+              take it to us and we will solve it.
+            </p>
+          </div>
+          <!-- Box 4 -->
+          <div
+            class="bg-slate-50 border border-slate-100 p-6 rounded-2xl text-center hover:shadow-md transition-shadow"
+          >
+            <div
+              class="w-14 h-14 mx-auto bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mb-4"
+            >
+              <svg
+                class="w-7 h-7"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                ></path>
+              </svg>
+            </div>
+            <h4 class="text-[15px] font-bold text-[#9c1642] mb-2">
+              Best Price in Market
+            </h4>
+            <p class="text-xs text-slate-600 font-medium leading-relaxed">
+              We will give you the best and lowest possible price in market.
+            </p>
+          </div>
+          <!-- Box 5 -->
+          <div
+            class="bg-slate-50 border border-slate-100 p-6 rounded-2xl text-center hover:shadow-md transition-shadow"
+          >
+            <div
+              class="w-14 h-14 mx-auto bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mb-4"
+            >
+              <svg
+                class="w-7 h-7"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13 10V3L4 14h7v7l9-11h-7z"
+                ></path>
+              </svg>
+            </div>
+            <h4 class="text-[15px] font-bold text-[#9c1642] mb-2">
+              Fast Delivary
+            </h4>
+            <p class="text-xs text-slate-600 font-medium leading-relaxed">
+              We deliver our products carefully as fast as possible at your door
+              step.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Structured Dark Footer for High Contrast -->
+    <footer
+      class="bg-[#1e293b] text-slate-300 pt-16 pb-8 border-t-[8px] border-brand-600"
+    >
+      <div
+        class="max-w-[1400px] mx-auto px-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8"
+      >
+        <!-- Address Col -->
+        <div>
+          <h3 class="text-white text-lg font-black mb-6">Address</h3>
+          <ul class="space-y-5 text-sm font-medium">
+            <li class="flex items-start gap-3">
+              <svg
+                class="w-5 h-5 text-brand-500 shrink-0 mt-0.5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                ></path>
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                ></path>
+              </svg>
+              <span
+                ><strong class="text-white block mb-1">Shop # 4D-014B1</strong>
+                East court, Block # D, Level #04, Jamuna Future Park, Dhaka
+                -1229</span
+              >
+            </li>
+            <li class="flex items-start gap-3">
+              <svg
+                class="w-5 h-5 text-slate-500 shrink-0 mt-0.5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                ></path>
+              </svg>
+              <span
+                ><strong class="text-white block mb-1">Shop # 33</strong> level
+                6, Block D, Bashundhara City Shopping complex, West Panthapath,
+                Dhaka - 1215</span
+              >
+            </li>
+            <li class="flex items-start gap-3">
+              <svg
+                class="w-5 h-5 text-slate-500 shrink-0 mt-0.5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                ></path>
+              </svg>
+              <span
+                ><strong class="text-white block mb-1"
+                  >Shop # 607 (5th Floor)</strong
+                >
+                Rajuk Commercial-Complex, Azampur, Uttara, Dhaka-1230</span
+              >
+            </li>
+          </ul>
+        </div>
+
+        <!-- Company Col -->
+        <div>
+          <h3 class="text-white text-lg font-black mb-6">Company</h3>
+          <ul class="space-y-3 text-sm font-medium">
+            <li>
+              <a
+                href="#"
+                class="hover:text-white transition flex items-center gap-2"
+                ><span class="w-1.5 h-1.5 rounded-full bg-slate-600"></span>
+                About Us</a
+              >
+            </li>
+            <li>
+              <a
+                href="#"
+                class="hover:text-white transition flex items-center gap-2"
+                ><span class="w-1.5 h-1.5 rounded-full bg-slate-600"></span>
+                Terms & Conditions</a
+              >
+            </li>
+            <li>
+              <a
+                href="#"
+                class="hover:text-white transition flex items-center gap-2"
+                ><span class="w-1.5 h-1.5 rounded-full bg-slate-600"></span>
+                Privay Policy</a
+              >
+            </li>
+            <li>
+              <a
+                href="#"
+                class="hover:text-white transition flex items-center gap-2"
+                ><span class="w-1.5 h-1.5 rounded-full bg-slate-600"></span> My
+                account</a
+              >
+            </li>
+            <li>
+              <a
+                href="#"
+                class="hover:text-white transition flex items-center gap-2"
+                ><span class="w-1.5 h-1.5 rounded-full bg-slate-600"></span>
+                Refund & Service Policy</a
+              >
+            </li>
+          </ul>
+        </div>
+
+        <!-- Contact Col -->
+        <div>
+          <h3 class="text-white text-lg font-black mb-6">Contact</h3>
+          <div class="space-y-4 text-sm font-medium">
+            <div>
+              <span class="block text-slate-500 mb-1">Phone:</span>
+              <div class="mb-1 text-slate-400">
+                Outlet 01 Uttara -
+                <a
+                  href="tel:01901643831"
+                  class="text-white hover:text-brand-400 font-semibold"
+                  >01901-643831</a
+                >,
+                <a
+                  href="tel:01901643834"
+                  class="text-white hover:text-brand-400 font-semibold"
+                  >01901-643834</a
+                >
+              </div>
+              <div class="mb-1 text-slate-400">
+                Outlet 02 Jamuna -
+                <a
+                  href="tel:01901643835"
+                  class="text-white hover:text-brand-400 font-semibold"
+                  >01901-643835</a
+                >,
+                <a
+                  href="tel:01901643836"
+                  class="text-white hover:text-brand-400 font-semibold"
+                  >01901-643836</a
+                >
+              </div>
+              <div class="text-slate-400">
+                Outlet 03 Bashundhara city -
+                <a
+                  href="tel:01901643832"
+                  class="text-white hover:text-brand-400 font-semibold"
+                  >01901-643832</a
+                >,
+                <a
+                  href="tel:01901643833"
+                  class="text-white hover:text-brand-400 font-semibold"
+                  >01901-643833</a
+                >
+              </div>
+            </div>
+            <div>
+              <span class="block text-slate-500 mb-1">Email:</span>
+              <a
+                href="mailto:info@lappyvalley.com"
+                class="text-white font-bold hover:text-brand-400"
+                >info@lappyvalley.com</a
+              >
+            </div>
+            <div class="pt-2">
+              <a href="#" class="block text-brand-400 hover:text-white mb-1"
+                >Map Link : In Uttra (Dhaka)</a
+              >
+              <a href="#" class="block text-brand-400 hover:text-white"
+                >Map Link: In Jamuna Future Park (Dhaka)</a
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- Trust Partners Col -->
+        <div>
+          <h3 class="text-white text-lg font-black mb-6">Our Partners</h3>
+          <!-- Monochromatic minimal logos for a clean footer look -->
+          <div class="grid grid-cols-4 gap-2 mb-6">
+            <div
+              class="bg-slate-800 h-10 rounded flex items-center justify-center text-[10px] font-bold text-slate-400 uppercase"
+            >
+              Visa
+            </div>
+            <div
+              class="bg-slate-800 h-10 rounded flex items-center justify-center text-[10px] font-bold text-slate-400 uppercase"
+            >
+              Master
+            </div>
+            <div
+              class="bg-slate-800 h-10 rounded flex items-center justify-center text-[10px] font-bold text-slate-400 uppercase"
+            >
+              Amex
+            </div>
+            <div
+              class="bg-slate-800 h-10 rounded flex items-center justify-center text-[10px] font-bold text-slate-400 uppercase"
+            >
+              bKash
+            </div>
+            <div
+              class="bg-slate-800 h-10 rounded flex items-center justify-center text-[10px] font-bold text-slate-400 uppercase"
+            >
+              Nagad
+            </div>
+            <div
+              class="bg-slate-800 h-10 rounded flex items-center justify-center text-[10px] font-bold text-slate-400 uppercase leading-[1.1] text-center"
+            >
+              SSL<br />Cmrz
+            </div>
+          </div>
+
+          <div
+            class="bg-slate-800 p-3 rounded-lg border border-slate-700 flex items-center gap-3 w-fit mb-6"
+          >
+            <div
+              class="w-8 h-8 rounded bg-emerald-600 flex items-center justify-center font-black text-white text-xs"
+            >
+              BCS
+            </div>
+            <span class="text-xs font-bold text-white">Verified Member</span>
+          </div>
+
+          <div class="text-xs text-slate-500 space-y-1 font-mono">
+            <div>Trade license: 202984</div>
+            <div>Bin Number: 0049818790102</div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="max-w-[1400px] mx-auto px-4 mt-12 pt-6 border-t border-slate-700/50 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-medium text-slate-500"
+      >
+        <p>
+          © 2026 lappyvalley.com, All Rights Reserved || Developed By Innovative
+          Skills BD
+        </p>
+        <div class="flex gap-4">
+          <a
+            href="#"
+            class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center hover:bg-brand-600 hover:text-white transition"
+            ><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <path
+                d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"
+              /></svg
+          ></a>
+          <a
+            href="#"
+            class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center hover:bg-brand-600 hover:text-white transition"
+            ><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <path
+                d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"
+              /></svg
+          ></a>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Essential WhatsApp Button -->
+    <a
+      href="#"
+      class="fixed bottom-6 right-6 bg-[#25D366] text-white p-4 rounded-full shadow-[0_10px_20px_rgba(37,211,102,0.3)] hover:scale-110 hover:bg-[#1ebd5a] transition-all duration-300 z-50 flex items-center justify-center"
+    >
+      <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
+        <path
+          d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.898-4.45 9.896-9.898-.002-5.462-4.452-9.89-9.9-9.89-5.45 0-9.898 4.43-9.896 9.884.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.761-.97z"
+        />
+      </svg>
+    </a>
+  </body>
+</html>
