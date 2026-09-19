@@ -9130,11 +9130,11 @@ function initBarcodeGenerator(pane) {
                 pane.style.bottom = 'calc(85px + env(safe-area-inset-bottom))'; 
                 pane.style.left = '0.5rem';
                 pane.style.right = '0.5rem';
-                pane.style.borderRadius = '1.25rem';
+               pane.style.borderRadius = '1.25rem';
                 pane.style.zIndex = '35';
                 pane.style.boxShadow = '0 10px 40px rgba(0,0,0,0.8)';
                 pane.style.border = '1px solid var(--border-color)';
-                pane.className = 'flex flex-col bg-bg-primary overflow-hidden';
+                pane.className = 'view-pane flex flex-col bg-bg-primary overflow-hidden';
 
                 if (!document.getElementById('mpos-styles')) {
                     document.head.insertAdjacentHTML('beforeend', `<style id="mpos-styles">
@@ -9254,30 +9254,30 @@ function initBarcodeGenerator(pane) {
                     }
                 });
 
-                // FIX: Use mousedown AND touchstart to fire before input blur hides the div!
-                const handleSearchSelect = (e) => {
+              // Better approach: use native click and delayed blur for robust mobile support
+                resultsDiv.addEventListener('click', (e) => {
                     const itemDiv = e.target.closest('[data-add-id]');
                     if(itemDiv) {
-                        e.preventDefault(); // Prevents input blur from executing instantly
                         const product = firestoreData.products.find(p => p.id === itemDiv.dataset.addId);
                         if(product) {
-                            addProductToActiveCart(product);
+                            window.addProductToActiveCart(product);
                             searchInput.value = '';
                             resultsDiv.classList.add('hidden');
-                            searchInput.blur(); // Dismiss keyboard
+                            
+                            // Animate floating cart icon as feedback
+                            const floatCart = document.getElementById('mobile-floating-cart');
+                            if(floatCart && window.innerWidth < 1024) {
+                                floatCart.classList.add('scale-105', 'ring-4', 'ring-accent');
+                                setTimeout(() => floatCart.classList.remove('scale-105', 'ring-4', 'ring-accent'), 400);
+                            }
                         }
                     }
-                };
-                resultsDiv.addEventListener('mousedown', handleSearchSelect);
-                resultsDiv.addEventListener('touchstart', handleSearchSelect, { passive: false });
+                });
 
-                // Hide search results if clicked outside
-                const hideSearchListener = (e) => {
-                    if (pane.contains(searchInput) && !searchInput.contains(e.target) && !resultsDiv.contains(e.target)) {
-                        resultsDiv.classList.add('hidden');
-                    }
-                };
-                document.addEventListener('click', hideSearchListener);
+                searchInput.addEventListener('blur', () => {
+                    // Delay hiding results so the tap event has time to register on mobile
+                    setTimeout(() => resultsDiv.classList.add('hidden'), 250);
+                });
 
                 // --- Robust ZXing Scanner Logic ---
                 if (!window.mposCodeReader) {

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biodata - Munni Akter</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts: Lora (Elegant Serif) & Quicksand (Rounded, Friendly, "Smily" Sans) -->
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        peach: {
+                            50: '#FFF9F5',
+                            100: '#FFF0E6',
+                            200: '#FFE1CC',
+                            300: '#FFC8A6',
+                            800: '#B35E30',
+                            900: '#8C451F',
+                        },
+                        warmgrey: {
+                            100: '#F7F6F5',
+                            500: '#8A817C',
+                            700: '#5C544F',
+                            900: '#3D3632',
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['"Lora"', 'serif'],
+                        sans: ['"Quicksand"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* A4 Setup */
+        :root {
+            --a4-width: 210mm;
+            --a4-height: 297mm;
+        }
+
+        body {
+            background-color: #e5e7eb;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        .a4-page {
+            width: var(--a4-width);
+            height: var(--a4-height);
+            background: #FFFFFF;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            overflow: hidden;
+            display: flex;
+            position: relative;
+        }
+
+        /* Print Media Query */
+        @media print {
+            @page {
+                size: A4;
+                margin: 0;
+            }
+            body {
+                background: none;
+                padding: 0;
+            }
+            .a4-page {
+                box-shadow: none;
+                width: 100%;
+                height: 100%;
+            }
+        }
+
+        /* Minimalist Soft Underline for Headings */
+        .soft-underline {
+            position: relative;
+            display: inline-block;
+        }
+        .soft-underline::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background-color: rgba(255, 225, 204, 0.6);
+            border-radius: 4px;
+            z-index: -1;
+        }
+
+        .icon-circle {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: #FFF0E6;
+            color: #D97A4A;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body class="font-sans text-warmgrey-700 antialiased">
+
+    <div class="a4-page">
+        <!-- LEFT SIDEBAR - WARM PEACH -->
+        <div class="w-[34%] bg-peach-50 h-full p-8 flex flex-col relative border-r border-peach-100">
+            
+            <!-- Soft Monogram -->
+            <div class="flex flex-col items-center mt-0 mb-6">
+                <div class="w-24 h-24 rounded-3xl bg-peach-100 flex items-center justify-center shadow-sm rotate-3">
+                    <div class="w-24 h-24 rounded-3xl bg-white flex items-center justify-center -rotate-3 border border-peach-200">
+                        <span class="font-serif text-4xl text-peach-800">M</span>
+                    </div>
+                </div>
+                <div class="mt-4 text-[10.5px] tracking-[0.25em] text-peach-800 uppercase font-bold text-center">
+                    Marriage Biodata
+                </div>
+            </div>
+
+            <!-- Contact Section -->
+            <div class="mb-6">
+                <h2 class="font-serif text-[19px] text-warmgrey-900 mb-4 tracking-wide font-medium soft-underline">
+                    Contact Info
+                </h2>
+                <div class="space-y-4 text-[14px] leading-relaxed">
+                    <div class="flex items-start gap-3">
+                        <i class="fa-solid fa-envelope mt-1.5 text-peach-800 text-[12px]"></i>
+                        <div>
+                            <p class="font-bold text-warmgrey-900">Email Address</p>
+                            <p class="text-warmgrey-700 font-semibold mt-0.5 font-[1vw]break-all">munianurmunni@gmail.com</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Personal Details Section -->
+            <div class="flex-grow">
+                <h2 class="font-serif text-[19px] text-warmgrey-900 mb-4 tracking-wide font-medium soft-underline">
+                    Personal Details
+                </h2>
+                <div class="space-y-3.5 text-[14.5px] leading-snug">
+                    <div>
+                        <p class="font-bold text-[11px] uppercase tracking-wider text-peach-800 mb-0.5">Date of Birth</p>
+                        <p class="font-semibold text-warmgrey-900">02-01-2000</p>
+                    </div>
+                    <div>
+                        <p class="font-bold text-[11px] uppercase tracking-wider text-peach-800 mb-0.5">Height</p>
+                        <p class="font-semibold text-warmgrey-900">5 Feet (Nearly)</p>
+                    </div>
+                    <div>
+                        <p class="font-bold text-[11px] uppercase tracking-wider text-peach-800 mb-0.5">Complexion</p>
+                        <p class="font-semibold text-warmgrey-900">Wheatish</p>
+                    </div>
+                    <div>
+                        <p class="font-bold text-[11px] uppercase tracking-wider text-peach-800 mb-0.5">Blood Group</p>
+                        <p class="font-semibold text-warmgrey-900">O+ (Positive)</p>
+                    </div>
+                    <div>
+                        <p class="font-bold text-[11px] uppercase tracking-wider text-peach-800 mb-0.5">Religion</p>
+                        <p class="font-semibold text-warmgrey-900">Islam <span class="font-medium text-warmgrey-700">(Practicing Muslim)</span></p>
+                    </div>
+                    <div>
+                        <p class="font-bold text-[11px] uppercase tracking-wider text-peach-800 mb-0.5">Permanent Address</p>
+                        <p class="font-semibold text-warmgrey-900 leading-relaxed">Brahmapur, Sadar, Noakhali.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Soft bottom corner decor -->
+            <div class="absolute bottom-0 left-0 w-24 h-24 bg-peach-100 rounded-tr-full opacity-50"></div>
+        </div>
+
+        <!-- RIGHT MAIN AREA - CLEAN WHITE -->
+        <div class="w-[66%] px-10 pt-7 pb-8 flex flex-col bg-white relative h-full">
+            
+            <!-- Header -->
+            <div class="text-center mb-5 relative z-10">
+                <p class="text-[17px] font-serif text-peach-300 mb-1">﷽</p>
+                <h1 class="text-[2.6rem] font-serif text-warmgrey-900 leading-none mb-3 tracking-tight">Munni Akter</h1>
+                
+                <p class="text-[13px] font-bold text-peach-900 bg-peach-100/80 inline-block px-5 py-1.5 rounded-full mb-1">
+                    Assistant Teacher (Recommended)<span class="text-peach-800 font-medium"</span>
+                </p>
+                <p class="text-[14px] text-warmgrey-500 font-semibold mt-1">Government Primary School</p>
+            </div>
+
+            <!-- About Me -->
+            <div class="mb-5 mt-2">
+                <div class="flex items-center gap-3 mb-2">
+                    <span class="icon-circle"><i class="fa-regular fa-user"></i></span>
+                    <h2 class="font-serif text-[21px] text-warmgrey-900 tracking-wide font-medium">About Me</h2>
+                </div>
+                <p class="text-[14.5px] leading-relaxed text-warmgrey-700 pl-[44px] text-justify font-medium">
+                    By nature, I am a quiet, shy and soft-spoken person. I uphold the values of humility, modesty, honesty, kindness and good manners. I am a practicing Muslim and strive to maintain my religious values in my daily life.
+                </p>
+            </div>
+
+            <!-- Educational Qualification -->
+            <div class="mb-6">
+                <div class="flex items-center gap-3 mb-3">
+                    <span class="icon-circle"><i class="fa-solid fa-graduation-cap"></i></span>
+                    <h2 class="font-serif text-[21px] text-warmgrey-900 tracking-wide font-medium">Educational Qualification</h2>
+                </div>
+                <div class="pl-[44px] space-y-3.5 mt-1">
+                    <div class="relative pl-4 border-l-2 border-peach-200">
+                        <div class="absolute w-2.5 h-2.5 bg-peach-300 rounded-full -left-[5.5px] top-1.5"></div>
+                        <h3 class="text-[15.5px] font-bold text-warmgrey-900">Master of Science (M.Sc.)</h3>
+                        <p class="text-[14.5px] text-warmgrey-500 font-semibold mt-0.5">in Mathematics</p>
+                    </div>
+                    <div class="relative pl-4 border-l-2 border-peach-200">
+                        <div class="absolute w-2.5 h-2.5 bg-peach-300 rounded-full -left-[5.5px] top-1.5"></div>
+                        <h3 class="text-[15.5px] font-bold text-warmgrey-900">Bachelor of Science (B.Sc. Honours)</h3>
+                        <p class="text-[14.5px] text-warmgrey-500 font-semibold mt-0.5">in Mathematics</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Family Details -->
+            <div class="mb-5">
+                <div class="flex items-center gap-3 mb-3">
+                    <span class="icon-circle"><i class="fa-solid fa-users"></i></span>
+                    <h2 class="font-serif text-[21px] text-warmgrey-900 tracking-wide font-medium">Family Details</h2>
+                </div>
+                <div class="pl-[44px]">
+                    <div class="grid grid-cols-1 gap-3.5">
+                        
+                        <!-- Father -->
+                        <div>
+                            <p class="text-[11px] uppercase tracking-wider text-peach-800 font-bold mb-0.5">Father</p>
+                            <p class="text-[15.5px] font-bold text-warmgrey-900">Main Uddin Manik</p>
+                            <p class="text-[14px] text-warmgrey-500 font-semibold mt-0.5">Construction Contractor <span class="italic font-normal">(Former Expatriate)</span></p>
+                        </div>
+                        
+                        <!-- Mother -->
+                        <div>
+                            <p class="text-[11px] uppercase tracking-wider text-peach-800 font-bold mb-0.5">Mother</p>
+                            <p class="text-[15.5px] font-bold text-warmgrey-900">Shahin Akter</p>
+                            <p class="text-[14px] text-warmgrey-500 font-semibold mt-0.5">Homemaker</p>
+                        </div>
+                        
+                        <!-- Siblings -->
+                        <div class="bg-peach-50/50 p-3 rounded-2xl">
+                            <p class="text-[11px] uppercase tracking-wider text-peach-800 font-bold mb-1">Siblings</p>
+                            <p class="text-[15px] font-bold text-warmgrey-900 mb-1.5">1 Sister (Self) and 1 Younger Brother</p>
+                            <div class="mt-1 pl-3 border-l-2 border-peach-200">
+                                <p class="text-[14.5px] font-bold text-warmgrey-900">Shahadat Hosen Sabbir</p>
+                                <p class="text-[13.5px] text-warmgrey-500 mt-0.5 font-semibold">Passed HSC <span class="text-peach-300 mx-1.5">•</span> Preparing to move abroad</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Expectations -->
+            <div class="mb-0 mt-auto">
+                <div class="flex items-center gap-3 mb-3">
+                    <span class="icon-circle"><i class="fa-regular fa-heart"></i></span>
+                    <h2 class="font-serif text-[21px] text-warmgrey-900 tracking-wide font-medium">Expectations from Partner</h2>
+                </div>
+                <div class="pl-[44px]">
+                    <div class="bg-peach-50/80 rounded-3xl p-4 relative">
+                        <i class="fa-solid fa-quote-left absolute top-3 right-4 text-3xl text-peach-200/60"></i>
+                        <p class="text-[14.5px] leading-relaxed text-warmgrey-900 font-semibold relative z-10 text-justify">
+                            Most importantly, I am looking for a practicing, Allah-fearing, caring, good character, mutual respect, understanding and protective partner who will help me stay firm upon Islam and encourage me to become closer to Allah.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>
