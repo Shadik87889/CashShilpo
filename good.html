@@ -3890,17 +3890,21 @@ function handleCustomerExport() {
                 </div>
             `;
             
-           document.body.insertAdjacentHTML('beforeend', content);
+          document.body.insertAdjacentHTML('beforeend', content);
             lucide.createIcons();
 
-            // PERFORMANCE BOOST: Restrict barcode formats to standard retail formats to scan 10x faster
+            // ULTIMATE ENGINE UPGRADE: Restrict formats to 1D only, skipping heavy QR matrix logic
             const hints = new Map();
             hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [
                 ZXing.BarcodeFormat.CODE_128, ZXing.BarcodeFormat.EAN_13, 
                 ZXing.BarcodeFormat.EAN_8, ZXing.BarcodeFormat.UPC_A, 
-                ZXing.BarcodeFormat.UPC_E, ZXing.BarcodeFormat.QR_CODE
+                ZXing.BarcodeFormat.UPC_E
             ]);
             const codeReader = new ZXing.BrowserMultiFormatReader(hints);
+            
+            // INSANE SPEED TWEAK: Default delay is 500ms. We force it to scan every 50ms!
+            codeReader.timeBetweenDecodingAttempts = 50;
+
             const scannerDiv = document.getElementById('native-scanner-view');
 
             const closeScanner = () => {
@@ -3910,12 +3914,14 @@ function handleCustomerExport() {
 
             scannerDiv.querySelector('[data-action="close-scanner"]').addEventListener('click', closeScanner);
 
-            // SUPER POWERFUL CAMERA CONSTRAINTS FOR HD CLARITY & INSTANT AUTOFOCUS
+            // GOLDEN RATIO CONSTRAINTS: 1080p chokes bad phones and causes motion blur. 
+            // 720p @ 60fps is the holy grail for instant, blur-free JS barcode scanning.
             const constraints = {
                 video: {
                     facingMode: "environment",
-                    width: { ideal: 1920, min: 1280 },
-                    height: { ideal: 1080, min: 720 },
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 },
+                    frameRate: { ideal: 60, min: 30 },
                     advanced: [{ focusMode: "continuous" }]
                 }
             };
@@ -9296,16 +9302,18 @@ function initBarcodeGenerator(pane) {
                     setTimeout(() => resultsDiv.classList.add('hidden'), 250);
                 });
 
-               // --- Robust ZXing Scanner Logic ---
+              // --- Robust ZXing Scanner Logic ---
                 if (!window.mposCodeReader) {
-                    // PERFORMANCE BOOST: Restrict barcode formats to standard retail formats to scan 10x faster
+                    // ULTIMATE ENGINE UPGRADE: Restrict formats to 1D only
                     const hints = new Map();
                     hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [
                         ZXing.BarcodeFormat.CODE_128, ZXing.BarcodeFormat.EAN_13, 
                         ZXing.BarcodeFormat.EAN_8, ZXing.BarcodeFormat.UPC_A, 
-                        ZXing.BarcodeFormat.UPC_E, ZXing.BarcodeFormat.QR_CODE
+                        ZXing.BarcodeFormat.UPC_E
                     ]);
                     window.mposCodeReader = new ZXing.BrowserMultiFormatReader(hints);
+                    // INSANE SPEED TWEAK: Drop scanning interval from 500ms to 50ms!
+                    window.mposCodeReader.timeBetweenDecodingAttempts = 50;
                 }
                 const codeReader = window.mposCodeReader;
 
