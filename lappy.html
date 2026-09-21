@@ -1,0 +1,2221 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5.0"
+    />
+    <title>Lappy Valley // New Era of Life</title>
+
+    <!-- Google Fonts: Outfit (Luxury Geometric Sans) & Plus Jakarta Sans (Clean Modern Sans) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              display: ["Outfit", "sans-serif"],
+              sans: ['"Plus Jakarta Sans"', "sans-serif"],
+            },
+            colors: {
+              canvas: "#FBFBFC",
+              surface: "#FFFFFF",
+              slate: {
+                50: "#F8FAFC",
+                100: "#F1F5F9",
+                200: "#E2E8F0",
+                300: "#CBD5E1",
+                400: "#94A3B8",
+                500: "#64748B",
+                600: "#475569",
+                700: "#334155",
+                800: "#1E293B",
+                900: "#0F172A",
+              },
+              accent: {
+                blue: "#2563EB",
+                azure: "#3B82F6",
+                gold: "#C5A880",
+                emerald: "#059669",
+              },
+            },
+            boxShadow: {
+              soft: "0 20px 40px -15px rgba(15, 23, 42, 0.04)",
+              hover:
+                "0 30px 60px -15px rgba(15, 23, 42, 0.08), 0 0 1px 1px rgba(255,255,255,1) inset",
+              island:
+                "0 15px 35px -5px rgba(15, 23, 42, 0.12), 0 0 1px 1px rgba(255,255,255,0.9) inset",
+              sheet: "0 -20px 50px rgba(15, 23, 42, 0.1)",
+            },
+          },
+        },
+      };
+    </script>
+
+    <style>
+      /* Mobile-First Reset and Safe Areas */
+      html,
+      body {
+        background-color: #fbfbfc;
+        color: #0f172a;
+        overflow-x: hidden;
+        width: 100%;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      /* Glass Blurs optimized for mobile GPU rendering */
+      .glass-bar {
+        background: rgba(251, 251, 252, 0.88);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+      }
+
+      .glass-island {
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+      }
+
+      /* Hide scrollbar on mobile horizontal pill lists while keeping smooth inertia */
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      /* Bottom Sheet Physics on Mobile */
+      .bottom-sheet {
+        transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      /* Lock body scroll when drawer/modal is open */
+      body.modal-open {
+        overflow: hidden;
+        touch-action: none;
+      }
+
+      /* Safe Area Padding for notch and home-indicator */
+      .pb-safe {
+        padding-bottom: env(safe-area-inset-bottom, 16px);
+      }
+      .pt-safe {
+        padding-top: env(safe-area-inset-top, 16px);
+      }
+    </style>
+  </head>
+  <body
+    class="font-sans antialiased text-slate-800 selection:bg-slate-900 selection:text-white"
+  >
+    <!-- TOP CONCIERGE TICKER (Responsive) -->
+    <div class="bg-[#A41E4F] text-white text-[11px] py-2 px-4 sm:px-6">
+      <div class="max-w-7xl mx-auto flex justify-between items-center">
+        <div class="flex items-center space-x-2 truncate">
+          <span
+            class="w-1.5 h-1.5 rounded-full bg-white shrink-0 animate-pulse"
+          ></span>
+          <span
+            class="tracking-wide text-white/90 font-medium truncate text-[10px] sm:text-xs"
+          >
+            Lappy Valley • The Best Product We Offer Is Here • Hotline:
+            +8801901643834
+          </span>
+        </div>
+        <div
+          class="hidden sm:flex items-center space-x-5 text-white/80 shrink-0 text-xs"
+        >
+          <button
+            id="audioToggleBtn"
+            onclick="toggleAudio()"
+            class="hover:text-white transition-colors flex items-center space-x-1.5 cursor-pointer"
+          >
+            <svg
+              id="audioIcon"
+              class="w-3.5 h-3.5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"
+              ></path>
+            </svg>
+            <span id="audioLabel">Sound: On</span>
+          </button>
+          <span class="text-white/40">|</span>
+          <select
+            id="currencySwitch"
+            onchange="setCurrency(this.value)"
+            class="bg-transparent text-white font-medium cursor-pointer focus:outline-none"
+          >
+            <option value="BDT" class="text-slate-900">BDT (৳)</option>
+            <option value="USD" class="text-slate-900">USD ($)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- NAVIGATION BAR (Mobile Ergonomic) -->
+    <header class="sticky top-0 z-40 glass-bar border-b border-slate-200/70">
+      <div
+        class="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between"
+      >
+        <!-- Brand Logo -->
+        <a
+          href="#"
+          class="flex items-center space-x-2.5 group"
+          onclick="playTick()"
+        >
+          <div
+            class="w-8 h-8 rounded-lg bg-[#A41E4F] text-white flex items-center justify-center font-display font-semibold text-xs sm:text-sm shadow-xs transition-transform active:scale-95"
+          >
+            LV
+          </div>
+          <div>
+            <span
+              class="font-display font-semibold text-base sm:text-xl tracking-wider text-[#A41E4F] block leading-none"
+              >LAPPY VALLEY</span
+            >
+            <span
+              class="text-[8px] sm:text-[9px] text-slate-500 tracking-widest uppercase font-semibold block mt-0.5"
+              >New Era Of Life</span
+            >
+          </div>
+        </a>
+
+        <!-- Desktop Links -->
+        <nav
+          class="hidden md:flex items-center space-x-9 text-xs font-semibold uppercase tracking-wider text-slate-500"
+        >
+          <a
+            href="#collection"
+            class="hover:text-[#A41E4F] transition-colors"
+            onclick="playTick()"
+            >All Categories</a
+          >
+          <a
+            href="#why-choose-us"
+            class="hover:text-[#A41E4F] transition-colors"
+            onclick="playTick()"
+            >Why Choose Us</a
+          >
+          <button
+            onclick="openCompareModal()"
+            class="hover:text-[#A41E4F] transition-colors uppercase cursor-pointer"
+          >
+            Compare Models
+          </button>
+          <a
+            href="#branches"
+            class="hover:text-[#A41E4F] transition-colors"
+            onclick="playTick()"
+            >Our Branches</a
+          >
+        </nav>
+
+        <!-- Right Controls -->
+        <div class="flex items-center space-x-2.5 sm:space-x-4">
+          <!-- Search Trigger -->
+          <button
+            onclick="openSearchModal()"
+            aria-label="Search"
+            class="p-2 sm:px-3 sm:py-1.5 rounded-full border border-slate-200 bg-white/80 hover:border-[#A41E4F] text-slate-500 hover:text-[#A41E4F] text-xs transition-all active:scale-95 flex items-center space-x-2"
+          >
+            <svg
+              class="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              ></path>
+            </svg>
+            <span class="hidden sm:inline text-[11px] font-medium">Search</span>
+          </button>
+
+          <!-- Bag Trigger -->
+          <button
+            onclick="toggleBag()"
+            aria-label="Shopping Bag"
+            class="flex items-center space-x-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-white border border-slate-200 hover:border-[#A41E4F] transition-all active:scale-95 shadow-xs"
+          >
+            <svg
+              class="w-4 h-4 text-slate-900"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.8"
+                d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+              ></path>
+            </svg>
+            <span
+              id="bagCounter"
+              class="bg-[#A41E4F] text-white text-[10px] sm:text-[11px] font-semibold w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center justify-center"
+              >0</span
+            >
+          </button>
+
+          <!-- Mobile Menu Toggle Button -->
+          <button
+            onclick="toggleMobileMenu()"
+            aria-label="Toggle Menu"
+            class="md:hidden p-2 rounded-full border border-slate-200 bg-white text-slate-700 active:scale-95"
+          >
+            <svg
+              id="menuIcon"
+              class="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 6h16M4 12h16m-7 6h7"
+              ></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile Slide-Down Menu Drawer -->
+      <div
+        id="mobileMenu"
+        class="hidden md:hidden border-t border-slate-200 bg-white/95 px-6 py-6 space-y-4 font-display text-base font-medium shadow-lg"
+      >
+        <a
+          href="#collection"
+          onclick="toggleMobileMenu()"
+          class="block text-slate-800 hover:text-[#A41E4F] py-1"
+          >All Categories</a
+        >
+        <a
+          href="#why-choose-us"
+          onclick="toggleMobileMenu()"
+          class="block text-slate-800 hover:text-[#A41E4F] py-1"
+          >Why Choose Us</a
+        >
+        <button
+          onclick="toggleMobileMenu(); openCompareModal();"
+          class="block text-left w-full text-slate-800 hover:text-[#A41E4F] py-1"
+        >
+          Compare Models
+        </button>
+        <a
+          href="#branches"
+          onclick="toggleMobileMenu()"
+          class="block text-slate-800 hover:text-[#A41E4F] py-1"
+          >Our Branches</a
+        >
+        <div
+          class="pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-sans text-slate-500"
+        >
+          <button onclick="toggleAudio()" class="flex items-center space-x-1.5">
+            <span>Acoustics:</span>
+            <span id="mobileAudioLabel" class="text-slate-900 font-semibold"
+              >On</span
+            >
+          </button>
+          <div class="flex items-center space-x-1.5">
+            <span>Currency:</span>
+            <select
+              onchange="setCurrency(this.value)"
+              class="bg-transparent text-slate-900 font-semibold"
+            >
+              <option value="BDT">BDT (৳)</option>
+              <option value="USD">USD ($)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- MOBILE-OPTIMIZED STICKY BOTTOM DYNAMIC ISLAND -->
+    <aside
+      id="floatingIsland"
+      aria-label="Quick Purchase Action"
+      class="fixed bottom-4 inset-x-4 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 z-30 glass-island border border-slate-200/90 rounded-2xl sm:rounded-full px-4 sm:px-6 py-3 shadow-island hidden items-center justify-between sm:space-x-8 pb-safe transition-all duration-300"
+    >
+      <div class="flex items-center space-x-3 truncate mr-2">
+        <div
+          class="w-7 h-7 rounded-full bg-[#A41E4F] text-white flex items-center justify-center font-display font-semibold text-xs shrink-0"
+        >
+          LV
+        </div>
+        <div class="truncate">
+          <span
+            class="text-xs font-display font-semibold text-slate-900 block leading-tight truncate"
+            >ASUS ROG Zephyrus G16</span
+          >
+          <span class="text-[10px] text-slate-500 font-medium"
+            >Core ultra 9 185H • RTX 4090</span
+          >
+        </div>
+      </div>
+      <div class="flex items-center space-x-3 shrink-0">
+        <span
+          class="text-xs sm:text-sm font-display font-semibold text-slate-900"
+          id="islandPrice"
+          >৳450,000</span
+        >
+        <button
+          onclick="openConfigModal(0)"
+          class="px-4 py-2 sm:py-2.5 rounded-full bg-[#A41E4F] active:bg-rose-800 text-white text-xs font-semibold tracking-wide transition-all shadow-xs active:scale-95"
+        >
+          Configure
+        </button>
+      </div>
+    </aside>
+
+    <!-- HERO SECTION: SERENE STUDIO STAGE -->
+    <section
+      class="max-w-7xl mx-auto px-4 sm:px-6 pt-6 sm:pt-10 pb-12 sm:pb-20"
+      id="heroSection"
+    >
+      <div
+        class="relative bg-gradient-to-b from-white via-slate-50/40 to-white rounded-3xl border border-slate-200/80 p-5 sm:p-12 shadow-soft overflow-hidden"
+      >
+        <!-- Subtle Ambient Diffuse Aura -->
+        <div
+          id="heroAura"
+          class="absolute -top-32 left-1/2 -translate-x-1/2 w-[350px] sm:w-[650px] h-[250px] sm:h-[400px] bg-rose-100/70 rounded-full blur-3xl pointer-events-none transition-all duration-700 -z-0"
+        ></div>
+
+        <div
+          class="relative z-10 flex flex-col items-center text-center max-w-3xl mx-auto"
+        >
+          <div
+            class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-white border border-slate-200/80 text-slate-600 text-[11px] font-medium tracking-wide mb-4 shadow-xs"
+          >
+            <span
+              class="w-1.5 h-1.5 rounded-full bg-[#A41E4F] animate-pulse"
+            ></span>
+            <span>New Arrival • Gaming Laptop</span>
+          </div>
+
+          <h1
+            class="text-3xl sm:text-5xl lg:text-6xl font-display font-semibold text-slate-900 tracking-tight leading-tight uppercase"
+          >
+            Asus ROG Zephyrus G16
+          </h1>
+
+          <p
+            class="text-xs sm:text-base text-slate-600 font-normal mt-2.5 max-w-xl leading-relaxed"
+          >
+            14th Gen Core ultra 9 185H, 32GB RAM, 2TB SSD Storage paired with
+            the ultimate NVIDIA RTX 4090 16 GB GPU. Available now at Lappy
+            Valley.
+          </p>
+
+          <!-- Touch-Friendly Angle Switchers (Swipeable pill container on mobile) -->
+          <div class="w-full max-w-md mt-6 overflow-x-auto no-scrollbar py-1">
+            <div
+              class="flex items-center justify-start sm:justify-center space-x-1.5 p-1 rounded-full bg-white/90 border border-slate-200 shadow-xs text-xs font-medium text-slate-600 shrink-0 min-w-max mx-auto"
+            >
+              <button
+                id="viewBtn-0"
+                onclick="switchHeroView(0)"
+                class="px-3.5 py-1.5 rounded-full bg-slate-900 text-white font-semibold transition-all"
+              >
+                01 // Front Display
+              </button>
+              <button
+                id="viewBtn-1"
+                onclick="switchHeroView(1)"
+                class="px-3.5 py-1.5 rounded-full text-slate-600 hover:text-slate-900 transition-all"
+              >
+                02 // Keyboard Deck
+              </button>
+              <button
+                id="viewBtn-2"
+                onclick="switchHeroView(2)"
+                class="px-3.5 py-1.5 rounded-full text-slate-600 hover:text-slate-900 transition-all"
+              >
+                03 // Closed Lid
+              </button>
+              <button
+                id="viewBtn-3"
+                onclick="switchHeroView(3)"
+                class="px-3.5 py-1.5 rounded-full text-slate-600 hover:text-slate-900 transition-all"
+              >
+                04 // Profile Angle
+              </button>
+            </div>
+          </div>
+
+          <!-- Product Image Stage (Touch-responsive, fluid aspect ratio) -->
+          <div
+            class="w-full max-w-2xl aspect-[16/10] my-6 sm:my-8 rounded-2xl overflow-hidden bg-slate-100 border border-slate-200/80 shadow-soft relative group"
+          >
+            <img
+              id="heroImg"
+              src="https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=1200&q=85"
+              alt="Asus ROG Zephyrus G16"
+              class="w-full h-full object-cover object-center transition-all duration-500 ease-out"
+            />
+          </div>
+
+          <!-- Touch-Optimized Metallurgy Swatches -->
+          <div class="flex flex-col items-center space-y-2">
+            <span class="text-xs font-medium text-slate-500">
+              Color Option:
+              <span id="heroFinishName" class="text-slate-900 font-semibold"
+                >Eclipse Gray</span
+              >
+            </span>
+            <div
+              class="flex items-center space-x-3.5 p-1.5 rounded-full bg-white border border-slate-200 shadow-xs"
+            >
+              <button
+                onclick="setFinish('Eclipse Gray', 'rgba(255, 228, 230, 0.7)', 0)"
+                aria-label="Eclipse Gray"
+                class="w-7 h-7 rounded-full bg-[#334155] border-2 border-white ring-2 ring-slate-900 transition-all shadow-xs active:scale-90"
+              ></button>
+              <button
+                onclick="setFinish('Moonlight White', 'rgba(241, 245, 249, 0.9)', 1)"
+                aria-label="Moonlight White"
+                class="w-7 h-7 rounded-full bg-[#F8FAFC] border-2 border-white hover:scale-110 transition-all shadow-xs active:scale-90"
+              ></button>
+            </div>
+          </div>
+
+          <!-- Primary Action Triggers -->
+          <div
+            class="mt-6 sm:mt-8 w-full sm:w-auto flex flex-col sm:flex-row items-stretch sm:items-center space-y-2.5 sm:space-y-0 sm:space-x-4"
+          >
+            <button
+              onclick="openConfigModal(0)"
+              class="w-full sm:w-auto px-8 py-3.5 sm:py-4 rounded-full bg-[#A41E4F] active:bg-rose-800 text-white text-xs font-semibold tracking-wider uppercase transition-all shadow-sm active:scale-98"
+            >
+              Add to Cart — From <span id="heroPriceTag">৳450,000</span>
+            </button>
+            <button
+              onclick="openCompareModal()"
+              class="w-full sm:w-auto px-6 py-3.5 sm:py-4 rounded-full bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-semibold tracking-wider uppercase transition-all active:scale-98"
+            >
+              Compare Models
+            </button>
+          </div>
+
+          <!-- Mobile Spec Matrix Pills (2x2 Grid) -->
+          <div
+            class="mt-8 pt-6 border-t border-slate-200/80 w-full grid grid-cols-2 sm:grid-cols-4 gap-3 text-left"
+          >
+            <div class="p-3 bg-white/70 rounded-xl border border-slate-100">
+              <span class="text-[10px] text-slate-400 block font-medium"
+                >PROCESSOR</span
+              >
+              <span
+                class="text-xs sm:text-sm font-display font-semibold text-slate-900 mt-0.5 block"
+                >Ultra 9 185H</span
+              >
+            </div>
+            <div class="p-3 bg-white/70 rounded-xl border border-slate-100">
+              <span class="text-[10px] text-slate-400 block font-medium"
+                >GRAPHICS</span
+              >
+              <span
+                class="text-xs sm:text-sm font-display font-semibold text-slate-900 mt-0.5 block"
+                >RTX 4090 16GB</span
+              >
+            </div>
+            <div class="p-3 bg-white/70 rounded-xl border border-slate-100">
+              <span class="text-[10px] text-slate-400 block font-medium"
+                >MEMORY / STORAGE</span
+              >
+              <span
+                class="text-xs sm:text-sm font-display font-semibold text-slate-900 mt-0.5 block"
+                >32GB / 2TB SSD</span
+              >
+            </div>
+            <div class="p-3 bg-white/70 rounded-xl border border-slate-100">
+              <span class="text-[10px] text-slate-400 block font-medium"
+                >CONDITION</span
+              >
+              <span
+                class="text-xs sm:text-sm font-display font-semibold text-slate-900 mt-0.5 block"
+                >Brand New</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STORE COLLECTION: 6 BESPOKE MODELS -->
+    <section
+      id="collection"
+      class="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-16"
+    >
+      <!-- Filter Bar (Smooth horizontal swipe on mobile) -->
+      <div
+        class="flex flex-col md:flex-row md:items-end justify-between mb-8 sm:mb-12 pb-4 sm:pb-6 border-b border-slate-200 gap-4"
+      >
+        <div>
+          <span
+            class="text-xs font-semibold tracking-wider uppercase text-[#A41E4F]"
+            >The Best Offers Are Here</span
+          >
+          <h2
+            class="text-2xl sm:text-4xl font-display font-semibold text-slate-900 tracking-tight mt-1"
+          >
+            Our Premium Collection
+          </h2>
+        </div>
+
+        <!-- Category Filter Pills (Horizontal swipe on phone) -->
+        <div class="overflow-x-auto no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
+          <div class="flex items-center space-x-2 shrink-0 min-w-max">
+            <button
+              onclick="filterCatalog('all')"
+              id="tab-all"
+              class="px-4 py-2 rounded-full bg-slate-900 text-white text-xs font-medium transition-all shadow-xs active:scale-95"
+            >
+              All Laptops
+            </button>
+            <button
+              onclick="filterCatalog('new-arrival')"
+              id="tab-new-arrival"
+              class="px-4 py-2 rounded-full bg-white border border-slate-200 text-slate-600 hover:text-slate-900 text-xs font-medium transition-all active:scale-95"
+            >
+              New Arrival
+            </button>
+            <button
+              onclick="filterCatalog('student')"
+              id="tab-student"
+              class="px-4 py-2 rounded-full bg-white border border-slate-200 text-slate-600 hover:text-slate-900 text-xs font-medium transition-all active:scale-95"
+            >
+              Student Budgeted
+            </button>
+            <button
+              onclick="filterCatalog('gaming')"
+              id="tab-gaming"
+              class="px-4 py-2 rounded-full bg-white border border-slate-200 text-slate-600 hover:text-slate-900 text-xs font-medium transition-all active:scale-95"
+            >
+              Gaming Laptop
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile-First Product Grid -->
+      <div
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8"
+        id="productGrid"
+      >
+        <!-- Card 1 -->
+        <div
+          class="product-item bg-white rounded-3xl border border-slate-200 p-5 sm:p-6 flex flex-col justify-between hover:shadow-hover transition-all duration-300"
+          data-category="new-arrival"
+        >
+          <div>
+            <div
+              class="aspect-[16/11] rounded-2xl overflow-hidden bg-slate-100 border border-slate-100 mb-5 relative group cursor-pointer"
+              onclick="openConfigModal(1)"
+            >
+              <img
+                src="https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=800&q=80"
+                alt="HP EliteBook 850 G8"
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+              />
+              <span
+                class="absolute top-3 left-3 bg-[#A41E4F] text-white px-2.5 py-0.5 rounded-full text-[10px] font-semibold border border-rose-900/50"
+                >-5% Off</span
+              >
+            </div>
+            <div class="flex justify-between items-start">
+              <div>
+                <span
+                  class="text-[10px] font-semibold text-blue-600 block uppercase tracking-wider"
+                  >New Arrival</span
+                >
+                <h3
+                  class="text-lg sm:text-xl font-display font-semibold text-slate-900 mt-0.5"
+                >
+                  HP EliteBook 850 G8
+                </h3>
+              </div>
+              <span
+                class="product-price text-base sm:text-lg font-display font-semibold text-slate-900"
+                data-base="55500"
+                >৳55,500</span
+              >
+            </div>
+            <p class="text-xs text-slate-500 mt-2 leading-relaxed">
+              Core i5-11th gen 8GB-256GB Pre-Owned AAA+ condition. Perfect for
+              business and professionals.
+            </p>
+            <div
+              class="mt-4 pt-3 border-t border-slate-100 space-y-1 text-xs text-slate-600"
+            >
+              <div class="flex justify-between">
+                <span>Processor:</span
+                ><span class="font-medium text-slate-900"
+                  >Intel Core i5-11th Gen</span
+                >
+              </div>
+              <div class="flex justify-between">
+                <span>Storage:</span
+                ><span class="font-medium text-slate-900"
+                  >8GB RAM / 256GB SSD</span
+                >
+              </div>
+            </div>
+          </div>
+          <div class="mt-5 pt-4 flex items-center space-x-2.5">
+            <button
+              onclick="openConfigModal(1)"
+              class="flex-1 py-2.5 rounded-full bg-slate-900 active:bg-slate-800 text-white text-xs font-semibold transition-all text-center active:scale-95"
+            >
+              Configure
+            </button>
+            <button
+              onclick="quickAdd(1)"
+              class="px-4 py-2.5 rounded-full border border-slate-200 active:border-slate-900 text-slate-900 text-xs font-semibold transition-all active:scale-95"
+            >
+              Add to Cart
+            </button>
+          </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div
+          class="product-item bg-white rounded-3xl border border-slate-200 p-5 sm:p-6 flex flex-col justify-between hover:shadow-hover transition-all duration-300"
+          data-category="new-arrival"
+        >
+          <div>
+            <div
+              class="aspect-[16/11] rounded-2xl overflow-hidden bg-slate-100 border border-slate-100 mb-5 relative group cursor-pointer"
+              onclick="openConfigModal(2)"
+            >
+              <img
+                src="https://images.unsplash.com/photo-1541807084-5c52b6b3adef?auto=format&fit=crop&w=800&q=80"
+                alt="Apple MacBook Pro M5"
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+              />
+              <span
+                class="absolute top-3 left-3 bg-[#A41E4F] text-white px-2.5 py-0.5 rounded-full text-[10px] font-semibold border border-rose-900/50"
+                >-7% Off</span
+              >
+            </div>
+            <div class="flex justify-between items-start">
+              <div>
+                <span
+                  class="text-[10px] font-semibold text-emerald-600 block uppercase tracking-wider"
+                  >New Arrival</span
+                >
+                <h3
+                  class="text-lg sm:text-xl font-display font-semibold text-slate-900 mt-0.5"
+                >
+                  Apple MacBook Pro
+                </h3>
+              </div>
+              <span
+                class="product-price text-base sm:text-lg font-display font-semibold text-slate-900"
+                data-base="215000"
+                >৳215,000</span
+              >
+            </div>
+            <p class="text-xs text-slate-500 mt-2 leading-relaxed">
+              10-Core CPU 10-Core GPU 16GB-512GB Open Boxed With original Box.
+              The pinnacle of creative performance.
+            </p>
+            <div
+              class="mt-4 pt-3 border-t border-slate-100 space-y-1 text-xs text-slate-600"
+            >
+              <div class="flex justify-between">
+                <span>Chipset:</span
+                ><span class="font-medium text-slate-900">Apple Silicon</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Specs:</span
+                ><span class="font-medium text-slate-900"
+                  >16GB Unified / 512GB SSD</span
+                >
+              </div>
+            </div>
+          </div>
+          <div class="mt-5 pt-4 flex items-center space-x-2.5">
+            <button
+              onclick="openConfigModal(2)"
+              class="flex-1 py-2.5 rounded-full bg-slate-900 active:bg-slate-800 text-white text-xs font-semibold transition-all text-center active:scale-95"
+            >
+              Configure
+            </button>
+            <button
+              onclick="quickAdd(2)"
+              class="px-4 py-2.5 rounded-full border border-slate-200 active:border-slate-900 text-slate-900 text-xs font-semibold transition-all active:scale-95"
+            >
+              Add to Cart
+            </button>
+          </div>
+        </div>
+
+        <!-- Card 3 -->
+        <div
+          class="product-item bg-white rounded-3xl border border-slate-200 p-5 sm:p-6 flex flex-col justify-between hover:shadow-hover transition-all duration-300"
+          data-category="student"
+        >
+          <div>
+            <div
+              class="aspect-[16/11] rounded-2xl overflow-hidden bg-slate-100 border border-slate-100 mb-5 relative group cursor-pointer"
+              onclick="openConfigModal(3)"
+            >
+              <img
+                src="https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=800&q=80"
+                alt="Dell Latitude 5330"
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+              />
+              <span
+                class="absolute top-3 left-3 bg-[#A41E4F] text-white px-2.5 py-0.5 rounded-full text-[10px] font-semibold border border-rose-900/50"
+                >-7% Off</span
+              >
+            </div>
+            <div class="flex justify-between items-start">
+              <div>
+                <span
+                  class="text-[10px] font-semibold text-indigo-600 block uppercase tracking-wider"
+                  >Student Budget</span
+                >
+                <h3
+                  class="text-lg sm:text-xl font-display font-semibold text-slate-900 mt-0.5"
+                >
+                  Dell Latitude 5330
+                </h3>
+              </div>
+              <span
+                class="product-price text-base sm:text-lg font-display font-semibold text-slate-900"
+                data-base="56500"
+                >৳56,500</span
+              >
+            </div>
+            <p class="text-xs text-slate-500 mt-2 leading-relaxed">
+              Core i5-1245U 16-256 GB Pre-owned AAA+. Excellent portability and
+              solid performance for daily coursework.
+            </p>
+            <div
+              class="mt-4 pt-3 border-t border-slate-100 space-y-1 text-xs text-slate-600"
+            >
+              <div class="flex justify-between">
+                <span>Processor:</span
+                ><span class="font-medium text-slate-900"
+                  >Intel Core i5-1245U</span
+                >
+              </div>
+              <div class="flex justify-between">
+                <span>Memory:</span
+                ><span class="font-medium text-slate-900">16GB RAM</span>
+              </div>
+            </div>
+          </div>
+          <div class="mt-5 pt-4 flex items-center space-x-2.5">
+            <button
+              onclick="openConfigModal(3)"
+              class="flex-1 py-2.5 rounded-full bg-slate-900 active:bg-slate-800 text-white text-xs font-semibold transition-all text-center active:scale-95"
+            >
+              Configure
+            </button>
+            <button
+              onclick="quickAdd(3)"
+              class="px-4 py-2.5 rounded-full border border-slate-200 active:border-slate-900 text-slate-900 text-xs font-semibold transition-all active:scale-95"
+            >
+              Add to Cart
+            </button>
+          </div>
+        </div>
+
+        <!-- Card 4 -->
+        <div
+          class="product-item bg-white rounded-3xl border border-slate-200 p-5 sm:p-6 flex flex-col justify-between hover:shadow-hover transition-all duration-300"
+          data-category="student"
+        >
+          <div>
+            <div
+              class="aspect-[16/11] rounded-2xl overflow-hidden bg-slate-100 border border-slate-100 mb-5 relative group cursor-pointer"
+              onclick="openConfigModal(4)"
+            >
+              <img
+                src="https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?auto=format&fit=crop&w=800&q=80"
+                alt="Lenovo X1 Carbon"
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+              />
+              <span
+                class="absolute top-3 left-3 bg-[#A41E4F] text-white px-2.5 py-0.5 rounded-full text-[10px] font-semibold border border-rose-900/50"
+                >-6% Off</span
+              >
+            </div>
+            <div class="flex justify-between items-start">
+              <div>
+                <span
+                  class="text-[10px] font-semibold text-slate-500 block uppercase tracking-wider"
+                  >Student Budget</span
+                >
+                <h3
+                  class="text-lg sm:text-xl font-display font-semibold text-slate-900 mt-0.5"
+                >
+                  Lenovo X1 Carbon
+                </h3>
+              </div>
+              <span
+                class="product-price text-base sm:text-lg font-display font-semibold text-slate-900"
+                data-base="47500"
+                >৳47,500</span
+              >
+            </div>
+            <p class="text-xs text-slate-500 mt-2 leading-relaxed">
+              Core i7-8th Gen 16-256 GB Pre-owned AAA+. The ultimate durable,
+              lightweight ultrabook for writers and coders.
+            </p>
+            <div
+              class="mt-4 pt-3 border-t border-slate-100 space-y-1 text-xs text-slate-600"
+            >
+              <div class="flex justify-between">
+                <span>Processor:</span
+                ><span class="font-medium text-slate-900"
+                  >Intel Core i7-8th Gen</span
+                >
+              </div>
+              <div class="flex justify-between">
+                <span>Build:</span
+                ><span class="font-medium text-slate-900"
+                  >Carbon Fiber Chassis</span
+                >
+              </div>
+            </div>
+          </div>
+          <div class="mt-5 pt-4 flex items-center space-x-2.5">
+            <button
+              onclick="openConfigModal(4)"
+              class="flex-1 py-2.5 rounded-full bg-slate-900 active:bg-slate-800 text-white text-xs font-semibold transition-all text-center active:scale-95"
+            >
+              Configure
+            </button>
+            <button
+              onclick="quickAdd(4)"
+              class="px-4 py-2.5 rounded-full border border-slate-200 active:border-slate-900 text-slate-900 text-xs font-semibold transition-all active:scale-95"
+            >
+              Add to Cart
+            </button>
+          </div>
+        </div>
+
+        <!-- Card 5 -->
+        <div
+          class="product-item bg-white rounded-3xl border border-slate-200 p-5 sm:p-6 flex flex-col justify-between hover:shadow-hover transition-all duration-300"
+          data-category="gaming"
+        >
+          <div>
+            <div
+              class="aspect-[16/11] rounded-2xl overflow-hidden bg-slate-100 border border-slate-100 mb-5 relative group cursor-pointer"
+              onclick="openConfigModal(5)"
+            >
+              <img
+                src="https://images.unsplash.com/photo-1593640495253-23d96b4236d4?auto=format&fit=crop&w=800&q=80"
+                alt="Lenovo LOQ 15APH8"
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+              />
+              <span
+                class="absolute top-3 left-3 bg-[#A41E4F] text-white px-2.5 py-0.5 rounded-full text-[10px] font-semibold border border-rose-900/50"
+                >-4% Off</span
+              >
+            </div>
+            <div class="flex justify-between items-start">
+              <div>
+                <span
+                  class="text-[10px] font-semibold text-rose-600 block uppercase tracking-wider"
+                  >Gaming Series</span
+                >
+                <h3
+                  class="text-lg sm:text-xl font-display font-semibold text-slate-900 mt-0.5"
+                >
+                  Lenovo LOQ 15APH8
+                </h3>
+              </div>
+              <span
+                class="product-price text-base sm:text-lg font-display font-semibold text-slate-900"
+                data-base="86500"
+                >৳86,500</span
+              >
+            </div>
+            <p class="text-xs text-slate-500 mt-2 leading-relaxed">
+              Ryzen 7 7840HS 16/512GB SSD Used AAA+. Uncompromised performance
+              for AAA gaming titles and heavy workloads.
+            </p>
+            <div
+              class="mt-4 pt-3 border-t border-slate-100 space-y-1 text-xs text-slate-600"
+            >
+              <div class="flex justify-between">
+                <span>Processor:</span
+                ><span class="font-medium text-slate-900"
+                  >AMD Ryzen 7 7840HS</span
+                >
+              </div>
+              <div class="flex justify-between">
+                <span>Storage:</span
+                ><span class="font-medium text-slate-900"
+                  >16GB / 512GB NVMe</span
+                >
+              </div>
+            </div>
+          </div>
+          <div class="mt-5 pt-4 flex items-center space-x-2.5">
+            <button
+              onclick="openConfigModal(5)"
+              class="flex-1 py-2.5 rounded-full bg-slate-900 active:bg-slate-800 text-white text-xs font-semibold transition-all text-center active:scale-95"
+            >
+              Configure
+            </button>
+            <button
+              onclick="quickAdd(5)"
+              class="px-4 py-2.5 rounded-full border border-slate-200 active:border-slate-900 text-slate-900 text-xs font-semibold transition-all active:scale-95"
+            >
+              Add to Cart
+            </button>
+          </div>
+        </div>
+
+        <!-- Card 6 -->
+        <div
+          class="product-item bg-white rounded-3xl border border-slate-200 p-5 sm:p-6 flex flex-col justify-between hover:shadow-hover transition-all duration-300"
+          data-category="gaming"
+        >
+          <div>
+            <div
+              class="aspect-[16/11] rounded-2xl overflow-hidden bg-slate-100 border border-slate-100 mb-5 relative group cursor-pointer"
+              onclick="openConfigModal(6)"
+            >
+              <img
+                src="https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?auto=format&fit=crop&w=800&q=80"
+                alt="Acer Nitro V15"
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+              />
+              <span
+                class="absolute top-3 left-3 bg-[#A41E4F] text-white px-2.5 py-0.5 rounded-full text-[10px] font-semibold border border-rose-900/50"
+                >-3% Off</span
+              >
+            </div>
+            <div class="flex justify-between items-start">
+              <div>
+                <span
+                  class="text-[10px] font-semibold text-amber-600 block uppercase tracking-wider"
+                  >Gaming Series</span
+                >
+                <h3
+                  class="text-lg sm:text-xl font-display font-semibold text-slate-900 mt-0.5"
+                >
+                  Acer Nitro V15
+                </h3>
+              </div>
+              <span
+                class="product-price text-base sm:text-lg font-display font-semibold text-slate-900"
+                data-base="135500"
+                >৳135,500</span
+              >
+            </div>
+            <p class="text-xs text-slate-500 mt-2 leading-relaxed">
+              Intel Core i5-13420H 16-512 GB NVIDIA GeForce RTX 5050 with 8GB
+              Graphics 15.6" FHD Gaming Laptop.
+            </p>
+            <div
+              class="mt-4 pt-3 border-t border-slate-100 space-y-1 text-xs text-slate-600"
+            >
+              <div class="flex justify-between">
+                <span>Graphics:</span
+                ><span class="font-medium text-slate-900">RTX 5050 8GB</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Display:</span
+                ><span class="font-medium text-slate-900">15.6" FHD</span>
+              </div>
+            </div>
+          </div>
+          <div class="mt-5 pt-4 flex items-center space-x-2.5">
+            <button
+              onclick="openConfigModal(6)"
+              class="flex-1 py-2.5 rounded-full bg-slate-900 active:bg-slate-800 text-white text-xs font-semibold transition-all text-center active:scale-95"
+            >
+              Configure
+            </button>
+            <button
+              onclick="quickAdd(6)"
+              class="px-4 py-2.5 rounded-full border border-slate-200 active:border-slate-900 text-slate-900 text-xs font-semibold transition-all active:scale-95"
+            >
+              Add to Cart
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- METALLURGY CRAFTSMANSHIP -> WHY CHOOSE US SECTION -->
+    <section
+      id="why-choose-us"
+      class="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-20 border-t border-slate-200"
+    >
+      <div class="max-w-2xl mb-10">
+        <span
+          class="text-xs font-semibold tracking-wider uppercase text-[#A41E4F]"
+          >Trusted and Reliable</span
+        >
+        <h2
+          class="text-2xl sm:text-4xl font-display font-semibold text-slate-900 tracking-tight mt-1"
+        >
+          Why Choose Us?
+        </h2>
+        <p class="text-slate-600 mt-2.5 text-xs sm:text-sm leading-relaxed">
+          We provide you with the best after-sales services and deliver our
+          products carefully as fast as possible at your doorstep. We are the
+          trusted and reliable shop for your tech needs.
+        </p>
+      </div>
+
+      <!-- 5-Column Feature Grid inside standard responsive layout -->
+      <div
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6"
+      >
+        <div
+          class="p-5 rounded-2xl sm:rounded-3xl bg-white border border-slate-200 shadow-soft"
+        >
+          <div
+            class="w-8 h-8 rounded-full bg-rose-50 flex items-center justify-center font-display font-semibold text-[#A41E4F] text-xs mb-4"
+          >
+            01
+          </div>
+          <h3
+            class="text-sm sm:text-base font-display font-semibold text-slate-900"
+          >
+            Wide Varieties
+          </h3>
+          <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">
+            We have a wide collection of laptops from different brands. We have
+            brand new and pre-owned laptops in our collection.
+          </p>
+        </div>
+        <div
+          class="p-5 rounded-2xl sm:rounded-3xl bg-white border border-slate-200 shadow-soft"
+        >
+          <div
+            class="w-8 h-8 rounded-full bg-rose-50 flex items-center justify-center font-display font-semibold text-[#A41E4F] text-xs mb-4"
+          >
+            02
+          </div>
+          <h3
+            class="text-sm sm:text-base font-display font-semibold text-slate-900"
+          >
+            Trusted and Reliable
+          </h3>
+          <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">
+            We are a trusted and reliable shop. We provide you with the best
+            services and good quality products.
+          </p>
+        </div>
+        <div
+          class="p-5 rounded-2xl sm:rounded-3xl bg-white border border-slate-200 shadow-soft"
+        >
+          <div
+            class="w-8 h-8 rounded-full bg-rose-50 flex items-center justify-center font-display font-semibold text-[#A41E4F] text-xs mb-4"
+          >
+            03
+          </div>
+          <h3
+            class="text-sm sm:text-base font-display font-semibold text-slate-900"
+          >
+            Best Service
+          </h3>
+          <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">
+            We provide you with the best after-sales services. Any problem, you
+            take it to us and we will solve it.
+          </p>
+        </div>
+        <div
+          class="p-5 rounded-2xl sm:rounded-3xl bg-white border border-slate-200 shadow-soft"
+        >
+          <div
+            class="w-8 h-8 rounded-full bg-rose-50 flex items-center justify-center font-display font-semibold text-[#A41E4F] text-xs mb-4"
+          >
+            04
+          </div>
+          <h3
+            class="text-sm sm:text-base font-display font-semibold text-slate-900"
+          >
+            Best Price in Market
+          </h3>
+          <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">
+            We will give you the best and lowest possible price in the market
+            across our entire range of tech.
+          </p>
+        </div>
+        <div
+          class="p-5 rounded-2xl sm:rounded-3xl bg-white border border-slate-200 shadow-soft"
+        >
+          <div
+            class="w-8 h-8 rounded-full bg-rose-50 flex items-center justify-center font-display font-semibold text-[#A41E4F] text-xs mb-4"
+          >
+            05
+          </div>
+          <h3
+            class="text-sm sm:text-base font-display font-semibold text-slate-900"
+          >
+            Fast Delivery
+          </h3>
+          <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">
+            We deliver our products carefully as fast as possible at your door
+            step anywhere in the country.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- NATIVE-FEEL MOBILE BOTTOM SHEET: BESPOKE CONFIGURATOR -->
+    <div
+      id="configModal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="cfgModalTitle"
+      class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs hidden items-end sm:items-center justify-center"
+    >
+      <div
+        class="bottom-sheet bg-white w-full sm:max-w-2xl rounded-t-[32px] sm:rounded-3xl border border-slate-200 shadow-sheet sm:shadow-2xl p-6 sm:p-8 max-h-[88vh] overflow-y-auto flex flex-col justify-between pb-safe"
+      >
+        <!-- Mobile Drag Indicator Bar -->
+        <div
+          class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-4 sm:hidden shrink-0"
+        ></div>
+
+        <div>
+          <div
+            class="flex justify-between items-center pb-4 border-b border-slate-100"
+          >
+            <div>
+              <span
+                class="text-[10px] font-semibold text-blue-600 uppercase tracking-wide"
+                >Custom Upgrades</span
+              >
+              <h3
+                id="cfgModalTitle"
+                class="text-xl sm:text-2xl font-display font-semibold text-slate-900"
+              >
+                ASUS ROG Zephyrus G16
+              </h3>
+            </div>
+            <button
+              onclick="closeConfigModal()"
+              class="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:text-slate-900 transition-colors active:scale-95"
+            >
+              ✕
+            </button>
+          </div>
+
+          <div class="py-5 space-y-5">
+            <!-- Memory Selection -->
+            <div>
+              <label class="text-xs font-semibold text-slate-700 block mb-2"
+                >Memory (RAM) Upgrade</label
+              >
+              <div class="grid grid-cols-3 gap-2 sm:gap-3">
+                <button
+                  onclick="selectRam(0, 0, 'Standard RAM')"
+                  id="ramBtn-0"
+                  class="p-2.5 sm:p-3 rounded-xl border-2 border-[#A41E4F] bg-rose-50 text-[#A41E4F] font-semibold text-xs text-center transition-all"
+                >
+                  Base
+                  <span class="block text-[9px] text-[#A41E4F]/70 font-normal"
+                    >Included</span
+                  >
+                </button>
+                <button
+                  onclick="selectRam(1, 4000, '+16GB Extra RAM')"
+                  id="ramBtn-1"
+                  class="p-2.5 sm:p-3 rounded-xl border border-slate-200 text-slate-700 hover:border-[#A41E4F] font-semibold text-xs text-center transition-all"
+                >
+                  +16GB
+                  <span class="block text-[9px] text-slate-500 font-normal"
+                    >+ ৳4,000</span
+                  >
+                </button>
+                <button
+                  onclick="selectRam(2, 9000, '+32GB Extra RAM')"
+                  id="ramBtn-2"
+                  class="p-2.5 sm:p-3 rounded-xl border border-slate-200 text-slate-700 hover:border-[#A41E4F] font-semibold text-xs text-center transition-all"
+                >
+                  +32GB
+                  <span class="block text-[9px] text-slate-500 font-normal"
+                    >+ ৳9,000</span
+                  >
+                </button>
+              </div>
+            </div>
+
+            <!-- Storage Selection -->
+            <div>
+              <label class="text-xs font-semibold text-slate-700 block mb-2"
+                >Storage (SSD) Upgrade</label
+              >
+              <div class="grid grid-cols-3 gap-2 sm:gap-3">
+                <button
+                  onclick="selectSsd(0, 0, 'Standard Storage')"
+                  id="ssdBtn-0"
+                  class="p-2.5 sm:p-3 rounded-xl border-2 border-[#A41E4F] bg-rose-50 text-[#A41E4F] font-semibold text-xs text-center transition-all"
+                >
+                  Base
+                  <span class="block text-[9px] text-[#A41E4F]/70 font-normal"
+                    >Included</span
+                  >
+                </button>
+                <button
+                  onclick="selectSsd(1, 3500, '+512GB NVMe')"
+                  id="ssdBtn-1"
+                  class="p-2.5 sm:p-3 rounded-xl border border-slate-200 text-slate-700 hover:border-[#A41E4F] font-semibold text-xs text-center transition-all"
+                >
+                  +512GB
+                  <span class="block text-[9px] text-slate-500 font-normal"
+                    >+ ৳3,500</span
+                  >
+                </button>
+                <button
+                  onclick="selectSsd(2, 7000, '+1TB NVMe')"
+                  id="ssdBtn-2"
+                  class="p-2.5 sm:p-3 rounded-xl border border-slate-200 text-slate-700 hover:border-[#A41E4F] font-semibold text-xs text-center transition-all"
+                >
+                  +1TB
+                  <span class="block text-[9px] text-slate-500 font-normal"
+                    >+ ৳7,000</span
+                  >
+                </button>
+              </div>
+            </div>
+
+            <!-- Laser Engraving Input (Safe base font to prevent auto-zoom) -->
+            <div>
+              <label class="text-xs font-semibold text-slate-700 block mb-2"
+                >Special Request / Notes</label
+              >
+              <input
+                type="text"
+                id="engraveInput"
+                maxlength="64"
+                placeholder="e.g. Include original charger, check battery..."
+                class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm sm:text-xs text-slate-900 focus:outline-none focus:border-[#A41E4F] tracking-wider"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Sticky Bottom Drawer Button -->
+        <div
+          class="pt-4 border-t border-slate-100 flex items-center justify-between"
+        >
+          <div>
+            <span class="text-[10px] text-slate-500 block">Total Due</span>
+            <span
+              id="cfgFinalPrice"
+              class="text-xl sm:text-2xl font-display font-semibold text-slate-900"
+              >৳450,000</span
+            >
+          </div>
+          <button
+            onclick="confirmCustomUnit()"
+            class="px-6 sm:px-8 py-3.5 rounded-full bg-[#A41E4F] active:bg-rose-800 text-white text-xs font-semibold tracking-wide transition-all shadow-sm active:scale-95"
+          >
+            Add to Cart
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- NATIVE-FEEL MOBILE BOTTOM SHEET: SPEC MATRIX COMPARISON -->
+    <div
+      id="compareModal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="cmpModalTitle"
+      class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs hidden items-end sm:items-center justify-center"
+    >
+      <div
+        class="bottom-sheet bg-white w-full sm:max-w-4xl rounded-t-[32px] sm:rounded-3xl border border-slate-200 shadow-sheet sm:shadow-2xl p-6 sm:p-8 max-h-[85vh] overflow-y-auto pb-safe"
+      >
+        <!-- Mobile Drag Indicator -->
+        <div
+          class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-4 sm:hidden"
+        ></div>
+
+        <div
+          class="flex justify-between items-center pb-4 border-b border-slate-200"
+        >
+          <div>
+            <span
+              class="text-[10px] font-semibold text-[#A41E4F] uppercase tracking-wide"
+              >Hardware Reference</span
+            >
+            <h3
+              id="cmpModalTitle"
+              class="text-xl sm:text-2xl font-display font-semibold text-slate-900"
+            >
+              Model Comparison
+            </h3>
+          </div>
+          <button
+            onclick="closeCompareModal()"
+            class="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:text-slate-900 transition-colors active:scale-95"
+          >
+            ✕
+          </button>
+        </div>
+
+        <!-- Touch-Scrollable Comparison Matrix Table -->
+        <div class="overflow-x-auto py-4 no-scrollbar">
+          <table class="w-full text-left text-xs text-slate-600 min-w-[500px]">
+            <thead>
+              <tr
+                class="border-b border-slate-100 font-display font-semibold text-slate-900 text-xs sm:text-sm"
+              >
+                <th class="py-3 pr-3">Attribute</th>
+                <th class="py-3 px-3 text-[#A41E4F]">ROG Zephyrus G16</th>
+                <th class="py-3 px-3">Apple MacBook Pro</th>
+                <th class="py-3 px-3">HP EliteBook 850 G8</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              <tr>
+                <td class="py-3 pr-3 font-semibold text-slate-900">Price</td>
+                <td class="py-3 px-3 font-semibold text-[#A41E4F]">৳450,000</td>
+                <td class="py-3 px-3 font-semibold">৳215,000</td>
+                <td class="py-3 px-3 font-semibold">৳55,500</td>
+              </tr>
+              <tr>
+                <td class="py-3 pr-3 font-medium text-slate-500">Category</td>
+                <td class="py-3 px-3 font-semibold text-slate-900">
+                  Gaming Laptop
+                </td>
+                <td class="py-3 px-3 font-semibold text-emerald-600">
+                  Creator & Pro
+                </td>
+                <td class="py-3 px-3 font-semibold text-slate-900">
+                  Business / Student
+                </td>
+              </tr>
+              <tr>
+                <td class="py-3 pr-3 font-medium text-slate-500">Processor</td>
+                <td class="py-3 px-3">Core ultra 9 185H</td>
+                <td class="py-3 px-3">10-Core CPU</td>
+                <td class="py-3 px-3">Intel Core i5-11th Gen</td>
+              </tr>
+              <tr>
+                <td class="py-3 pr-3 font-medium text-slate-500">Graphics</td>
+                <td class="py-3 px-3">NVIDIA RTX 4090 16GB</td>
+                <td class="py-3 px-3">10-Core GPU</td>
+                <td class="py-3 px-3">Integrated Graphics</td>
+              </tr>
+              <tr>
+                <td class="py-3 pr-3 font-medium text-slate-500">
+                  Memory / SSD
+                </td>
+                <td class="py-3 px-3">32GB RAM / 2TB SSD</td>
+                <td class="py-3 px-3 font-semibold text-emerald-600">
+                  16GB / 512GB
+                </td>
+                <td class="py-3 px-3">8GB RAM / 256GB SSD</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="pt-4 border-t border-slate-200 flex justify-end">
+          <button
+            onclick="closeCompareModal()"
+            class="w-full sm:w-auto px-6 py-3 rounded-full bg-slate-900 active:bg-slate-800 text-white text-xs font-semibold transition-all active:scale-95"
+          >
+            Done Reviewing
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- NATIVE-FEEL MOBILE BOTTOM SHEET: SPOTLIGHT SEARCH -->
+    <div
+      id="searchModal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="searchModalTitle"
+      class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs hidden items-start sm:items-center justify-center p-4 pt-16 sm:pt-4"
+    >
+      <div
+        class="bg-white w-full max-w-xl rounded-3xl border border-slate-200 shadow-2xl p-5 overflow-hidden"
+      >
+        <h3 id="searchModalTitle" class="sr-only">Search Models</h3>
+
+        <div class="flex items-center space-x-3 pb-3 border-b border-slate-100">
+          <svg
+            class="w-4 h-4 text-slate-400 shrink-0"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            ></path>
+          </svg>
+          <input
+            type="text"
+            id="searchInput"
+            oninput="handleSearch(this.value)"
+            placeholder="Search gaming, student, new arrival..."
+            class="w-full text-base sm:text-xs text-slate-900 placeholder-slate-400 focus:outline-none"
+          />
+          <button
+            onclick="closeSearchModal()"
+            class="text-xs font-mono text-slate-400 hover:text-slate-900 p-1"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div id="searchResults" class="py-3 max-h-64 overflow-y-auto space-y-2">
+          <div class="text-xs text-slate-400 text-center py-6">
+            Type keywords to search all available laptops.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NATIVE-FEEL MOBILE BOTTOM SHEET: SHOPPING BAG -->
+    <div
+      id="bagDrawer"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="bagTitle"
+      class="fixed inset-x-0 bottom-0 sm:inset-y-0 sm:left-auto sm:right-0 z-50 w-full sm:max-w-md bg-white border-t sm:border-t-0 sm:border-l border-slate-200 shadow-sheet sm:shadow-drawer rounded-t-[32px] sm:rounded-none transform translate-y-full sm:translate-y-0 sm:translate-x-full transition-transform duration-400 ease-out flex flex-col justify-between max-h-[90vh] sm:max-h-full pb-safe"
+    >
+      <!-- Mobile Drag Handle -->
+      <div
+        class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mt-3 sm:hidden shrink-0"
+      ></div>
+
+      <div
+        class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50"
+      >
+        <div>
+          <span class="text-[10px] font-medium text-slate-500 block uppercase"
+            >Your Order</span
+          >
+          <h3
+            id="bagTitle"
+            class="text-lg sm:text-xl font-display font-semibold text-slate-900"
+          >
+            Shopping Cart
+          </h3>
+        </div>
+        <button
+          onclick="toggleBag()"
+          class="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:text-slate-900 transition-colors active:scale-95"
+        >
+          ✕
+        </button>
+      </div>
+
+      <!-- Bag Item List -->
+      <div id="bagList" class="p-5 flex-1 overflow-y-auto space-y-3">
+        <div id="emptyBagText" class="text-center py-16 text-slate-400 text-xs">
+          Your shopping cart is currently empty.
+        </div>
+      </div>
+
+      <!-- Complimentary Insured Bar -->
+      <div
+        class="px-5 py-2 bg-emerald-50/70 border-t border-emerald-100 text-[10px] text-emerald-800 flex items-center justify-between"
+      >
+        <span>CAREFUL SECURE DELIVERY</span>
+        <span class="font-semibold">NATIONWIDE</span>
+      </div>
+
+      <!-- Bag Summary & Checkout Button -->
+      <div class="p-5 border-t border-slate-100 bg-slate-50/50 space-y-3">
+        <div class="flex justify-between items-baseline">
+          <span class="text-xs text-slate-500">Subtotal Due</span>
+          <span
+            id="bagTotal"
+            class="text-xl sm:text-2xl font-display font-semibold text-slate-900"
+            >৳0</span
+          >
+        </div>
+        <button
+          onclick="checkout()"
+          class="w-full py-3.5 rounded-full bg-[#A41E4F] active:bg-rose-800 text-white text-xs font-semibold tracking-wide transition-all shadow-sm active:scale-98"
+        >
+          Proceed to Secure Checkout
+        </button>
+        <div
+          class="flex justify-center items-center space-x-1.5 text-[10px] text-slate-400"
+        >
+          <svg
+            class="w-3.5 h-3.5 text-emerald-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M5 13l4 4L19 7"
+            ></path>
+          </svg>
+          <span>Backed by Lappy Valley Guarantee</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL / BAG BACKDROP -->
+    <div
+      id="backdropOverlay"
+      onclick="closeAllSheets()"
+      class="fixed inset-0 bg-slate-900/25 backdrop-blur-xs z-40 hidden transition-opacity"
+    ></div>
+
+    <!-- BRANCHES & CONTACT SECTION -->
+    <section
+      id="branches"
+      class="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16 border-t border-slate-200 text-xs text-slate-500"
+    >
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+        <div>
+          <h4 class="font-display font-semibold text-slate-900 text-sm mb-1.5">
+            Jamuna Future Park Branch
+          </h4>
+          <p class="leading-relaxed text-slate-600">
+            Shop # 4D-014B1, East court, Block # D, Level #04, Jamuna Future
+            Park, Dhaka -1229.<br />Phone: 01901-643835, 01901-643836
+          </p>
+        </div>
+        <div>
+          <h4 class="font-display font-semibold text-slate-900 text-sm mb-1.5">
+            Bashundhara City Branch
+          </h4>
+          <p class="leading-relaxed text-slate-600">
+            Shop # 33, level 6, Block D, Bashundhara City Shopping complex, West
+            Panthapath, Dhaka - 1215.<br />Phone: 01901-643832, 01901-643833
+          </p>
+        </div>
+        <div>
+          <h4 class="font-display font-semibold text-slate-900 text-sm mb-1.5">
+            Uttara Branch
+          </h4>
+          <p class="leading-relaxed text-slate-600">
+            Shop # 607 (5th Floor), Rajuk Commercial-Complex, Azampur, Uttara,
+            Dhaka-1230.<br />Phone: 01901-643831, 01901-643834
+          </p>
+        </div>
+        <div>
+          <h4 class="font-display font-semibold text-slate-900 text-sm mb-1.5">
+            Corporate & Legal
+          </h4>
+          <p class="leading-relaxed text-slate-600">
+            Email: info@lappyvalley.com<br />
+            Trade license: 202984<br />
+            Bin Number: 0049818790102
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer
+      class="bg-[#A41E4F] text-white/80 py-10 sm:py-16 text-xs pb-20 sm:pb-16 border-t-4 border-slate-900"
+    >
+      <div
+        class="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row justify-between items-center gap-6"
+      >
+        <div class="flex items-center space-x-2.5">
+          <div
+            class="w-8 h-8 rounded-lg bg-white text-[#A41E4F] flex items-center justify-center font-display font-semibold text-xs"
+          >
+            LV
+          </div>
+          <div>
+            <span
+              class="font-display font-semibold text-white tracking-wider text-sm block leading-none"
+              >LAPPY VALLEY</span
+            >
+            <span class="text-[10px] text-white/60 tracking-wider"
+              >NEW ERA OF LIFE</span
+            >
+          </div>
+        </div>
+        <div class="flex flex-wrap justify-center gap-4 sm:gap-6 text-white/90">
+          <a href="#" class="hover:text-white font-medium">About Us</a>
+          <a href="#" class="hover:text-white font-medium"
+            >Terms & Conditions</a
+          >
+          <a href="#" class="hover:text-white font-medium">Privacy Policy</a>
+          <a href="#" class="hover:text-white font-medium">My account</a>
+          <a href="#" class="hover:text-white font-medium"
+            >Refund & Service Policy</a
+          >
+        </div>
+        <div class="text-white/60 text-center space-y-2">
+          <div>
+            <span class="font-semibold text-white/90">Partners: </span>
+            SSLCOMMERZ | BCS
+          </div>
+          <div>
+            © 2026 lappyvalley.com, All Rights Reserved || Developed By
+            Innovative Skills BD
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- MOBILE-AWARE ENGINE SCRIPT -->
+    <script>
+      /* ==========================================================
+       1. SYNTHETIC TACTILE AUDIO ENGINE (Zero-Latency Mobile)
+       ========================================================== */
+      let audioCtx = null;
+      let soundEnabled = true;
+
+      function initAudio() {
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === "suspended") {
+          audioCtx.resume();
+        }
+      }
+
+      function playTick(freq = 900, duration = 0.02) {
+        if (!soundEnabled) return;
+        try {
+          initAudio();
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+          gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(
+            0.0001,
+            audioCtx.currentTime + duration,
+          );
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start();
+          osc.stop(audioCtx.currentTime + duration);
+        } catch (e) {}
+      }
+
+      function toggleAudio() {
+        soundEnabled = !soundEnabled;
+        const label = soundEnabled ? "Sound: On" : "Sound: Off";
+        document.getElementById("audioLabel").innerText = label;
+        document.getElementById("mobileAudioLabel").innerText = soundEnabled
+          ? "On"
+          : "Off";
+        playTick(1200, 0.04);
+      }
+
+      /* ==========================================================
+       2. CURRENCY CONVERTER
+       ========================================================== */
+      let currentCurrency = "BDT";
+      const CURRENCY_RATES = {
+        BDT: { symbol: "৳", rate: 1.0 },
+        USD: { symbol: "$", rate: 0.0091 }, // Approx 1 USD = 110 BDT
+      };
+
+      function setCurrency(curr) {
+        currentCurrency = curr;
+        updateCurrencyPrices();
+        renderBag();
+      }
+
+      function formatCurrency(baseVal) {
+        const { symbol, rate } = CURRENCY_RATES[currentCurrency];
+        const converted = Math.round(baseVal * rate);
+        return `${symbol}${converted.toLocaleString()}`;
+      }
+
+      function updateCurrencyPrices() {
+        document.getElementById("heroPriceTag").innerText = formatCurrency(
+          450000,
+        );
+        document.getElementById("islandPrice").innerText = formatCurrency(
+          450000,
+        );
+        document.querySelectorAll(".product-price").forEach((el) => {
+          const base = parseInt(el.getAttribute("data-base"));
+          if (base) el.innerText = formatCurrency(base);
+        });
+      }
+
+      /* ==========================================================
+       3. HERO 4-VIEW PERSPECTIVE SWITCHER
+       ========================================================== */
+      const HERO_PERSPECTIVES = [
+        "https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=1200&q=85", // Open Front
+        "https://images.unsplash.com/photo-1593640495253-23d96b4236d4?auto=format&fit=crop&w=1200&q=85", // Keyboard
+        "https://images.unsplash.com/photo-1541807084-5c52b6b3adef?auto=format&fit=crop&w=1200&q=85", // Lid Top
+        "https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?auto=format&fit=crop&w=1200&q=85", // Profile
+      ];
+
+      function switchHeroView(idx) {
+        playTick(800 + idx * 100);
+        for (let i = 0; i < 4; i++) {
+          const btn = document.getElementById(`viewBtn-${i}`);
+          if (i === idx) {
+            btn.className =
+              "px-3.5 py-1.5 rounded-full bg-slate-900 text-white font-semibold transition-all";
+          } else {
+            btn.className =
+              "px-3.5 py-1.5 rounded-full text-slate-600 hover:text-slate-900 transition-all";
+          }
+        }
+        const img = document.getElementById("heroImg");
+        img.style.opacity = "0.3";
+        setTimeout(() => {
+          img.src = HERO_PERSPECTIVES[idx];
+          img.style.opacity = "1";
+        }, 120);
+      }
+
+      function setFinish(name, auraColor, viewIdx) {
+        playTick(1000);
+        document.getElementById("heroFinishName").innerText = name;
+        document.getElementById("heroAura").style.backgroundColor = auraColor;
+        switchHeroView(viewIdx);
+      }
+
+      /* ==========================================================
+       4. SMART MOBILE BOTTOM BAR (Shows when scrolling past hero)
+       ========================================================== */
+      window.addEventListener("scroll", () => {
+        const island = document.getElementById("floatingIsland");
+        if (window.scrollY > 450) {
+          island.classList.remove("hidden");
+          island.classList.add("flex");
+        } else {
+          island.classList.add("hidden");
+          island.classList.remove("flex");
+        }
+      });
+
+      /* ==========================================================
+       5. MOBILE MENU TOGGLE
+       ========================================================== */
+      function toggleMobileMenu() {
+        playTick(900);
+        const menu = document.getElementById("mobileMenu");
+        menu.classList.toggle("hidden");
+      }
+
+      /* ==========================================================
+       6. BODY SCROLL LOCK & SHEET CONTROLLER
+       ========================================================= */
+      function lockScroll(lock = true) {
+        if (lock) {
+          document.body.classList.add("modal-open");
+        } else {
+          document.body.classList.remove("modal-open");
+        }
+      }
+
+      function closeAllSheets() {
+        closeConfigModal();
+        closeCompareModal();
+        closeSearchModal();
+        const bag = document.getElementById("bagDrawer");
+        bag.classList.add("translate-y-full", "sm:translate-x-full");
+        document.getElementById("backdropOverlay").classList.add("hidden");
+        lockScroll(false);
+      }
+
+      /* ==========================================================
+       7. SPOTLIGHT SEARCH
+       ========================================================== */
+      const CATALOG = [
+        {
+          id: "LV-ROG",
+          name: "ASUS ROG Zephyrus G16",
+          price: 450000,
+          cat: "gaming",
+          spec: "Core ultra 9 185H • RTX 4090",
+        },
+        {
+          id: "LV-HP850",
+          name: "HP EliteBook 850 G8",
+          price: 55500,
+          cat: "new-arrival",
+          spec: "Core i5-11th gen • 8GB-256GB",
+        },
+        {
+          id: "LV-MAC",
+          name: "Apple MacBook Pro",
+          price: 215000,
+          cat: "new-arrival",
+          spec: "10-Core CPU • 16GB-512GB",
+        },
+        {
+          id: "LV-DELL",
+          name: "Dell Latitude 5330",
+          price: 56500,
+          cat: "student",
+          spec: "Core i5-1245U • 16-256 GB",
+        },
+        {
+          id: "LV-LENX1",
+          name: "Lenovo X1 Carbon",
+          price: 47500,
+          cat: "student",
+          spec: "Core i7-8th Gen • 16-256 GB",
+        },
+        {
+          id: "LV-LENLOQ",
+          name: "Lenovo LOQ 15APH8",
+          price: 86500,
+          cat: "gaming",
+          spec: "Ryzen 7 7840HS • 16/512GB",
+        },
+        {
+          id: "LV-ACER",
+          name: "Acer Nitro V15",
+          price: 135500,
+          cat: "gaming",
+          spec: "Core i5-13420H • RTX 5050",
+        },
+      ];
+
+      function openSearchModal() {
+        playTick(900);
+        closeAllSheets();
+        document.getElementById("searchModal").classList.remove("hidden");
+        document.getElementById("searchModal").classList.add("flex");
+        document.getElementById("backdropOverlay").classList.remove("hidden");
+        lockScroll(true);
+        setTimeout(() => document.getElementById("searchInput").focus(), 100);
+      }
+
+      function closeSearchModal() {
+        document.getElementById("searchModal").classList.add("hidden");
+        document.getElementById("searchModal").classList.remove("flex");
+        document.getElementById("backdropOverlay").classList.add("hidden");
+        lockScroll(false);
+      }
+
+      function handleSearch(term) {
+        const container = document.getElementById("searchResults");
+        if (!term.trim()) {
+          container.innerHTML =
+            '<div class="text-xs text-slate-400 text-center py-6">Type keywords to search all available laptops.</div>';
+          return;
+        }
+        const filtered = CATALOG.filter(
+          (c) =>
+            c.name.toLowerCase().includes(term.toLowerCase()) ||
+            c.spec.toLowerCase().includes(term.toLowerCase()),
+        );
+
+        if (filtered.length === 0) {
+          container.innerHTML =
+            '<div class="text-xs text-slate-400 text-center py-6">No models match your query.</div>';
+          return;
+        }
+
+        container.innerHTML = "";
+        filtered.forEach((item) => {
+          const row = document.createElement("div");
+          row.className =
+            "p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 active:scale-98 cursor-pointer flex justify-between items-center transition-all";
+          row.onclick = () => {
+            closeSearchModal();
+            const idx = CATALOG.findIndex((c) => c.id === item.id);
+            openConfigModal(idx);
+          };
+          row.innerHTML = `
+          <div>
+            <h5 class="text-xs font-semibold text-slate-900">${item.name}</h5>
+            <span class="text-[10px] text-slate-500">${item.spec}</span>
+          </div>
+          <span class="text-xs font-semibold text-slate-900">${formatCurrency(
+            item.price,
+          )}</span>
+        `;
+          container.appendChild(row);
+        });
+      }
+
+      /* ==========================================================
+       8. MODEL MATRIX MODAL
+       ========================================================== */
+      function openCompareModal() {
+        playTick(1100);
+        closeAllSheets();
+        document.getElementById("compareModal").classList.remove("hidden");
+        document.getElementById("compareModal").classList.add("flex");
+        document.getElementById("backdropOverlay").classList.remove("hidden");
+        lockScroll(true);
+      }
+
+      function closeCompareModal() {
+        document.getElementById("compareModal").classList.add("hidden");
+        document.getElementById("compareModal").classList.remove("flex");
+        document.getElementById("backdropOverlay").classList.add("hidden");
+        lockScroll(false);
+      }
+
+      /* ==========================================================
+       9. CATALOG FILTERING
+       ========================================================== */
+      function filterCatalog(category) {
+        playTick(750);
+        const tabs = ["all", "new-arrival", "student", "gaming"];
+        tabs.forEach((t) => {
+          const btn = document.getElementById(`tab-${t}`);
+          if (t === category) {
+            btn.className =
+              "px-4 py-2 rounded-full bg-slate-900 text-white text-xs font-medium transition-all shadow-xs active:scale-95";
+          } else {
+            btn.className =
+              "px-4 py-2 rounded-full bg-white border border-slate-200 text-slate-600 hover:text-slate-900 text-xs font-medium transition-all active:scale-95";
+          }
+        });
+
+        document.querySelectorAll(".product-item").forEach((card) => {
+          if (
+            category === "all" ||
+            card.getAttribute("data-category") === category
+          ) {
+            card.style.display = "flex";
+          } else {
+            card.style.display = "none";
+          }
+        });
+      }
+
+      /* ==========================================================
+       10. BESPOKE CONFIGURATOR LOGIC
+       ========================================================== */
+      let currentConfigItem = CATALOG[0];
+      let ramPriceDelta = 0;
+      let ramLabel = "Base RAM";
+      let ssdPriceDelta = 0;
+      let ssdLabel = "Base Storage";
+
+      function openConfigModal(idx) {
+        playTick(1000);
+        closeAllSheets();
+        currentConfigItem = CATALOG[idx];
+        ramPriceDelta = 0;
+        ramLabel = "Base RAM";
+        ssdPriceDelta = 0;
+        ssdLabel = "Base Storage";
+
+        document.getElementById("cfgModalTitle").innerText =
+          currentConfigItem.name;
+        document.getElementById("engraveInput").value = "";
+        resetConfigOptions();
+        updateConfigTotal();
+
+        document.getElementById("configModal").classList.remove("hidden");
+        document.getElementById("configModal").classList.add("flex");
+        document.getElementById("backdropOverlay").classList.remove("hidden");
+        lockScroll(true);
+      }
+
+      function closeConfigModal() {
+        document.getElementById("configModal").classList.add("hidden");
+        document.getElementById("configModal").classList.remove("flex");
+        document.getElementById("backdropOverlay").classList.add("hidden");
+        lockScroll(false);
+      }
+
+      function resetConfigOptions() {
+        ["ram", "ssd"].forEach((t) => {
+          for (let i = 0; i < 3; i++) {
+            const btn = document.getElementById(`${t}Btn-${i}`);
+            if (i === 0) {
+              btn.className =
+                "p-2.5 sm:p-3 rounded-xl border-2 border-[#A41E4F] bg-rose-50 text-[#A41E4F] font-semibold text-xs text-center transition-all";
+            } else {
+              btn.className =
+                "p-2.5 sm:p-3 rounded-xl border border-slate-200 text-slate-700 hover:border-[#A41E4F] font-semibold text-xs text-center transition-all";
+            }
+          }
+        });
+      }
+
+      function selectRam(idx, delta, name) {
+        playTick(800 + idx * 50);
+        ramPriceDelta = delta;
+        ramLabel = name;
+        for (let i = 0; i < 3; i++) {
+          document.getElementById(`ramBtn-${i}`).className =
+            "p-2.5 sm:p-3 rounded-xl border border-slate-200 text-slate-700 hover:border-[#A41E4F] font-semibold text-xs text-center transition-all";
+        }
+        document.getElementById(`ramBtn-${idx}`).className =
+          "p-2.5 sm:p-3 rounded-xl border-2 border-[#A41E4F] bg-rose-50 text-[#A41E4F] font-semibold text-xs text-center transition-all";
+        updateConfigTotal();
+      }
+
+      function selectSsd(idx, delta, name) {
+        playTick(800 + idx * 50);
+        ssdPriceDelta = delta;
+        ssdLabel = name;
+        for (let i = 0; i < 3; i++) {
+          document.getElementById(`ssdBtn-${i}`).className =
+            "p-2.5 sm:p-3 rounded-xl border border-slate-200 text-slate-700 hover:border-[#A41E4F] font-semibold text-xs text-center transition-all";
+        }
+        document.getElementById(`ssdBtn-${idx}`).className =
+          "p-2.5 sm:p-3 rounded-xl border-2 border-[#A41E4F] bg-rose-50 text-[#A41E4F] font-semibold text-xs text-center transition-all";
+        updateConfigTotal();
+      }
+
+      function updateConfigTotal() {
+        const totalBase =
+          currentConfigItem.price + ramPriceDelta + ssdPriceDelta;
+        document.getElementById("cfgFinalPrice").innerText = formatCurrency(
+          totalBase,
+        );
+      }
+
+      function confirmCustomUnit() {
+        playTick(1300);
+        const totalBase =
+          currentConfigItem.price + ramPriceDelta + ssdPriceDelta;
+        const engrave = document.getElementById("engraveInput").value.trim();
+
+        addToBag(
+          currentConfigItem.name,
+          totalBase,
+          `${ramLabel} • ${ssdLabel}${engrave ? ' • "' + engrave + '"' : ""}`,
+        );
+        closeConfigModal();
+      }
+
+      /* ==========================================================
+       11. SHOPPING BAG STATE & DISPATCH
+       ========================================================== */
+      let bag = [];
+
+      function quickAdd(idx) {
+        // Offset by 1 for the first hero item conceptually, but array maps directly
+        const p = CATALOG[idx];
+        addToBag(p.name, p.price, "Standard Stock Specification");
+      }
+
+      function addToBag(title, priceBase, spec) {
+        playTick(1200);
+        bag.push({
+          title,
+          priceBase,
+          spec,
+          id: "LV-" + Math.floor(100 + Math.random() * 900),
+        });
+        renderBag();
+        openBag();
+      }
+
+      function removeBagItem(idx) {
+        playTick(600);
+        bag.splice(idx, 1);
+        renderBag();
+      }
+
+      function renderBag() {
+        const counter = document.getElementById("bagCounter");
+        const list = document.getElementById("bagList");
+        const total = document.getElementById("bagTotal");
+
+        counter.innerText = bag.length;
+
+        if (bag.length === 0) {
+          list.innerHTML = `<div class="text-center py-16 text-slate-400 text-xs">Your shopping cart is currently empty.</div>`;
+          total.innerText = formatCurrency(0);
+          return;
+        }
+
+        let sumBase = 0;
+        list.innerHTML = "";
+        bag.forEach((item, i) => {
+          sumBase += item.priceBase;
+          const row = document.createElement("div");
+          row.className =
+            "p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1";
+          row.innerHTML = `
+          <div class="flex justify-between items-start">
+            <h4 class="font-display font-semibold text-xs sm:text-sm text-slate-900">${
+              item.title
+            }</h4>
+            <button onclick="removeBagItem(${i})" class="text-slate-400 hover:text-[#A41E4F] text-xs p-1">✕</button>
+          </div>
+          <p class="text-[11px] text-slate-500 leading-snug">${item.spec}</p>
+          <div class="text-xs sm:text-sm font-semibold text-[#A41E4F] pt-1 text-right">${formatCurrency(
+            item.priceBase,
+          )}</div>
+        `;
+          list.appendChild(row);
+        });
+
+        total.innerText = formatCurrency(sumBase);
+      }
+
+      function toggleBag() {
+        playTick(900);
+        const drawer = document.getElementById("bagDrawer");
+        const isClosed =
+          drawer.classList.contains("translate-y-full") ||
+          drawer.classList.contains("sm:translate-x-full");
+        if (isClosed) {
+          openBag();
+        } else {
+          closeAllSheets();
+        }
+      }
+
+      function openBag() {
+        closeAllSheets();
+        const drawer = document.getElementById("bagDrawer");
+        drawer.classList.remove("translate-y-full", "sm:translate-x-full");
+        document.getElementById("backdropOverlay").classList.remove("hidden");
+        lockScroll(true);
+      }
+
+      function checkout() {
+        if (bag.length === 0) return;
+        playTick(1400);
+        alert(
+          "CHECKOUT SECURED: Redirecting to SSLCOMMERZ gateway for Lappy Valley...",
+        );
+        bag = [];
+        renderBag();
+        closeAllSheets();
+      }
+
+      // Initialize currency values
+      updateCurrencyPrices();
+    </script>
+  </body>
+</html>

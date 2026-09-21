@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="bn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>
+      কক্সবাজার আলটিমেট বাজেট ট্যুর প্ল্যান (বাস ট্রিপ - ১০ জন) | সৌজন্যে: সাকিব
+    </title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts: Hind Siliguri -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- FontAwesome Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+
+    <!-- Leaflet Map CSS -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              bengali: ['"Hind Siliguri"', "sans-serif"],
+            },
+            colors: {
+              ocean: {
+                50: "#f0f9ff",
+                100: "#e0f2fe",
+                500: "#0284c7",
+                600: "#0369a1",
+                800: "#075985",
+                900: "#082f49",
+                950: "#031c33",
+              },
+            },
+          },
+        },
+      };
+    </script>
+
+    <style>
+      body {
+        font-family: "Hind Siliguri", sans-serif;
+        -webkit-tap-highlight-color: transparent;
+        scroll-behavior: smooth;
+      }
+
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+
+      #map {
+        height: 380px;
+        z-index: 10;
+        border-radius: 1.5rem;
+      }
+      @media (min-width: 768px) {
+        #map {
+          height: 480px;
+        }
+      }
+
+      /* Premium Map Marker Pins */
+      .premium-pin {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #0284c7, #075985);
+        color: white;
+        box-shadow: 0 4px 14px rgba(2, 132, 199, 0.45);
+        border: 2.5px solid #ffffff;
+        font-size: 14px;
+        transition: all 0.3s ease;
+      }
+      .premium-pin.sunset-pin {
+        background: linear-gradient(135deg, #f97316, #ef4444);
+        box-shadow: 0 4px 18px rgba(249, 115, 22, 0.6);
+        animation: pulse-ring 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
+      }
+      .premium-pin .pin-number {
+        position: absolute;
+        top: -6px;
+        right: -6px;
+        background: #0f172a;
+        color: #f8fafc;
+        font-size: 10px;
+        font-weight: 800;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1.5px solid #ffffff;
+      }
+
+      @keyframes pulse-ring {
+        0%,
+        100% {
+          transform: scale(1);
+          box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.65);
+        }
+        50% {
+          transform: scale(1.08);
+          box-shadow: 0 0 0 12px rgba(249, 115, 22, 0);
+        }
+      }
+
+      .timeline-line::before {
+        content: "";
+        position: absolute;
+        left: 17px;
+        top: 14px;
+        bottom: 24px;
+        width: 3px;
+        background: linear-gradient(
+          to bottom,
+          #0284c7,
+          #38bdf8,
+          #f59e0b,
+          #10b981
+        );
+        border-radius: 9999px;
+      }
+    </style>
+  </head>
+  <body
+    class="bg-slate-100/90 text-slate-800 antialiased selection:bg-ocean-500 selection:text-white pb-12"
+  >
+    <!-- Floating Mobile Quick Nav Bar -->
+    <nav
+      class="fixed bottom-3 inset-x-3 z-50 md:hidden bg-slate-950/90 backdrop-blur-lg border border-white/10 rounded-2xl shadow-2xl px-4 py-2.5 flex items-center justify-around text-white text-xs font-semibold"
+    >
+      <a
+        href="#map-section"
+        class="flex flex-col items-center gap-1 text-sky-400 hover:text-white transition"
+      >
+        <i class="fa-solid fa-map-location-dot text-base"></i>
+        <span>ম্যাপ</span>
+      </a>
+      <a
+        href="#protips-section"
+        class="flex flex-col items-center gap-1 text-amber-400 hover:text-white transition"
+      >
+        <i class="fa-solid fa-crown text-base"></i>
+        <span>প্রো-টিপস</span>
+      </a>
+      <a
+        href="#timeline-section"
+        class="flex flex-col items-center gap-1 text-slate-300 hover:text-white transition"
+      >
+        <i class="fa-solid fa-route text-base"></i>
+        <span>প্ল্যান</span>
+      </a>
+      <a
+        href="#budget-section"
+        class="flex flex-col items-center gap-1 text-emerald-400 hover:text-white transition"
+      >
+        <i class="fa-solid fa-calculator text-base"></i>
+        <span>১০ জনের বাজেট</span>
+      </a>
+    </nav>
+
+    <!-- Eye-Catching Header with Deep Ocean Gradient -->
+    <header
+      class="relative bg-gradient-to-br from-[#021f3d] via-[#03426e] to-[#026c9c] text-white overflow-hidden pt-10 pb-16 px-4 md:py-20 shadow-2xl"
+    >
+      <!-- Glow Accents -->
+      <div
+        class="absolute -top-20 -left-20 w-96 h-96 bg-sky-400/25 rounded-full blur-3xl pointer-events-none"
+      ></div>
+      <div
+        class="absolute top-1/2 -right-20 w-80 h-80 bg-amber-400/20 rounded-full blur-3xl pointer-events-none"
+      ></div>
+      <div
+        class="absolute inset-0 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:24px_24px] opacity-10"
+      ></div>
+
+      <div class="max-w-6xl mx-auto text-center relative z-10">
+        <!-- Shakib Branding Badge -->
+        <div
+          class="inline-flex items-center gap-2 bg-white/15 backdrop-blur-md border border-white/25 px-4 py-1.5 rounded-full text-xs md:text-sm font-bold text-amber-300 mb-4 shadow-lg"
+        >
+          <i class="fa-solid fa-compass text-amber-300"></i>
+          <span
+            >পরিকল্পনা ও সৌজন্যে:
+            <strong class="text-white tracking-wide">সাকিব</strong></span
+          >
+          <span
+            class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse ml-1"
+          ></span>
+        </div>
+
+        <h1
+          class="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight leading-tight mb-3 drop-shadow-md"
+        >
+          কক্সবাজার আলটিমেট বাজেট ভ্রমণ <br class="hidden sm:inline" />
+          <span
+            class="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-sky-200 to-emerald-300"
+          >
+            ভিজুয়াল রোডম্যাপ &amp; ১০ জনের বাস ট্রিপ গাইড
+          </span>
+        </h1>
+
+        <p
+          class="text-sky-100 text-xs sm:text-sm md:text-lg max-w-3xl mx-auto leading-relaxed px-2 font-normal"
+        >
+          বাস টার্মিনালে আগমন, হোটেল নেগোসিয়েশন, মেরিন ড্রাইভ, ইনানীর প্রবাল
+          পাথর, দোলনা বিচের সূর্যাস্ত, নাইট বিচ ওয়াক থেকে বান্দরবান যাত্রা—১০
+          জনের নিখুঁত গাইডলাইন!
+        </p>
+
+        <!-- Key Stat Highlights for 10 People (Mobile Grid) -->
+        <div
+          class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mt-7 max-w-4xl mx-auto text-left px-1"
+        >
+          <div
+            class="bg-white/10 backdrop-blur-md border border-white/20 p-3.5 rounded-2xl shadow-sm hover:bg-white/15 transition"
+          >
+            <div
+              class="text-amber-300 text-lg md:text-2xl font-black flex items-center gap-2"
+            >
+              <i class="fa-solid fa-users-line text-sm md:text-lg"></i> ১০ জন
+            </div>
+            <p class="text-[11px] md:text-xs text-sky-100 mt-0.5">
+              ট্যুর গ্রুপের মেম্বার
+            </p>
+          </div>
+
+          <div
+            class="bg-white/10 backdrop-blur-md border border-white/20 p-3.5 rounded-2xl shadow-sm hover:bg-white/15 transition"
+          >
+            <div
+              class="text-emerald-300 text-lg md:text-2xl font-black flex items-center gap-2"
+            >
+              <i class="fa-solid fa-hotel text-sm md:text-lg"></i> ৩টি রুম
+            </div>
+            <p class="text-[11px] md:text-xs text-sky-100 mt-0.5">
+              ৮০০৳ রেটে হোটেল সি ওশান
+            </p>
+          </div>
+
+          <div
+            class="bg-white/10 backdrop-blur-md border border-white/20 p-3.5 rounded-2xl shadow-sm hover:bg-white/15 transition"
+          >
+            <div
+              class="text-sky-300 text-lg md:text-2xl font-black flex items-center gap-2"
+            >
+              <i class="fa-solid fa-utensils text-sm md:text-lg"></i> ২০৳ / ২২০৳
+            </div>
+            <p class="text-[11px] md:text-xs text-sky-100 mt-0.5">
+              দানব পরোটা ও লাঞ্চ প্যাকেজ
+            </p>
+          </div>
+
+          <div
+            class="bg-white/10 backdrop-blur-md border border-white/20 p-3.5 rounded-2xl shadow-sm hover:bg-white/15 transition"
+          >
+            <div
+              class="text-rose-300 text-lg md:text-2xl font-black flex items-center gap-2"
+            >
+              <i class="fa-solid fa-bus text-sm md:text-lg"></i> বান্দরবান
+            </div>
+            <p class="text-[11px] md:text-xs text-sky-100 mt-0.5">
+              ১০ জনের টিকিট ডিসকাউন্ট
+            </p>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Container -->
+    <main
+      class="max-w-6xl mx-auto px-3.5 md:px-6 -mt-6 space-y-10 relative z-20"
+    >
+      <!-- Interactive Route Map Section -->
+      <section
+        id="map-section"
+        class="bg-white rounded-3xl p-4 sm:p-6 md:p-8 shadow-xl border border-slate-200/80"
+      >
+        <div
+          class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4"
+        >
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="p-2 bg-ocean-50 text-ocean-600 rounded-xl text-base">
+                <i class="fa-solid fa-map-location-dot"></i>
+              </span>
+              <h2 class="text-lg md:text-2xl font-extrabold text-slate-800">
+                ভিজুয়াল রুট ম্যাপ (বাস টার্মিনাল থেকে ইনানী, দোলনা বিচ হয়ে
+                কলাতলী বিচ)
+              </h2>
+            </div>
+            <p class="text-slate-500 text-xs md:text-sm mt-1 ml-9">
+              বাসে আগমন থেকে শুরু করে ইনানী ও দোলনা বিচে সূর্যাস্ত দেখে কলাতলী
+              বিচের ওয়াক পর্যন্ত সম্পূর্ণ রুট
+            </p>
+          </div>
+
+          <!-- Legend Badges -->
+          <div class="flex flex-wrap gap-2 text-[11px] md:text-xs ml-9 md:ml-0">
+            <span
+              class="bg-sky-50 text-sky-700 border border-sky-200 px-2.5 py-1 rounded-full font-semibold flex items-center gap-1.5"
+            >
+              <span class="w-2 h-2 rounded-full bg-ocean-600"></span> ডে-ট্যুর
+              পয়েন্টস
+            </span>
+            <span
+              class="bg-amber-50 text-amber-800 border border-amber-300 px-2.5 py-1 rounded-full font-bold flex items-center gap-1.5"
+            >
+              <span
+                class="w-2 h-2 rounded-full bg-amber-500 animate-ping"
+              ></span>
+              দোলনা সূর্যাস্ত স্পট
+            </span>
+          </div>
+        </div>
+
+        <!-- Map Element -->
+        <div
+          id="map"
+          class="shadow-inner border border-slate-200 overflow-hidden w-full"
+        ></div>
+
+        <!-- Mobile Horizontal Scrollable Quick Focus Bar -->
+        <div class="mt-4">
+          <p
+            class="text-[11px] text-slate-400 font-semibold uppercase tracking-wider mb-2 flex items-center gap-1"
+          >
+            <i class="fa-solid fa-hand-pointer text-ocean-500"></i> পয়েন্টে
+            ট্যাপ করে ম্যাপে সঠিক জায়গাটি দেখুন:
+          </p>
+          <div
+            class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1"
+          >
+            <button
+              onclick="flyToSpot(0)"
+              class="whitespace-nowrap px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-ocean-100 text-slate-700 hover:text-ocean-700 font-bold text-xs transition active:scale-95 border border-slate-200"
+            >
+              ১. বাস টার্মিনাল (পৌঁছানো)
+            </button>
+            <button
+              onclick="flyToSpot(1)"
+              class="whitespace-nowrap px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-ocean-100 text-slate-700 hover:text-ocean-700 font-bold text-xs transition active:scale-95 border border-slate-200"
+            >
+              ২. সুগন্ধা হোটেল সি ওশান
+            </button>
+            <button
+              onclick="flyToSpot(2)"
+              class="whitespace-nowrap px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-ocean-100 text-slate-700 hover:text-ocean-700 font-bold text-xs transition active:scale-95 border border-slate-200"
+            >
+              ৩. ডলফিন মোড়
+            </button>
+            <button
+              onclick="flyToSpot(3)"
+              class="whitespace-nowrap px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-ocean-100 text-slate-700 hover:text-ocean-700 font-bold text-xs transition active:scale-95 border border-slate-200"
+            >
+              ৪. হিমছড়ি পাহাড়
+            </button>
+            <button
+              onclick="flyToSpot(4)"
+              class="whitespace-nowrap px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-ocean-100 text-slate-700 hover:text-ocean-700 font-bold text-xs transition active:scale-95 border border-slate-200"
+            >
+              ৫. ইনানী প্রবাল বিচ
+            </button>
+            <button
+              onclick="flyToSpot(5)"
+              class="whitespace-nowrap px-3 py-1.5 rounded-xl bg-amber-100 text-amber-900 border border-amber-300 font-bold text-xs transition active:scale-95 shadow-sm"
+            >
+              ★ ৬. দোলনা বিচ (Sunset)
+            </button>
+            <button
+              onclick="flyToSpot(6)"
+              class="whitespace-nowrap px-3 py-1.5 rounded-xl bg-sky-100 text-sky-800 border border-sky-200 font-bold text-xs transition active:scale-95"
+            >
+              ৭. কলাতলী মোড় (অটো ফেরত)
+            </button>
+            <button
+              onclick="flyToSpot(7)"
+              class="whitespace-nowrap px-3 py-1.5 rounded-xl bg-emerald-100 text-emerald-800 border border-emerald-200 font-bold text-xs transition active:scale-95"
+            >
+              ৮. কলাতলী বিচ (নাইট ওয়াক)
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Step-by-Step Detailed Timeline -->
+      <section id="timeline-section" class="space-y-10">
+        <div class="text-center max-w-xl mx-auto">
+          <span
+            class="text-xs font-bold text-ocean-600 uppercase tracking-widest bg-ocean-50 px-3 py-1 rounded-full border border-ocean-200"
+          >
+            ধাপে ধাপে ট্যুর বিবরণ
+          </span>
+          <h2 class="text-2xl md:text-4xl font-extrabold text-slate-900 mt-2">
+            ১০ জনের কক্সবাজার ট্যুর টাইমলাইন
+          </h2>
+          <p class="text-slate-500 text-xs md:text-sm mt-1">
+            সময়, বার্গেনিং এবং প্রতিটি স্পটের সেরা মুহূর্তগুলোর গাইডলাইন
+          </p>
+        </div>
+
+        <!-- DAY 1 -->
+        <div
+          class="bg-white rounded-3xl p-4 sm:p-6 md:p-8 shadow-sm border border-slate-200"
+        >
+          <div
+            class="flex items-center gap-3 pb-6 border-b border-slate-100 mb-6"
+          >
+            <span
+              class="bg-ocean-600 text-white font-extrabold px-3.5 py-1.5 rounded-xl text-base shadow-md shadow-ocean-300"
+            >
+              দিন ০১
+            </span>
+            <div>
+              <h3 class="text-lg md:text-xl font-bold text-slate-800">
+                বাসে আগমন, হোটেল চেক-ইন, বিচে স্নান ও মেরিন ড্রাইভ সূর্যাস্ত
+              </h3>
+              <p class="text-xs text-slate-400">
+                সকাল থেকে শুরু করে গভীর রাত পর্যন্ত সম্পূর্ণ প্ল্যান
+              </p>
+            </div>
+          </div>
+
+          <div
+            class="relative timeline-line space-y-7 pl-9 md:pl-12 text-slate-700"
+          >
+            <!-- Step 1 (Updated strictly for Bus Arrival) -->
+            <div class="relative">
+              <div
+                class="absolute -left-9 md:-left-12 top-0.5 w-7 h-7 rounded-full bg-ocean-600 text-white flex items-center justify-center font-bold text-xs ring-4 ring-white shadow"
+              >
+                ১
+              </div>
+              <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                <div
+                  class="flex flex-wrap items-center justify-between gap-1 mb-1.5"
+                >
+                  <h4 class="font-bold text-slate-900 text-sm md:text-base">
+                    সকাল সকাল বাসে আগমন: বাস স্ট্যান্ড থেকে সুগন্ধা হোটেল
+                  </h4>
+                  <span
+                    class="text-[11px] bg-sky-100 text-sky-800 font-semibold px-2 py-0.5 rounded-md"
+                    >ভোর ৬:০০ - ৭:৩০</span
+                  >
+                </div>
+                <p class="text-xs md:text-sm text-slate-600 leading-relaxed">
+                  চেষ্টা করবেন ভোর বা সকাল সকাল বাসে কক্সবাজারে পৌঁছাতে। বাস
+                  আপনাকে সেন্ট্রাল বাস টার্মিনাল বা কলাতলী বাস ড্রপ পয়েন্টে
+                  নামিয়ে দেবে। সেখান থেকে সুগন্ধায় যাওয়ার জন্য আপনারা
+                  <strong>১০ জন মিলে ২টি অটো/টমটম রিজার্ভ</strong> করবেন। অটোতে
+                  ওঠার আগেই ভালো করে দরদাম করে নিবেন (টার্মিনালের পাশের কোনো
+                  দোকানদারকে স্বাভাবিকভাবে জিজ্ঞেস করে নেবেন আসল অটো ভাড়া কত)।
+                </p>
+              </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="relative">
+              <div
+                class="absolute -left-9 md:-left-12 top-0.5 w-7 h-7 rounded-full bg-ocean-600 text-white flex items-center justify-center font-bold text-xs ring-4 ring-white shadow"
+              >
+                ২
+              </div>
+              <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                <div
+                  class="flex flex-wrap items-center justify-between gap-1 mb-1.5"
+                >
+                  <h4 class="font-bold text-slate-900 text-sm md:text-base">
+                    হোটেল চেক-ইন (Hotel Sea Ocean) ও দানব পরোটার নাশতা
+                  </h4>
+                  <span
+                    class="text-[11px] bg-emerald-100 text-emerald-800 font-semibold px-2 py-0.5 rounded-md"
+                    >সকাল ৭:৩০ - ৮:৩০</span
+                  >
+                </div>
+                <p class="text-xs md:text-sm text-slate-600 leading-relaxed">
+                  সুগন্ধাতে সুন্দর কিন্তু সাশ্রয়ী হোটেল পাওয়া যায়। ১০০০ টাকার
+                  বেশি কোনো রুমেই উঠবেন না। আপনি চাইলে
+                  <strong>Hotel Sea Ocean</strong>-এ যেতে পারেন। আমরা ৩ জন প্রতি
+                  রাত <strong>৮০০ টাকায়</strong> থেকেছি। যেহেতু আপনারা
+                  <strong>১০ জন</strong>, তাই ৩টি রুম নিলে (৩+৩+৪ জন করে)
+                  ম্যানেজারকে বলুন:
+                  <em
+                    >"আমরা একসাথে ৩টা রুম নিচ্ছি, প্রতি রুম ৮০০ টাকাই রাখতে
+                    হবে।"</em
+                  >
+                  ১০ জনের গ্রুপ পাওয়ার সুবিধার কারণে তারা ৮০০ টাকায় রাজি হয়ে
+                  যাবে।
+                </p>
+                <div
+                  class="mt-2.5 bg-amber-50 border border-amber-200 p-2.5 rounded-xl text-xs text-amber-900"
+                >
+                  <strong
+                    ><i class="fa-solid fa-bread-slice"></i> সকালের
+                    নাশতা:</strong
+                  >
+                  হোটেলের বাইরে লোকাল হোটেলে পেয়ে যাবেন বিশাল বড় সাইজের দানব
+                  পরোটা মাত্র <strong>২০ টাকা</strong> পিস! সাথে ডিম বা সবজি
+                  <strong>৩০ টাকা</strong>। মাত্র ৫০ টাকায় পেট ভরে নাশতা সম্পন্ন
+                  করুন।
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="relative">
+              <div
+                class="absolute -left-9 md:-left-12 top-0.5 w-7 h-7 rounded-full bg-ocean-600 text-white flex items-center justify-center font-bold text-xs ring-4 ring-white shadow"
+              >
+                ৩
+              </div>
+              <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                <div
+                  class="flex flex-wrap items-center justify-between gap-1 mb-1.5"
+                >
+                  <h4 class="font-bold text-slate-900 text-sm md:text-base">
+                    সুগন্ধা বিচে সাঁতার, স্যান্ড ওয়াশার ও প্যাকেজ লাঞ্চ
+                  </h4>
+                  <span
+                    class="text-[11px] bg-sky-100 text-sky-800 font-semibold px-2 py-0.5 rounded-md"
+                    >সকাল ১১:০০ - দুপুর ১:৩০</span
+                  >
+                </div>
+                <p class="text-xs md:text-sm text-slate-600 leading-relaxed">
+                  হোটেল থেকে সুগন্ধা বিচ মাত্র
+                  <strong>৫ মিনিটের হাঁটা পথ</strong>। দুপুরের মধ্যেই ১০ জন
+                  একসাথে বিচে নেমে সাগরে সাঁতার কেটে নিন। গোসল শেষে হোটেলে ঢোকার
+                  সময় গেটের <strong>স্যান্ড ওয়াশার (Sand Washer)</strong> দিয়ে
+                  বালু ভালো করে ধুয়ে রুমে গিয়ে ফ্রেশ হয়ে নিন।
+                </p>
+                <div
+                  class="mt-2 text-xs bg-emerald-50 border border-emerald-200 p-2 rounded-xl text-emerald-800"
+                >
+                  <strong
+                    ><i class="fa-solid fa-plate-wheat"></i> লাঞ্চ
+                    প্যাকেজ:</strong
+                  >
+                  হোটেলের বাইরেই ভালো রেস্টুরেন্ট আছে। ২০০ থেকে ২২০ টাকার ফুল
+                  প্যাকেজ নিলে ভাত, ডাল, ভর্তাসহ সামুদ্রিক মাছ বা চিকেনের দারুণ
+                  খাওয়া হবে।
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="relative">
+              <div
+                class="absolute -left-9 md:-left-12 top-0.5 w-7 h-7 rounded-full bg-ocean-600 text-white flex items-center justify-center font-bold text-xs ring-4 ring-white shadow"
+              >
+                ৪
+              </div>
+              <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                <div
+                  class="flex flex-wrap items-center justify-between gap-1 mb-1.5"
+                >
+                  <h4 class="font-bold text-slate-900 text-sm md:text-base">
+                    ডলফিন মোড় → মেরিন ড্রাইভ → হিমছড়ি
+                  </h4>
+                  <span
+                    class="text-[11px] bg-sky-100 text-sky-800 font-semibold px-2 py-0.5 rounded-md"
+                    >দুপুর ২:০০ - ৩:৩০</span
+                  >
+                </div>
+                <p class="text-xs md:text-sm text-slate-600 leading-relaxed">
+                  খাওয়া শেষে মেইন রোড থেকে অল্প ভাড়ায় ডলফিন মোড়ে চলে আসুন।
+                  যেহেতু আপনারা ১০ জন, তাই আলাদা আলাদা লোকাল বাসে ওঠার চেয়ে
+                  <strong>২টি অটো রিজার্ভ</strong> অথবা
+                  <strong>১টি চান্দের গাড়ি রিজার্ভ</strong> করে নিলে খরচ লোকালের
+                  সমান বা কম পড়বে। ভেঙে গেলে হিমছড়ির লোকাল ভাড়া জনপ্রতি
+                  <strong>৪০ টাকা</strong>। মেরিন ড্রাইভের পাহাড় আর নীল সাগর
+                  দেখতে দেখতে হিমছড়ি পৌঁছাবেন।
+                </p>
+              </div>
+            </div>
+
+            <!-- Step 5 -->
+            <div class="relative">
+              <div
+                class="absolute -left-9 md:-left-12 top-0.5 w-7 h-7 rounded-full bg-ocean-600 text-white flex items-center justify-center font-bold text-xs ring-4 ring-white shadow"
+              >
+                ৫
+              </div>
+              <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                <div
+                  class="flex flex-wrap items-center justify-between gap-1 mb-1.5"
+                >
+                  <h4 class="font-bold text-slate-900 text-sm md:text-base">
+                    হিমছড়ি থেকে ইনানী বিচ (প্রবাল পাথরের মেলা)
+                  </h4>
+                  <span
+                    class="text-[11px] bg-sky-100 text-sky-800 font-semibold px-2 py-0.5 rounded-md"
+                    >বিকেল ৩:৩০ - ৪:৩০</span
+                  >
+                </div>
+                <p class="text-xs md:text-sm text-slate-600 leading-relaxed">
+                  হিমছড়ি দেখা শেষে ইনানী চলে যান (লোকাল ভাড়া জনপ্রতি প্রায়
+                  <strong>১২০ টাকা</strong>)। ১০ জনের গ্রুপে রিজার্ভ গাড়ির ভাড়া
+                  হিসেব করে দেখবেন আরও কমে যাওয়া সম্ভব। ইনানীতে প্রবাল পাথরের
+                  ওপর আছড়ে পড়া ঢেউ দেখুন এবং বিচের ছাতার নিচে বসে ১ ঘণ্টার মতো
+                  চমৎকার সময় কাটান।
+                </p>
+              </div>
+            </div>
+
+            <!-- Step 6 (Dolna Beach Sunset Highlight) -->
+            <div class="relative">
+              <div
+                class="absolute -left-9 md:-left-12 top-0.5 w-7 h-7 rounded-full bg-gradient-to-tr from-amber-500 to-rose-600 text-white flex items-center justify-center text-xs ring-4 ring-amber-200 shadow-lg shadow-rose-500/40 animate-bounce"
+              >
+                <i
+                  class="fa-solid fa-star text-[10px] text-white drop-shadow"
+                ></i>
+              </div>
+              <div
+                class="bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 p-4 md:p-5 rounded-2xl border-2 border-amber-400 shadow-sm"
+              >
+                <div
+                  class="flex flex-wrap items-center justify-between gap-1 mb-1.5"
+                >
+                  <span
+                    class="text-xs font-black uppercase tracking-wider bg-gradient-to-r from-rose-600 to-amber-600 text-white px-2.5 py-0.5 rounded-full shadow-sm"
+                  >
+                    ট্যুরের শ্রেষ্ঠ দৃশ্য
+                  </span>
+                  <span
+                    class="text-[11px] bg-amber-200 text-amber-900 font-bold px-2 py-0.5 rounded-md"
+                    >মাগরিবের ঠিক আগে</span
+                  >
+                </div>
+                <h4 class="font-black text-slate-900 text-sm md:text-lg">
+                  দোলনা বিচ: সাম্পান নৌকা ও লালচে সূর্যাস্ত
+                </h4>
+                <p
+                  class="text-xs md:text-sm text-slate-700 mt-1 leading-relaxed"
+                >
+                  ইনানী ঘুরে সময় হিসেব করে
+                  <strong>মাগরিবের ঠিক আগে</strong> দোলনা বিচে পৌঁছাবেন। সাগরের
+                  পাড়ে দোলনায় বসে রক্তিম সূর্যাস্ত, বালিতে রাখা ঐতিহ্যবাহী
+                  সাম্পান নৌকা আর বাতাসের গর্জন—এই দৃশ্য পুরো ১০ জনের মন জুড়িয়ে
+                  দেবে!
+                </p>
+                <div
+                  class="mt-2.5 bg-rose-100/90 border border-rose-300 p-2.5 rounded-xl text-[11px] md:text-xs text-rose-900 font-semibold flex items-center gap-2"
+                >
+                  <i class="fa-solid fa-triangle-exclamation text-rose-600"></i>
+                  জরুরি সতর্কতা: মাগরিব হওয়ার পরপরই ফেরার গাড়ি ধরবেন! একটু রাত
+                  হলেই গাড়ি পাওয়া যায় না এবং চালকরা অতিরিক্ত ভাড়া হাঁকে।
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 7 (Return loop to Kolatoli & Night Walk) -->
+            <div class="relative">
+              <div
+                class="absolute -left-9 md:-left-12 top-0.5 w-7 h-7 rounded-full bg-ocean-600 text-white flex items-center justify-center font-bold text-xs ring-4 ring-white shadow"
+              >
+                ৭
+              </div>
+              <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                <div
+                  class="flex flex-wrap items-center justify-between gap-1 mb-1.5"
+                >
+                  <h4 class="font-bold text-slate-900 text-sm md:text-base">
+                    দোলনা বিচ থেকে অটোতে কলাতলী মোড় ফেরত → কলাতলী বিচ → সুগন্ধা
+                    বিচ ওয়াক
+                  </h4>
+                  <span
+                    class="text-[11px] bg-sky-100 text-sky-800 font-semibold px-2 py-0.5 rounded-md"
+                    >সন্ধ্যা ৬:৪৫ - রাত ১০:০০</span
+                  >
+                </div>
+                <p class="text-xs md:text-sm text-slate-600 leading-relaxed">
+                  দোলনা বিচ থেকে ১০ জনের জন্য ২টি অটো শক্ত দরদাম করে
+                  <strong>৩৫০ টাকায় (সর্বোচ্চ ৪০০ টাকা প্রতি অটো)</strong> ঠিক
+                  করে কলাতলী মোড়ে চলে আসুন।
+                </p>
+                <div
+                  class="mt-2 p-3 bg-white rounded-xl border border-slate-200 text-xs space-y-1.5"
+                >
+                  <p class="font-bold text-slate-800">
+                    <i class="fa-solid fa-person-walking text-ocean-600"></i>
+                    রাতের বিচের অভিজ্ঞতা:
+                  </p>
+                  <p class="text-slate-600">
+                    • কলাতলী মোড়ে নেমে হেঁটে সরাসরি কলাতলী বিচে ঢুকবেন।
+                  </p>
+                  <p class="text-slate-600">
+                    • কলাতলী বিচ দিয়ে ১০ জন গল্প করতে করতে বিচের কোল ঘেঁষে হেঁটে
+                    চলে আসবেন সুগন্ধা বিচে।
+                  </p>
+                  <p class="text-slate-600">
+                    • সুগন্ধা বিচে কেনাকাটা করুন, বার্মিজ মার্কেট দেখুন এবং গরম
+                    গরম মচমচে কাঁকড়া ভাজি (Crab Fry) টেস্ট করুন।
+                  </p>
+                  <p class="text-slate-600">
+                    • এরপর হোটেলে ফিরে ভালো একটা ঘুম দিয়ে ফ্রেশ হয়ে নিন।
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DAY 2 -->
+        <div
+          class="bg-white rounded-3xl p-4 sm:p-6 md:p-8 shadow-sm border border-slate-200"
+        >
+          <div
+            class="flex items-center gap-3 pb-6 border-b border-slate-100 mb-6"
+          >
+            <span
+              class="bg-emerald-600 text-white font-extrabold px-3.5 py-1.5 rounded-xl text-base shadow-md shadow-emerald-300"
+            >
+              দিন ০২
+            </span>
+            <div>
+              <h3 class="text-lg md:text-xl font-bold text-slate-800">
+                ভোরের নির্জন বিচ, লাবণী ওয়াক, চেকআউট ও বান্দরবান অভিযান
+              </h3>
+              <p class="text-xs text-slate-400">
+                সকালের মিষ্টি বাতাস ও পাহাড়ের উদ্দেশ্যে যাত্রা
+              </p>
+            </div>
+          </div>
+
+          <div
+            class="relative timeline-line space-y-7 pl-9 md:pl-12 text-slate-700"
+          >
+            <!-- Step 8 -->
+            <div class="relative">
+              <div
+                class="absolute -left-9 md:-left-12 top-0.5 w-7 h-7 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-xs ring-4 ring-white shadow"
+              >
+                ৮
+              </div>
+              <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                <div
+                  class="flex flex-wrap items-center justify-between gap-1 mb-1.5"
+                >
+                  <h4 class="font-bold text-slate-900 text-sm md:text-base">
+                    ভোরের সুগন্ধা থেকে হেঁটে হেঁটে লাবণী বিচ
+                  </h4>
+                  <span
+                    class="text-[11px] bg-emerald-100 text-emerald-800 font-semibold px-2 py-0.5 rounded-md"
+                    >ভোর ৫:৪৫ - সকাল ৮:০০</span
+                  >
+                </div>
+                <p class="text-xs md:text-sm text-slate-600 leading-relaxed">
+                  ভোরবেলা ঘুম থেকে উঠেই সৈকতে চলে যান। হোটেল কাছে থাকায় সুগন্ধা
+                  বিচে নেমে ১০ জন একসাথে হেঁটে হেঁটে চলে যান
+                  <strong>লাবণী পয়েন্ট</strong> পর্যন্ত। সকালের শান্ত বিচে দারুণ
+                  গ্রুপ ফটো তুলুন। ইচ্ছে হলে ভোরের পানিতে শেষবারের মতো স্নান করে
+                  নিতে পারেন।
+                </p>
+              </div>
+            </div>
+
+            <!-- Step 9 -->
+            <div class="relative">
+              <div
+                class="absolute -left-9 md:-left-12 top-0.5 w-7 h-7 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-xs ring-4 ring-white shadow"
+              >
+                ৯
+              </div>
+              <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                <div
+                  class="flex flex-wrap items-center justify-between gap-1 mb-1.5"
+                >
+                  <h4 class="font-bold text-slate-900 text-sm md:text-base">
+                    হোটেল চেকআউট (দেরি করানোর চেষ্টা)
+                  </h4>
+                  <span
+                    class="text-[11px] bg-slate-200 text-slate-800 font-semibold px-2 py-0.5 rounded-md"
+                    >সকাল ১০:০০ - ১১:৩০</span
+                  >
+                </div>
+                <p class="text-xs md:text-sm text-slate-600 leading-relaxed">
+                  রুমে ফিরে ব্যাকপ্যাক গুছিয়ে নিন। রিসেপশনে একটু অনুরোধ করবেন
+                  চেকআউটের সময় কিছুটা বাড়িয়ে দেওয়া যায় কি না (সহজে রাজি হতে চায়
+                  না, তবুও চেষ্টা করবেন)। এরপর চেকআউট করে নিজের মালামাল নিয়ে বাস
+                  স্ট্যান্ডের উদ্দেশ্যে বের হন।
+                </p>
+              </div>
+            </div>
+
+            <!-- Step 10 -->
+            <div class="relative">
+              <div
+                class="absolute -left-9 md:-left-12 top-0.5 w-7 h-7 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-xs ring-4 ring-white shadow"
+              >
+                ১০
+              </div>
+              <div
+                class="bg-emerald-50/60 p-4 rounded-2xl border border-emerald-300"
+              >
+                <div
+                  class="flex flex-wrap items-center justify-between gap-1 mb-1.5"
+                >
+                  <h4 class="font-bold text-emerald-950 text-sm md:text-base">
+                    সেন্ট্রাল বাস স্ট্যান্ড → পূবালী / পূর্বাণী বাস → বান্দরবান
+                    মিশন শুরু
+                  </h4>
+                  <span
+                    class="text-[11px] bg-emerald-200 text-emerald-900 font-bold px-2 py-0.5 rounded-md"
+                    >দুপুর ১২:০০ এর পর</span
+                  >
+                </div>
+                <p class="text-xs md:text-sm text-emerald-900 leading-relaxed">
+                  সরাসরি চলে যান সেন্ট্রাল বাস টার্মিনালে। বান্দরবানের জন্য
+                  <strong>পূবালী (Pubali)</strong> অথবা
+                  <strong>পূর্বাণী (Purbani)</strong> বাসের কাউন্টারে যান।
+                  স্বাভাবিক টিকিট জনপ্রতি <strong>২৫০ টাকা</strong>। কাউন্টারে
+                  গিয়ে জোর গলায় বলবেন:
+                  <em
+                    >"আমরা কিন্তু একসাথে ১০ জন টিকিট কাটছি, জনপ্রতি ভাড়া কিছু
+                    কমিয়ে দিন!"</em
+                  >—এভাবে গ্রুপ ডিসকাউন্টে টিকিটে ভালো টাকা সেভ হবে। আর শুরু হয়ে
+                  যাবে আপনার রোমাঞ্চকর <strong>বান্দরবান ট্যুর!</strong>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- Shakib's Pro Tips (Asking Strategy) -->
+      <section
+        id="protips-section"
+        class="bg-gradient-to-br from-amber-50 via-white to-sky-50 rounded-3xl p-5 md:p-8 border-2 border-amber-300 shadow-md"
+      >
+        <div class="flex items-center gap-3 mb-4">
+          <span
+            class="w-10 h-10 rounded-2xl bg-amber-500 text-white flex items-center justify-center text-lg shadow-md shadow-amber-200"
+          >
+            <i class="fa-solid fa-crown"></i>
+          </span>
+          <div>
+            <h3 class="text-lg md:text-2xl font-extrabold text-slate-900">
+              সাকিবের গোল্ডেন প্রো-টিপস: সঠিক দাম জানার গোপন কৌশল
+            </h3>
+            <p class="text-xs text-slate-600">
+              ট্যুরিস্ট ফাঁদে না পড়ে আসল লোকাল রেট বের করার পরীক্ষিত ট্রিক
+            </p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+          <!-- Tip 1: Transport Inquiry -->
+          <div
+            class="bg-white p-4 rounded-2xl border border-amber-200 shadow-sm flex gap-3.5"
+          >
+            <div class="text-amber-600 text-2xl mt-1">
+              <i class="fa-solid fa-store"></i>
+            </div>
+            <div>
+              <h4 class="font-bold text-slate-800 text-sm md:text-base">
+                গাড়ির আসল ভাড়া জানতে: দোকানদারদের জিজ্ঞেস করুন
+              </h4>
+              <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+                বাস থেকে নামার পর বা ডলফিন মোড়ে সরাসরি কোনো অটো বা চান্দের গাড়ির
+                ড্রাইভারকে ভাড়া জিজ্ঞেস করবেন না। বাস স্ট্যান্ড বা রোডের পাশের
+                চায়ের দোকান বা মুদি দোকানিকে নরমালি গিয়ে জিজ্ঞেস করবেন:
+                <em>"ভাই, এখান থেকে সুগন্ধা বা ইনানীর অটো ভাড়া কত করে নেয়?"</em
+                >—দোকানদাররা একদম সঠিক লোকাল ভাড়া বলে দেবে, ফলে ড্রাইভার বেশি
+                চাইলে সাথে সাথে আটকে দিতে পারবেন।
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Checklist Section -->
+      <section
+        class="bg-white rounded-3xl p-5 md:p-6 shadow-sm border border-slate-200"
+      >
+        <h3
+          class="text-base md:text-lg font-bold text-slate-800 mb-3 flex items-center gap-2"
+        >
+          <i class="fa-solid fa-clipboard-check text-ocean-600"></i> ১০ জনের
+          ট্যুর ব্যাগের জরুরি চেকলিস্ট
+        </h3>
+        <div
+          class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs text-slate-700"
+        >
+          <div
+            class="flex items-center gap-2 p-2 bg-slate-50 rounded-xl border border-slate-100"
+          >
+            <i class="fa-solid fa-check text-emerald-500"></i> পাওয়ার ব্যাংক
+            (ছবি তোলার জন্য)
+          </div>
+          <div
+            class="flex items-center gap-2 p-2 bg-slate-50 rounded-xl border border-slate-100"
+          >
+            <i class="fa-solid fa-check text-emerald-500"></i> সানগ্লাস ও
+            সানস্ক্রিন
+          </div>
+          <div
+            class="flex items-center gap-2 p-2 bg-slate-50 rounded-xl border border-slate-100"
+          >
+            <i class="fa-solid fa-check text-emerald-500"></i> ড্রাই ব্যাগ বা
+            অতিরিক্ত পলিথিন
+          </div>
+          <div
+            class="flex items-center gap-2 p-2 bg-slate-50 rounded-xl border border-slate-100"
+          >
+            <i class="fa-solid fa-check text-emerald-500"></i> সবার জাতীয়
+            পরিচয়পত্র (NID) কপি
+          </div>
+        </div>
+      </section>
+
+      <!-- Comprehensive Estimated Budget Breakdown (Placed at the very bottom as requested) -->
+      <section
+        id="budget-section"
+        class="bg-gradient-to-br from-slate-950 via-slate-900 to-ocean-950 text-white rounded-3xl p-5 md:p-8 shadow-2xl border border-white/10"
+      >
+        <div
+          class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6"
+        >
+          <div>
+            <span
+              class="text-xs bg-emerald-500/20 text-emerald-400 border border-emerald-400/30 px-3 py-1 rounded-full font-bold uppercase tracking-wider"
+            >
+              বাজেট ক্যালকুলেশন
+            </span>
+            <h3
+              class="text-xl md:text-3xl font-black text-white mt-2 flex items-center gap-2"
+            >
+              <i class="fa-solid fa-calculator text-amber-400"></i> আনুমানিক মোট
+              বাজেট সামারি (১০ জনের গ্রুপ)
+            </h3>
+            <p class="text-slate-400 text-xs md:text-sm mt-1">
+              কক্সবাজার অংশ এবং বান্দরবানের বাস টিকিটসহ বাস্তবসম্মত খরচের হিসাব
+            </p>
+          </div>
+          <div
+            class="bg-white/10 border border-white/15 p-4 rounded-2xl text-left md:text-right shadow-inner"
+          >
+            <span class="text-xs text-slate-300 block font-semibold"
+              >১০ জনের সর্বমোট আনুমানিক খরচ:</span
+            >
+            <span
+              class="text-2xl md:text-3xl font-black text-amber-300 tracking-wide"
+              >৳ ১২,৩০০ – ১৪,২০০</span
+            >
+            <div class="mt-1.5 flex items-center md:justify-end gap-1.5">
+              <span class="text-xs text-slate-300 font-medium"
+                >মাথাপিছু মাত্র:</span
+              >
+              <span
+                class="text-sm md:text-base font-extrabold text-emerald-300 bg-emerald-950/70 border border-emerald-500/40 px-2.5 py-0.5 rounded-lg tracking-wider"
+              >
+                ৳ ১,২৩০ – ১,৪২০
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto -mx-2 md:mx-0">
+          <table
+            class="w-full text-left text-xs md:text-sm text-slate-300 min-w-[560px]"
+          >
+            <thead
+              class="bg-white/10 text-amber-300 uppercase text-[11px] font-bold"
+            >
+              <tr>
+                <th class="p-3.5 rounded-l-xl">খাত / বিবরণ</th>
+                <th class="p-3.5">১০ জনের হিসেবে প্ল্যানিং</th>
+                <th class="p-3.5 text-center">১০ জনের মোট খরচ</th>
+                <th class="p-3.5 text-right rounded-r-xl">জনপ্রতি খরচ</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-white/10 text-xs">
+              <tr>
+                <td class="p-3.5 font-semibold text-white">
+                  বাস টার্মিনাল থেকে সুগন্ধা হোটেল
+                </td>
+                <td class="p-3.5">১০ জনের জন্য ২টি অটো রিজার্ভ (দরদাম করে)</td>
+                <td class="p-3.5 text-center text-sky-300 font-bold">
+                  ৳১৫০ - ২০০
+                </td>
+                <td class="p-3.5 text-right font-bold text-emerald-400">
+                  ৳১৫ - ২০
+                </td>
+              </tr>
+              <tr>
+                <td class="p-3.5 font-semibold text-white">
+                  হোটেল স্টে (Hotel Sea Ocean)
+                </td>
+                <td class="p-3.5">৩টি রুম (৩+৩+৪ জন) @ ৮০০৳ বার্গেনিং রেট</td>
+                <td class="p-3.5 text-center text-sky-300 font-bold">৳২,৪০০</td>
+                <td class="p-3.5 text-right font-bold text-emerald-400">
+                  ৳২৪০
+                </td>
+              </tr>
+              <tr>
+                <td class="p-3.5 font-semibold text-white">সকালের নাশতা</td>
+                <td class="p-3.5">বড় দানব পরোটা (২০৳) + ডিম/সবজি (৩০৳)</td>
+                <td class="p-3.5 text-center text-sky-300 font-bold">৳৫০০</td>
+                <td class="p-3.5 text-right font-bold text-emerald-400">৳৫০</td>
+              </tr>
+              <tr>
+                <td class="p-3.5 font-semibold text-white">
+                  দুপুরের প্যাকেজ লাঞ্চ
+                </td>
+                <td class="p-3.5">মাছ/চিকেন, ডাল, ভর্তাসহ ফুল প্যাকেজ মিল</td>
+                <td class="p-3.5 text-center text-sky-300 font-bold">
+                  ৳২,০০০ - ২,২০০
+                </td>
+                <td class="p-3.5 text-right font-bold text-emerald-400">
+                  ৳২০০ - ২২০
+                </td>
+              </tr>
+              <tr>
+                <td class="p-3.5 font-semibold text-white">
+                  মেরিন ড্রাইভ, হিমছড়ি ও ইনানী
+                </td>
+                <td class="p-3.5">১০ জনের জন্য ২টি অটো রিজার্ভ / ভেঙে যাওয়া</td>
+                <td class="p-3.5 text-center text-sky-300 font-bold">
+                  ৳১,৬০০ - ১,৮০০
+                </td>
+                <td class="p-3.5 text-right font-bold text-emerald-400">
+                  ৳১৬০ - ১৮০
+                </td>
+              </tr>
+              <tr>
+                <td class="p-3.5 font-semibold text-white">
+                  দোলনা থেকে কলাতলী অটো ফেরত
+                </td>
+                <td class="p-3.5">
+                  ২টি অটো রিজার্ভ (মাগরিবের পর ৩৫০-৪০০৳ প্রতি অটো)
+                </td>
+                <td class="p-3.5 text-center text-sky-300 font-bold">
+                  ৳৭০০ - ৮০০
+                </td>
+                <td class="p-3.5 text-right font-bold text-emerald-400">
+                  ৳৭০ - ৮০
+                </td>
+              </tr>
+              <tr>
+                <td class="p-3.5 font-semibold text-white">
+                  রাতের স্ট্রিট ফুড, ক্র্যাব ফ্রাই ও ডিনার
+                </td>
+                <td class="p-3.5">
+                  সুগন্ধা বিচে কেনাকাটা, কাঁকড়া ভাজি ও খাবার
+                </td>
+                <td class="p-3.5 text-center text-sky-300 font-bold">
+                  ৳১,৫০০ - ২,০০০
+                </td>
+                <td class="p-3.5 text-right font-bold text-emerald-400">
+                  ৳১৫০ - ২০০
+                </td>
+              </tr>
+              <tr class="bg-white/5">
+                <td class="p-3.5 font-semibold text-white">
+                  বান্দরবানের বাস টিকিট (পূবালী/পূর্বাণী)
+                </td>
+                <td class="p-3.5">
+                  একসাথে ১০ টিকিট কাটায় বিশেষ কাউন্টার ডিসকাউন্ট
+                </td>
+                <td class="p-3.5 text-center text-sky-300 font-bold">
+                  ৳২,২০০ - ২,৩০০
+                </td>
+                <td class="p-3.5 text-right font-bold text-emerald-400">
+                  ৳২২০ - ২৩০
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer
+      class="mt-14 bg-slate-950 text-slate-400 py-10 px-4 border-t border-slate-800 text-center text-xs md:text-sm"
+    >
+      <div class="max-w-4xl mx-auto space-y-3">
+        <div
+          class="inline-flex items-center gap-2 bg-white/5 border border-white/10 px-4 py-1.5 rounded-full text-amber-300 font-bold"
+        >
+          <i class="fa-solid fa-heart text-rose-500"></i> সৌজন্যে ও সার্বিক
+          পরিকল্পনায়: সাকিব
+        </div>
+        <p class="text-slate-300 font-medium">
+          ১০ জনের চমৎকার কক্সবাজার ভ্রমণ আর বান্দরবানের সবুজ মেঘের রোমাঞ্চ সফল ও
+          আনন্দময় হোক! ✨
+        </p>
+        <p class="text-slate-500 text-[11px]">
+          বাস্তব ভ্রমণ অভিজ্ঞতার আলোকে নির্মিত নিখুঁত ভিজ্যুয়াল ফ্রেন্ডলি গাইড
+        </p>
+      </div>
+    </footer>
+
+    <!-- Leaflet Map JS Script -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+      // Spots Data strictly starting from Bus Terminal and looping up to Kolatoli Beach
+      const spots = [
+        {
+          id: 1,
+          name: "১. কক্সবাজার সেন্ট্রাল বাস টার্মিনাল",
+          desc:
+            "বাসে পৌঁছে ১০ জনের জন্য ২টি অটো রিজার্ভ করে সুগন্ধা হোটেলে যাত্রা।",
+          coords: [21.437, 91.99],
+          icon: "fa-bus",
+          type: "normal",
+        },
+        {
+          id: 2,
+          name: "২. সুগন্ধা পয়েন্ট ও হোটেল সি ওশান",
+          desc:
+            "১০ জনের জন্য ৩টি রুম (৮০০৳ বার্গেনিং) এবং সকালের ২০ টাকার দানব পরোটা।",
+          coords: [21.4235, 91.9792],
+          icon: "fa-hotel",
+          type: "normal",
+        },
+        {
+          id: 3,
+          name: "৩. ডলফিন মোড়",
+          desc: "মেরিন ড্রাইভ রুটে হিমছড়ি ও ইনানীর অটো স্টপ।",
+          coords: [21.4175, 91.9845],
+          icon: "fa-location-crosshairs",
+          type: "normal",
+        },
+        {
+          id: 4,
+          name: "৪. হিমছড়ি পাহাড় ও ঝর্ণা",
+          desc: "পাহাড় ও সাগরের মেলবন্ধন, শেয়ার্ড ভাড়া মাত্র ৪০ টাকা।",
+          coords: [21.3533, 92.0255],
+          icon: "fa-mountain-sun",
+          type: "normal",
+        },
+        {
+          id: 5,
+          name: "৫. ইনানী প্রবাল সৈকত",
+          desc: "পাথুরে সৈকত ও ছাতার নিচে ১ ঘণ্টা আড্ডা (ভাড়া ১২০ টাকা)।",
+          coords: [21.2315, 92.0514],
+          icon: "fa-umbrella-beach",
+          type: "normal",
+        },
+        {
+          id: 6,
+          name: "★ ৬. দোলনা বিচ (Sunset Highlight)",
+          desc:
+            "মাগরিবের ঠিক আগে সেরা দৃশ্য! সাগরের দোলনা, সাম্পান ও রক্তিম সূর্যাস্ত।",
+          coords: [21.285, 92.04],
+          icon: "fa-sun",
+          type: "sunset",
+        },
+        {
+          id: 7,
+          name: "৭. কলাতলী মোড় (অটো ফেরত)",
+          desc:
+            "দোলনা বিচ থেকে অটো বার্গেনিং করে ৩৫০-৪০০ টাকায় কলাতলীতে ফেরত।",
+          coords: [21.416, 91.983],
+          icon: "fa-car-side",
+          type: "normal",
+        },
+        {
+          id: 8,
+          name: "৮. কলাতলী বিচ (নাইট বিচ ওয়াক শুরু)",
+          desc:
+            "কলাতলী বিচ থেকে বিচের কোল ঘেঁষে সুগন্ধার দিকে চমৎকার নাইট ওয়াক।",
+          coords: [21.4185, 91.9805],
+          icon: "fa-person-walking",
+          type: "normal",
+        },
+      ];
+
+      // Initialize Map
+      const map = L.map("map", {
+        zoomControl: true,
+        tap: false,
+      }).setView([21.34, 92.0], 11);
+
+      // Clean CartoDB Voyager Map Layer
+      L.tileLayer(
+        "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+        {
+          maxZoom: 19,
+          attribution: "© OpenStreetMap contributors, CartoDB",
+        },
+      ).addTo(map);
+
+      const markers = [];
+      const routeCoords = [];
+
+      // Add Custom Designed Pins
+      spots.forEach((spot, index) => {
+        routeCoords.push(spot.coords);
+
+        const isSunset = spot.type === "sunset";
+        const customHtml = `
+        <div class="premium-pin ${isSunset ? "sunset-pin" : ""}">
+          <i class="fa-solid ${spot.icon}"></i>
+          <span class="pin-number">${spot.id}</span>
+        </div>
+      `;
+
+        const customIcon = L.divIcon({
+          html: customHtml,
+          className: "leaflet-clean-pin",
+          iconSize: [38, 38],
+          iconAnchor: [19, 19],
+          popupAnchor: [0, -20],
+        });
+
+        const marker = L.marker(spot.coords, { icon: customIcon }).addTo(map);
+        marker.bindPopup(`
+        <div class="font-bengali p-1 max-w-[200px]">
+          <strong class="text-xs md:text-sm font-extrabold text-slate-900">${spot.name}</strong>
+          <p class="text-[11px] text-slate-600 mt-1 leading-snug">${spot.desc}</p>
+        </div>
+      `);
+        markers.push(marker);
+      });
+
+      // Draw Connected Route Polyline
+      const polyline = L.polyline(routeCoords, {
+        color: "#0284c7",
+        weight: 4,
+        opacity: 0.85,
+        lineCap: "round",
+        dashArray: "6, 8",
+      }).addTo(map);
+
+      // Smooth Fly-to Action
+      function flyToSpot(index) {
+        if (markers[index]) {
+          map.flyTo(spots[index].coords, 14, {
+            duration: 1.2,
+          });
+          setTimeout(() => {
+            markers[index].openPopup();
+          }, 1200);
+        }
+      }
+    </script>
+  </body>
+</html>

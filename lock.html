@@ -1,0 +1,251 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>IELTS Mahir — Reading Class 06</title>
+<style>
+:root{--red:#c90016;--ink:#171717;--line:#ddd;--hl:#fff19a}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:#f1f1f1;color:var(--ink);font-family:Arial,Helvetica,sans-serif}
+body:before{content:"IELTS Mahir   IELTS Mahir   IELTS Mahir   IELTS Mahir";position:fixed;inset:0;z-index:-1;opacity:.025;font-size:52px;font-weight:900;line-height:2.2;transform:rotate(-24deg);pointer-events:none}
+#lock{position:fixed;inset:0;z-index:9999;background:#111;display:flex;align-items:center;justify-content:center;padding:20px}
+.lock-card{width:min(420px,94vw);background:#fff;border-radius:14px;padding:30px;text-align:center;box-shadow:0 25px 80px #0008}
+.brand{color:var(--red);font-weight:900;letter-spacing:.5px}
+.lock-card h1{margin:9px 0;font-size:25px}
+.lock-card p{color:#666;line-height:1.5}
+#pw{width:100%;padding:13px;border:1px solid #aaa;border-radius:8px;font-size:16px}
+#unlock{width:100%;margin-top:10px;padding:13px;border:0;border-radius:8px;background:var(--red);color:#fff;font-weight:900;cursor:pointer}
+#error{display:none;color:var(--red);font-size:13px;margin-top:8px}
+header{height:60px;position:fixed;top:0;left:0;right:0;z-index:1000;background:#111;color:#fff;display:flex;align-items:center;gap:15px;padding:0 18px;box-shadow:0 2px 8px #0004}
+.logo{font-weight:900;white-space:nowrap}.logo span{color:#ff3048}
+.exam{flex:1;color:#ddd;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.timer{font-size:20px;font-weight:900;font-variant-numeric:tabular-nums;min-width:74px;text-align:center}
+.topbtn{background:#222;color:#fff;border:1px solid #555;border-radius:6px;padding:7px 10px;font-weight:700;cursor:pointer}
+#app{display:block;padding-top:60px}
+.notice{background:#fff4f5;border-bottom:1px solid #e0a4ab;padding:8px;text-align:center;font-size:12px;color:#72000c}
+.tabs{position:sticky;top:60px;z-index:900;display:flex;overflow:auto;background:#fff;border-bottom:2px solid var(--red)}
+.tab{min-width:270px;padding:13px;border:0;border-right:1px solid #ddd;background:#f5f5f5;font-weight:900;cursor:pointer}
+.tab.active{background:var(--red);color:#fff}
+.workspace{max-width:1500px;margin:auto;padding:14px;display:grid;grid-template-columns:minmax(0,1fr) minmax(380px,1fr);gap:14px}
+.panel{background:#fff;border:1px solid var(--line);border-radius:6px;overflow:hidden;min-width:0}
+.panel-head{padding:11px 14px;background:#fafafa;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:8px}
+.panel-head h2{font-size:14px;margin:0;text-transform:uppercase}
+.tools{display:flex;gap:6px;flex-wrap:wrap}
+.tool{background:#fff;border:1px solid #aaa;border-radius:5px;padding:6px 9px;font-size:11px;font-weight:800;cursor:pointer}
+.tool.red{background:var(--red);border-color:var(--red);color:#fff}
+.content,.question-section{padding:20px;line-height:1.75;font-size:15px}
+.content p{margin:0 0 16px}
+.para-letter{font-weight:900;color:var(--red)}
+.instructions{background:#f8f8f8;border-left:4px solid var(--red);padding:12px 14px;margin-bottom:15px;line-height:1.55}
+.option-list{border:1px solid #ddd;border-radius:6px;background:#fafafa;padding:12px;margin-bottom:16px}
+.option-list div{margin:6px 0}
+.qbox{border-top:1px solid #e4e4e4;padding:15px 0}
+.qnum{font-weight:900;color:var(--red);margin-bottom:6px}
+.qtext{line-height:1.6;margin-bottom:9px}
+.answer{width:auto;min-width:180px;max-width:100%;padding:8px 32px 8px 9px;border:1px solid #aaa;border-radius:5px;font-size:14px;background:#fff}
+.inline-answer{display:inline-block;vertical-align:middle;margin:0 5px;min-width:150px}
+.match-question{line-height:2.05;margin:18px 0;padding:13px;border-top:1px solid #e5e5e5}
+.highlight{background:var(--hl);padding:1px 2px;border-radius:2px}
+.hidden{display:none!important}
+.finish{max-width:1500px;margin:0 auto 18px;padding:0 14px}
+.finish-card{background:#fff;border:1px solid #ddd;border-radius:6px;padding:15px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.finish-card a{color:var(--red);font-weight:800}
+#copyStatus{font-size:12px;color:#176b40}
+@media(max-width:900px){.workspace{grid-template-columns:1fr}.exam{display:none}}
+@media(max-width:560px){header{padding:0 9px;gap:7px}.logo{font-size:15px}.timer{font-size:17px;min-width:62px}.topbtn{padding:6px 7px;font-size:11px}.workspace{padding:7px}.content,.question-section{padding:14px}.tab{min-width:225px}.inline-answer{min-width:120px}}
+</style>
+</head>
+<body>
+
+
+
+<header>
+<div class="logo"><span>●</span> IELTS Mahir</div>
+<div class="exam">Class 23 : Sentence Ending , Paragraph Matching</div>
+<div class="timer" id="timer">60:00</div>
+<button class="topbtn" id="pause">⏸ Pause</button>
+<button class="topbtn" id="resetTimer">↻ Reset</button>
+</header>
+
+<div id="app">
+<div class="notice">Use a desktop/laptop for the best IELTS-style experience. Mobile is supported, but the wider layout is recommended.</div>
+
+<div class="tabs">
+<button class="tab active" data-tab="sentence">Class 23 · Sentence Ending</button>
+<button class="tab" data-tab="paragraph">Passage 2 · The Power of the Big Screen</button>
+</div>
+
+<section class="workspace tabpage" id="sentence">
+<div class="panel">
+<div class="panel-head">
+<h2>Reading Passage</h2>
+<div class="tools"><button class="tool red hi">Highlight Selection</button><button class="tool clear">Clear Highlights</button></div>
+</div>
+<div class="content highlight-area">
+<h3 style="margin-top:0">Passage : What causes obesity and overweight?</h3>
+<p>The fundamental cause of obesity and overweight is an energy imbalance between calories consumed and calories expended. Globally, there has been an increased intake of energy-dense foods that are high in fat and an increase in physical inactivity due to the increasingly sedentary nature of many forms of work, changing modes of transportation, and increasing urbanization.Changes in dietary and physical activity patterns are often the result of environmental and societal changes associated with the development and lack of supportive policies in sectors such as health, agriculture, transport, urban planning, environment, food processing, distribution, marketing, and education.</p>
+</div>
+</div>
+
+<div class="panel">
+<div class="panel-head">
+<h2>Sentence Endings</h2>
+<div class="tools"><button class="tool red hi">Highlight Selection</button><button class="tool clear">Clear Highlights</button></div>
+</div>
+<div class="question-section highlight-area">
+<div class="instructions">Match the sentence endings:</div>
+<div class="option-list">
+<div><b>A.</b> the number of calories burned are not the same as the calories that have been eaten</div>
+<div><b>B.</b> health and the lifestyle that you have</div>
+<div><b>C.</b> a person consumes too much fast food</div>
+<div><b>D.</b> lead to weight gain, because of less movement</div>
+<div><b>E.</b> make a person gain weight and go out less</div>
+<div><b>F.</b> outlook on life, which affects your daily diet and exercise routine</div>
+</div>
+
+<div class="match-question"><b>1)</b> Weight issues are created when
+<select class="answer inline-answer" data-q="Sentence-1"><option value="">—</option><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option></select>
+</div>
+
+<div class="match-question"><b>2)</b> Having a job where you are sitting for long periods of time or no exercise in your regular routine can
+<select class="answer inline-answer" data-q="Sentence-2"><option value="">—</option><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option></select>
+</div>
+
+<div class="match-question"><b>3)</b> The situation around you can affect your
+<select class="answer inline-answer" data-q="Sentence-3"><option value="">—</option><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option></select>
+</div>
+</div>
+</div>
+</section>
+
+<section class="workspace tabpage hidden" id="paragraph">
+<div class="panel">
+<div class="panel-head">
+<h2>Reading Passage</h2>
+<div class="tools"><button class="tool red hi">Highlight Selection</button><button class="tool clear">Clear Highlights</button></div>
+</div>
+<div class="content highlight-area">
+<h3 style="margin-top:0">Passage : The power of the big screen</h3>
+<p><span class="para-letter">A.</span> The Lumière Brothers opened their Cinématographe, at 14 Boulevard des Capucines in Paris, to 100 paying customers over 100 years ago, on December 8, 1895. Before the eyes of the stunned, thrilled audience, photographs came to life and moved across a flat screen.</p><p><span class="para-letter">B.</span> So ordinary and routine has this become to us that it takes a determined leap of the imagination to grasp the impact of those first moving images. But it is worth trying, for to understand the initial shock of those images is to understand the extraordinary power and magic of cinema, the unique, hypnotic quality that has made film the most dynamic, effective art form of the 20th century.</p><p><span class="para-letter">C.</span> One of the Lumière Brothers&#x27; earliest films was a 30-second piece which showed a section of a railway platform flooded with sunshine. A train appears and heads straight for the camera. And that is all that happens. Yet the Russian director Andrei Tarkovsky, one of the greatest of all film artists, described the film as a &#x27;work of genius&#x27;. &#x27;As the train approached,&#x27; wrote Tarkovsky, &#x27;panic started in the theatre: people jumped and ran away. That was the moment when cinema was born. The frightened audience could not accept that they were watching a mere picture. Pictures were still, only reality moved; this must, therefore, be reality. In their confusion, they feared that a real train was about to crush them.&#x27;</p><p><span class="para-letter">D.</span> Early cinema audiences often experienced the same confusion. In time, the idea of film became familiar, the magic was accepted -but it never stopped being magic. Film has never lost its unique power to embrace its audiences and transport them to a different world. For Tarkovsky, the key to that magic was the way in which cinema created a dynamic image of the real flow of events. A still picture could only imply the existence of time, while time in a novel passed at the whim of the reader. But in cinema, the real, objective flow of time was captured.</p><p><span class="para-letter">E.</span> One effect of this realism was to educate the world about itself. For cinema makes the world smaller. Long before people travelled to America or anywhere else, they knew what other places looked like; they knew how other people worked and lived. Overwhelmingly, the lives recorded - at least in film fiction — have been American. From the earliest days of the industry, Hollywood has dominated the world film market. American imagery - the cars, the cities, the cowboys - became the primary imagery of film. Film carried American life and values around the globe.</p><p><span class="para-letter">F.</span> And, thanks to film, future generations will know the 20th century more intimately than any other period. We can only imagine what life was like in the 14lh century or in classical Greece. But the life of the modern world has been recorded on film in massive, encyclopaedic detail. We shall be known better than any preceding generations.</p><p><span class="para-letter">G.</span> The &#x27;star&#x27; was another natural consequence of cinema. The cinema star was effectively born in 1910. Film personalities have such an immediate presence that, inevitably, they become super-real. Because we watch them so closely and because everybody in the world seems to know who they are, they appear more real to us than we do ourselves. The star as magnified human self is one of cinema&#x27;s most strange and enduring legacies.</p><p><span class="para-letter">H.</span> Cinema has also given a new lease of life to the idea of the story. When the Lumière Brothers and other pioneers began showing off this new invention, it was by no means obvious how it would be used. All that mattered at first was the wonder of movement. Indeed, some said that, once this novelty had worn off, cinema would fade away. It was no more than a passing gimmick, a fairground attraction.</p><p><span class="para-letter">I.</span> Cinema might, for example, have become primarily a documentary form. Or it might have developed like television - as a strange, noisy transfer of music, information and narrative. But what happened was that it became, overwhelmingly, a medium for telling stories. Originally these were conceived as short stories - early producers doubted the ability of audiences to concentrate for more than the length of a reel. Then, in 1912, an Italian 2-hour film was hugely successful, and Hollywood settled upon the novel-length narrative that remains the dominant cinematic convention of today.</p><p><span class="para-letter">J.</span> And it has all happened so quickly. Almost unbelievably, it is a mere 100 years since that train arrived and the audience screamed and fled, convinced by the dangerous reality of what they saw, and, perhaps, suddenly aware that the world could never be the same again - that, maybe, it could be better, brighter, more astonishing, more real than reality.</p>
+</div>
+</div>
+
+<div class="panel">
+<div class="panel-head">
+<h2>Questions 1-5</h2>
+<div class="tools"><button class="tool red hi">Highlight Selection</button><button class="tool clear">Clear Highlights</button></div>
+</div>
+<div class="question-section highlight-area">
+<div class="instructions">
+<b>Questions 1-5</b><br>
+Reading Passage 1 has ten paragraphs, A-J.<br>
+Which paragraph contains the following information?<br>
+Write the correct letter, A-J, in boxes 1-5 on your answer sheet.
+</div>
+
+<div class="qbox"><div class="qnum">1</div><div class="qtext">the location of the first cinema</div>
+<select class="answer" data-q="Paragraph-1"><option value="">— select —</option>
+<option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option><option>G</option><option>H</option><option>I</option><option>J</option></select></div>
+
+<div class="qbox"><div class="qnum">2</div><div class="qtext">how cinema came to focus on stories</div>
+<select class="answer" data-q="Paragraph-2"><option value="">— select —</option>
+<option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option><option>G</option><option>H</option><option>I</option><option>J</option></select></div>
+
+<div class="qbox"><div class="qnum">3</div><div class="qtext">the speed with which cinema has changed</div>
+<select class="answer" data-q="Paragraph-3"><option value="">— select —</option>
+<option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option><option>G</option><option>H</option><option>I</option><option>J</option></select></div>
+
+<div class="qbox"><div class="qnum">4</div><div class="qtext">how cinema teaches us about other cultures</div>
+<select class="answer" data-q="Paragraph-4"><option value="">— select —</option>
+<option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option><option>G</option><option>H</option><option>I</option><option>J</option></select></div>
+
+<div class="qbox"><div class="qnum">5</div><div class="qtext">the attraction of actors in films</div>
+<select class="answer" data-q="Paragraph-5"><option value="">— select —</option>
+<option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option><option>G</option><option>H</option><option>I</option><option>J</option></select></div>
+</div>
+</div>
+</section>
+
+<div class="finish">
+<div class="finish-card">
+<button class="tool red" id="copy">Copy all answers</button>
+<button class="tool" id="clearAll">Clear all highlights</button>
+<button class="tool" id="resetAnswers">Reset all answers</button>
+<span id="copyStatus"></span>
+<span style="margin-left:auto">Google Form: <a href="PASTE_GOOGLE_FORM_LINK_HERE" target="_blank" rel="noopener">PASTE_GOOGLE_FORM_LINK_HERE</a></span>
+</div>
+</div>
+</div>
+
+<script>
+(()=>{
+let seconds=3600,running=false,timerId=null,savedRange=null;
+
+function draw(){
+document.getElementById("timer").textContent=String(Math.floor(seconds/60)).padStart(2,"0")+":"+String(seconds%60).padStart(2,"0");
+}
+function start(){
+if(running)return;
+running=true;document.getElementById("pause").textContent="⏸ Pause";
+timerId=setInterval(()=>{
+if(seconds>0){seconds--;draw();}
+else{clearInterval(timerId);running=false;document.getElementById("pause").textContent="▶ Resume";alert("Time is up.");}
+},1000);
+}
+draw();
+start();
+
+document.getElementById("pause").onclick=()=>{
+if(running){clearInterval(timerId);running=false;document.getElementById("pause").textContent="▶ Resume";}
+else start();
+};
+document.getElementById("resetTimer").onclick=()=>{
+clearInterval(timerId);seconds=3600;running=false;draw();document.getElementById("pause").textContent="▶ Resume";
+};
+
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
+document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+document.querySelectorAll(".tabpage").forEach(x=>x.classList.add("hidden"));
+t.classList.add("active");document.getElementById(t.dataset.tab).classList.remove("hidden");
+window.scrollTo({top:0,behavior:"smooth"});
+});
+
+// Highlight selected text in either the passage or question panel.
+document.addEventListener("selectionchange",()=>{
+const s=getSelection();if(!s||s.rangeCount===0||s.isCollapsed)return;
+const n=s.anchorNode,e=n&&(n.nodeType===3?n.parentElement:n);
+if(e&&e.closest(".highlight-area"))savedRange=s.getRangeAt(0).cloneRange();
+});
+function hi(){
+if(!savedRange||savedRange.collapsed)return;
+const r=savedRange,span=document.createElement("span");span.className="highlight";
+try{span.appendChild(r.extractContents());r.insertNode(span);}catch(e){}
+savedRange=null;
+}
+function clear(root){
+(root||document).querySelectorAll(".highlight").forEach(s=>{
+const p=s.parentNode;while(s.firstChild)p.insertBefore(s.firstChild,s);p.removeChild(s);
+});
+}
+document.querySelectorAll(".hi").forEach(b=>b.onclick=hi);
+document.querySelectorAll(".clear").forEach(b=>b.onclick=()=>clear(b.closest(".panel")));
+document.getElementById("clearAll").onclick=()=>clear(document);
+
+function answers(){
+return [...document.querySelectorAll(".answer")].map((e,i)=>(e.dataset.q||String(i+1))+": "+(e.value||"")).join("\n");
+}
+document.getElementById("copy").onclick=async()=>{
+try{await navigator.clipboard.writeText(answers());document.getElementById("copyStatus").textContent="Answers copied.";}
+catch(e){document.getElementById("copyStatus").textContent="Copy unavailable in this browser.";}
+setTimeout(()=>document.getElementById("copyStatus").textContent="",2500);
+};
+document.getElementById("resetAnswers").onclick=()=>{
+if(confirm("Reset all answers?"))document.querySelectorAll(".answer").forEach(e=>e.value="");
+};
+})();
+</script>
+</body>
+</html>
