@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Europass CV - UMME HALIMA SHRABONI</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Font Awesome 6 Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+
+    <!-- Google Fonts: Plus Jakarta Sans & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --eu-navy: #0b2545;
+        --eu-blue: #004b87;
+        --eu-azure: #0284c7;
+        --eu-bg-card: #f8fafc;
+        --text-dark: #0f172a;
+        --text-muted: #334155;
+      }
+
+      body {
+        font-family: "Plus Jakarta Sans", sans-serif;
+        color: var(--text-dark);
+        background-color: #0f172a;
+        margin: 0;
+        padding: 0;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* Strict A4 Print Sheet Spec */
+      .a4-page {
+        width: 210mm;
+        height: 297mm;
+        max-height: 297mm;
+        min-height: 297mm;
+        margin: 26px auto;
+        padding: 12mm 15mm 10mm 15mm;
+        background: #ffffff;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45);
+        box-sizing: border-box;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      /* Print Rules for A4 PDF Output */
+      @media print {
+        body {
+          background: transparent !important;
+          padding: 0 !important;
+        }
+        .no-print {
+          display: none !important;
+        }
+        .a4-page {
+          width: 210mm !important;
+          height: 297mm !important;
+          max-height: 297mm !important;
+          min-height: 297mm !important;
+          margin: 0 !important;
+          padding: 11mm 14mm 9mm 14mm !important;
+          box-shadow: none !important;
+          page-break-after: always !important;
+          break-after: page !important;
+        }
+        @page {
+          size: A4 portrait;
+          margin: 0;
+        }
+        * {
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+        }
+      }
+
+      .section-title {
+        font-size: 11.5pt;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: var(--eu-navy);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .section-divider {
+        flex: 1;
+        height: 2px;
+        background: linear-gradient(to right, #0b2545 30%, #e2e8f0 100%);
+        border-radius: 9999px;
+      }
+
+      .eu-tag {
+        background: #f1f5f9;
+        color: #0f172a;
+        border: 1px solid #cbd5e1;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 9pt;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .eu-tag-blue {
+        background: #eff6ff;
+        color: #004b87;
+        border: 1px solid #bfdbfe;
+      }
+
+      .eu-tag-accent {
+        background: #ecfdf5;
+        color: #065f46;
+        border: 1px solid #a7f3d0;
+      }
+    </style>
+  </head>
+  <body class="py-6">
+    <!-- Interactive Control Bar (Screen only, excluded in PDF) -->
+    <header
+      class="no-print max-w-[210mm] mx-auto mb-6 bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl p-4 px-6 flex flex-wrap items-center justify-between gap-4 text-white"
+    >
+      <div class="flex items-center gap-3">
+        <div
+          class="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#0b2545] to-[#004b87] flex items-center justify-center text-amber-300 text-lg shadow-inner"
+        >
+          <i class="fa-solid fa-award"></i>
+        </div>
+        <div>
+          <h1 class="text-sm font-bold tracking-wide">
+            Europass Official Curriculum Vitae
+          </h1>
+          <p class="text-xs text-slate-400">
+            Enhanced Typography &bull; Exact A4 Output &bull; No Page Spill
+          </p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <label
+          for="photoUpload"
+          class="cursor-pointer bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold px-4 py-2 rounded-lg border border-slate-600 transition flex items-center gap-2"
+        >
+          <i class="fa-solid fa-camera text-blue-400"></i> Change Photo
+        </label>
+        <input type="file" id="photoUpload" accept="image/*" class="hidden" />
+
+        <button
+          onclick="window.print()"
+          class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-5 py-2.5 rounded-lg shadow-lg hover:shadow-blue-500/30 transition flex items-center gap-2"
+        >
+          <i class="fa-solid fa-file-pdf text-amber-300"></i> Print / Save as
+          PDF
+        </button>
+      </div>
+    </header>
+
+    <!-- ========================================================================= -->
+    <!-- PAGE 1: Identity, Objectives, Experience, Education                       -->
+    <!-- ========================================================================= -->
+    <main class="a4-page">
+      <div>
+        <!-- TOP BANNER & IDENTITY -->
+        <div
+          class="bg-gradient-to-r from-[#071d36] via-[#0b2545] to-[#004b87] rounded-xl p-4 text-white mb-3.5 shadow-sm"
+        >
+          <div class="flex items-center justify-between gap-5">
+            <div class="flex items-center gap-4">
+              <!-- Candidate Photo Frame (Clickable for quick upload) -->
+              <div
+                class="relative cursor-pointer group flex-shrink-0"
+                onclick="document.getElementById('photoUpload').click()"
+                title="Click to upload your photo"
+              >
+                <div
+                  class="w-[88px] h-[106px] rounded-lg overflow-hidden border-2 border-white/90 shadow bg-slate-800"
+                >
+                  <img
+                    id="avatarImg"
+                    src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=400&auto=format&fit=crop"
+                    alt="Umme Halima Shraboni"
+                    class="w-full h-full object-cover object-center"
+                  />
+                </div>
+                <div
+                  class="absolute inset-0 bg-black/60 text-white text-[10px] font-bold uppercase rounded-lg opacity-0 group-hover:opacity-100 flex items-center justify-center no-print transition"
+                >
+                  Change
+                </div>
+              </div>
+
+              <!-- Name and Title -->
+              <div>
+                <div
+                  class="inline-flex items-center gap-2 px-2.5 py-0.5 rounded bg-blue-900/70 border border-blue-400/40 text-[8.5pt] font-semibold tracking-wider text-blue-200 uppercase mb-1"
+                >
+                  <span>Europass Curriculum Vitae</span>
+                </div>
+                <h1
+                  class="text-[21pt] font-extrabold tracking-tight uppercase leading-none text-white drop-shadow-sm"
+                >
+                  Umme Halima Shraboni
+                </h1>
+                <div
+                  class="flex flex-wrap items-center gap-x-2 gap-y-1 mt-1.5 text-[9pt] font-medium text-blue-100 tracking-wide"
+                >
+                  <span class="whitespace-nowrap">Educator</span>
+                  <span class="text-blue-300 select-none">&bull;</span>
+                  <span class="whitespace-nowrap">Sociology Graduate</span>
+                  <span class="text-blue-300 select-none">&bull;</span>
+                  <span class="whitespace-nowrap"
+                    >Social Research Assistant</span
+                  >
+                </div>
+              </div>
+            </div>
+
+            <!-- Official Europass & EU Emblem -->
+            <div class="flex flex-col items-end flex-shrink-0"></div>
+          </div>
+
+          <!-- Contact Information Strip (Larger, bold and legible) -->
+          <div
+            class="mt-3 pt-2.5 border-t border-white/20 grid grid-cols-3 gap-2 text-[9pt] text-blue-50 font-medium"
+          >
+            <div class="flex items-center gap-2 truncate">
+              <i
+                class="fa-solid fa-location-dot text-amber-300 text-[10pt]"
+              ></i>
+              <span class="truncate"
+                >Road:3, Block D, Section:6 Mirpur, Dhaka</span
+              >
+            </div>
+            <div class="flex items-center gap-2 justify-center">
+              <i class="fa-solid fa-phone text-amber-300 text-[10pt]"></i>
+              <span class="font-bold tracking-wide">01716318404</span>
+            </div>
+            <div class="flex items-center gap-2 justify-end truncate">
+              <i class="fa-solid fa-envelope text-amber-300 text-[10pt]"></i>
+              <span class="truncate">shraboniislam111@gmail.com</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- CAREER OBJECTIVES -->
+        <section
+          class="mb-3.5 bg-slate-50 border-l-4 border-[#0b2545] rounded-r-xl p-3"
+        >
+          <div class="flex items-start gap-2.5">
+            <i
+              class="fa-solid fa-quote-left text-[#004b87] text-base mt-0.5"
+            ></i>
+            <div>
+              <h2
+                class="text-[9.5pt] font-extrabold uppercase tracking-wider text-[#0b2545] mb-0.5"
+              >
+                Career Objectives
+              </h2>
+              <p class="text-[10pt] text-slate-800 leading-relaxed font-normal">
+                To obtain a teaching position at a progressive school where I
+                can utilize my knowledge to achieve students academic success
+                while also encouraging personal and social growth.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- WORK EXPERIENCE -->
+        <section class="mb-3.5">
+          <div class="flex items-center gap-2 mb-2">
+            <span
+              class="w-6 h-6 rounded-md bg-[#eff6ff] text-[#004b87] flex items-center justify-center text-[10pt]"
+            >
+              <i class="fa-solid fa-briefcase"></i>
+            </span>
+            <h2 class="section-title">Experience</h2>
+            <div class="section-divider"></div>
+          </div>
+
+          <div class="space-y-3">
+            <!-- Experience 1 -->
+            <div
+              class="p-3 rounded-xl border border-slate-200 bg-white shadow-xs"
+            >
+              <div class="flex items-start justify-between">
+                <div>
+                  <h3
+                    class="text-[11pt] font-extrabold text-slate-900 leading-tight"
+                  >
+                    Assistant Teacher
+                  </h3>
+                  <p class="text-[9.8pt] font-bold text-[#004b87]">
+                    British Arabian International School and College, Mirpur
+                  </p>
+                </div>
+                <span class="eu-tag eu-tag-blue font-bold">
+                  <i class="fa-regular fa-calendar text-[8pt]"></i> January 1,
+                  2025 – Present
+                </span>
+              </div>
+
+              <ul class="mt-2 text-[9.5pt] text-slate-800 space-y-1.5 ml-1">
+                <li class="flex items-start gap-2">
+                  <i
+                    class="fa-solid fa-circle-check text-[8.5pt] text-blue-600 mt-1 flex-shrink-0"
+                  ></i>
+                  <span
+                    >Develop and implement syllabus, lesson plans for
+                    students</span
+                  >
+                </li>
+                <li class="flex items-start gap-2">
+                  <i
+                    class="fa-solid fa-circle-check text-[8.5pt] text-blue-600 mt-1 flex-shrink-0"
+                  ></i>
+                  <span>Assess student progress and provide feedback</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <i
+                    class="fa-solid fa-circle-check text-[8.5pt] text-blue-600 mt-1 flex-shrink-0"
+                  ></i>
+                  <span
+                    >Collaborate with other teachers and staff to improve
+                    curriculum</span
+                  >
+                </li>
+                <li class="flex items-start gap-2">
+                  <i
+                    class="fa-solid fa-circle-check text-[8.5pt] text-blue-600 mt-1 flex-shrink-0"
+                  ></i>
+                  <span
+                    >Communicate with parents and guardians about students
+                    performance</span
+                  >
+                </li>
+              </ul>
+            </div>
+
+            <!-- Experience 2 -->
+            <div
+              class="p-3 rounded-xl border border-slate-200 bg-white shadow-xs"
+            >
+              <div class="flex items-start justify-between">
+                <div>
+                  <h3
+                    class="text-[11pt] font-extrabold text-slate-900 leading-tight"
+                  >
+                    Research Assistant
+                  </h3>
+                  <p class="text-[9.8pt] font-bold text-[#004b87]">
+                    House of Survey Research (SURCH)
+                  </p>
+                </div>
+                <span class="eu-tag eu-tag-accent font-bold">
+                  <i class="fa-solid fa-globe text-[8pt]"></i> Funded by UNICEF
+                </span>
+              </div>
+
+              <div
+                class="mt-2 p-2.5 rounded-lg bg-slate-50 border border-slate-200 text-[9.5pt] text-slate-800"
+              >
+                <p>
+                  <strong class="text-slate-900">Baseline Study:</strong>
+                  Baseline Study of ‘Alternative Learning Programme’
+                </p>
+                <div
+                  class="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-[9pt] text-slate-700"
+                >
+                  <span
+                    ><i class="fa-solid fa-user-tie text-[#004b87] mr-1"></i
+                    ><strong>Supervision:</strong> Under Supervision of MD.
+                    Kamal Pasa</span
+                  >
+                  <span
+                    ><i class="fa-solid fa-map-pin text-[#004b87] mr-1"></i
+                    ><strong>Field:</strong> Mymensigh</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- EDUCATION -->
+        <section>
+          <div class="flex items-center gap-2 mb-2">
+            <span
+              class="w-6 h-6 rounded-md bg-[#eff6ff] text-[#004b87] flex items-center justify-center text-[10pt]"
+            >
+              <i class="fa-solid fa-graduation-cap"></i>
+            </span>
+            <h2 class="section-title">Education</h2>
+            <div class="section-divider"></div>
+          </div>
+
+          <div class="space-y-2.5">
+            <!-- Degree 1 -->
+            <div
+              class="p-2.5 rounded-xl border border-slate-200 bg-white flex items-center justify-between shadow-xs"
+            >
+              <div>
+                <h3
+                  class="text-[10.5pt] font-extrabold text-slate-900 leading-tight"
+                >
+                  Bachelor of Social Science, Department of Sociology
+                </h3>
+                <p class="text-[9.5pt] font-bold text-[#004b87]">
+                  Rabindra University, Bangladesh, Shahzadpur, Sirajganj
+                </p>
+                <p class="text-[8.5pt] text-slate-500 font-medium">
+                  Academic Duration: 2017 – 2021
+                </p>
+              </div>
+              <div class="text-right flex-shrink-0">
+                <span class="eu-tag eu-tag-blue font-bold !text-[9pt]"
+                  >GOT CGPA 3.61 OUT OF 4.0</span
+                >
+              </div>
+            </div>
+
+            <!-- Degree 2 -->
+            <div
+              class="p-2.5 rounded-xl border border-slate-200 bg-white flex items-center justify-between shadow-xs"
+            >
+              <div>
+                <h3
+                  class="text-[10.5pt] font-extrabold text-slate-900 leading-tight"
+                >
+                  Higher Secondary Certificate
+                </h3>
+                <p class="text-[9.5pt] font-bold text-[#004b87]">
+                  Panchagarh Govt. Women College, Panchagarh
+                </p>
+                <p class="text-[8.5pt] text-slate-500 font-medium">
+                  Session: 2015 – 2017
+                </p>
+              </div>
+              <div class="text-right flex-shrink-0">
+                <span class="eu-tag eu-tag-accent font-bold !text-[9pt]"
+                  >GOT GPA 5.00 OUT OF 5.0</span
+                >
+              </div>
+            </div>
+
+            <!-- Degree 3 -->
+            <div
+              class="p-2.5 rounded-xl border border-slate-200 bg-white flex items-center justify-between shadow-xs"
+            >
+              <div>
+                <h3
+                  class="text-[10.5pt] font-extrabold text-slate-900 leading-tight"
+                >
+                  Secondary School Certificate
+                </h3>
+                <p class="text-[9.5pt] font-bold text-[#004b87]">
+                  Panchagarh Govt. Girls High School, Panchagarh
+                </p>
+                <p class="text-[8.5pt] text-slate-500 font-medium">
+                  Passing Year 2015
+                </p>
+              </div>
+              <div class="text-right flex-shrink-0">
+                <span class="eu-tag font-bold !text-[9pt]"
+                  >GOT GPA 4.28 OUT OF 5.00</span
+                >
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Official Europass Page 1 Footer -->
+      <footer
+        class="pt-2 border-t border-slate-200 flex items-center justify-between text-[8.5pt] text-slate-500"
+      >
+        <div>
+          Europass Curriculum Vitae &bull; <strong>Umme Halima Shraboni</strong>
+        </div>
+        <div class="font-bold">Page 1 / 2</div>
+      </footer>
+    </main>
+
+    <!-- ========================================================================= -->
+    <!-- PAGE 2: Certifications, Publications, Skills, Extracurricular, References -->
+    <!-- ========================================================================= -->
+    <main class="a4-page">
+      <div>
+        <!-- Page 2 Slim Continuation Header -->
+        <div
+          class="flex items-center justify-between border-b-2 border-slate-200 pb-2 mb-3.5"
+        >
+          <div class="flex items-center gap-2">
+            <span
+              class="text-[10.5pt] font-extrabold uppercase tracking-wider text-[#0b2545]"
+              >Umme Halima Shraboni</span
+            >
+            <span class="text-slate-300">|</span>
+            <span class="text-[9.5pt] font-semibold text-slate-600"
+              >Curriculum Vitae</span
+            >
+          </div>
+          <div
+            class="flex items-center gap-1.5 text-[8.5pt] font-bold text-[#004b87] bg-blue-50 px-2.5 py-1 rounded border border-blue-200"
+          >
+            <i class="fa-solid fa-certificate"></i> Official Academic &amp;
+            Research Portfolio
+          </div>
+        </div>
+
+        <!-- CERTIFICATION -->
+        <section class="mb-3.5">
+          <div class="flex items-center gap-2 mb-2">
+            <span
+              class="w-6 h-6 rounded-md bg-[#eff6ff] text-[#004b87] flex items-center justify-center text-[10pt]"
+            >
+              <i class="fa-solid fa-award"></i>
+            </span>
+            <h2 class="section-title">Certification</h2>
+            <div class="section-divider"></div>
+          </div>
+
+          <div class="space-y-2.5">
+            <!-- Cert 1 -->
+            <div
+              class="p-3 rounded-xl border border-slate-200 bg-white shadow-xs"
+            >
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-[10pt] font-extrabold text-[#0b2545]"
+                  >ICBM-2024</span
+                >
+                <span class="eu-tag eu-tag-blue !py-0.5 font-bold"
+                  >Brac Business School</span
+                >
+              </div>
+              <p class="text-[9.5pt] text-slate-800 leading-snug">
+                Earned Certificate From ICBM-2024 by Brac Business School For
+                Paper Presentation on
+                <span class="font-bold text-slate-900"
+                  >"Preservation of Cultural Heritage Through Creative and
+                  Sustainable Tourism in Bangladesh: Interaction Between
+                  Cultural Heritage and Heritage Hotel Tourism"</span
+                >.
+              </p>
+            </div>
+
+            <!-- Cert 2 -->
+            <div
+              class="p-3 rounded-xl border border-slate-200 bg-white shadow-xs"
+            >
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-[10pt] font-extrabold text-[#0b2545]"
+                  >ICASC-2024</span
+                >
+                <span class="eu-tag eu-tag-blue !py-0.5 font-bold"
+                  >Rabindra University, Bangladesh</span
+                >
+              </div>
+              <p class="text-[9.5pt] text-slate-800 leading-snug">
+                Earned Certificate From ICASC-2024 By Rabindra University,
+                Bangladesh For Paper Poster Presentation on
+                <span class="font-bold text-slate-900"
+                  >"Potentials of Cultural Heritage Based Tourism by Converting
+                  Heritage Buildings of Bangladesh into Heritage Hotel: A Case
+                  Study on Puthia Rajbari"</span
+                >.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- PUBLICATIONS -->
+        <section class="mb-3.5">
+          <div class="flex items-center gap-2 mb-2">
+            <span
+              class="w-6 h-6 rounded-md bg-[#eff6ff] text-[#004b87] flex items-center justify-center text-[10pt]"
+            >
+              <i class="fa-solid fa-newspaper"></i>
+            </span>
+            <h2 class="section-title">Publications</h2>
+            <div class="section-divider"></div>
+          </div>
+
+          <div class="space-y-2">
+            <div
+              class="p-2.5 rounded-lg bg-slate-50 border-l-4 border-[#004b87] text-[9.5pt] text-slate-800"
+            >
+              Published an Artical About
+              <strong class="text-slate-900"
+                >"Importance of Protecting Rock Museum"</strong
+              >
+              (In Bangla)
+              <span
+                class="block text-[8.5pt] font-semibold text-slate-600 mt-0.5"
+                >Daily Star, May 18, 2021</span
+              >
+            </div>
+
+            <div
+              class="p-2.5 rounded-lg bg-slate-50 border-l-4 border-[#004b87] text-[9.5pt] text-slate-800"
+            >
+              Published an Article about
+              <strong class="text-slate-900"
+                >‘Heritage Hotel : New Potential in Tourism Industry’</strong
+              >
+              (In Bangla)
+              <span
+                class="block text-[8.5pt] font-semibold text-slate-600 mt-0.5"
+                >Souvenir of Bangladesh Tourism Board, 25 September, 2021</span
+              >
+            </div>
+          </div>
+        </section>
+
+        <!-- SKILLS & LANGUAGES (2-Column Grid) -->
+        <div class="grid grid-cols-2 gap-4 mb-3.5">
+          <!-- SKILLS -->
+          <div>
+            <div class="flex items-center gap-2 mb-2">
+              <span
+                class="w-6 h-6 rounded-md bg-[#eff6ff] text-[#004b87] flex items-center justify-center text-[10pt]"
+              >
+                <i class="fa-solid fa-sliders"></i>
+              </span>
+              <h2 class="section-title !text-[10.5pt]">Skills</h2>
+              <div class="section-divider"></div>
+            </div>
+
+            <div class="flex flex-wrap gap-1.5">
+              <span class="eu-tag"
+                ><i class="fa-brands fa-microsoft text-blue-600"></i>Microsoft
+                OfficeSuit</span
+              >
+              <span class="eu-tag"
+                ><i class="fa-solid fa-comments text-blue-600"></i
+                >Communication</span
+              >
+              <span class="eu-tag"
+                ><i class="fa-solid fa-clock text-blue-600"></i>Time
+                Management</span
+              >
+              <span class="eu-tag"
+                ><i class="fa-solid fa-heart text-rose-500"></i>Patience</span
+              >
+              <span class="eu-tag"
+                ><i class="fa-solid fa-shuffle text-emerald-600"></i
+                >Adaptability</span
+              >
+              <span class="eu-tag"
+                ><i class="fa-solid fa-check text-blue-600"></i>Student
+                Assesment</span
+              >
+              <span class="eu-tag"
+                ><i class="fa-solid fa-chalkboard-user text-indigo-600"></i
+                >Classroom Management</span
+              >
+              <span class="eu-tag"
+                ><i class="fa-solid fa-user-group text-amber-600"></i
+                >Leadership</span
+              >
+            </div>
+          </div>
+
+          <!-- LANGUAGES & HOBBIES -->
+          <div>
+            <div class="flex items-center gap-2 mb-2">
+              <span
+                class="w-6 h-6 rounded-md bg-[#eff6ff] text-[#004b87] flex items-center justify-center text-[10pt]"
+              >
+                <i class="fa-solid fa-language"></i>
+              </span>
+              <h2 class="section-title !text-[10.5pt]">Languages</h2>
+              <div class="section-divider"></div>
+            </div>
+
+            <div class="flex gap-2 mb-2.5">
+              <div
+                class="flex-1 p-2 rounded-lg bg-slate-50 border border-slate-200 text-center"
+              >
+                <span class="text-[10pt] font-extrabold text-slate-900 block"
+                  >Bangla</span
+                >
+                <span class="text-[8.5pt] font-bold text-blue-700 uppercase"
+                  >Native</span
+                >
+              </div>
+              <div
+                class="flex-1 p-2 rounded-lg bg-slate-50 border border-slate-200 text-center"
+              >
+                <span class="text-[10pt] font-extrabold text-slate-900 block"
+                  >English</span
+                >
+                <span class="text-[8.5pt] font-bold text-emerald-700 uppercase"
+                  >Fluent</span
+                >
+              </div>
+            </div>
+
+            <!-- HOBBIES -->
+            <div class="flex items-center gap-2 mb-1.5">
+              <span class="text-[9.5pt] font-extrabold uppercase text-[#0b2545]"
+                ><i class="fa-solid fa-compass mr-1 text-blue-600"></i>
+                Hobbies:</span
+              >
+            </div>
+            <div class="flex flex-wrap gap-1.5 text-[8.5pt]">
+              <span class="eu-tag !py-1">Reading Books</span>
+              <span class="eu-tag !py-1">Gardening</span>
+              <span class="eu-tag !py-1">Writing</span>
+              <span class="eu-tag !py-1">Travelling</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- EXTRACURRICULAR ACTIVITIES -->
+        <section class="mb-3.5">
+          <div class="flex items-center gap-2 mb-2">
+            <span
+              class="w-6 h-6 rounded-md bg-[#eff6ff] text-[#004b87] flex items-center justify-center text-[10pt]"
+            >
+              <i class="fa-solid fa-users"></i>
+            </span>
+            <h2 class="section-title">Extracurricular Activities</h2>
+            <div class="section-divider"></div>
+          </div>
+
+          <ul class="grid grid-cols-2 gap-3 text-[9.5pt] text-slate-800">
+            <li
+              class="p-2 rounded-lg bg-white border border-slate-200 flex items-center gap-2"
+            >
+              <i
+                class="fa-solid fa-star text-amber-500 text-[9pt] flex-shrink-0"
+              ></i>
+              <span
+                >Former Executive Member of Robiroshni Pathchokro, Rabindra
+                University</span
+              >
+            </li>
+            <li
+              class="p-2 rounded-lg bg-white border border-slate-200 flex items-center gap-2"
+            >
+              <i
+                class="fa-solid fa-star text-amber-500 text-[9pt] flex-shrink-0"
+              ></i>
+              <span>Former member of Rabindra University Debating Society</span>
+            </li>
+          </ul>
+        </section>
+
+        <!-- REFERENCES -->
+        <section>
+          <div class="flex items-center gap-2 mb-2">
+            <span
+              class="w-6 h-6 rounded-md bg-[#eff6ff] text-[#004b87] flex items-center justify-center text-[10pt]"
+            >
+              <i class="fa-solid fa-address-book"></i>
+            </span>
+            <h2 class="section-title">References</h2>
+            <div class="section-divider"></div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3 text-[9.5pt]">
+            <!-- Ref 1 -->
+            <div
+              class="p-3 rounded-xl border border-slate-200 bg-white shadow-xs"
+            >
+              <h3 class="font-extrabold text-slate-900 text-[10.5pt]">
+                MD. Rifat-Ur-Rahman
+              </h3>
+              <p class="text-[#004b87] font-bold text-[9pt]">
+                Assistant Professor,
+              </p>
+              <p class="text-slate-700 text-[9pt]">
+                Dept. of Sociology Rabindra University, Bangladesh
+              </p>
+              <div
+                class="mt-2 pt-1.5 border-t border-slate-100 space-y-0.5 text-[9pt] text-slate-700"
+              >
+                <div>
+                  <i class="fa-solid fa-phone text-[#004b87] mr-1.5"></i>Mob:
+                  <strong>01747862033</strong>
+                </div>
+                <div>
+                  <i class="fa-solid fa-envelope text-[#004b87] mr-1.5"></i
+                  >E-mail:
+                  <a
+                    href="mailto:rifat.soc@rub.ac.bd"
+                    class="text-blue-600 hover:underline"
+                    >rifat.soc@rub.ac.bd</a
+                  >
+                </div>
+              </div>
+            </div>
+
+            <!-- Ref 2 -->
+            <div
+              class="p-3 rounded-xl border border-slate-200 bg-white shadow-xs"
+            >
+              <h3 class="font-extrabold text-slate-900 text-[10.5pt]">
+                MD. Kamal Pasa
+              </h3>
+              <p class="text-[#004b87] font-bold text-[9pt]">
+                Associate Professor,
+              </p>
+              <p class="text-slate-700 text-[9pt]">
+                Dept of Anthropology. University of Rajshahi
+              </p>
+              <div
+                class="mt-2 pt-1.5 border-t border-slate-100 space-y-0.5 text-[9pt] text-slate-700"
+              >
+                <div>
+                  <i class="fa-solid fa-phone text-[#004b87] mr-1.5"></i>Mob:
+                  <strong>01711-075067</strong>
+                </div>
+                <div>
+                  <i class="fa-solid fa-envelope text-[#004b87] mr-1.5"></i
+                  >E-mail:
+                  <a
+                    href="mailto:kamalpasa16@gmail.com"
+                    class="text-blue-600 hover:underline"
+                    >kamalpasa16@gmail.com</a
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Official Europass Page 2 Footer -->
+      <footer
+        class="pt-2 border-t border-slate-200 flex items-center justify-between text-[8.5pt] text-slate-500"
+      >
+        <div>
+          Europass Curriculum Vitae &bull; <strong>Umme Halima Shraboni</strong>
+        </div>
+        <div class="font-bold">Page 2 / 2</div>
+      </footer>
+    </main>
+
+    <!-- Photo Replacement Script -->
+    <script>
+      document
+        .getElementById("photoUpload")
+        .addEventListener("change", function (e) {
+          const file = e.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = function (event) {
+              document.getElementById("avatarImg").src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+    </script>
+  </body>
+</html>
