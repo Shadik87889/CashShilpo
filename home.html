@@ -600,9 +600,8 @@
           <a href="pricing" class="nav-link text-gray-300">Pricing</a>
           <a href="support" class="nav-link text-gray-300">Support</a>
           <a
-            href="CashShilpo.apk"
-            download="CashShilpo.apk"
-            onclick="handleAppDownload(event)"
+            <a
+            href="download"
             class="bg-white/10 text-white font-semibold px-5 py-2.5 rounded-full border border-white/15 hover:bg-white/20 transition-all duration-300 flex items-center gap-2 transform hover:-translate-y-0.5 cursor-pointer"
           >
             <i data-lucide="download" class="w-4 h-4 text-accent"></i>
@@ -647,9 +646,7 @@
           >Support</a
         >
         <a
-          href="CashShilpo.apk"
-          download="CashShilpo.apk"
-          onclick="handleAppDownload(event)"
+          href="download"
           class="w-full mt-4 bg-white/10 border border-white/15 text-white font-bold px-6 py-3.5 rounded-full flex items-center justify-center gap-2 hover:bg-white/20 transition-all duration-300 cursor-pointer"
         >
           <i data-lucide="download" class="w-5 h-5 text-accent"></i>
@@ -731,9 +728,7 @@
                   Start 7-Day Free Trial
                 </a>
                 <a
-                  href="CashShilpo.apk"
-                  download="CashShilpo.apk"
-                  onclick="handleAppDownload(event)"
+                  href="download"
                   class="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-lg px-8 py-4 rounded-full shadow-lg shadow-blue-500/25 flex items-center justify-center gap-3 transition-all duration-300 transform hover:-translate-y-1 active:scale-95 cursor-pointer"
                 >
                   <i data-lucide="download" class="w-5 h-5"></i>
@@ -3226,24 +3221,7 @@
         translatePage(newLang);
       }
 
-      // Universal Snaptube-Style App Download Handler
-      function handleAppDownload(e) {
-        const isIOS =
-          /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-        if (isIOS) {
-          if (e) e.preventDefault();
-          if (typeof window.triggerAppInstall === "function") {
-            window.triggerAppInstall();
-          } else {
-            alert(
-              "On iPhone: Tap the Share button (⎋) in Safari, then tap 'Add to Home Screen' to install.",
-            );
-          }
-          return false;
-        }
-        // For Android and PC: Let the direct file download of CashShilpo.apk happen immediately!
-        return true;
-      }
+     // Navigation to dedicated download page is handled directly via href="download.html"
 
       // UX & Interaction Scripts
       document.addEventListener("DOMContentLoaded", () => {
