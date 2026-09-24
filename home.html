@@ -203,6 +203,9 @@
     <!-- Lucide Icons CDN -->
     <script src="https://unpkg.com/lucide@0.452.0/dist/umd/lucide.js"></script>
 
+    <!-- CashShilpo PWA App Installation Engine -->
+    <script src="cashshilpo-pwa.js"></script>
+
     <style>
       body {
         font-family: "Inter", sans-serif;
@@ -580,10 +583,17 @@
         </a>
 
         <!-- Desktop Nav -->
-        <div class="hidden md:flex space-x-8 items-center font-medium">
+        <div class="hidden md:flex space-x-6 items-center font-medium">
           <a href="#features" class="nav-link text-gray-300">Features</a>
           <a href="pricing" class="nav-link text-gray-300">Pricing</a>
           <a href="support" class="nav-link text-gray-300">Support</a>
+          <button
+            onclick="window.triggerAppInstall()"
+            class="bg-white/10 text-white font-semibold px-5 py-2.5 rounded-full border border-white/15 hover:bg-white/20 transition-all duration-300 flex items-center gap-2 transform hover:-translate-y-0.5"
+          >
+            <i data-lucide="download" class="w-4 h-4 text-accent"></i>
+            <span>Download Our App</span>
+          </button>
           <a
             href="workplace"
             class="bg-accent text-black font-bold px-6 py-2.5 rounded-full hover:bg-white hover:shadow-[0_0_20px_rgba(57,255,20,0.4)] transition-all duration-300 transform hover:-translate-y-0.5"
@@ -622,9 +632,16 @@
           class="block text-gray-300 hover:text-accent py-3 font-medium"
           >Support</a
         >
+        <button
+          onclick="window.triggerAppInstall()"
+          class="w-full mt-4 bg-white/10 border border-white/15 text-white font-bold px-6 py-3.5 rounded-full flex items-center justify-center gap-2 hover:bg-white/20 transition-all duration-300"
+        >
+          <i data-lucide="download" class="w-5 h-5 text-accent"></i>
+          <span>Download Our App</span>
+        </button>
         <a
           href="workplace"
-          class="mt-6 block bg-accent text-black font-bold px-6 py-3.5 rounded-full text-center hover:bg-white transition-all duration-300"
+          class="mt-3 block bg-accent text-black font-bold px-6 py-3.5 rounded-full text-center hover:bg-white transition-all duration-300"
         >
           Get Started
         </a>
@@ -689,17 +706,24 @@
 
               <!-- CTAs -->
               <div
-                class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-5"
+                class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 flex-wrap"
               >
                 <a
                   href="workplace"
-                  class="w-full sm:w-auto bg-accent text-black font-extrabold text-lg px-9 py-4 rounded-full hover:bg-white hover:shadow-[0_0_30px_rgba(57,255,20,0.4)] transition-all duration-300 transform hover:-translate-y-1 text-center"
+                  class="w-full sm:w-auto bg-accent text-black font-extrabold text-lg px-8 py-4 rounded-full hover:bg-white hover:shadow-[0_0_30px_rgba(57,255,20,0.4)] transition-all duration-300 transform hover:-translate-y-1 text-center"
                 >
                   Start 7-Day Free Trial
                 </a>
+                <button
+                  onclick="window.triggerAppInstall()"
+                  class="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-lg px-8 py-4 rounded-full shadow-lg shadow-blue-500/25 flex items-center justify-center gap-3 transition-all duration-300 transform hover:-translate-y-1 active:scale-95"
+                >
+                  <i data-lucide="download" class="w-5 h-5"></i>
+                  <span>Download Our App</span>
+                </button>
                 <a
                   href="pricing"
-                  class="w-full sm:w-auto bg-white/5 border border-white/10 backdrop-blur-md text-white font-bold text-lg px-9 py-4 rounded-full hover:bg-white/10 hover:border-white/30 transition-all duration-300 text-center flex items-center justify-center gap-2 group"
+                  class="w-full sm:w-auto bg-white/5 border border-white/10 backdrop-blur-md text-white font-bold text-lg px-7 py-4 rounded-full hover:bg-white/10 hover:border-white/30 transition-all duration-300 text-center flex items-center justify-center gap-2 group"
                 >
                   <i
                     data-lucide="play-circle"
@@ -2903,6 +2927,7 @@
         "From lightning-fast billing to real-time inventory and deep analytics. Control your retail or restaurant business smartly. Stop guessing, start growing.":
           "বিদ্যুৎগতির বিলিং থেকে শুরু করে রিয়েল-টাইম ইনভেন্টরি—আপনার ব্যবসার সম্পূর্ণ নিয়ন্ত্রণ নিন। অনুমান নয়, স্মার্ট অ্যানালিটিক্স দিয়ে ব্যবসার পরিধি বাড়ান।",
         "Start 7-Day Free Trial": "৭ দিনের ফ্রি ট্রায়াল শুরু করুন",
+        "Download Our App": "অ্যাপ ডাউনলোড করুন",
         "View Packages": "প্যাকেজসমূহ দেখুন",
         "No Credit Card Required": "কোনো ক্রেডিট কার্ডের প্রয়োজন নেই",
         "Secure & Cloud-Based": "নিরাপদ ও ক্লাউড-ভিত্তিক",

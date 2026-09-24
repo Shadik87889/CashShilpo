@@ -2,25 +2,10 @@
 <html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
-    <!-- Hardened Mobile Viewport: Disables User Scaling & Double-Tap Delay -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CashShilpo - AI Powered Universal POS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="shortcut icon" href="The Official-Cashsilpo-Fav.png" type="image/x-icon">
-    <!-- Progressive Web App Configuration -->
-    <link rel="manifest" href="manifest.json" />
-    <meta name="theme-color" content="#0a0a0a" />
-
-    <!-- iOS Native App WebKit Engine Overrides -->
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="CashShilpo" />
-    <link rel="apple-touch-icon" href="cashshilpo-official-logo.png" />
-    <link rel="apple-touch-icon" sizes="192x192" href="icons/icon-192.png" />
-    <link rel="apple-touch-icon" sizes="512x512" href="icons/icon-512.png" />
-
-    <!-- Smart Cross-Platform Installer Engine -->
-    <script src="cashshilpo-pwa.js"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700&family=Source+Code+Pro:wght@400;700&display=swap"
       rel="stylesheet"
@@ -30,21 +15,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
 
-    <!-- Global Gesture & Pinch-to-Zoom Lock -->
-    <script>
-      document.addEventListener('gesturestart', (e) => e.preventDefault(), { passive: false });
-      document.addEventListener('gesturechange', (e) => e.preventDefault(), { passive: false });
-      document.addEventListener('gestureend', (e) => e.preventDefault(), { passive: false });
-    </script>
-
     <style>
-      /* Universal Anti-Double-Tap Zoom Across the Entire Site */
-      html, body, *, *::before, *::after {
-        touch-action: manipulation !important;
-        -ms-touch-action: manipulation !important;
-        -webkit-text-size-adjust: 100% !important;
-      }
-
       :root {
         --bg-primary: #0a0a0a; /* Near black */
         --bg-secondary: #121212; /* Darker Gray */
@@ -69,14 +40,6 @@
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
         overflow: hidden;
-        -webkit-touch-callout: none;
-      }
-
-      /* Prevent iOS Safari from Auto-Zooming When Tapping Form Inputs */
-      @media (max-width: 1023px) {
-        input, select, textarea, .form-input, .form-select, .form-textarea {
-          font-size: 16px !important;
-        }
       }
 
       /* Custom Scrollbar */
@@ -402,7 +365,7 @@
         color: var(--text-primary);
       }
 
-     /* Action Menu Dropdown */
+      /* Action Menu Dropdown */
       .action-menu {
         position: absolute;
         right: 0;
@@ -434,46 +397,6 @@
         margin-bottom: 0.5rem;
         transform-origin: bottom right;
         transform: translateY(-10px) scale(0.95);
-      }
-
-      /* Store Switcher Dropdown - Anchored to the Left Side of the Screen */
-      #store-switcher-container {
-        position: relative !important;
-      }
-      #store-menu {
-        left: 0 !important;
-        right: auto !important;
-        transform-origin: top left !important;
-        min-width: 230px !important;
-        max-width: calc(100vw - 2rem) !important;
-        background: #18181b !important;
-        border: 1px solid rgba(255, 255, 255, 0.14) !important;
-        box-shadow: 0 16px 36px -4px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.06) !important;
-        border-radius: 0.95rem !important;
-        padding: 0.45rem !important;
-        z-index: 150 !important;
-      }
-      #store-menu .action-menu-item {
-        display: flex !important;
-        align-items: center !important;
-        gap: 0.75rem !important;
-        padding: 0.7rem 0.85rem !important;
-        font-size: 0.88rem !important;
-        font-weight: 500 !important;
-        color: #f3f4f6 !important;
-        border-radius: 0.65rem !important;
-        transition: background-color 0.15s ease !important;
-      }
-      #store-menu .action-menu-item:hover,
-      #store-menu .action-menu-item:active {
-        background-color: rgba(255, 255, 255, 0.08) !important;
-        color: #ffffff !important;
-      }
-      #store-menu .action-menu-item i {
-        width: 18px !important;
-        height: 18px !important;
-        color: var(--accent) !important;
-        flex-shrink: 0 !important;
       }
       .action-menu-item {
         display: flex;
@@ -754,325 +677,36 @@
 
       /* Workspace Content Area */
         #workspace-content { 
-          padding: 1rem 0.85rem calc(95px + env(safe-area-inset-bottom)) 0.85rem !important; 
-          overflow-y: auto !important; 
-          overflow-x: hidden !important; 
-          flex: 1 1 0% !important; 
-          min-height: 0 !important; 
-          min-width: 0 !important;
-          width: 100% !important;
-          max-width: 100% !important;
-          box-sizing: border-box !important;
+          padding: 1rem 1rem calc(90px + env(safe-area-inset-bottom)) 1rem !important; 
+          overflow-y: auto; overflow-x: hidden; 
+          flex: 1 1 0% !important; min-height: 0 !important; height: auto !important;
           -webkit-overflow-scrolling: touch;
         }
-
-        /* Reset Viewport Container Blowouts */
-        .view-pane,
-        .view-pane > div {
-          width: 100% !important;
-          max-width: 100% !important;
-          min-width: 0 !important;
-          box-sizing: border-box !important;
-        }
-
-        /* Reset Table Wrappers on Mobile */
-        .bg-bg-secondary\/50,
-        .overflow-x-auto {
-          background: transparent !important;
-          border: none !important;
-          box-shadow: none !important;
-          overflow-x: visible !important;
-          width: 100% !important;
-          max-width: 100% !important;
-          min-width: 0 !important;
-          padding: 0 !important;
-          box-sizing: border-box !important;
-        }
         
-        /* Auto-Convert Data Tables to Responsive Mobile Cards */
-        .table-pro thead { display: none !important; }
-        
-        .table-pro { 
-          display: flex !important; 
-          flex-direction: column !important; 
-          width: 100% !important; 
-          max-width: 100% !important; 
-          min-width: 0 !important; 
-          border-spacing: 0 !important;
-          border-collapse: separate !important;
-          box-sizing: border-box !important;
-        }
-
-        .table-pro tbody { 
-          display: flex !important; 
-          flex-direction: column !important; 
-          gap: 0.85rem !important; 
-          width: 100% !important; 
-          max-width: 100% !important; 
-          min-width: 0 !important;
-          box-sizing: border-box !important;
-        }
-
-      /* Responsive Fintech Card Surface */
+        /* Auto-Convert Data Tables to Beautiful Mobile Cards */
+        .table-pro thead { display: none; }
+        .table-pro, .table-pro tbody { display: flex; flex-direction: column; gap: 1rem; width: 100%; }
         .table-pro tr.table-row { 
-          display: flex !important; 
-          flex-wrap: wrap !important; 
-          align-items: center !important; 
-          justify-content: flex-start !important;
-          padding: 1rem 1rem 0.85rem 1rem !important; 
-          border: 1px solid rgba(255, 255, 255, 0.08) !important; 
-          border-radius: 1.15rem !important; 
-          background: linear-gradient(145deg, #171717 0%, #111111 100%) !important; 
-          position: relative !important; 
-          box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
-          width: 100% !important;
-          min-width: 0 !important;
-          max-width: 100% !important;
-          box-sizing: border-box !important;
-          margin: 0 !important;
-          z-index: 1 !important;
+          display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-start;
+          padding: 1.25rem; border: 1px solid var(--border-color); border-radius: 1.25rem; 
+          background: var(--bg-secondary); position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
-
-        /* Elevate Active Card Over All Sibling Rows */
-        .table-pro tr.table-row:has(.action-menu.open),
-        .table-pro tr.table-row:has(.action-menu.open-up) {
-          z-index: 100 !important;
-        }
-
-        .table-pro td { 
-          display: block !important; 
-          border: none !important; 
-          padding: 0 !important; 
-          width: auto !important; 
-          text-align: left !important; 
-          min-height: auto !important; 
-          box-sizing: border-box !important;
-        }
+        .table-pro td { display: block; border: none !important; padding: 0 !important; width: auto !important; text-align: left !important; min-height: auto; }
         .table-pro td::before { display: none !important; }
         
-        /* Card Title / ID Header */
-        .table-pro tr.table-row td:first-child { 
-          width: 100% !important; 
-          flex-basis: 100% !important; 
-          margin-bottom: 0.65rem !important; 
-          font-size: 0.95rem !important; 
-          font-weight: 600 !important;
-          color: #f3f4f6 !important;
-          line-height: 1.35 !important;
-          padding: 0 2.75rem 0 0 !important; 
-          box-sizing: border-box !important;
-          word-break: break-word !important;
-          overflow-wrap: anywhere !important;
-        }
-
-        /* Pinned 3-Dots Quick Action Button Container */
-        .table-pro tr.table-row td:last-child { 
-          position: absolute !important; 
-          right: 0.75rem !important; 
-          top: 0.75rem !important; 
-          margin: 0 !important; 
-          padding: 0 !important; 
-          width: auto !important; 
-          height: auto !important;
-          z-index: 2 !important;
-        }
-        .table-pro tr.table-row td:last-child:has(.action-menu.open),
-        .table-pro tr.table-row td:last-child:has(.action-menu.open-up) {
-          z-index: 110 !important;
-        }
-        .table-pro tr.table-row td:last-child button {
-          width: 34px !important;
-          height: 34px !important;
-          display: flex !important;
-          align-items: center !important;
-          justify-content: center !important;
-          border-radius: 0.55rem !important;
-          background: rgba(255, 255, 255, 0.05) !important;
-          border: 1px solid rgba(255, 255, 255, 0.08) !important;
-          color: #9ca3af !important;
-          transition: all 0.15s ease !important;
-        }
-        .table-pro tr.table-row td:last-child button:active {
-          background: rgba(255, 255, 255, 0.14) !important;
-          color: #ffffff !important;
-          transform: scale(0.92) !important;
-        }
-
-        /* Clean, Crisp Native Popover Menu (No Fullscreen Blur) */
-        .table-pro tr.table-row td:last-child .action-menu { 
-          position: absolute !important;
-          right: 0 !important;
-          left: auto !important;
-          top: calc(100% + 6px) !important;
-          bottom: auto !important;
-          width: 215px !important;
-          max-width: calc(100vw - 2rem) !important;
-          margin: 0 !important;
-          border-radius: 0.95rem !important;
-          background: #18181b !important;
-          border: 1px solid rgba(255, 255, 255, 0.14) !important;
-          box-shadow: 0 16px 36px -4px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.06) !important;
-          padding: 0.45rem !important;
-          z-index: 120 !important;
-          transform-origin: top right !important;
-          transform: translateY(-6px) scale(0.96) !important;
-          transition: opacity 0.15s ease-out, transform 0.15s ease-out !important;
-          opacity: 0 !important;
-          pointer-events: none !important;
-          display: flex !important;
-          flex-direction: column !important;
-          gap: 0.2rem !important;
-        }
-
-        /* Upward Opening Menu when tapped near the screen bottom */
-        .table-pro tr.table-row td:last-child .action-menu.open-up {
-          top: auto !important;
-          bottom: calc(100% + 6px) !important;
-          transform-origin: bottom right !important;
-          transform: translateY(6px) scale(0.96) !important;
-        }
-
-        /* Active Menu State */
-        .table-pro tr.table-row td:last-child .action-menu.open,
-        .table-pro tr.table-row td:last-child .action-menu.open-up { 
-          opacity: 1 !important;
-          transform: translateY(0) scale(1) !important;
-          pointer-events: auto !important;
-        }
-
-        /* Crisp, High-Contrast Action Menu Items */
-        .table-pro tr.table-row td:last-child .action-menu .action-menu-item {
-          display: flex !important;
-          align-items: center !important;
-          gap: 0.75rem !important;
-          padding: 0.7rem 0.85rem !important;
-          font-size: 0.88rem !important;
-          font-weight: 500 !important;
-          color: #f3f4f6 !important;
-          border-radius: 0.65rem !important;
-          background: transparent !important;
-          border: none !important;
-          transition: background-color 0.15s ease, transform 0.1s ease !important;
-        }
-        .table-pro tr.table-row td:last-child .action-menu .action-menu-item:active {
-          background: rgba(255, 255, 255, 0.1) !important;
-          transform: scale(0.98) !important;
-        }
-        .table-pro tr.table-row td:last-child .action-menu .action-menu-item i {
-          width: 17px !important;
-          height: 17px !important;
-          color: var(--accent) !important;
-        }
-        .table-pro tr.table-row td:last-child .action-menu .action-menu-item.danger {
-          color: #f87171 !important;
-        }
-        .table-pro tr.table-row td:last-child .action-menu .action-menu-item.danger:active {
-          background: rgba(239, 68, 68, 0.16) !important;
-        }
-        .table-pro tr.table-row td:last-child .action-menu .action-menu-item.danger i {
-          color: #ef4444 !important;
-        }
-
-        /* Smart Responsive Data Badges / Pills */
+        /* Magic Card Layout Structure */
+        .table-pro tr.table-row td:first-child { width: 100% !important; flex-basis: 100%; margin-bottom: 0.75rem; font-size: 1.1rem; padding-right: 2.5rem !important; }
+        .table-pro tr.table-row td:last-child { position: absolute; right: 0.75rem; top: 1rem; margin: 0; padding: 0 !important; }
+        .table-pro tr.table-row td:last-child .action-menu { right: 0; transform: none; transform-origin: top right; }
         .table-pro tr.table-row td:not(:first-child):not(:last-child) {
-          background: rgba(255, 255, 255, 0.05) !important; 
-          padding: 0.35rem 0.65rem !important; 
-          border-radius: 0.55rem !important; 
-          font-size: 0.8rem !important; 
-          font-weight: 500 !important;
-          color: #e2e8f0 !important;
-          border: 1px solid rgba(255, 255, 255, 0.08) !important; 
-          display: inline-flex !important; 
-          align-items: center !important;
-          gap: 0.35rem !important;
-          max-width: calc(100% - 0.25rem) !important;
-          box-sizing: border-box !important;
-          overflow: hidden !important;
-          text-overflow: ellipsis !important;
-          white-space: nowrap !important;
-          line-height: 1.25 !important;
-          margin: 0 0.35rem 0.35rem 0 !important;
-        }
-        .table-pro tr.table-row td:not(:first-child):not(:last-child) span {
-          background: transparent !important;
-          border: none !important;
-          padding: 0 !important;
-          margin: 0 !important;
+            background: var(--bg-tertiary); padding: 0.35rem 0.6rem !important; border-radius: 0.5rem; 
+            font-size: 0.8rem; margin-right: 0.5rem; margin-bottom: 0.5rem; color: var(--text-primary);
+            border: 1px solid var(--border-color); display: inline-flex; align-items: center;
         }
 
-        /* Intelligent Status Tinting */
-        .table-pro tr.table-row td:not(:first-child):not(:last-child):has(.bg-green-500\/20),
-        .table-pro tr.table-row td:not(:first-child):not(:last-child):has(.text-green-300),
-        .table-pro tr.table-row td:not(:first-child):not(:last-child):has(.text-green-400) {
-          background: rgba(34, 197, 94, 0.12) !important;
-          border-color: rgba(34, 197, 94, 0.25) !important;
-          color: #4ade80 !important;
-        }
-        .table-pro tr.table-row td:not(:first-child):not(:last-child):has(.bg-red-500\/20),
-        .table-pro tr.table-row td:not(:first-child):not(:last-child):has(.text-red-300),
-        .table-pro tr.table-row td:not(:first-child):not(:last-child):has(.text-red-400) {
-          background: rgba(239, 68, 68, 0.12) !important;
-          border-color: rgba(239, 68, 68, 0.25) !important;
-          color: #f87171 !important;
-        }
-        .table-pro tr.table-row td:not(:first-child):not(:last-child):has(.bg-yellow-500\/20),
-        .table-pro tr.table-row td:not(:first-child):not(:last-child):has(.text-yellow-300),
-        .table-pro tr.table-row td:not(:first-child):not(:last-child):has(.text-yellow-400) {
-          background: rgba(234, 179, 8, 0.12) !important;
-          border-color: rgba(234, 179, 8, 0.25) !important;
-          color: #facc15 !important;
-        }
-        .table-pro tr.table-row td:not(:first-child):not(:last-child):has(.bg-blue-500\/20),
-        .table-pro tr.table-row td:not(:first-child):not(:last-child):has(.text-blue-300),
-        .table-pro tr.table-row td:not(:first-child):not(:last-child):has(.text-blue-400) {
-          background: rgba(59, 130, 246, 0.12) !important;
-          border-color: rgba(59, 130, 246, 0.25) !important;
-          color: #60a5fa !important;
-        }
-
-        /* Empty State / No Data Rows (Centering & Zero Overflow) */
-        .table-pro tr:not(.table-row) { 
-          display: flex !important; 
-          width: 100% !important; 
-          min-width: 0 !important;
-          max-width: 100% !important; 
-          justify-content: center !important; 
-          align-items: center !important;
-          background: linear-gradient(145deg, #161616 0%, #111111 100%) !important; 
-          border-radius: 1.15rem !important; 
-          border: 1px dashed rgba(255, 255, 255, 0.12) !important; 
-          box-sizing: border-box !important;
-          padding: 0 !important;
-          margin: 0.5rem 0 !important;
-        }
-        .table-pro tr:not(.table-row) td { 
-          width: 100% !important; 
-          min-width: 0 !important;
-          max-width: 100% !important; 
-          text-align: center !important; 
-          background: transparent !important; 
-          border: none !important; 
-          padding: 2.25rem 1.25rem !important; 
-          position: static !important; 
-          box-sizing: border-box !important;
-          color: var(--text-secondary) !important;
-          font-size: 0.875rem !important;
-          line-height: 1.5 !important;
-          word-break: break-word !important;
-          overflow-wrap: break-word !important;
-          white-space: normal !important;
-        }
-
-        /* Mobile Pagination Container Cleanup */
-        div[id$="-pagination"] > div {
-          flex-direction: column !important;
-          gap: 0.75rem !important;
-          align-items: center !important;
-          justify-content: center !important;
-          text-align: center !important;
-          width: 100% !important;
-          box-sizing: border-box !important;
-        }
+        /* Fix empty/no-data rows */
+        .table-pro tr:not(.table-row) { display: flex; width: 100%; justify-content: center; background: var(--bg-secondary); border-radius: 1.25rem; border: 1px solid var(--border-color); }
+        .table-pro tr:not(.table-row) td { width: 100% !important; text-align: center !important; background: transparent !important; border: none !important; padding: 2rem !important; position: static !important; }
 
        /* Native Bottom Sheet Modals */
         .modal-overlay { align-items: flex-end; padding: 0; z-index: 200 !important; }
@@ -1136,8 +770,8 @@
       #reader video { border-radius: 0 !important; object-fit: cover !important; width: 100% !important; height: 100% !important; }
       #reader { border: none !important; width: 100% !important; height: 100% !important; }
     </style>
-    <!-- ZXing Enterprise Barcode Scanner -->
-    <script src="https://unpkg.com/@zxing/library@latest/umd/index.min.js"></script>
+    <!-- HTML5 QR Code Scanner -->
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
   </head>
   <body class="bg-dots">
     <div
@@ -1147,68 +781,29 @@
       <!-- This will be populated by the renderLoginScreen function -->
     </div>
     <div class="flex h-screen bg-bg-primary text-text-secondary">
-     <!-- Modern High-Speed Splash Screen with Glowing Laser -->
+      <!-- Loading Overlay -->
       <div
         id="loading-overlay"
-        class="fixed inset-0 z-[500] flex flex-col items-center justify-center bg-[#0a0a0a] select-none"
+        class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-gray-900/80 backdrop-blur-sm"
       >
-        <div class="flex flex-col items-center">
-          <!-- Official Logo with Soft Pulse Glow -->
-          <div class="relative mb-4 flex items-center justify-center">
-            <div class="absolute -inset-3 bg-blue-600/25 rounded-full blur-xl animate-pulse"></div>
-            <img
-              src="cashshilpo-official-logo.png"
-              class="w-16 h-16 sm:w-20 sm:h-20 object-contain relative z-10 drop-shadow-[0_8px_25px_rgba(0,123,255,0.4)]"
-              alt="CashShilpo"
-            />
-          </div>
-
-          <!-- Brand Name -->
-          <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-2">
-            CashShilpo
-          </h1>
-
-          <!-- Moving Laser Beam Progress Bar -->
-          <div class="laser-track">
-            <div class="laser-runner"></div>
-          </div>
-        </div>
-
+        <div
+          class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mb-4"
+        ></div>
+        <h2 class="text-2xl font-semibold text-white">
+          Initializing System...
+        </h2>
+        <p class="text-text-secondary mt-2">Connecting to secure servers.</p>
         <style>
-          .laser-track {
-            width: 140px;
-            height: 3px;
-            background: rgba(255, 255, 255, 0.12);
-            border-radius: 9999px;
-            overflow: hidden;
-            position: relative;
-            margin-top: 0.75rem;
+          .loader {
+            border-top-color: var(--accent);
+            animation: spin 1s linear infinite;
           }
-
-          .laser-runner {
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            width: 55%;
-            border-radius: 9999px;
-            background: linear-gradient(
-              90deg,
-              transparent 0%,
-              #007bff 30%,
-              #60a5fa 50%,
-              #007bff 70%,
-              transparent 100%
-            );
-            box-shadow: 0 0 12px #007bff, 0 0 4px #60a5fa;
-            animation: modernLaserSweep 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-          }
-
-          @keyframes modernLaserSweep {
+          @keyframes spin {
             0% {
-              transform: translateX(-150%);
+              transform: rotate(0deg);
             }
             100% {
-              transform: translateX(250%);
+              transform: rotate(360deg);
             }
           }
         </style>
@@ -2114,7 +1709,7 @@
             productFormDraft: null,
             isHeaderCollapsed: false, // NEW: For header state
             currentCurrency: 'USD', // Will be updated from storeInfo
-           settings: { // Will be updated from storeInfo.settings
+            settings: { // Will be updated from storeInfo.settings
                 selectedReceiptTemplate: 'modern',
                 posLayout: 'classic', // To switch between POS layouts
                 businessType: 'general',
@@ -2122,7 +1717,6 @@
                 taxRate: 10,
                 defaultUnit: 'pcs',
                 voidLockoutDays: 30,
-                autoOpenScanner: localStorage.getItem('cashshilpo_auto_open_scanner') === 'true',
                 automations: { // Default automation settings
                     dynamicPricing: { enabled: false, strategy: 'balanced' },
                     fraudDetection: { enabled: true, sensitivity: 'high' },
@@ -3587,17 +3181,9 @@ const printElement = (elementId) => {
     document.body.removeChild(printContainer);
     document.head.removeChild(printStyles);
 };
-let globalAudioContext = null;
 const playNotificationSound = () => {
-    if (!globalAudioContext) {
-        const AudioCtx = window.AudioContext || window.webkitAudioContext;
-        if (!AudioCtx) return;
-        globalAudioContext = new AudioCtx();
-    }
-    if (globalAudioContext.state === 'suspended') {
-        globalAudioContext.resume();
-    }
-    const audioContext = globalAudioContext;
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    if (!audioContext) return; // Web Audio API not supported
 
     const oscillator = audioContext.createOscillator();
     const gainNode = audioContext.createGain();
@@ -3605,22 +3191,15 @@ const playNotificationSound = () => {
     oscillator.connect(gainNode);
     gainNode.connect(audioContext.destination);
 
-    // Ultra-fast attack and smooth decay for a realistic, piercing scanner beep
     gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-    gainNode.gain.linearRampToValueAtTime(1, audioContext.currentTime + 0.01);
-    gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.15);
+    gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.01); // Quick fade in
 
-    // Sine wave at 2800Hz matches the exact pitch of industry-standard zebra scanners
-    oscillator.type = 'sine'; 
-    oscillator.frequency.setValueAtTime(2800, audioContext.currentTime); 
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(880, audioContext.currentTime); // A nice "ping" frequency
     
     oscillator.start(audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.00001, audioContext.currentTime + 0.15); // Quick fade out
     oscillator.stop(audioContext.currentTime + 0.15);
-
-    // Sharp, instantaneous tactile feedback
-    if (navigator.vibrate) {
-        navigator.vibrate(30); 
-    }
 };
 
 const showToast = (message, type = 'success') => {
@@ -4282,8 +3861,7 @@ function handleCustomerExport() {
                         </button>
                     </div>
                     <div class="flex-grow w-full h-full relative flex items-center justify-center overflow-hidden bg-black" id="scanner-wrapper">
-                        <!-- USING NATIVE VIDEO TAG FOR ZXING -->
-                        <video id="global-reader" class="absolute inset-0 w-full h-full object-cover" autoplay muted playsinline></video>
+                        <div id="reader" class="absolute inset-0 w-full h-full object-cover"></div>
                         <div class="absolute w-64 h-40 border-4 border-accent rounded-xl shadow-[0_0_0_4000px_rgba(0,0,0,0.85)] pointer-events-none z-10 flex items-center justify-center">
                             <div class="w-full h-1 bg-accent/70 animate-pulse shadow-[0_0_15px_rgba(0,123,255,1)]"></div>
                         </div>
@@ -4296,50 +3874,37 @@ function handleCustomerExport() {
                 </div>
             `;
             
-          document.body.insertAdjacentHTML('beforeend', content);
+            document.body.insertAdjacentHTML('beforeend', content);
             lucide.createIcons();
 
-            // ULTIMATE ENGINE UPGRADE: Restrict formats to 1D only, skipping heavy QR matrix logic
-            const hints = new Map();
-            hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [
-                ZXing.BarcodeFormat.CODE_128, ZXing.BarcodeFormat.EAN_13, 
-                ZXing.BarcodeFormat.EAN_8, ZXing.BarcodeFormat.UPC_A, 
-                ZXing.BarcodeFormat.UPC_E
-            ]);
-            const codeReader = new ZXing.BrowserMultiFormatReader(hints);
-            
-            // INSANE SPEED TWEAK: Default delay is 500ms. We force it to scan every 50ms!
-            codeReader.timeBetweenDecodingAttempts = 50;
-
+            const html5QrCode = new Html5Qrcode("reader");
             const scannerDiv = document.getElementById('native-scanner-view');
 
             const closeScanner = () => {
-                codeReader.reset();
-                scannerDiv.remove();
+                if (html5QrCode.isScanning) {
+                    html5QrCode.stop().then(() => {
+                        html5QrCode.clear();
+                        scannerDiv.remove();
+                    }).catch(err => {
+                        console.error("Failed to stop scanner", err);
+                        scannerDiv.remove();
+                    });
+                } else {
+                    scannerDiv.remove();
+                }
             };
 
             scannerDiv.querySelector('[data-action="close-scanner"]').addEventListener('click', closeScanner);
 
-            // GOLDEN RATIO CONSTRAINTS: 1080p chokes bad phones and causes motion blur. 
-            // 720p @ 60fps is the holy grail for instant, blur-free JS barcode scanning.
-            const constraints = {
-                video: {
-                    facingMode: "environment",
-                    width: { ideal: 1280 },
-                    height: { ideal: 720 },
-                    frameRate: { ideal: 60, min: 30 },
-                    advanced: [{ focusMode: "continuous" }]
-                }
-            };
+            const config = { fps: 15, qrbox: { width: 250, height: 150 }, aspectRatio: window.innerHeight / window.innerWidth };
 
-            codeReader.decodeFromConstraints(constraints, 'global-reader', (result, err) => {
-                if (result) {
-                    const decodedText = result.getText();
+            html5QrCode.start({ facingMode: "environment" }, config,
+                (decodedText, decodedResult) => {
                     closeScanner();
                     playNotificationSound();
-                   const product = firestoreData.products.find(p => p.barcode === decodedText || p.id === decodedText);
+                    const product = firestoreData.products.find(p => p.barcode === decodedText || p.id === decodedText);
                     if (product) {
-                        window.addProductToActiveCart(product);
+                        addProductToActiveCart(product);
                         showToast(`Added: ${product.name}`, 'success');
                         const floatCart = document.getElementById('mobile-floating-cart');
                         if(floatCart && window.innerWidth < 1024) {
@@ -4349,9 +3914,10 @@ function handleCustomerExport() {
                     } else {
                         showToast(`No product found: ${decodedText}`, 'error');
                     }
-                }
-            }).catch((err) => {
-                console.error("Scanner failed:", err);
+                },
+                (errorMessage) => { /* Ignore constant scan frame errors */ }
+            ).catch((err) => {
+                console.error("Error starting scanner", err);
                 const wrapper = document.getElementById('scanner-wrapper');
                 if (wrapper) {
                     wrapper.innerHTML = `
@@ -4369,6 +3935,7 @@ function handleCustomerExport() {
                 }
             });
         };
+
         document.addEventListener('DOMContentLoaded', () => {
             // --- NEW: STORE SWITCHER LOGIC ---
             const renderStoreSwitcher = () => {
@@ -6674,44 +6241,21 @@ function handleCustomerExport() {
                         // Cashier-specific settings view
                         if (isCashier) {
                             // Cashiers ONLY see POS Layout options, and can save them.
-                          // Cashiers settings view with Premium Camera Launch Toggle
-                    return `<div id="settings-form">
-                        <h1 class="text-3xl font-bold text-text-primary mb-6">Settings</h1>
-                        <div class="space-y-8 max-w-4xl">
-                            <!-- Instant Camera Scanner Toggle (Premium Feature) -->
-                            <div class="glass-pane p-6 rounded-xl border border-border-color">
-                                <div class="flex items-center justify-between gap-4">
-                                    <div class="flex items-start gap-3">
-                                        <div class="w-10 h-10 rounded-xl bg-accent/10 border border-accent/25 flex items-center justify-center text-accent shrink-0 mt-0.5">
-                                            <i data-lucide="scan-barcode" class="w-5 h-5"></i>
-                                        </div>
-                                        <div>
-                                            <div class="flex items-center gap-2">
-                                                <h3 class="font-bold text-text-primary text-base">Instant Camera Scanner</h3>
-                                                <span class="px-2 py-0.5 rounded-full bg-gradient-to-r from-accent to-blue-600 text-[10px] font-bold text-white uppercase tracking-wider shadow-sm">Premium</span>
-                                            </div>
-                                            <p class="text-xs text-text-secondary mt-1">Automatically launch the camera viewfinder upon entering the Mobile POS terminal for high-speed scanning.</p>
-                                        </div>
+                            return `<div id="settings-form">
+                                <h1 class="text-3xl font-bold text-text-primary mb-6">Settings</h1>
+                                <div class="space-y-8 max-w-4xl">
+                                    <div class="glass-pane p-6 rounded-lg">
+                                        <h2 class="text-xl font-semibold text-text-primary border-b border-border-color pb-4 mb-4 flex items-center gap-2">
+                                            <i data-lucide="layout-template" class="text-accent"></i> POS Layout
+                                        </h2>
+                                        <p class="text-sm text-text-secondary mb-4">Choose the layout for your Point of Sale terminal.</p>
+                                        <div id="pos-layout-selector"></div>
                                     </div>
-                                    <label class="toggle-switch-label shrink-0">
-                                        <input type="checkbox" id="setting-auto-open-scanner" name="autoOpenScanner" class="sr-only toggle-switch-input" ${appState.settings.autoOpenScanner ? 'checked' : ''}>
-                                        <div class="toggle-switch-track"><div class="toggle-switch-thumb"></div></div>
-                                    </label>
+                                    <div class="flex justify-end">
+                                        <button data-action="save-settings" class="btn btn-primary">Save Changes</button>
+                                    </div>
                                 </div>
-                            </div>
-
-                            <div class="glass-pane p-6 rounded-lg">
-                                <h2 class="text-xl font-semibold text-text-primary border-b border-border-color pb-4 mb-4 flex items-center gap-2">
-                                    <i data-lucide="layout-template" class="text-accent"></i> POS Layout
-                                </h2>
-                                <p class="text-sm text-text-secondary mb-4">Choose the layout for your Point of Sale terminal.</p>
-                                <div id="pos-layout-selector"></div>
-                            </div>
-                            <div class="flex justify-end">
-                                <button data-action="save-settings" class="btn btn-primary">Save Changes</button>
-                            </div>
-                        </div>
-                    </div>`;
+                            </div>`;
                         }
 
                         // Full settings view for Admin/Manager
@@ -6816,28 +6360,6 @@ function handleCustomerExport() {
                         ` : ''}
                         
                         
-                       <!-- Instant Camera Scanner Toggle (Premium Feature) -->
-                        <div class="glass-pane p-6 rounded-xl border border-border-color">
-                            <div class="flex items-center justify-between gap-4">
-                                <div class="flex items-start gap-3">
-                                    <div class="w-10 h-10 rounded-xl bg-accent/10 border border-accent/25 flex items-center justify-center text-accent shrink-0 mt-0.5">
-                                        <i data-lucide="scan-barcode" class="w-5 h-5"></i>
-                                    </div>
-                                    <div>
-                                        <div class="flex items-center gap-2">
-                                            <h3 class="font-bold text-text-primary text-base">Instant Camera Scanner</h3>
-                                            <span class="px-2 py-0.5 rounded-full bg-gradient-to-r from-accent to-blue-600 text-[10px] font-bold text-white uppercase tracking-wider shadow-sm">Premium</span>
-                                        </div>
-                                        <p class="text-xs text-text-secondary mt-1">Automatically launch the camera viewfinder upon entering the Mobile POS terminal for high-speed scanning.</p>
-                                    </div>
-                                </div>
-                                <label class="toggle-switch-label shrink-0">
-                                    <input type="checkbox" id="setting-auto-open-scanner" name="autoOpenScanner" class="sr-only toggle-switch-input" ${appState.settings.autoOpenScanner ? 'checked' : ''}>
-                                    <div class="toggle-switch-track"><div class="toggle-switch-thumb"></div></div>
-                                </label>
-                            </div>
-                        </div>
-
                         <div class="glass-pane p-6 rounded-lg"><h2 class="text-xl font-semibold text-text-primary border-b border-border-color pb-4 mb-4 flex items-center gap-2"><i data-lucide="layout-template" class="text-accent"></i> POS Layout</h2><p class="text-sm text-text-secondary mb-4">Choose the layout for your Point of Sale terminal.</p><div id="pos-layout-selector"></div></div>
                         
                         ${canManageSettings ? `
@@ -9516,127 +9038,36 @@ function initBarcodeGenerator(pane) {
             }
 
 // -----------------------------------------------------------------------------
-            // NATIVE MOBILE RETAIL POS TERMINAL (MILLION-DOLLAR UI/UX)
+            // ULTIMATE MOBILE-FIRST BARCODE POS & WRAPPER
             // -----------------------------------------------------------------------------
             let mobilePosScanner = null;
             let mobileLastScannedCode = '';
             let mobileLastScanTime = 0;
+            let isScannerTransitioning = false;
 
-            // Global Native Held Orders Sheet
-            window.openHeldSalesModal = function() {
-                const heldSales = posState.sales.filter(s => s.status === 'held');
-                if (heldSales.length === 0) {
-                    showToast('No held orders currently parked.', 'info');
-                    return;
-                }
-
-                const activeSale = posState.sales.find(s => s.id === posState.activeSaleId);
-                const hasActiveCart = activeSale && activeSale.cart.length > 0;
-
-                const content = `
-                    <div class="space-y-3 max-h-[60vh] overflow-y-auto -mx-2 px-2">
-                        ${hasActiveCart ? `
-                            <div class="p-3 bg-blue-500/10 border border-blue-500/25 rounded-xl text-xs text-blue-200 flex items-center gap-2 mb-1">
-                                <i data-lucide="info" class="w-4 h-4 text-blue-400 shrink-0"></i>
-                                <span>Resuming will safely park your current cart so no items are lost.</span>
-                            </div>
-                        ` : ''}
-                        
-                        ${heldSales.map(sale => {
-                            const itemCount = sale.cart.reduce((sum, item) => sum + item.qty, 0);
-                            const totalBase = sale.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-                            const customerName = sale.customer ? sale.customer.name : 'Walk-in Customer';
-                            const itemsSummary = sale.cart.map(i => `${i.qty}x ${i.name}`).join(', ');
-
-                            return `
-                            <div class="bg-[#161618] border border-white/10 rounded-2xl p-3.5 flex flex-col gap-2.5 shadow-lg relative">
-                                <div class="flex items-start justify-between gap-2">
-                                    <div>
-                                        <div class="flex items-center gap-2">
-                                            <span class="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 font-bold text-[10px] uppercase tracking-wider flex items-center gap-1">
-                                                <i data-lucide="pause-circle" class="w-3 h-3"></i> Parked
-                                            </span>
-                                            <h4 class="font-bold text-white text-sm">${sale.name}</h4>
-                                        </div>
-                                        <p class="text-xs text-text-secondary mt-1 flex items-center gap-1">
-                                            <i data-lucide="user" class="w-3 h-3 text-accent"></i> ${customerName}
-                                        </p>
-                                    </div>
-                                    <div class="text-right">
-                                        <span class="font-mono font-bold text-white text-base">${currencyUtils.format(totalBase)}</span>
-                                        <span class="block text-[10px] text-text-secondary">${itemCount} item${itemCount > 1 ? 's' : ''}</span>
-                                    </div>
-                                </div>
-
-                                <div class="bg-black/50 rounded-xl px-2.5 py-2 text-xs text-text-secondary font-mono truncate border border-white/5">
-                                    ${itemsSummary || 'No items'}
-                                </div>
-
-                                <div class="flex items-center gap-2 pt-1 border-t border-white/[0.06]">
-                                    <button data-held-action="discard" data-sale-id="${sale.id}" class="flex-1 py-2 px-3 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-bold active:scale-95 transition-all flex items-center justify-center gap-1.5">
-                                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Discard
-                                    </button>
-                                    <button data-held-action="resume" data-sale-id="${sale.id}" class="flex-[2] py-2 px-3 rounded-xl bg-gradient-to-r from-accent to-blue-600 hover:from-blue-600 hover:to-accent text-white text-xs font-bold active:scale-95 transition-all shadow-md flex items-center justify-center gap-1.5">
-                                        <i data-lucide="play" class="w-3.5 h-3.5 fill-current"></i> Resume Sale
-                                    </button>
-                                </div>
-                            </div>
-                            `;
-                        }).join('')}
-                    </div>
-                `;
-
-                const footer = `<button data-action="close-modal" class="btn btn-secondary w-full">Close</button>`;
-                const modal = showModal(`Parked Orders (${heldSales.length})`, content, footer, { size: 'max-w-md' });
-
-                modal.addEventListener('click', e => {
-                    const btn = e.target.closest('[data-held-action]');
-                    if (!btn) return;
-
-                    const action = btn.dataset.heldAction;
-                    const saleId = btn.dataset.saleId;
-
-                    if (action === 'resume') {
-                        const targetSale = posState.sales.find(s => s.id === saleId);
-                        if (!targetSale) return;
-
-                        if (activeSale && activeSale.id !== saleId && activeSale.cart.length > 0 && activeSale.status !== 'held') {
-                            activeSale.status = 'held';
-                            showToast('Current sale placed on hold.', 'info');
-                        }
-
-                        targetSale.status = 'active';
-                        posState.activeSaleId = targetSale.id;
-
-                        closeModal(modal);
-                        const viewPane = document.querySelector('#workspace-content .view-pane');
-                        if (viewPane) posFullRender(viewPane);
-                        showToast(`Resumed ${targetSale.name}!`, 'success');
-                    }
-
-                    if (action === 'discard') {
-                        const saleIndex = posState.sales.findIndex(s => s.id === saleId);
-                        if (saleIndex > -1) {
-                            const discardedName = posState.sales[saleIndex].name;
-                            posState.sales.splice(saleIndex, 1);
-                            closeModal(modal);
-                            const viewPane = document.querySelector('#workspace-content .view-pane');
-                            if (viewPane) posFullRender(viewPane);
-                            showToast(`${discardedName} discarded.`, 'info');
-                        }
-                    }
-                });
-                lucide.createIcons();
+            // Highly realistic, satisfying barcode scanner beep
+            const playBarcodeBeep = () => {
+                try {
+                    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.type = 'square'; // Square wave gives it that electronic laser sound
+                    osc.frequency.setValueAtTime(1400, ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(2000, ctx.currentTime + 0.05);
+                    gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+                    osc.start(ctx.currentTime);
+                    osc.stop(ctx.currentTime + 0.1);
+                } catch (e) { console.error("Audio beep error:", e); }
             };
 
             function updateMobilePOS(pane) {
                 const listEl = pane.querySelector('#mpos-cart-list');
                 const totalEl = pane.querySelector('#mpos-total');
-                const itemCountEl = pane.querySelector('#mpos-item-count');
                 const customerEl = pane.querySelector('#mpos-customer-area');
                 const chargeBtn = pane.querySelector('#mpos-charge-btn');
-                const heldBannerEl = pane.querySelector('#mpos-held-banner-container');
-                const holdBtn = pane.querySelector('#mpos-hold-btn');
 
                 if (!listEl || !totalEl || !customerEl || !chargeBtn) return;
 
@@ -9663,278 +9094,140 @@ function initBarcodeGenerator(pane) {
                 const cartCount = activeSale.cart.reduce((sum, item) => sum + item.qty, 0);
 
                 totalEl.textContent = currencyUtils.format(totalBase);
-                if (itemCountEl) {
-                    itemCountEl.textContent = cartCount > 0 ? `${cartCount} items` : '0 items';
-                }
                 chargeBtn.disabled = cartCount === 0;
 
-                // Track Held Orders
-                const heldSales = posState.sales.filter(s => s.status === 'held');
-                const heldCount = heldSales.length;
-
-                // 1. Dynamic Top Banner for Held Orders
-                if (heldBannerEl) {
-                    if (heldCount > 0) {
-                        heldBannerEl.innerHTML = `
-                            <div data-action="open-held-sales" class="bg-amber-500/10 border-b border-amber-500/25 px-3 py-2 flex items-center justify-between cursor-pointer active:bg-amber-500/20 transition-all">
-                                <div class="flex items-center gap-2 text-xs text-amber-300 font-semibold">
-                                    <span class="flex h-2 w-2 relative">
-                                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                                        <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
-                                    </span>
-                                    <span>${heldCount} Parked Order${heldCount > 1 ? 's' : ''} on Hold</span>
-                                </div>
-                                <span class="text-[11px] font-bold text-amber-400 flex items-center gap-1 bg-amber-500/20 px-2 py-0.5 rounded-full">
-                                    Resume ➔
-                                </span>
-                            </div>
-                        `;
-                    } else {
-                        heldBannerEl.innerHTML = '';
-                    }
-                }
-
-                // 2. Dynamic Hold Button State in Shortcut Bar
-                if (holdBtn) {
-                    if (cartCount === 0 && heldCount > 0) {
-                        holdBtn.className = 'bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 rounded-lg py-1.5 text-center text-xs font-bold text-amber-300 active:scale-95 transition-all flex items-center justify-center gap-1.5 shadow-sm';
-                        holdBtn.innerHTML = `<i data-lucide="play-circle" class="w-3.5 h-3.5 text-amber-400"></i> Resume (${heldCount})`;
-                    } else {
-                        holdBtn.className = 'bg-[#18181b] hover:bg-white/10 border border-white/10 rounded-lg py-1.5 text-center text-xs font-semibold text-text-secondary active:scale-95 transition-all flex items-center justify-center gap-1.5';
-                        holdBtn.innerHTML = `<i data-lucide="pause-circle" class="w-3.5 h-3.5 text-blue-400"></i> Hold ${heldCount > 0 ? `(${heldCount})` : ''}`;
-                    }
-                }
-
-                // Popular / Quick Add suggestions for empty state
-                const quickProducts = firestoreData.products
-                    .filter(p => !p.parentSKU && (p.status || 'active') === 'active')
-                    .slice(0, 4);
-
                 listEl.innerHTML = activeSale.cart.length ? activeSale.cart.map(item => `
-                    <div class="bg-[#141416] p-3 rounded-2xl flex items-center gap-3 border border-white/[0.08] shadow-md relative overflow-hidden transition-all duration-150">
-                        <div class="flex-grow min-w-0 pr-2">
-                            <p class="font-bold text-white text-[13px] leading-snug truncate">${item.name}</p>
-                            <div class="flex items-center gap-2 mt-1">
-                                <span class="font-mono text-xs text-text-secondary">${currencyUtils.format(item.price)}</span>
-                                <span class="text-white/20 text-[10px]">•</span>
-                                <span class="font-mono text-xs font-bold text-accent">${currencyUtils.format(item.price * item.qty)}</span>
-                                ${item.serialNumber ? `<span class="bg-blue-500/10 text-blue-400 text-[10px] px-1.5 py-0.5 rounded font-mono">SN: ${item.serialNumber}</span>` : ''}
-                            </div>
+                    <div class="bg-bg-tertiary/40 backdrop-blur-md p-4 rounded-[1.25rem] flex items-center gap-4 border border-white/5 shadow-sm relative overflow-hidden active:scale-[0.98] transition-all cursor-pointer group">
+                        <div class="flex-grow overflow-hidden pr-2">
+                            <p class="font-bold text-text-primary text-[15px] leading-tight mb-1.5 truncate">${item.name}</p>
+                            <p class="font-mono text-xs text-text-secondary">${currencyUtils.format(item.price)} × ${item.qty} = <span class="text-accent font-bold text-[13px]">${currencyUtils.format(item.price * item.qty)}</span></p>
                         </div>
-                        <div class="flex items-center gap-1.5 shrink-0 bg-[#0a0a0a] rounded-xl p-1 border border-white/10">
-                            <button data-action="decrement-qty" data-id="${item.id}" data-serial="${item.serialNumber || ''}" class="w-8 h-8 flex items-center justify-center text-text-secondary hover:text-white rounded-lg active:bg-white/10 active:scale-95 transition-all">
-                                <i data-lucide="minus" class="w-3.5 h-3.5 pointer-events-none"></i>
-                            </button>
-                            <span class="font-mono font-bold text-sm w-6 text-center text-white">${item.qty}</span>
-                            <button data-action="increment-qty" data-id="${item.id}" data-serial="${item.serialNumber || ''}" class="w-8 h-8 flex items-center justify-center text-accent hover:text-white rounded-lg active:bg-white/10 active:scale-95 transition-all">
-                                <i data-lucide="plus" class="w-3.5 h-3.5 pointer-events-none"></i>
-                            </button>
+                        <div class="flex items-center gap-1.5 shrink-0 bg-bg-primary rounded-xl p-1 border border-white/10 z-10 shadow-inner">
+                            <button data-action="decrement-qty" data-id="${item.id}" data-serial="${item.serialNumber || ''}" class="w-9 h-9 flex items-center justify-center text-text-primary hover:bg-bg-secondary rounded-lg active:bg-border-color transition-colors"><i data-lucide="minus" class="w-4 h-4 pointer-events-none"></i></button>
+                            <span class="font-bold text-base w-6 text-center font-mono">${item.qty}</span>
+                            <button data-action="increment-qty" data-id="${item.id}" data-serial="${item.serialNumber || ''}" class="w-9 h-9 flex items-center justify-center text-text-primary hover:bg-bg-secondary rounded-lg active:bg-border-color transition-colors"><i data-lucide="plus" class="w-4 h-4 pointer-events-none"></i></button>
                         </div>
-                        <button data-action="remove-from-cart" data-id="${item.id}" data-serial="${item.serialNumber || ''}" class="text-text-secondary hover:text-red-400 active:scale-90 p-1.5 ml-1 shrink-0 transition-colors" title="Remove">
-                            <i data-lucide="trash-2" class="w-4 h-4 pointer-events-none"></i>
-                        </button>
+                        <button data-action="remove-from-cart" data-id="${item.id}" data-serial="${item.serialNumber || ''}" class="absolute top-2 left-2 bg-red-500/90 text-white rounded-full p-2 shadow-xl active:scale-90 hidden z-20 border border-white/20"><i data-lucide="trash-2" class="w-4 h-4 pointer-events-none"></i></button>
                     </div>
                 `).join('') : `
-                    <div class="flex flex-col items-center justify-center h-full py-6 text-center">
-                        ${heldCount > 0 ? `
-                        <div data-action="open-held-sales" class="mb-4 bg-amber-500/10 border border-amber-500/30 rounded-2xl p-3 w-full max-w-xs text-center cursor-pointer active:scale-95 transition-transform shadow-md">
-                            <div class="flex items-center justify-center gap-2 text-amber-300 font-bold text-xs mb-0.5">
-                                <i data-lucide="pause-circle" class="w-4 h-4"></i> ${heldCount} Parked Order${heldCount > 1 ? 's' : ''} on Hold
-                            </div>
-                            <p class="text-[11px] text-amber-200/80">Tap here to view and resume parked orders</p>
-                        </div>` : ''}
-
-                        <div class="w-12 h-12 rounded-2xl bg-white/[0.04] border border-white/10 flex items-center justify-center mb-2 text-accent shadow-inner">
-                            <i data-lucide="scan-barcode" class="w-6 h-6"></i>
-                        </div>
-                        <p class="font-bold text-white text-sm">Scanner Ready</p>
-                        <p class="text-xs text-text-secondary mt-0.5 max-w-[210px]">Align a barcode within the camera frame or search products above.</p>
-                        ${quickProducts.length > 0 ? `
-                        <div class="mt-4 pt-3 border-t border-white/[0.06] w-full max-w-xs">
-                            <p class="text-[10px] uppercase font-bold tracking-widest text-text-secondary/70 mb-2">⚡ Quick Add</p>
-                            <div class="flex flex-wrap gap-1.5 justify-center">
-                                ${quickProducts.map(p => `
-                                    <button data-quick-add="${p.id}" class="text-xs bg-[#161616] hover:bg-white/10 border border-white/10 text-text-primary px-2.5 py-1.5 rounded-lg active:scale-95 transition-all truncate max-w-[140px]">
-                                        + ${p.name}
-                                    </button>
-                                `).join('')}
-                            </div>
-                        </div>` : ''}
+                    <div class="flex flex-col items-center justify-center h-48 text-text-secondary opacity-50">
+                        <div class="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center mb-4"><i data-lucide="scan-line" class="w-10 h-10 text-text-secondary"></i></div>
+                        <p class="text-lg font-bold text-text-primary tracking-wide">Cart is empty</p>
                     </div>
                 `;
 
                 customerEl.innerHTML = activeSale.customer ? `
-                    <div class="flex items-center justify-between bg-blue-500/10 border border-blue-500/30 rounded-xl px-3 py-2 shadow-sm">
-                        <div class="flex items-center gap-2.5 overflow-hidden">
-                            <div class="w-7 h-7 rounded-lg bg-blue-500/20 flex items-center justify-center shrink-0">
-                                <i data-lucide="user" class="w-3.5 h-3.5 text-blue-400 pointer-events-none"></i>
-                            </div>
-                            <div class="overflow-hidden">
-                                <p class="font-bold text-xs text-blue-100 truncate">${activeSale.customer.name}</p>
-                                <p class="text-[10px] text-blue-300/80 font-mono truncate">${activeSale.customer.phone || 'No phone'} ${activeSale.customer.currentDue > 0 ? `• Due: ${currencyUtils.format(activeSale.customer.currentDue)}` : ''}</p>
-                            </div>
+                    <div class="flex items-center justify-between bg-gradient-to-r from-blue-900/40 to-blue-800/20 border border-blue-500/30 rounded-2xl p-3 shadow-md mb-4 backdrop-blur-md">
+                        <div class="flex items-center gap-3 overflow-hidden">
+                            <div class="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center shrink-0 border border-blue-400/30"><i data-lucide="user" class="w-5 h-5 text-blue-400 pointer-events-none"></i></div>
+                            <div class="overflow-hidden"><p class="font-bold text-sm text-blue-100 truncate">${activeSale.customer.name}</p><p class="text-[10px] text-blue-300 font-mono tracking-widest uppercase mt-0.5">Linked Customer</p></div>
                         </div>
-                        <button data-action="remove-customer-from-sale" class="p-1 text-red-400 hover:bg-red-400/20 rounded-lg shrink-0 active:scale-90" title="Remove customer">
-                            <i data-lucide="x" class="w-3.5 h-3.5 pointer-events-none"></i>
-                        </button>
+                        <button data-action="remove-customer-from-sale" class="w-10 h-10 flex items-center justify-center text-red-400 bg-red-500/10 hover:bg-red-500/20 rounded-full shrink-0 active:scale-90 transition-transform"><i data-lucide="x" class="w-5 h-5 pointer-events-none"></i></button>
                     </div>
                 ` : `
-                    <button data-action="add-customer-to-sale" class="w-full flex items-center justify-between px-3 py-2 bg-[#141416] hover:bg-white/[0.06] border border-white/10 rounded-xl text-xs font-semibold text-text-secondary active:scale-[0.99] transition-all">
-                        <span class="flex items-center gap-2"><i data-lucide="user-plus" class="w-3.5 h-3.5 text-accent"></i> Link Customer</span>
-                        <span class="text-[10px] text-accent font-bold">Select ➔</span>
+                    <button data-action="add-customer-to-sale" class="w-full flex items-center justify-center gap-3 py-3.5 mb-4 bg-white/5 hover:bg-white/10 text-text-secondary hover:text-white rounded-2xl text-sm font-bold active:scale-[0.98] transition-all border border-dashed border-white/20 shadow-sm">
+                        <i data-lucide="user-plus" class="w-5 h-5"></i> Link Customer to Sale
                     </button>
                 `;
                 lucide.createIcons();
             }
 
             function initMobilePOS(pane) {
-                // If container is already built, simply update cart data without restarting camera
-                if (pane.querySelector('#mpos-search')) {
-                    updateMobilePOS(pane);
-                    return;
-                }
-
-              // Seamless full-bleed native viewport fill
                 pane.style.position = 'fixed';
-                pane.style.inset = 'calc(60px + env(safe-area-inset-top)) 0 calc(65px + env(safe-area-inset-bottom)) 0';
-                pane.style.margin = '0';
-                pane.style.padding = '0';
-                pane.style.border = 'none';
-                pane.style.borderRadius = '0';
+                pane.style.top = 'calc(65px + env(safe-area-inset-top))';
+                pane.style.bottom = 'calc(65px + env(safe-area-inset-bottom))'; 
+                pane.style.left = '0';
+                pane.style.right = '0';
                 pane.style.zIndex = '35';
-                pane.className = 'view-pane flex flex-col bg-[#0a0a0a] overflow-hidden select-none';
-
-                // Check user preference for auto-opening scanner
-                const shouldAutoOpen = localStorage.getItem('cashshilpo_auto_open_scanner') === 'true' || appState.settings.autoOpenScanner === true;
+                pane.className = 'flex flex-col bg-black overflow-hidden'; // Base is black for seamless camera integration
 
                 if (!document.getElementById('mpos-styles')) {
                     document.head.insertAdjacentHTML('beforeend', `<style id="mpos-styles">
-                        @keyframes mposLaserSweep {
-                            0% { top: 12%; opacity: 0; }
-                            15% { opacity: 1; }
-                            85% { opacity: 1; }
-                            100% { top: 88%; opacity: 0; }
-                        }
-                        .mpos-laser-line {
-                            position: absolute;
-                            left: 5%;
-                            right: 5%;
-                            height: 2px;
-                            background: linear-gradient(90deg, transparent 0%, #007bff 30%, #60a5fa 50%, #007bff 70%, transparent 100%);
-                            box-shadow: 0 0 14px 2px rgba(0, 123, 255, 0.85), 0 0 4px #60a5fa;
-                            animation: mposLaserSweep 1.6s ease-in-out infinite alternate;
-                        }
-                        .mpos-scanner-collapsed { height: 0px !important; opacity: 0 !important; border-bottom: none !important; }
-                        #mpos-reader { object-fit: cover !important; width: 100% !important; height: 100% !important; }
+                        @keyframes mposScanLine { 0% { transform: translateY(-50px); opacity: 0; } 10% { opacity: 1; } 50% { transform: translateY(50px); } 90% { opacity: 1; } 100% { transform: translateY(-50px); opacity: 0; } }
+                        .mpos-scan-line { position: absolute; left: 10%; right: 10%; height: 2px; background: #007bff; box-shadow: 0 0 20px 2px #007bff; top: 50%; animation: mposScanLine 2.5s cubic-bezier(0.4, 0, 0.2, 1) infinite; z-index: 15; }
+                        .mpos-glass-panel { background: rgba(18, 18, 18, 0.85); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border-top: 1px solid rgba(255, 255, 255, 0.1); }
                     </style>`);
                 }
 
                 pane.innerHTML = `
-                    <!-- TOP BAR: Unified Search & Action Buttons -->
-                    <div class="shrink-0 bg-[#121214] border-b border-white/[0.08] p-2.5 z-20 shadow-md">
-                        <div class="flex items-center gap-2">
-                            <div class="relative flex-grow">
-                                <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary"></i>
-                                <input 
-                                    type="text" 
-                                    id="mpos-search" 
-                                    placeholder="Scan barcode or type SKU..." 
-                                    class="w-full bg-[#18181b] border border-white/10 text-white rounded-xl pl-9 pr-8 py-2.5 text-sm font-medium focus:ring-1 focus:ring-accent outline-none shadow-inner"
-                                    autocomplete="off"
-                                >
-                                <button id="mpos-search-clear" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-text-secondary hover:text-white hidden p-1">
-                                    <i data-lucide="x" class="w-3.5 h-3.5"></i>
-                                </button>
-                                <div id="mpos-search-results" class="absolute top-[calc(100%+6px)] left-0 right-0 bg-[#18181b] border border-white/15 rounded-xl shadow-2xl hidden max-h-[40vh] overflow-y-auto z-[150] divide-y divide-white/[0.06]"></div>
+                    <!-- CAMERA BACKDROP (Top half of screen) -->
+                    <div class="absolute top-0 left-0 w-full h-[55%] bg-bg-tertiary z-0 flex items-center justify-center overflow-hidden" id="mpos-camera-backdrop">
+                        <div id="mpos-reader" class="w-full h-full object-cover opacity-0 transition-opacity duration-500"></div>
+                        
+                        <!-- Premium Viewfinder Overlay -->
+                        <div id="mpos-scanner-overlay" class="absolute inset-0 pointer-events-none flex flex-col items-center justify-center z-10 hidden">
+                            <div class="w-64 h-40 relative">
+                                <!-- Corner Brackets -->
+                                <div class="absolute -top-2 -left-2 w-8 h-8 border-t-4 border-l-4 border-white rounded-tl-xl shadow-[0_0_10px_rgba(0,0,0,0.5)]"></div>
+                                <div class="absolute -top-2 -right-2 w-8 h-8 border-t-4 border-r-4 border-white rounded-tr-xl shadow-[0_0_10px_rgba(0,0,0,0.5)]"></div>
+                                <div class="absolute -bottom-2 -left-2 w-8 h-8 border-b-4 border-l-4 border-white rounded-bl-xl shadow-[0_0_10px_rgba(0,0,0,0.5)]"></div>
+                                <div class="absolute -bottom-2 -right-2 w-8 h-8 border-b-4 border-r-4 border-white rounded-br-xl shadow-[0_0_10px_rgba(0,0,0,0.5)]"></div>
+                                <!-- Laser -->
+                                <div class="mpos-scan-line"></div>
                             </div>
-                            <!-- Torch / Flashlight Toggle -->
-                            <button id="mpos-torch-btn" class="w-10 h-10 bg-[#18181b] border border-white/10 rounded-xl flex items-center justify-center text-text-secondary active:scale-95 transition-all" title="Toggle Flashlight">
-                                <i data-lucide="flashlight" class="w-4 h-4 pointer-events-none"></i>
-                            </button>
-                            <!-- Camera Viewfinder Toggle -->
-                            <button id="toggle-scanner-btn" class="w-10 h-10 ${shouldAutoOpen ? 'bg-accent hover:bg-accent-hover text-white shadow-lg shadow-accent/25' : 'bg-[#18181b] border border-white/10 text-text-secondary'} rounded-xl flex items-center justify-center active:scale-95 transition-all" title="Toggle Camera">
-                                <i data-lucide="${shouldAutoOpen ? 'eye-off' : 'camera'}" class="w-4 h-4 pointer-events-none" id="mpos-cam-icon"></i>
-                            </button>
+                            <div class="mt-8 px-4 py-1.5 bg-black/40 backdrop-blur-md rounded-full border border-white/10 flex items-center gap-2 shadow-lg">
+                                <div class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                                <span class="text-white text-[10px] font-bold tracking-widest uppercase">Scanning</span>
+                            </div>
+                        </div>
+
+                        <!-- Fallback / Error UI -->
+                        <div id="mpos-fallback" class="absolute inset-0 bg-bg-primary flex flex-col items-center justify-center text-center p-6 z-20">
+                            <div class="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mb-4 border border-red-500/20 shadow-inner">
+                                <i data-lucide="camera-off" class="w-8 h-8 text-red-400"></i>
+                            </div>
+                            <h3 class="text-white font-bold text-lg mb-1">Camera Unavailable</h3>
+                            <p class="text-text-secondary text-xs mb-6 max-w-[250px]">Secure connection required. Use the search bar below.</p>
+                            <button id="mpos-retry-camera" class="bg-white/10 hover:bg-white/20 text-white font-bold text-xs py-2.5 px-6 rounded-full border border-white/20 active:scale-95 transition-all">Retry Camera</button>
                         </div>
                     </div>
 
-                    <!-- DYNAMIC HELD ORDERS ALERT STRIP -->
-                    <div id="mpos-held-banner-container" class="shrink-0 z-20"></div>
-
-                    <!-- ERGONOMIC VIEWFINDER: High-Tech Reticle & Neon Laser -->
-                    <div id="mpos-scanner-wrapper" class="${shouldAutoOpen ? '' : 'mpos-scanner-collapsed'} relative w-full h-[180px] bg-black shrink-0 overflow-hidden transition-all duration-300 ease-out border-b border-white/10 z-10">
-                        <video id="mpos-reader" class="w-full h-full object-cover" autoplay muted playsinline></video>
-                        
-                        <!-- High-Tech Neon Framing Overlay -->
-                        <div id="mpos-scanner-overlay" class="absolute inset-0 pointer-events-none flex flex-col items-center justify-center">
-                            <div class="w-[65%] h-[125px] max-w-[260px] border border-white/20 rounded-2xl relative overflow-hidden bg-white/[0.02] shadow-[0_0_0_9999px_rgba(0,0,0,0.55)]">
-                                <div class="absolute -top-0.5 -left-0.5 w-6 h-6 border-t-2 border-l-2 border-accent rounded-tl-xl"></div>
-                                <div class="absolute -top-0.5 -right-0.5 w-6 h-6 border-t-2 border-r-2 border-accent rounded-tr-xl"></div>
-                                <div class="absolute -bottom-0.5 -left-0.5 w-6 h-6 border-b-2 border-l-2 border-accent rounded-bl-xl"></div>
-                                <div class="absolute -bottom-0.5 -right-0.5 w-6 h-6 border-b-2 border-r-2 border-accent rounded-br-xl"></div>
-                                <div class="mpos-laser-line"></div>
-                            </div>
-                            <div class="mt-2 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/10 flex items-center gap-1.5">
-                                <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
-                                <span class="text-[10px] font-bold text-white/90 tracking-wider uppercase">Auto-Detecting Barcode</span>
-                            </div>
+                    <!-- FLOATING SEARCH BAR -->
+                    <div class="absolute top-4 left-4 right-4 z-30 flex items-center gap-2">
+                        <div class="relative flex-grow">
+                            <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/50"></i>
+                            <input type="text" id="mpos-search" placeholder="Search products..." class="w-full bg-black/40 backdrop-blur-xl border border-white/10 text-white rounded-2xl pl-12 pr-4 py-4 shadow-[0_10px_30px_rgba(0,0,0,0.5)] focus:ring-2 focus:ring-accent outline-none font-medium text-sm placeholder-white/50 transition-all">
+                            <div id="mpos-search-results" class="absolute top-full left-0 right-0 mt-2 bg-bg-secondary/95 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl hidden max-h-[40vh] overflow-y-auto z-[150]"></div>
                         </div>
-
-                        <!-- Fallback & Permissions Error Screen -->
-                        <div id="mpos-fallback" class="absolute inset-0 bg-[#121214] flex flex-col items-center justify-center text-center p-4 z-30 hidden">
-                            <i data-lucide="camera-off" class="w-8 h-8 text-red-400 mb-2"></i>
-                            <p class="text-white font-bold text-sm">Camera Permission Needed</p>
-                            <p class="text-xs text-text-secondary mt-1 mb-3 max-w-[220px]">Allow camera access in your browser settings to scan items directly.</p>
-                            <button id="mpos-retry-camera" class="bg-white text-black font-bold text-xs py-2 px-5 rounded-full active:scale-95">Enable Camera</button>
-                        </div>
+                        <button id="toggle-scanner-btn" class="w-[52px] h-[52px] bg-black/40 backdrop-blur-xl border border-white/10 text-white rounded-2xl flex shrink-0 items-center justify-center shadow-[0_10px_30px_rgba(0,0,0,0.5)] active:scale-95 transition-all">
+                            <i data-lucide="camera" class="w-6 h-6 pointer-events-none"></i>
+                        </button>
                     </div>
 
-                    <!-- CART ITEMS LIST (Generously Scrollable) -->
-                    <div id="mpos-cart-list" class="flex-1 overflow-y-auto p-2.5 space-y-2 relative z-0"></div>
-
-                    <!-- BOTTOM CHECKOUT ACTION DRAWER -->
-                    <div class="shrink-0 bg-[#121214] border-t border-white/[0.08] p-3 shadow-[0_-10px_30px_rgba(0,0,0,0.8)] z-30">
-                        <!-- Customer Linking Bar -->
-                        <div id="mpos-customer-area" class="mb-2.5"></div>
+                    <!-- CART BOTTOM SHEET -->
+                    <div class="absolute bottom-0 left-0 w-full h-[55%] mpos-glass-panel rounded-t-[2.5rem] shadow-[0_-20px_50px_rgba(0,0,0,0.8)] z-40 flex flex-col pt-2 transition-transform duration-300 transform translate-y-0" id="mpos-cart-section">
+                        <!-- Drag Handle -->
+                        <div class="w-12 h-1.5 bg-white/20 rounded-full mx-auto mb-4"></div>
                         
-                       <!-- Quick Tool Shortcuts (Discount, Hold/Resume, Clear) -->
-                        <div class="grid grid-cols-3 gap-2 mb-2.5">
-                            <button data-action="apply-total-discount" class="bg-[#18181b] hover:bg-white/10 border border-white/10 rounded-lg py-1.5 text-center text-xs font-semibold text-text-secondary active:scale-95 transition-all flex items-center justify-center gap-1.5">
-                                <i data-lucide="tag" class="w-3.5 h-3.5 text-yellow-400"></i> Discount
-                            </button>
-                            <button id="mpos-hold-btn" data-action="hold-sale" class="bg-[#18181b] hover:bg-white/10 border border-white/10 rounded-lg py-1.5 text-center text-xs font-semibold text-text-secondary active:scale-95 transition-all flex items-center justify-center gap-1.5">
-                                <i data-lucide="pause-circle" class="w-3.5 h-3.5 text-blue-400"></i> Hold
-                            </button>
-                            <button data-action="cancel-sale" class="bg-[#18181b] hover:bg-red-500/20 border border-white/10 rounded-lg py-1.5 text-center text-xs font-semibold text-red-400 active:scale-95 transition-all flex items-center justify-center gap-1.5">
-                                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Clear
-                            </button>
+                        <!-- Customer -->
+                        <div class="px-5 shrink-0" id="mpos-customer-area"></div>
+
+                        <!-- Cart List -->
+                        <div id="mpos-cart-list" class="flex-1 overflow-y-auto px-5 space-y-3 pb-[100px]">
+                            <!-- Items go here -->
                         </div>
 
-                        <!-- Final Charge Bar -->
-                        <div class="flex items-center gap-3">
-                            <div class="flex flex-col justify-center shrink-0 pr-1">
-                                <div class="flex items-center gap-1">
-                                    <span class="text-[10px] text-text-secondary uppercase font-bold tracking-wider">Total</span>
-                                    <span id="mpos-item-count" class="text-[10px] text-text-secondary font-mono">0 items</span>
+                        <!-- Checkout Bar -->
+                        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-bg-primary via-bg-primary/95 to-transparent pt-12 pb-4 px-5 pointer-events-none z-50">
+                            <div class="w-full bg-white/5 backdrop-blur-2xl border border-white/10 rounded-[2rem] p-2.5 shadow-[0_20px_50px_rgba(0,0,0,0.9)] pointer-events-auto flex items-center justify-between">
+                                <div class="pl-4 py-1 flex flex-col justify-center">
+                                    <span class="text-[10px] uppercase font-bold text-white/50 tracking-widest mb-0.5">Total</span>
+                                    <span id="mpos-total" class="text-[28px] font-black text-white font-mono leading-none tracking-tight">$0.00</span>
                                 </div>
-                                <span id="mpos-total" class="text-2xl font-black font-mono text-white leading-none tracking-tight">৳ 0.00</span>
+                                <button id="mpos-charge-btn" data-action="process-payment" class="bg-gradient-to-r from-accent to-blue-500 hover:from-blue-500 hover:to-accent text-white px-8 h-14 rounded-[1.5rem] font-bold text-lg tracking-wider shadow-[0_5px_20px_rgba(0,123,255,0.5)] active:scale-95 transition-all disabled:opacity-50 disabled:active:scale-100 flex items-center justify-center gap-2 border border-white/20">
+                                    PAY <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                                </button>
                             </div>
-                            <button 
-                                id="mpos-charge-btn" 
-                                data-action="process-payment" 
-                                class="flex-1 bg-gradient-to-r from-accent to-blue-600 hover:from-blue-600 hover:to-accent text-white h-12 rounded-xl text-base font-black tracking-wider shadow-lg shadow-accent/30 active:scale-95 transition-all disabled:opacity-40 disabled:shadow-none disabled:active:scale-100 flex items-center justify-center gap-2 border border-white/15"
-                            >
-                                PAY <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                            </button>
                         </div>
                     </div>
 
-                    <!-- Instant Scan Confirmation Flash -->
-                    <div id="mpos-flash" class="absolute inset-0 bg-accent/95 backdrop-blur-md z-[200] flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-200">
-                        <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-[0_0_50px_rgba(255,255,255,0.6)] mb-3 transform scale-50 transition-transform duration-200" id="mpos-flash-icon-wrapper">
-                            <i data-lucide="check" class="w-10 h-10 text-accent"></i>
+                    <!-- Success Flash Overlay -->
+                    <div id="mpos-flash" class="absolute inset-0 bg-accent/90 backdrop-blur-md z-[200] flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-200">
+                        <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-[0_0_50px_rgba(255,255,255,0.5)] mb-6 transform scale-110">
+                            <i data-lucide="check" class="w-12 h-12 text-accent"></i>
                         </div>
-                        <p id="mpos-flash-text" class="text-white font-bold text-xl px-4 text-center drop-shadow-md"></p>
+                        <h2 id="mpos-flash-text" class="text-3xl font-black text-white text-center px-4 tracking-wide drop-shadow-lg"></h2>
+                        <p class="text-white/80 font-bold tracking-widest uppercase text-sm mt-2">Added to Cart</p>
                     </div>
                 `;
 
@@ -9942,227 +9235,153 @@ function initBarcodeGenerator(pane) {
                 updateMobilePOS(pane);
 
                 const searchInput = pane.querySelector('#mpos-search');
-                const searchClear = pane.querySelector('#mpos-search-clear');
                 const resultsDiv = pane.querySelector('#mpos-search-results');
-                const scannerWrapper = pane.querySelector('#mpos-scanner-wrapper');
+                const readerElement = pane.querySelector('#mpos-reader');
+                const overlay = pane.querySelector('#mpos-scanner-overlay');
                 const fallback = pane.querySelector('#mpos-fallback');
                 const toggleScannerBtn = pane.querySelector('#toggle-scanner-btn');
-                const camIcon = pane.querySelector('#mpos-cam-icon');
-                const torchBtn = pane.querySelector('#mpos-torch-btn');
                 const flash = pane.querySelector('#mpos-flash');
                 const flashText = pane.querySelector('#mpos-flash-text');
-                const flashIconWrapper = pane.querySelector('#mpos-flash-icon-wrapper');
 
-                // Quick Add Click Handler
-                pane.addEventListener('click', e => {
-                    const quickBtn = e.target.closest('[data-quick-add]');
-                    if (quickBtn) {
-                        const product = firestoreData.products.find(p => p.id === quickBtn.dataset.quickAdd);
-                        if (product) {
-                            addProductToActiveCart(product);
-                            updateMobilePOS(pane);
-                        }
-                    }
-                });
-
-                // Search Live Filtering
+                // --- Live Search Logic ---
                 searchInput.addEventListener('input', e => {
                     const q = e.target.value.toLowerCase().trim();
-                    searchClear.classList.toggle('hidden', q.length === 0);
-
-                    if (q.length < 2) { 
-                        resultsDiv.classList.add('hidden'); 
-                        return; 
-                    }
-
-                    const hits = firestoreData.products
-                        .filter(p => !p.parentSKU && (p.name.toLowerCase().includes(q) || p.id.toLowerCase().includes(q) || (p.barcode && p.barcode.toLowerCase().includes(q))))
-                        .slice(0, 6);
-
-                    if (hits.length > 0) {
+                    if(q.length < 2) { resultsDiv.classList.add('hidden'); return; }
+                    const hits = firestoreData.products.filter(p => !p.parentSKU && (p.name.toLowerCase().includes(q) || p.id.toLowerCase().includes(q) || (p.barcode && String(p.barcode).toLowerCase().includes(q)))).slice(0, 6);
+                    if (hits.length) {
                         resultsDiv.innerHTML = hits.map(p => `
-                            <div class="p-3 flex justify-between items-center active:bg-white/[0.08] cursor-pointer transition-colors" data-add-id="${p.id}">
-                                <div class="pr-2 truncate">
-                                    <p class="font-bold text-sm text-white truncate">${p.name}</p>
-                                    <p class="text-xs text-text-secondary font-mono mt-0.5">${p.id} ${p.stock ? `• ${p.stock} in stock` : ''}</p>
+                            <div class="p-4 border-b border-white/5 last:border-b-0 flex justify-between items-center hover:bg-white/5 active:bg-white/10 cursor-pointer transition-colors" data-add-id="${p.id}">
+                                <div class="pr-3 overflow-hidden">
+                                    <p class="font-bold text-sm text-white pointer-events-none truncate">${p.name}</p>
+                                    <p class="text-[10px] text-text-secondary font-mono pointer-events-none mt-1 tracking-wider uppercase">${p.id}</p>
                                 </div>
-                                <p class="font-mono text-accent font-bold text-sm shrink-0">${currencyUtils.format(p.price)}</p>
+                                <p class="font-mono text-accent font-bold text-base pointer-events-none shrink-0 bg-accent/10 px-2 py-1 rounded-lg">${currencyUtils.format(p.price)}</p>
                             </div>
                         `).join('');
                         resultsDiv.classList.remove('hidden');
                     } else {
-                        resultsDiv.innerHTML = `<p class="text-center text-text-secondary py-3 text-xs">No products found</p>`;
+                        resultsDiv.innerHTML = `<p class="text-center text-text-secondary py-6 text-sm font-medium">No products found.</p>`;
                         resultsDiv.classList.remove('hidden');
-                    }
-                });
-
-                searchClear.addEventListener('click', () => {
-                    searchInput.value = '';
-                    searchClear.classList.add('hidden');
-                    resultsDiv.classList.add('hidden');
-                    searchInput.focus();
-                });
-
-                // Enter Key Barcode / SKU Entry
-                searchInput.addEventListener('keydown', e => {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        const query = searchInput.value.trim();
-                        if (!query) return;
-                        const product = firestoreData.products.find(p => p.barcode === query || p.id.toLowerCase() === query.toLowerCase());
-                        if (product) {
-                            addProductToActiveCart(product);
-                            updateMobilePOS(pane);
-                            searchInput.value = '';
-                            searchClear.classList.add('hidden');
-                            resultsDiv.classList.add('hidden');
-                            searchInput.blur();
-                        } else {
-                            showToast(`Product not found: ${query}`, 'error');
-                        }
                     }
                 });
 
                 resultsDiv.addEventListener('click', e => {
                     const itemDiv = e.target.closest('[data-add-id]');
-                    if (itemDiv) {
+                    if(itemDiv) {
                         const product = firestoreData.products.find(p => p.id === itemDiv.dataset.addId);
-                        if (product) {
+                        if(product) {
                             addProductToActiveCart(product);
                             updateMobilePOS(pane);
                             searchInput.value = '';
-                            searchClear.classList.add('hidden');
                             resultsDiv.classList.add('hidden');
+                            searchInput.blur();
                         }
                     }
                 });
 
-                searchInput.addEventListener('blur', () => {
-                    setTimeout(() => resultsDiv.classList.add('hidden'), 250);
-                });
-
-                // --- Robust 1D ZXing Barcode Scanning Engine ---
-                if (!window.mposCodeReader) {
-                    const hints = new Map();
-                    hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [
-                        ZXing.BarcodeFormat.CODE_128, 
-                        ZXing.BarcodeFormat.EAN_13, 
-                        ZXing.BarcodeFormat.EAN_8, 
-                        ZXing.BarcodeFormat.UPC_A, 
-                        ZXing.BarcodeFormat.UPC_E
-                    ]);
-                    window.mposCodeReader = new ZXing.BrowserMultiFormatReader(hints);
-                    window.mposCodeReader.timeBetweenDecodingAttempts = 50;
-                }
-                const codeReader = window.mposCodeReader;
-
-                const stopScanner = () => {
-                    try { codeReader.reset(); } catch(e) {}
-                    const video = pane.querySelector('#mpos-reader');
-                    if (video && video.srcObject) {
-                        const tracks = video.srcObject.getTracks();
-                        tracks.forEach(t => t.stop());
-                        video.srcObject = null;
+                // --- Bulletproof Scanner Logic ---
+                const stopScanner = async () => {
+                    if (isScannerTransitioning) return;
+                    isScannerTransitioning = true;
+                    if (mobilePosScanner && mobilePosScanner.isScanning) {
+                        try {
+                            await mobilePosScanner.stop();
+                            mobilePosScanner.clear();
+                        } catch (e) { console.error("Scanner stop error:", e); }
                     }
+                    readerElement.classList.remove('opacity-100');
+                    readerElement.classList.add('opacity-0');
+                    overlay.classList.add('hidden');
+                    fallback.classList.remove('hidden');
+                    isScannerTransitioning = false;
                 };
 
-                const showSuccessFlash = (productName) => {
-                    flashText.textContent = productName;
-                    flash.classList.remove('opacity-0');
-                    flashIconWrapper.classList.remove('scale-50');
-                    flashIconWrapper.classList.add('scale-100');
-                    setTimeout(() => {
-                        flash.classList.add('opacity-0');
-                        flashIconWrapper.classList.add('scale-50');
-                        flashIconWrapper.classList.remove('scale-100');
-                    }, 650);
-                };
-
-                const startScanner = async () => {
+                const startScanner = () => {
+                    if (isScannerTransitioning) return;
+                    if (mobilePosScanner && mobilePosScanner.isScanning) return;
+                    isScannerTransitioning = true;
+                    
                     fallback.classList.add('hidden');
-                    try {
-                        const constraints = {
-                            video: { 
-                                facingMode: "environment",
-                                width: { ideal: 1280 },
-                                height: { ideal: 720 },
-                                frameRate: { ideal: 60, min: 30 }
-                            }
-                        };
-                        
-                        codeReader.decodeFromConstraints(constraints, 'mpos-reader', (result, err) => {
-                            if (result) {
-                                const decodedText = result.getText();
-                                const now = Date.now();
-                                if (decodedText === mobileLastScannedCode && now - mobileLastScanTime < 450) return;
+                    overlay.classList.add('hidden'); // Hide UI until fully started
+                    readerElement.classList.remove('opacity-100');
+                    readerElement.classList.add('opacity-0');
+
+                    if (!mobilePosScanner) mobilePosScanner = new Html5Qrcode("mpos-reader");
+
+                    // Optimized config for real retail scanning
+                    const config = { 
+                        fps: 30, // Faster scanning
+                        qrbox: { width: window.innerWidth * 0.7, height: 120 }, 
+                        aspectRatio: window.innerWidth / (window.innerHeight * 0.5) 
+                    };
+                    
+                    mobilePosScanner.start({ facingMode: "environment" }, config,
+                        (decodedText) => {
+                            const now = Date.now();
+                            // Standardize barcode to prevent loose match errors
+                            const scannedCode = String(decodedText).trim().toLowerCase();
+
+                            // Debounce
+                            if (scannedCode === mobileLastScannedCode && now - mobileLastScanTime < 1000) return;
+                            mobileLastScannedCode = scannedCode;
+                            mobileLastScanTime = now;
+
+                            if (document.querySelector('.modal-overlay:not(.opacity-0)')) return;
+
+                            // Robust matching
+                            const product = firestoreData.products.find(p => 
+                                String(p.barcode).trim().toLowerCase() === scannedCode || 
+                                String(p.id).trim().toLowerCase() === scannedCode
+                            );
+
+                            if (product) {
+                                playBarcodeBeep();
+                                if (navigator.vibrate) navigator.vibrate(40);
                                 
-                                mobileLastScannedCode = decodedText;
-                                mobileLastScanTime = now;
+                                addProductToActiveCart(product);
+                                updateMobilePOS(pane); 
+                                
+                                // Beautiful flash success
+                                flashText.textContent = product.name;
+                                flash.classList.remove('opacity-0');
+                                setTimeout(() => flash.classList.add('opacity-0'), 600);
 
-                                if (document.querySelector('.modal-overlay:not(.opacity-0)')) return;
-
-                                const product = firestoreData.products.find(p => p.barcode === decodedText || p.id === decodedText);
-                                if (product) {
-                                    playNotificationSound();
-                                    addProductToActiveCart(product);
-                                    updateMobilePOS(pane);
-                                    showSuccessFlash(product.name);
-                                } else {
-                                    if (navigator.vibrate) navigator.vibrate([80, 50, 80]);
-                                    showToast(`Barcode not found: ${decodedText}`, 'error');
-                                }
+                            } else {
+                                if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+                                showToast(`Unrecognized Barcode: ${decodedText}`, 'error');
                             }
-                        });
-                    } catch (err) {
-                        console.error("Camera access failed:", err);
+                        },
+                        () => {} // Suppress constant frame errors
+                    ).then(() => {
+                        readerElement.classList.remove('opacity-0');
+                        readerElement.classList.add('opacity-100');
+                        overlay.classList.remove('hidden');
+                        isScannerTransitioning = false;
+                    }).catch((err) => {
+                        console.error("Scanner failed:", err);
                         stopScanner();
-                        fallback.classList.remove('hidden');
-                    }
+                        isScannerTransitioning = false;
+                    });
                 };
 
                 pane.querySelector('#mpos-retry-camera').addEventListener('click', startScanner);
-
-                // Torch Toggle
-                torchBtn.addEventListener('click', async () => {
-                    const video = pane.querySelector('#mpos-reader');
-                    if (!video || !video.srcObject) {
-                        showToast('Camera must be active to use flashlight.', 'info');
-                        return;
-                    }
-                    const track = video.srcObject.getVideoTracks()[0];
-                    if (!track) return;
-                    const capabilities = track.getCapabilities ? track.getCapabilities() : {};
-                    if (capabilities.torch) {
-                        const currentTorch = track.getConstraints()?.advanced?.find(c => 'torch' in c)?.torch || false;
-                        await track.applyConstraints({ advanced: [{ torch: !currentTorch }] });
-                        torchBtn.classList.toggle('text-yellow-400', !currentTorch);
-                        torchBtn.classList.toggle('bg-yellow-400/10', !currentTorch);
-                    } else {
-                        showToast('Flashlight not supported on this device.', 'info');
-                    }
-                });
-
-                // Toggle Camera / Expand / Collapse
+                
                 toggleScannerBtn.addEventListener('click', () => {
-                    const isCollapsed = scannerWrapper.classList.contains('mpos-scanner-collapsed');
-                    
-                    if (!isCollapsed) {
-                        // Collapse
+                    if (mobilePosScanner && mobilePosScanner.isScanning) {
                         stopScanner();
-                        scannerWrapper.classList.add('mpos-scanner-collapsed');
-                        toggleScannerBtn.className = 'w-10 h-10 bg-[#18181b] border border-white/10 text-text-secondary rounded-xl flex items-center justify-center active:scale-95 transition-all';
-                        camIcon.setAttribute('data-lucide', 'camera');
+                        toggleScannerBtn.classList.remove('bg-red-500/80');
+                        toggleScannerBtn.classList.add('bg-black/40');
+                        toggleScannerBtn.innerHTML = '<i data-lucide="camera" class="w-6 h-6 pointer-events-none"></i>';
                     } else {
-                        // Expand
-                        scannerWrapper.classList.remove('mpos-scanner-collapsed');
-                        toggleScannerBtn.className = 'w-10 h-10 bg-accent text-white rounded-xl flex items-center justify-center shadow-lg shadow-accent/25 active:scale-95 transition-all';
-                        camIcon.setAttribute('data-lucide', 'eye-off');
-                        setTimeout(startScanner, 250);
+                        startScanner();
+                        toggleScannerBtn.classList.remove('bg-black/40');
+                        toggleScannerBtn.classList.add('bg-red-500/80');
+                        toggleScannerBtn.innerHTML = '<i data-lucide="camera-off" class="w-6 h-6 pointer-events-none"></i>';
                     }
                     lucide.createIcons();
                 });
 
-                // Auto-cleanup on route changes
+                // Auto-cleanup memory leak protection
                 const observer = new MutationObserver((mutations) => {
                     mutations.forEach((mutation) => {
                         mutation.removedNodes.forEach((node) => {
@@ -10174,12 +9393,30 @@ function initBarcodeGenerator(pane) {
                     });
                 });
                 observer.observe(document.body, { childList: true, subtree: true });
+                
+                // Swipe-to-delete simulation (Click to reveal X)
+                pane.addEventListener('click', e => {
+                    const cartItem = e.target.closest('.bg-bg-secondary');
+                    if (cartItem && !e.target.closest('button')) {
+                        const deleteBtn = cartItem.querySelector('[data-action="remove-from-cart"]');
+                        if(deleteBtn) deleteBtn.classList.toggle('hidden');
+                    }
+                });
 
-                // Only start camera automatically if user has enabled the setting
-                if (shouldAutoOpen) {
-                    setTimeout(startScanner, 300);
-                }
+                // Start automatically
+                setTimeout(startScanner, 200);
             }
+
+            const posFullRender = (pane) => {
+                if (!pane) return;
+                if (window.innerWidth < 1024) {
+                    initMobilePOS(pane);
+                } else if (appState.settings.posLayout === 'modern') {
+                    posModernLayoutRender(pane);
+                } else {
+                    posClassicLayoutRender(pane);
+                }
+            };
 const posModernLayoutRender = (pane) => {
     if (!pane) return;
     const term = getCurrentProfile().terminology;
@@ -10778,23 +10015,18 @@ function openVariantSelectorModal(parentProduct) {
 }
 
 
-const addProductToActiveCart = (product) => {
+// --- REPLACED FUNCTION: addProductToActiveCart ---
+            const addProductToActiveCart = (product) => {
                 // This function is now a gateway that checks for variants
                 if (product.hasVariants) {
                     openVariantSelectorModal(product);
                     return; // Stop here, the modal will handle adding the actual variant.
                 }
 
+                // Original logic for non-variant products
                 const activeSale = posState.sales.find(s => s.id === posState.activeSaleId);
                 if (!activeSale) { showToast('No active sale selected.', 'error'); return; }
-                
-                const isPhysical = product.productType === 'physical';
-                const stock = product.stock || 0;
-
-                if(isPhysical && stock <= 0) { 
-                    showToast(`${product.name} is out of stock.`, 'error'); 
-                    return; 
-                }
+                if(product.stock <= 0 && product.productType === 'physical') { showToast(`${product.name} is out of stock.`, 'error'); return; }
 
                 if (product.isSerialized) {
                     const availableSerials = product.serials || [];
@@ -10816,8 +10048,7 @@ const addProductToActiveCart = (product) => {
                             return;
                         }
                         activeSale.cart.push({ ...product, qty: 1, serialNumber: selectedSerial });
-                        const viewPane = document.querySelector('#workspace-content .view-pane');
-                        if (viewPane) posFullRender(viewPane);
+                        posFullRender(workspaceContent.querySelector('.view-pane'));
                         closeModal(modal);
                     });
                     return;
@@ -10825,21 +10056,18 @@ const addProductToActiveCart = (product) => {
 
                 const existingItem = activeSale.cart.find(item => item.id === product.id);
                 if(existingItem) {
-                    if(!isPhysical || existingItem.qty < stock) {
+                    if(existingItem.qty < product.stock) {
                         existingItem.qty++;
                     } else {
-                        showToast(`Only ${stock} units available for ${product.name}.`, 'warning');
+                        showToast(`No more stock available for ${product.name}.`, 'warning');
                         return;
                     }
                 } else {
                     activeSale.cart.push({ ...product, qty: 1 });
                 }
-                
-                const viewPane = document.querySelector('#workspace-content .view-pane');
-                if (viewPane) posFullRender(viewPane);
+                posFullRender(workspaceContent.querySelector('.view-pane'));
             };
-            window.addProductToActiveCart = addProductToActiveCart;
-
+            
             const initClassicPOS = (pane) => {
                 posClassicLayoutRender(pane);
 
@@ -11384,11 +10612,7 @@ const addProductToActiveCart = (product) => {
                 }
             };
             
-        function posFullRender(pane) {
-                if (pane) initPOS(pane);
-            }
-
-            function initPOS(pane) {
+        function initPOS(pane) {
                 if (posState.sales.length === 0) {
                     const newSaleId = `sale_${Date.now()}`;
                     posState.sales.push({ id: newSaleId, name: `Sale ${posState.saleCounter++}`, cart: [], customer: null, status: 'active', discount: { type: 'percent', value: 0 } });
@@ -11407,10 +10631,12 @@ function openPaymentModal() {
     const activeSale = posState.sales.find(s => s.id === posState.activeSaleId);
     if (!activeSale || activeSale.cart.length === 0) { showToast('Cart is empty!', 'error'); return; }
 
+    // --- NEW DISCOUNT LOGIC ---
     const taxRate = (appState.settings.taxRate ?? 0) / 100;
     const subtotalBase = activeSale.cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
     const customer = activeSale.customer;
     
+    // 1. Find best persistent discount
     let tierDiscountPercent = 0;
     let customerTier = null;
     const tiers = firestoreData.loyaltySettings?.loyaltyTiers || [];
@@ -11430,53 +10656,56 @@ function openPaymentModal() {
     const persistentDiscountAmountBase = subtotalBase * (bestPersistentPercent / 100);
     const subtotalAfterPersistent = subtotalBase - persistentDiscountAmountBase;
 
+    // 2. Apply manual discount
     let manualDiscountAmountBase = 0;
     if (activeSale.discount && activeSale.discount.value > 0) {
         if (activeSale.discount.type === 'percent') {
             manualDiscountAmountBase = subtotalAfterPersistent * (activeSale.discount.value / 100);
-        } else {
+        } else { // fixed
             manualDiscountAmountBase = activeSale.discount.value;
         }
     }
     const subtotalAfterTotalDiscount = subtotalAfterPersistent - manualDiscountAmountBase;
     
+    // 3. Calculate Tax
     const taxableItemsSubtotal = activeSale.cart.filter(i => i.taxable).reduce((acc, item) => acc + (item.price * item.qty), 0);
     const proportionOfTaxable = subtotalBase > 0 ? taxableItemsSubtotal / subtotalBase : 0;
     
+    // Pro-rate both discounts
     const persistentDiscountOnTaxable = persistentDiscountAmountBase * proportionOfTaxable;
+    // Manual discount's proportion is relative to the subtotal it was applied to
     const manualDiscountProportion = subtotalAfterPersistent > 0 ? (taxableItemsSubtotal - persistentDiscountOnTaxable) / subtotalAfterPersistent : 0;
     const manualDiscountOnTaxable = manualDiscountAmountBase * manualDiscountProportion;
 
     const taxableAmount = taxableItemsSubtotal - persistentDiscountOnTaxable - manualDiscountOnTaxable;
     const taxBase = Math.max(0, taxableAmount * taxRate);
     
+    // 4. Final Total
     const totalBase = subtotalAfterTotalDiscount + taxBase;
+    // --- END NEW DISCOUNT LOGIC ---
+
     const totalCurrent = currencyUtils.convert(totalBase);
 
-    const getSmartSuggestions = (totalDue) => {
+ const getSmartSuggestions = (totalDue) => {
         const suggestions = new Set();
         if (totalDue > 1 && totalDue % 1 !== 0) suggestions.add(Math.ceil(totalDue));
-        
-        let magnitude = Math.pow(10, Math.floor(Math.log10(totalDue)) - 1);
-        if (magnitude < 10) magnitude = 10;
-        
-        const baseDenominations = [1, 2, 5, 10, 50];
-        const scaledDenominations = baseDenominations.map(d => d * magnitude);
-        
-        scaledDenominations.forEach(d => {
-            if (totalDue < d * 10 && totalDue > d / 10) {
+        const denominations = [10, 20, 50, 100, 500, 1000, 5000, 10000];
+        denominations.forEach(d => {
+            if (totalDue < d * 4 && totalDue > d/10) {
                 const rounded = Math.ceil(totalDue / d) * d;
                 if(rounded > totalDue) suggestions.add(rounded);
             }
         });
-        
-        [500, 1000, 5000, 10000, 50000, 100000, 500000, 1000000].forEach(d => {
-             const rounded = Math.ceil(totalDue / d) * d;
-             if(rounded > totalDue && rounded <= totalDue * 2) suggestions.add(rounded);
-        });
-
         let finalSuggestions = [...suggestions].sort((a, b) => a - b);
-        return finalSuggestions.slice(0, 3);
+        if (finalSuggestions.length < 3) {
+            let lastNum = Math.max(totalDue, ...finalSuggestions);
+            while(finalSuggestions.length < 3 && lastNum < totalDue * 5) {
+                const magnitude = Math.pow(10, Math.floor(Math.log10(lastNum)));
+                lastNum = Math.ceil((lastNum + 1) / (magnitude/2)) * (magnitude/2);
+                if (!finalSuggestions.includes(lastNum)) finalSuggestions.push(lastNum);
+            }
+        }
+        return [...new Set(finalSuggestions)].slice(0, 3);
     };
 
     const quickCashButtons = [...getSmartSuggestions(totalCurrent), 'Exact'];
@@ -11488,262 +10717,205 @@ function openPaymentModal() {
         get remaining() { return this.total - this.totalPaid; }
     };
 
-    const getPaymentIcons = (method) => {
-        const icons = {
-            'Cash': 'dollar-sign',
-            'Card': 'credit-card',
-            'Mobile Banking': 'smartphone',
-            'bKash': 'smartphone',
-            'Nagad': 'smartphone',
-            'Rocket': 'smartphone',
-            'Upay': 'smartphone',
-            'Add to Due': 'file-plus-2'
-        };
-        return icons[method] || 'dollar-sign';
-    };
+    const getPaymentIcons = (method) => ({
+        'Cash': 'dollar-sign',
+        'Card': 'credit-card',
+        'Mobile Banking': 'smartphone',
+        'bKash': 'smartphone',
+        'Nagad': 'smartphone',
+        'Rocket': 'smartphone',
+        'Upay': 'smartphone',
+        'Add to Due': 'file-plus-2'
+    })[method] || 'dollar-sign';
 
+    // --- NEW: Persistent Discount Label ---
     let persistentLabel = 'Persistent Discount';
     if (bestPersistentPercent > 0) {
-        if (bestPersistentPercent === staffDiscountPercent) persistentLabel = "Staff Discount (" + staffDiscountPercent + "%)";
-        else if (bestPersistentPercent === lifetimeDiscountPercent) persistentLabel = "Lifetime Discount (" + lifetimeDiscountPercent + "%)";
-        else if (bestPersistentPercent === tierDiscountPercent) persistentLabel = (customerTier?.name || 'Tier') + " Discount (" + tierDiscountPercent + "%)";
+        if (bestPersistentPercent === staffDiscountPercent) persistentLabel = `Staff Discount (${staffDiscountPercent}%)`;
+        else if (bestPersistentPercent === lifetimeDiscountPercent) persistentLabel = `Lifetime Discount (${lifetimeDiscountPercent}%)`;
+        else if (bestPersistentPercent === tierDiscountPercent) persistentLabel = `${customerTier?.name || 'Tier'} Discount (${tierDiscountPercent}%)`;
     }
+    // --- END NEW ---
 
-    // Safely building HTML to prevent syntax errors in the editor
-    let quickCashHtml = "";
-    quickCashButtons.forEach(val => { 
-        const amount = val === 'Exact' ? totalCurrent.toFixed(2) : val.toFixed(2);
-        const display = val === 'Exact' ? 'Exact' : new Intl.NumberFormat('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(val);
-        quickCashHtml += '<button data-payment-action="quick-cash" data-amount="' + amount + '" class="flex-1 min-w-[75px] bg-bg-tertiary hover:bg-border-color border border-border-color rounded-xl py-3 text-xs sm:text-sm font-bold text-white whitespace-nowrap active:scale-95 transition-transform shadow-sm px-2">' + display + '</button>';
-    });
-
-    let numpadHtml = "";
-    ['1', '2', '3', '4', '5', '6', '7', '8', '9', '00', '0', '.'].forEach(key => {
-        numpadHtml += '<button data-payment-action="keypad" data-key="' + key + '" class="bg-bg-tertiary hover:bg-border-color border border-border-color rounded-xl text-xl sm:text-2xl font-medium font-mono text-white active:scale-95 transition-transform flex items-center justify-center shadow-sm">' + key + '</button>';
-    });
-
-    const content = `
-    <div class="flex flex-col h-full max-h-[95dvh] lg:max-h-[85vh] -m-6 bg-bg-primary overflow-hidden relative" style="touch-action: manipulation;">
+   const content = `<div class="flex flex-col md:grid md:grid-cols-2 gap-0 md:gap-6 h-[85vh] md:h-auto overflow-hidden md:overflow-visible -m-6 bg-bg-primary md:bg-transparent rounded-xl">
+        <!-- Top/Left Side: Info & Quick Cash -->
+        <div class="bg-[var(--bg-secondary)] p-4 md:p-6 md:rounded-l-xl flex flex-col shadow-md md:shadow-none z-10 shrink-0 border-b md:border-b-0 border-border-color">
+            <div class="space-y-2 mb-4">
+                <p class="text-text-secondary text-sm md:text-base">Total Due</p>
+                <p class="text-4xl md:text-6xl font-bold text-text-primary font-mono tracking-tighter">${currencyUtils.format(totalBase, appState.currentCurrency, { currencyDisplay: 'symbol' })}</p>
+                <div class="space-y-1 text-xs md:text-sm pt-2">
+                    <div class="flex justify-between text-text-secondary"><span>Subtotal:</span><span class="font-mono">${currencyUtils.format(subtotalBase)}</span></div>
+                    ${persistentDiscountAmountBase > 0 ? `
+                        <div class="flex justify-between text-purple-400">
+                            <span>${persistentLabel}:</span>
+                            <span class="font-mono">-${currencyUtils.format(persistentDiscountAmountBase)}</span>
+                        </div>
+                    ` : ''}
+                    ${manualDiscountAmountBase > 0 ? `
+                        <div class="flex justify-between text-red-400">
+                            <span>Manual Discount:</span>
+                            <span class="font-mono">-${currencyUtils.format(manualDiscountAmountBase)}</span>
+                        </div>
+                    ` : ''}
+                    <div class="flex justify-between text-text-secondary"><span>Tax:</span><span class="font-mono">${currencyUtils.format(taxBase)}</span></div>
+                </div>
+            </div>
+            
+            <div id="payment-status-display" class="h-14 md:h-16 mb-2 flex flex-col justify-end"></div>
+            <div class="space-y-2 pt-2 mb-4 overflow-y-auto max-h-32" id="payment-splits-container"></div>
+            
+            <div class="grid grid-cols-4 gap-2 mt-auto">
+                ${quickCashButtons.map(val => { 
+                    const amount = val === 'Exact' ? totalCurrent.toFixed(2) : val.toFixed(2);
+                    const amountInBase = val === 'Exact' ? (totalBase) : (val / currencyUtils.get().rate);
+                    const useCompact = val > 99999 && val !== 'Exact';
+                    const display = val === 'Exact' ? 'Exact' : currencyUtils.format(amountInBase, appState.currentCurrency, { notation: useCompact ? 'compact' : 'standard', maximumFractionDigits: useCompact ? 1 : 0 });
+                    let textSize = 'text-sm md:text-lg';
+                    if (display.length > 8) textSize = 'text-xs md:text-sm';
+                    else if (display.length > 6) textSize = 'text-xs md:text-base';
+                    return `<button data-payment-action="quick-cash" data-amount="${amount}" class="keypad-btn rounded-lg h-10 md:h-12 ${textSize} font-semibold px-1 flex items-center justify-center">${display}</button>`
+                }).join('')}
+            </div>
+        </div>
         
-        <!-- PREMIUM UX: Dynamic Top Header (Morphs from Summary to Splits) -->
-        <div id="dynamic-payment-header" class="bg-bg-secondary p-4 sm:p-5 flex flex-col justify-center items-center shadow-lg relative shrink-0 z-20 w-full min-h-[140px] transition-all rounded-b-3xl border-b border-border-color">
-            <!-- Rendered dynamically by JS below -->
-        </div>
+        <!-- Bottom/Right Side: Actions & Keypad -->
+        <div class="p-4 md:p-6 flex flex-col overflow-y-auto flex-grow pb-24 md:pb-6">
+            <div class="grid grid-cols-2 gap-2 md:gap-3 mb-3 md:mb-4 shrink-0">
+                <button data-payment-action="set-method" data-method="Cash" class="payment-method-btn btn btn-secondary h-12 md:h-16 flex-col gap-1 active"><i data-lucide="dollar-sign" class="w-5 h-5 md:w-6 md:h-6"></i><span class="text-xs md:text-sm">Cash</span></button>
+                <button data-payment-action="set-method" data-method="Card" class="payment-method-btn btn btn-secondary h-12 md:h-16 flex-col gap-1"><i data-lucide="credit-card" class="w-5 h-5 md:w-6 md:h-6"></i><span class="text-xs md:text-sm">Card</span></button>
+            </div>
+            <div class="grid grid-cols-2 gap-2 md:gap-3 mb-3 md:mb-4 shrink-0">
+                 <button data-payment-action="set-method" data-method="Mobile Banking" class="payment-method-btn btn btn-secondary h-12 md:h-16 flex-col gap-1"><i data-lucide="smartphone" class="w-5 h-5 md:w-6 md:h-6"></i><span class="text-xs md:text-sm">M-Bank</span></button>
+                 <button data-payment-action="set-method" data-method="Add to Due" class="payment-method-btn btn btn-secondary h-12 md:h-16 flex-col gap-1" ${!activeSale.customer ? 'disabled' : ''} title="${!activeSale.customer ? 'Select a customer to enable due payment' : ''}"><i data-lucide="file-plus-2" class="w-5 h-5 md:w-6 md:h-6"></i><span class="text-xs md:text-sm">To Due</span></button>
+            </div>
 
-        <!-- MIDDLE: Input & Quick Cash -->
-        <div class="flex flex-col flex-grow overflow-y-auto p-4 space-y-4 relative z-0">
-            <!-- Large Input -->
-            <div class="bg-bg-primary border-2 border-border-color focus-within:border-accent rounded-2xl p-4 flex items-center shadow-inner transition-colors shrink-0">
-                <span class="text-2xl sm:text-3xl font-mono text-text-secondary mr-2 font-bold">${currencyUtils.get().symbol}</span>
-                <input type="text" id="payment-input" class="w-full bg-transparent text-right text-4xl sm:text-5xl font-black font-mono text-white outline-none overflow-x-auto no-scrollbar" value="${paymentState.remaining.toFixed(2)}" readonly>
-            </div>
-            
-            <!-- Exact/Quick Cash Chips -->
-            <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1 shrink-0">
-                ${quickCashHtml}
-            </div>
-        </div>
-
-        <!-- BOTTOM: Fixed Numpad & Actions -->
-        <div class="bg-bg-secondary p-4 rounded-t-3xl shadow-[0_-10px_30px_rgba(0,0,0,0.5)] shrink-0 z-30 pb-[max(1rem,env(safe-area-inset-bottom))]">
-            
-            <!-- Payment Methods -->
-            <div class="flex gap-2 overflow-x-auto no-scrollbar pb-3 mb-1 shrink-0">
-                <button data-payment-action="set-method" data-method="Cash" class="payment-method-btn flex-1 min-w-[70px] rounded-xl py-2.5 flex flex-col items-center gap-1 active border-accent bg-bg-tertiary border transition-all"><i data-lucide="dollar-sign" class="w-5 h-5 text-current"></i><span class="text-[11px] font-bold">Cash</span></button>
-                <button data-payment-action="set-method" data-method="Card" class="payment-method-btn flex-1 min-w-[70px] rounded-xl py-2.5 flex flex-col items-center gap-1 bg-bg-tertiary border border-border-color transition-all"><i data-lucide="credit-card" class="w-5 h-5 text-current"></i><span class="text-[11px] font-bold">Card</span></button>
-                <button data-payment-action="set-method" data-method="Mobile Banking" class="payment-method-btn flex-1 min-w-[70px] rounded-xl py-2.5 flex flex-col items-center gap-1 bg-bg-tertiary border border-border-color transition-all"><i data-lucide="smartphone" class="w-5 h-5 text-current"></i><span class="text-[11px] font-bold">M-Bank</span></button>
-                <button data-payment-action="set-method" data-method="Add to Due" class="payment-method-btn flex-1 min-w-[70px] rounded-xl py-2.5 flex flex-col items-center gap-1 bg-bg-tertiary border border-border-color transition-all disabled:opacity-30" ${!activeSale.customer ? 'disabled' : ''}><i data-lucide="file-plus-2" class="w-5 h-5 text-current"></i><span class="text-[11px] font-bold">Due</span></button>
-            </div>
-            
-            <!-- Mobile Banking Sub-View -->
-            <div id="mobile-banking-view" class="hidden mb-3 animate-[fadeIn_0.2s_ease-out]">
-                <div class="flex gap-2 overflow-x-auto no-scrollbar">
-                    <button data-payment-action="set-mobile-method" data-method="bKash" class="bg-pink-500/10 text-pink-400 hover:bg-pink-500 hover:text-white rounded-lg px-3 py-1.5 text-[10px] font-bold transition-colors border border-pink-500/30 whitespace-nowrap">bKash</button>
-                    <button data-payment-action="set-mobile-method" data-method="Nagad" class="bg-orange-500/10 text-orange-400 hover:bg-orange-500 hover:text-white rounded-lg px-3 py-1.5 text-[10px] font-bold transition-colors border border-orange-500/30 whitespace-nowrap">Nagad</button>
-                    <button data-payment-action="set-mobile-method" data-method="Rocket" class="bg-purple-500/10 text-purple-400 hover:bg-purple-500 hover:text-white rounded-lg px-3 py-1.5 text-[10px] font-bold transition-colors border border-purple-500/30 whitespace-nowrap">Rocket</button>
+            <div id="mobile-banking-view" class="hidden my-2 md:my-4 shrink-0">
+                <p class="text-xs md:text-sm text-center text-text-secondary mb-2 md:mb-3">Select Mobile Banking Service</p>
+                <div class="grid grid-cols-2 gap-2 md:gap-3">
+                    <button data-payment-action="set-mobile-method" data-method="bKash" class="btn btn-secondary h-10 md:h-16 text-xs md:text-base">bKash</button>
+                    <button data-payment-action="set-mobile-method" data-method="Nagad" class="btn btn-secondary h-10 md:h-16 text-xs md:text-base">Nagad</button>
+                    <button data-payment-action="set-mobile-method" data-method="Rocket" class="btn btn-secondary h-10 md:h-16 text-xs md:text-base">Rocket</button>
+                    <button data-payment-action="set-mobile-method" data-method="Upay" class="btn btn-secondary h-10 md:h-16 text-xs md:text-base">Upay</button>
                 </div>
             </div>
 
-            <!-- Numpad Grid -->
-            <div class="grid grid-cols-4 gap-2 h-[180px] sm:h-[220px]">
-                <div class="col-span-3 grid grid-cols-3 gap-2">
-                    ${numpadHtml}
+            <div id="payment-entry-view" class="flex flex-col flex-grow shrink-0 mt-auto md:mt-0">
+                <div class="relative mb-3 md:mb-4">
+                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-xl md:text-2xl font-mono text-text-secondary">${currencyUtils.get().symbol}</span>
+                    <input type="text" id="payment-input" class="form-input w-full text-right text-3xl md:text-4xl font-mono p-3 md:p-4 pr-4 md:pr-6 bg-transparent" value="${paymentState.remaining.toFixed(2)}" readonly>
                 </div>
-                <div class="col-span-1 flex flex-col gap-2">
-                    <button data-payment-action="keypad" data-key="del" class="bg-bg-tertiary hover:bg-danger/20 hover:text-danger rounded-xl flex-1 flex items-center justify-center active:scale-95 transition-colors border border-border-color text-text-secondary"><i data-lucide="delete" class="w-6 h-6 pointer-events-none"></i></button>
-                    <button id="add-payment-btn" data-payment-action="add-payment" class="bg-blue-600 hover:bg-blue-500 text-white rounded-xl flex-1 flex flex-col items-center justify-center font-bold text-sm shadow-[0_4px_15px_rgba(37,99,235,0.4)] active:scale-95 transition-all border border-white/10 disabled:opacity-50 disabled:shadow-none"><i data-lucide="plus" class="w-6 h-6 mb-1"></i>Add</button>
+                <div class="grid grid-cols-3 gap-1.5 md:gap-2 shrink-0">
+                    ${['1', '2', '3', '4', '5', '6', '7', '8', '9', '00', '0', '.'].map(key => `<button data-payment-action="keypad" data-key="${key}" class="keypad-btn rounded-lg text-xl md:text-2xl font-mono h-12 md:h-12">${key}</button>`).join('')}
+                    <button data-payment-action="keypad" data-key="del" class="keypad-btn rounded-lg text-xl md:text-2xl font-mono h-12 md:h-12 flex items-center justify-center"><i data-lucide="delete" class="w-5 h-5 md:w-6 md:h-6 pointer-events-none"></i></button>
                 </div>
-            </div>
-
-            <!-- Actions Footer -->
-            <div class="grid grid-cols-[1fr_2fr] gap-3 mt-3 pt-3 border-t border-border-color shrink-0">
-                <button data-action="close-modal" class="btn bg-bg-tertiary border border-border-color hover:bg-border-color text-text-primary rounded-xl h-14 font-bold text-sm transition-all active:scale-95 shadow-sm">Cancel</button>
-                <button id="finalize-payment" class="btn bg-green-600 hover:bg-green-500 text-white rounded-xl h-14 font-black text-lg tracking-widest uppercase disabled:opacity-50 disabled:grayscale transition-all shadow-[0_4px_15px_rgba(22,163,74,0.4)] flex items-center justify-center active:scale-95" disabled>PAY</button>
+                <button id="add-payment-btn" data-payment-action="add-payment" class="btn btn-primary w-full mt-3 md:mt-4 text-base md:text-lg py-3 md:py-4 shrink-0 shadow-lg shadow-accent-glow">Add Payment</button>
             </div>
         </div>
     </div>`;
 
-    const footer = ""; 
-    const modal = showModal('Process Payment', content, footer, {size: 'max-w-4xl', customClasses: 'p-0 overflow-hidden'});
+    const footer = `<button data-action="close-modal" class="btn btn-secondary">Cancel Transaction</button><button id="finalize-payment" class="btn btn-success text-white" disabled><i data-lucide="check-circle" class="w-5 h-5 mr-2"></i>Finalize Payment</button>`;
+    const modal = showModal('Process Payment', content, footer, {size: 'max-w-4xl', customClasses: 'p-0'});
     lucide.createIcons();
 
-    const modalHeader = modal.querySelector('.modal-content > div:first-child');
-    if (modalHeader && window.innerWidth < 768) {
-        modalHeader.classList.add('hidden');
-    }
-
     const inputEl = modal.querySelector('#payment-input');
+    const statusDisplay = modal.querySelector('#payment-status-display');
+    const splitsContainer = modal.querySelector('#payment-splits-container');
     const addPaymentBtn = modal.querySelector('#add-payment-btn');
     const finalizeBtn = modal.querySelector('#finalize-payment');
+    const paymentEntryView = modal.querySelector('#payment-entry-view');
     const mobileBankingView = modal.querySelector('#mobile-banking-view');
-    const dynamicHeaderEl = modal.querySelector('#dynamic-payment-header');
-
-    // FIX: Core function to add payments instantly, bypassing DOM constraints
-    const processAutoAdd = () => {
-        const amt = parseFloat(inputEl.value);
-        if (amt > 0) {
-            paymentState.payments.push({ 
-                method: paymentState.activePaymentMethod, 
-                amount: amt, 
-                ref: (paymentState.activePaymentMethod !== 'Cash' ? `TRX_${Date.now()}`: null) 
-            });
-            renderPaymentState();
-        }
-    };
 
     const renderPaymentState = () => {
         const remainingValue = parseFloat(paymentState.remaining.toPrecision(15));
         inputEl.value = remainingValue > 0 ? remainingValue.toFixed(2) : '0.00';
-        
         const remainingBase = remainingValue / currencyUtils.get().rate;
         const formattedRemaining = currencyUtils.format(remainingBase);
         const formattedChange = currencyUtils.format(Math.abs(remainingBase));
 
-        finalizeBtn.removeAttribute('title'); 
-        
-        const inputValue = parseFloat(inputEl.value) || 0;
-        addPaymentBtn.disabled = inputValue <= 0;
+        finalizeBtn.removeAttribute('title'); // Clear title first
 
-        let canFinalize = false;
-        let reason = "A payment is still due.";
+        if (remainingValue > 0.001) {
+            statusDisplay.innerHTML = `<p class="text-text-secondary">Amount Remaining</p><p class="text-4xl font-bold text-danger font-mono tracking-tight">- ${formattedRemaining}</p>`;
+            const inputValue = parseFloat(inputEl.value) || 0;
+            addPaymentBtn.textContent = `Add ${currencyUtils.get().symbol}${inputValue.toFixed(2)} Payment`;
+            addPaymentBtn.disabled = inputValue <= 0;
 
-        if (remainingValue <= 0.001) {
-            canFinalize = true;
-        } else if (activeSale.customer) {
-            const custData = firestoreData.customers.find(c => c.id === activeSale.customer.id);
-            if (custData) {
-                const potentialDue = (custData.currentDue || 0) + remainingBase;
-                if (custData.creditLimit === undefined || custData.creditLimit === null || potentialDue <= custData.creditLimit) {
-                     canFinalize = true;
+            let canFinalize = false;
+            let reason = "A payment is still due.";
+
+            if (activeSale.customer) {
+                const customer = firestoreData.customers.find(c => c.id === activeSale.customer.id);
+                if (customer) {
+                    const potentialDue = (customer.currentDue || 0) + remainingBase;
+                    if (customer.creditLimit === undefined || customer.creditLimit === null || potentialDue <= customer.creditLimit) {
+                         canFinalize = true;
+                    } else {
+                        reason = `Remaining amount exceeds customer's credit limit of ${currencyUtils.format(customer.creditLimit || 0)}. New Due: ${currencyUtils.format(potentialDue)}`;
+                    }
                 } else {
-                    reason = `Exceeds credit limit of ${currencyUtils.format(custData.creditLimit || 0)}.`;
+                     reason = "Selected customer could not be found.";
                 }
+            } else {
+                reason = "Select a customer to finalize a due payment.";
             }
+
+            finalizeBtn.disabled = !canFinalize;
+            if (!canFinalize) {
+                finalizeBtn.setAttribute('title', reason);
+            }
+
         } else {
-            reason = "Select customer to finalize due.";
+            const change = Math.abs(remainingValue);
+            statusDisplay.innerHTML = `<p class="text-text-secondary">Change Due</p><p class="text-4xl font-bold text-success font-mono tracking-tight">${formattedChange}</p>`;
+            addPaymentBtn.textContent = 'Add Payment';
+            addPaymentBtn.disabled = true;
+            finalizeBtn.disabled = false;
         }
 
-        finalizeBtn.disabled = !canFinalize;
-        if (!canFinalize) finalizeBtn.setAttribute('title', reason);
-
-        // SMART UI MORPH: Pin details to the top when splits are added
-        const summaryRowHtml = `
-            <div class="flex justify-between items-center w-full text-[10px] sm:text-xs text-text-secondary mb-3 border-b border-border-color pb-2 shrink-0">
-                <div class="flex gap-3">
-                    <span>Sub: <span class="text-white font-mono">${currencyUtils.format(subtotalBase)}</span></span>
-                    ${taxBase > 0 ? `<span>Tax: <span class="text-white font-mono">${currencyUtils.format(taxBase)}</span></span>` : ''}
-                    ${(manualDiscountAmountBase > 0 || persistentDiscountAmountBase > 0) ? `<span class="text-red-400">Disc: <span class="font-mono">-${currencyUtils.format(manualDiscountAmountBase + persistentDiscountAmountBase)}</span></span>` : ''}
-                </div>
-                <span class="uppercase font-bold tracking-widest text-[10px]">Total: <span class="text-white font-mono text-sm">${currencyUtils.format(totalBase)}</span></span>
+        splitsContainer.innerHTML = paymentState.payments.map((p, i) => `
+            <div class="payment-split-item flex items-center justify-between p-2 bg-bg-tertiary rounded-md text-sm">
+                <div class="flex items-center gap-2"><i data-lucide="${getPaymentIcons(p.method)}" class="w-4 h-4 text-accent"></i><span>${p.method} Payment</span></div>
+                <div class="flex items-center gap-2"><span class="font-mono text-text-primary font-medium">${currencyUtils.get().symbol}${p.amount.toFixed(2)}</span><button data-payment-action="remove-split" data-index="${i}" class="text-danger/70 hover:text-danger"><i data-lucide="x" class="w-4 h-4 pointer-events-none"></i></button></div>
             </div>
-        `;
-
-        if (paymentState.payments.length === 0) {
-            // Default "Summary" State
-            dynamicHeaderEl.innerHTML = summaryRowHtml + `
-                <div class="flex flex-col items-center justify-center w-full animate-[fadeIn_0.2s_ease-out] py-2">
-                    <p class="text-[10px] sm:text-xs text-text-secondary uppercase font-bold tracking-widest mb-1">Total Due</p>
-                    <div class="w-full px-4 overflow-hidden text-center">
-                        <h1 class="text-4xl sm:text-5xl md:text-6xl font-black text-white font-mono tracking-tighter truncate">${currencyUtils.format(totalBase, appState.currentCurrency, { currencyDisplay: 'symbol' })}</h1>
-                    </div>
-                </div>
-            `;
-        } else {
-            // Active "Splits" State
-            const splitsHtml = paymentState.payments.map((p, i) => `
-                <div class="flex justify-between items-center bg-bg-tertiary/80 border border-border-color rounded-xl px-4 py-3 mb-2 shadow-sm animate-[fadeIn_0.2s_ease-out]">
-                    <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-accent">
-                            <i data-lucide="${getPaymentIcons(p.method)}" class="w-4 h-4"></i>
-                        </div>
-                        <span class="text-sm font-bold text-text-primary">${p.method}</span>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <span class="font-mono text-white font-bold text-lg">${currencyUtils.format(p.amount / currencyUtils.get().rate)}</span>
-                        <button data-payment-action="remove-split" data-index="${i}" class="text-danger/70 hover:text-danger bg-danger/10 rounded-full p-1.5 active:scale-90 transition-transform"><i data-lucide="x" class="w-4 h-4 pointer-events-none"></i></button>
-                    </div>
-                </div>
-            `).join('');
-
-            const statusHtml = remainingValue > 0.001 
-                ? `<div class="flex justify-between items-center w-full"><span class="text-[10px] sm:text-xs font-bold text-red-400 uppercase tracking-widest">Remaining</span><span class="text-3xl sm:text-4xl font-black font-mono text-red-400 tracking-tighter truncate">${formattedRemaining}</span></div>`
-                : `<div class="flex justify-between items-center w-full"><span class="text-[10px] sm:text-xs font-bold text-green-400 uppercase tracking-widest">Change Due</span><span class="text-3xl sm:text-4xl font-black font-mono text-green-400 tracking-tighter truncate">${formattedChange}</span></div>`;
-
-            dynamicHeaderEl.innerHTML = summaryRowHtml + `
-                <div class="w-full flex flex-col text-left h-full animate-[fadeIn_0.2s_ease-out]">
-                    <div class="flex-grow overflow-y-auto no-scrollbar max-h-[18vh]">
-                        ${splitsHtml}
-                    </div>
-                    <div class="shrink-0 mt-2 pt-3 border-t border-border-color">
-                        ${statusHtml}
-                    </div>
-                </div>
-            `;
-            lucide.createIcons();
-        }
-
+        `).join('');
+        lucide.createIcons();
         paymentState.userInputStarted = false;
     };
 
-    modal.addEventListener('click', e => { 
+    modal.addEventListener('click', e => { /* ... (no changes needed in event handling logic) ... */
         const target = e.target.closest('[data-payment-action]');
         if (!target) return;
         const { paymentAction, method, amount, key, index } = target.dataset;
 
         switch (paymentAction) {
             case 'set-method':
-                modal.querySelectorAll('.payment-method-btn').forEach(btn => btn.classList.remove('active', 'border-accent'));
-                target.classList.add('active', 'border-accent');
+                modal.querySelectorAll('.payment-method-btn').forEach(btn => btn.classList.remove('active'));
+                target.classList.add('active');
 
                 if (method === 'Mobile Banking') {
+                    paymentEntryView.classList.add('hidden');
                     mobileBankingView.classList.remove('hidden');
                 } else {
+                    paymentEntryView.classList.remove('hidden');
                     mobileBankingView.classList.add('hidden');
                     paymentState.activePaymentMethod = method;
-                    
-                    // 1-TAP PREMIUM UX: Auto-add instantly
-                    if ((method === 'Card' || method === 'Add to Due') && !paymentState.userInputStarted && paymentState.remaining > 0.001) {
+                    if (method === 'Add to Due') {
                         inputEl.value = paymentState.remaining.toFixed(2);
-                        processAutoAdd();
+                        addPaymentBtn.click();
                     }
                 }
                 break;
              case 'set-mobile-method':
                 paymentState.activePaymentMethod = method;
+                paymentEntryView.classList.remove('hidden');
                 mobileBankingView.classList.add('hidden');
-                
-                // 1-TAP PREMIUM UX: Auto-add instantly
-                if (!paymentState.userInputStarted && paymentState.remaining > 0.001) {
-                    inputEl.value = paymentState.remaining.toFixed(2);
-                    processAutoAdd();
-                }
                 break;
             case 'quick-cash':
                 inputEl.value = parseFloat(amount).toFixed(2);
                 paymentState.userInputStarted = true;
                 paymentState.activePaymentMethod = 'Cash';
                 modal.querySelectorAll('.payment-method-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.method === 'Cash'));
-                processAutoAdd();
+                addPaymentBtn.click();
                 break;
             case 'keypad': {
                 let currentVal = inputEl.value;
@@ -11762,14 +10934,18 @@ function openPaymentModal() {
                     if (currentVal === '0' && key !== '.') {
                         currentVal = key;
                     } else {
-                        if (currentVal.length < 15) currentVal += key;
+                        if (currentVal.length < 12) currentVal += key;
                     }
                 }
                 inputEl.value = currentVal;
                 break;
             }
             case 'add-payment': {
-                processAutoAdd();
+                const paymentAmount = parseFloat(inputEl.value);
+                if (paymentAmount > 0) {
+                    paymentState.payments.push({ method: paymentState.activePaymentMethod, amount: paymentAmount, ref: (paymentState.activePaymentMethod !== 'Cash' ? `TRX_${Date.now()}`: null) });
+                    renderPaymentState();
+                }
                 break;
             }
              case 'remove-split':
@@ -11780,48 +10956,54 @@ function openPaymentModal() {
         if (paymentAction === 'keypad' || paymentAction === 'set-method' || paymentAction === 'set-mobile-method') {
              const inputValue = parseFloat(inputEl.value) || 0;
              if(paymentState.remaining > 0.001) {
+                addPaymentBtn.textContent = `Add ${currencyUtils.get().symbol}${inputValue.toFixed(2)} ${paymentState.activePaymentMethod} Payment`;
                 addPaymentBtn.disabled = inputValue <= 0;
              }
         }
     });
 
-    inputEl.addEventListener('input', () => { 
+    inputEl.addEventListener('input', () => { /* ... (no changes needed) ... */
         const inputValue = parseFloat(inputEl.value) || 0;
         if(paymentState.remaining > 0.001) {
+            addPaymentBtn.textContent = `Add ${currencyUtils.get().symbol}${inputValue.toFixed(2)} Payment`;
             addPaymentBtn.disabled = inputValue <= 0;
         }
     });
 
     finalizeBtn.addEventListener('click', async () => {
-        const remainingAmountCurrent = paymentState.remaining;
-        const remainingAmountBase = remainingAmountCurrent > 0.001 ? currencyUtils.convertToBase(remainingAmountCurrent) : 0;
-
-        if (remainingAmountBase > 0.001 && !activeSale.customer) {
-            showToast("Cannot complete a due sale without a selected customer.", "error");
-            return;
-        }
-
         const newInvoiceRef = doc(invoicesRef);
+
+        // --- ADDED LOADING STATE ---
         const originalBtnHTML = finalizeBtn.innerHTML;
         finalizeBtn.disabled = true;
         finalizeBtn.innerHTML = `<div class="loader-sm"></div> Processing...`;
+        // --- END ADDED ---
         
         try {
-            const customerObj = activeSale.customer ? firestoreData.customers.find(c => c.id === activeSale.customer.id) : null;
+            // Define customer variable in scope so it's available for the receipt later
+            const customer = activeSale.customer ? firestoreData.customers.find(c => c.id === activeSale.customer.id) : null;
 
             await runTransaction(db, async (transaction) => {
+                // --- READS ---
+                // const customer = activeSale.customer ? firestoreData.customers.find(c => c.id === activeSale.customer.id) : null; // Moved up
                 const actualPaidAmountCurrent = paymentState.payments.filter(p => p.method !== 'Add to Due').reduce((sum, p) => sum + p.amount, 0);
+                const remainingAmountCurrent = totalCurrent - actualPaidAmountCurrent;
+                const remainingAmountBase = remainingAmountCurrent > 0.001 ? currencyUtils.convertToBase(remainingAmountCurrent) : 0;
 
                 const productRefs = {}; const productDocPromises = [];
                 for (const item of activeSale.cart) { if (!productRefs[item.id]) { const productRef = doc(productsRef, item.id); productRefs[item.id] = productRef; productDocPromises.push(transaction.get(productRef)); } }
                 let customerRef = null; let customerDocPromise = null;
-                if (customerObj) { customerRef = doc(customersRef, customerObj.id); customerDocPromise = transaction.get(customerRef); }
+                if (customer) { customerRef = doc(customersRef, customer.id); customerDocPromise = transaction.get(customerRef); }
                 const productDocs = await Promise.all(productDocPromises);
                 const customerDoc = customerDocPromise ? await customerDocPromise : null;
 
-                const amountEligibleForPoints = totalBase - remainingAmountBase;
+                // --- WRITES ---
+                // --- UPDATED: Calculate points based on paid amount, considering tier discount ---
+                const amountEligibleForPoints = totalBase - remainingAmountBase; // Base currency amount paid
                 const pointsEarned = Math.floor(amountEligibleForPoints * (firestoreData.loyaltySettings?.pointsPerDollar || 1));
+                // --- END UPDATED ---
 
+                // Update stock/sales
                 const productUpdates = {};
                 for (const cartItem of activeSale.cart) {
                      if (!productUpdates[cartItem.id]) {
@@ -11846,8 +11028,9 @@ function openPaymentModal() {
                     transaction.update(productRef, updatePayload);
                 });
 
-                if (customerObj && customerDoc) {
-                    if (!customerDoc.exists()) throw `Customer ${customerObj.id} not found!`;
+                               // Update customer points/due
+                if (customer && customerDoc) {
+                    if (!customerDoc.exists()) throw `Customer ${customer.id} not found!`;
                     const customerData = customerDoc.data();
                     let newPoints = (customerData.loyaltyPoints || 0) + pointsEarned;
                     let newCustomerDue = customerData.currentDue || 0;
@@ -11855,8 +11038,8 @@ function openPaymentModal() {
 
                     let newTierId = customerData.loyaltyTierId || null;
                     if (firestoreData.loyaltySettings?.tiersEnabled) {
-                        const tiersList = firestoreData.loyaltySettings.loyaltyTiers || [];
-                        const eligibleTier = tiersList
+                        const tiers = firestoreData.loyaltySettings.loyaltyTiers || [];
+                        const eligibleTier = tiers
                             .filter(t => newPoints >= t.pointsThreshold)
                             .sort((a, b) => b.pointsThreshold - a.pointsThreshold)[0];
                         newTierId = eligibleTier ? eligibleTier.id : null;
@@ -11868,12 +11051,19 @@ function openPaymentModal() {
                         loyaltyTierId: newTierId
                     };
 
+                    // --- MODIFIED: Make credit limit check optional ---
+                    // Only check the limit if it's defined AND greater than 0
                     if (customerData.creditLimit && customerData.creditLimit > 0 && newCustomerDue > customerData.creditLimit) {
                          throw `Sale exceeds customer's credit limit. Limit: ${currencyUtils.format(customerData.creditLimit || 0)}, New Due: ${currencyUtils.format(newCustomerDue)}`;
                     }
+                    // --- END MODIFICATION ---
+
                     transaction.update(customerRef, updatePayload);
+                } else if (remainingAmountBase > 0.001) {
+                    throw "Cannot complete a due sale without a selected customer.";
                 }
 
+                // Create invoice & warranty records
                 for (const item of activeSale.cart) {
                     if (item.isSerialized && item.serialNumber) {
                         let policyId = null; const product = firestoreData.products.find(p => p.id === item.id);
@@ -11881,19 +11071,23 @@ function openPaymentModal() {
                         if (!policyId) { policyId = 'standard-1-year'; }
                         const policies = appState.settings.warrantyPolicies || { 'standard-1-year': { name: "Standard 1-Year", durationMonths: 12 } };
                         const policy = policies[policyId];
-                        if(policy) { const startDate = new Date(); const expiryDate = new Date(startDate); expiryDate.setMonth(startDate.getMonth() + policy.durationMonths); const newWarrantyRef = doc(warrantiesRef); transaction.set(newWarrantyRef, { id: newWarrantyRef.id, productId: item.id, productName: item.name, serialNumber: item.serialNumber, customerId: customerObj?.id || null, customerName: customerObj?.name || 'Walk-in Customer', invoiceId: newInvoiceRef.id, policyId: policyId, policyName: policy.name, startDate: startDate.toISOString(), expiryDate: expiryDate.toISOString(), status: 'active' }); }
+                        if(policy) { const startDate = new Date(); const expiryDate = new Date(startDate); expiryDate.setMonth(startDate.getMonth() + policy.durationMonths); const newWarrantyRef = doc(warrantiesRef); transaction.set(newWarrantyRef, { id: newWarrantyRef.id, productId: item.id, productName: item.name, serialNumber: item.serialNumber, customerId: customer?.id || null, customerName: customer?.name || 'Walk-in Customer', invoiceId: newInvoiceRef.id, policyId: policyId, policyName: policy.name, startDate: startDate.toISOString(), expiryDate: expiryDate.toISOString(), status: 'active' }); } // <-- This line is now fixed
                         else { console.warn(`Warranty policy "${policyId}" not found for ${item.id}.`); }
                     }
                 }
 
+                                // --- UPDATED: Save Discount Info to Invoice ---
+                // const newInvoiceRef = doc(invoicesRef); // <-- DELETED THIS LINE
                 const actualPaidInBase = currencyUtils.convertToBase(actualPaidAmountCurrent);
                 let invoiceStatus = 'Paid';
                 if (remainingAmountBase > 0.001) invoiceStatus = (actualPaidInBase > 0.001) ? 'Partial' : 'Due';
 
                 const newInvoice = {
-                    customerId: customerObj?.id || null, customerName: customerObj?.name || 'Walk-in Customer',
+                    customerId: customer?.id || null, customerName: customer?.name || 'Walk-in Customer',
                     totalInBaseCurrency: totalBase,
                     subtotalInBaseCurrency: subtotalBase,
+                    
+                    // --- Store ALL Discount Details ---
                     persistentDiscountDetails: {
                         staff: staffDiscountPercent,
                         lifetime: lifetimeDiscountPercent,
@@ -11904,6 +11098,8 @@ function openPaymentModal() {
                     manualDiscountInBase: manualDiscountAmountBase,
                     manualDiscountType: activeSale.discount?.type || null,
                     manualDiscountReason: activeSale.discount?.reason || null,
+                    // --- End Store Discount Details ---
+
                     taxInBaseCurrency: taxBase,
                     dueAmount: remainingAmountBase,
                     currency: appState.currentCurrency, exchangeRate: currencyUtils.get().rate,
@@ -11915,11 +11111,14 @@ function openPaymentModal() {
                     customerTierSnapshot: customerTier
                 };
                 transaction.set(newInvoiceRef, newInvoice);
+                // --- END UPDATED ---
 
-                if (customerObj && pointsEarned !== 0) {
+                // finalizeBtn.dataset.newInvoiceId = newInvoiceRef.id; // <-- DELETED THIS LINE
+
+                if (customer && pointsEarned !== 0) {
                     const historyRef = doc(loyaltyHistoryRef);
                     transaction.set(historyRef, {
-                        customerId: customerObj.id,
+                        customerId: customer.id,
                         date: new Date().toISOString(),
                         type: 'earn',
                         pointsChange: pointsEarned,
@@ -11930,13 +11129,19 @@ function openPaymentModal() {
                 }
             });
 
+            // Post-transaction
             simulateFraudDetection(totalBase, appState.session.currentUser);
-            const newInvoiceId = newInvoiceRef.id;
+            // const newInvoiceId = finalizeBtn.dataset.newInvoiceId; // <-- DELETED THIS LINE
+            const newInvoiceId = newInvoiceRef.id; // <-- ADDED THIS LINE
             const finalInvoice = {id: newInvoiceId, ...await getDoc(doc(invoicesRef, newInvoiceId)).then(d => d.data())};
 
-            if (customerObj) {
-                finalInvoice.customer = customerObj;
+            // --- FIX: Attach customer object for receipt display ---
+            // If we have a customer object in scope, attach it to the invoice data
+            // so the receipt template can read properties like loyaltyId or address.
+            if (customer) {
+                finalInvoice.customer = customer;
             }
+            // --- END FIX ---
 
             closeModal(modal);
             showReceipt(finalInvoice, paymentState);
@@ -11952,8 +11157,10 @@ function openPaymentModal() {
             console.error("Payment failed:", error);
             showToast(`Transaction failed: ${error.message}`, "error");
         } finally {
+            // --- RESTORE BUTTON ---
             finalizeBtn.disabled = false;
             finalizeBtn.innerHTML = originalBtnHTML;
+            // --- END RESTORE ---
         }
     });
 
@@ -18434,20 +17641,7 @@ function initReports(pane) {
                 });
             }
 
-           function initSettings(pane) {
-                // Instant Camera Scanner Toggle Handler
-                const autoOpenToggle = pane.querySelector('#setting-auto-open-scanner');
-                if (autoOpenToggle) {
-                    const isAutoOpen = localStorage.getItem('cashshilpo_auto_open_scanner') === 'true' || appState.settings.autoOpenScanner === true;
-                    autoOpenToggle.checked = isAutoOpen;
-                    autoOpenToggle.addEventListener('change', (e) => {
-                        const enabled = e.target.checked;
-                        localStorage.setItem('cashshilpo_auto_open_scanner', enabled ? 'true' : 'false');
-                        appState.settings.autoOpenScanner = enabled;
-                        showToast(`Instant camera launch ${enabled ? 'enabled' : 'disabled'}.`, 'success');
-                    });
-                }
-
+            function initSettings(pane) {
                 const businessTypeSelectorContainer = pane.querySelector('#business-type-selector');
                 const receiptSelectorContainer = pane.querySelector('#receipt-template-selector');
                 const posLayoutSelectorContainer = pane.querySelector('#pos-layout-selector');
@@ -20976,39 +20170,25 @@ async function openReceivePaymentModal(customerId) {
                             });
                             break;
                         }
-                       case 'open-held-sales': {
-                            if (window.openHeldSalesModal) {
-                                window.openHeldSalesModal();
-                            }
-                            break;
-                        }
                         case 'hold-sale': {
-                            const heldSalesList = posState.sales.filter(s => s.status === 'held');
-                            
-                            // If cart is empty and there are held sales, clicking Hold opens the Held Orders sheet
                             if (!activeSale || activeSale.cart.length === 0) {
-                                if (heldSalesList.length > 0 && window.openHeldSalesModal) {
-                                    window.openHeldSalesModal();
-                                } else {
-                                    showToast('Cannot hold an empty sale.', 'info');
-                                }
+                                showToast('Cannot hold an empty sale.', 'info');
                                 return;
                             }
-
                             const heldSaleName = activeSale.name;
                             activeSale.status = 'held';
                             
                             let nextSale = posState.sales.find(s => s.status === 'active' && s.id !== activeSale.id);
                             if (!nextSale) {
                                 const newSaleId = `sale_${Date.now()}`;
-                                posState.sales.push({ id: newSaleId, name: `Sale ${posState.saleCounter++}`, cart: [], customer: null, status: 'active', discount: { type: 'percent', value: 0 } });
+                                posState.sales.push({ id: newSaleId, name: `Sale ${posState.saleCounter++}`, cart: [], customer: null, status: 'active' });
                                 posState.activeSaleId = newSaleId;
                             } else {
                                 posState.activeSaleId = nextSale.id;
                             }
 
                             posFullRender(currentViewPane);
-                            showToast(`${heldSaleName} placed on hold.`, 'success');
+                            showToast(`${heldSaleName} is now on hold.`, 'success');
                             break;
                         }
                         case 'close-sale': {
