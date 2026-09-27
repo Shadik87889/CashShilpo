@@ -478,11 +478,11 @@
             if (preview && cardOpt) {
               cardOpt.style.setProperty(
                 "--preview-bg",
-                customColors["--bg-primary"]
+                customColors["--bg-primary"],
               );
               cardOpt.style.setProperty(
                 "--preview-sec",
-                customColors["--bg-secondary"]
+                customColors["--bg-secondary"],
               );
             }
           }
@@ -512,11 +512,11 @@
         if (cardOpt) {
           cardOpt.style.setProperty(
             "--preview-bg",
-            customColors["--bg-primary"]
+            customColors["--bg-primary"],
           );
           cardOpt.style.setProperty(
             "--preview-sec",
-            customColors["--bg-secondary"]
+            customColors["--bg-secondary"],
           );
         }
 
@@ -537,7 +537,7 @@
   function applyTheme(themeKey) {
     // Remove all pre-defined theme classes
     document.body.classList.remove(
-      ...Object.keys(themes).map((k) => `theme-${k}`)
+      ...Object.keys(themes).map((k) => `theme-${k}`),
     );
 
     // Variables to clean up if switching AWAY from custom

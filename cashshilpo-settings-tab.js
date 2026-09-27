@@ -1,60 +1,222 @@
-/**
- * CashShilpo Settings Tab Manager
- * Organizes the monolithic settings page into a clean tabbed interface.
- * Features the HyperVoice OS tab and the new Templates tab.
- * Updated: Language-agnostic sorting to fix Bangla translation bug.
- */
-
 (function () {
   console.log("CashShilpo Settings Tabs: Module Loaded");
+
+  // 1. INJECT SCOPED CSS (Guarantees padding, gaps & tabs work without relying on JIT compilation)
+  function injectSettingsStyles() {
+    const styleId = "cashshilpo-settings-scoped-styles";
+    if (document.getElementById(styleId)) return;
+
+    const styleEl = document.createElement("style");
+    styleEl.id = styleId;
+    styleEl.innerHTML = `
+      /* --- STRICTLY SCOPED TO SETTINGS VIEW (Zero impact on other sections) --- */
+      #settings-form {
+        padding: 0.5rem 0.25rem 6rem 0.25rem !important;
+        box-sizing: border-box !important;
+      }
+
+      /* Modern Segmented Tab Bar */
+      #settings-tab-scroller {
+        width: 100% !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        scrollbar-width: none !important;
+        padding-bottom: 0.75rem !important;
+        margin-bottom: 1.25rem !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+      }
+      #settings-tab-scroller::-webkit-scrollbar {
+        display: none !important;
+      }
+
+      #settings-tab-nav {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 0.5rem !important;
+        background: #141416 !important;
+        padding: 0.35rem !important;
+        border-radius: 9999px !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        white-space: nowrap !important;
+      }
+
+      .settings-tab-btn {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 0.45rem !important;
+        padding: 0.6rem 1.15rem !important;
+        border-radius: 9999px !important;
+        font-size: 0.825rem !important;
+        font-weight: 600 !important;
+        color: #9ca3af !important;
+        background: transparent !important;
+        border: 1px solid transparent !important;
+        white-space: nowrap !important;
+        cursor: pointer !important;
+        transition: all 0.2s ease !important;
+        flex-shrink: 0 !important;
+      }
+      .settings-tab-btn:hover {
+        color: #ffffff !important;
+        background: rgba(255, 255, 255, 0.06) !important;
+      }
+      .settings-tab-btn.active {
+        color: #ffffff !important;
+        background: #007bff !important;
+        border-color: rgba(255, 255, 255, 0.2) !important;
+        box-shadow: 0 4px 14px rgba(0, 123, 255, 0.45) !important;
+      }
+      .settings-tab-btn i {
+        width: 15px !important;
+        height: 15px !important;
+        flex-shrink: 0 !important;
+      }
+
+      /* Tab Content Containers: Vertical Spacing Between Cards */
+      #settings-tab-content-wrapper > div {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 1.25rem !important;
+        padding: 0 0.25rem !important;
+        box-sizing: border-box !important;
+      }
+      #settings-tab-content-wrapper > div.hidden {
+        display: none !important;
+      }
+
+      /* Restored Rich Card Padding and Rounded Corners */
+      #settings-tab-content-wrapper .glass-pane,
+      #settings-tab-content-wrapper .visual-engine-card,
+      #settings-tab-content-wrapper #theme-selector-card {
+        background: linear-gradient(145deg, #18181b 0%, #121214 100%) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 1.35rem !important;
+        padding: 1.35rem !important;
+        margin-bottom: 0 !important;
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45) !important;
+        box-sizing: border-box !important;
+        width: 100% !important;
+      }
+
+      /* Section Headings inside Cards */
+      #settings-tab-content-wrapper h2,
+      #settings-tab-content-wrapper h3,
+      #settings-tab-content-wrapper h4 {
+        font-size: 1.05rem !important;
+        font-weight: 700 !important;
+        color: #ffffff !important;
+        margin-bottom: 0.35rem !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 0.5rem !important;
+      }
+
+      /* Form Controls with Guaranteed Mobile Sizing */
+      #settings-tab-content-wrapper input[type="text"],
+      #settings-tab-content-wrapper input[type="number"],
+      #settings-tab-content-wrapper select,
+      #settings-tab-content-wrapper textarea {
+        background-color: #0a0a0a !important;
+        border: 1px solid rgba(255, 255, 255, 0.12) !important;
+        border-radius: 0.75rem !important;
+        color: #f3f4f6 !important;
+        padding: 0.65rem 0.85rem !important;
+        font-size: 0.875rem !important;
+        box-sizing: border-box !important;
+        width: 100% !important;
+        outline: none !important;
+      }
+      #settings-tab-content-wrapper select {
+        height: 44px !important;
+      }
+
+      /* Save Button Wrapper */
+      #settings-tab-content-wrapper .settings-save-bar {
+        display: flex !important;
+        justify-content: flex-end !important;
+        padding-top: 1rem !important;
+        margin-top: 0.5rem !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+      }
+      #settings-tab-content-wrapper button[data-action="save-settings"] {
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%) !important;
+        color: #ffffff !important;
+        font-weight: 700 !important;
+        border-radius: 0.75rem !important;
+        padding: 0.75rem 1.75rem !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        box-shadow: 0 4px 15px rgba(0, 123, 255, 0.4) !important;
+        cursor: pointer !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 0.5rem !important;
+        min-height: 46px !important;
+      }
+      @media (max-width: 640px) {
+        #settings-tab-content-wrapper button[data-action="save-settings"] {
+          width: 100% !important;
+          min-height: 48px !important;
+        }
+      }
+    `;
+    document.head.appendChild(styleEl);
+  }
+
+  injectSettingsStyles();
 
   // Configuration for tabs
   const TABS = [
     { id: "general", label: "General", icon: "settings" },
     { id: "appearance", label: "Appearance", icon: "palette" },
     { id: "templates", label: "Templates", icon: "layout-template" },
-    { id: "voice", label: "Voice OS", icon: "mic-activity" },
+    { id: "voice", label: "Voice OS", icon: "mic" },
     { id: "automation", label: "Automation", icon: "zap" },
   ];
 
   let currentTab = "general";
 
-  // Helper to create the tab navigation UI
+  // Modern Scrollable Tab Navigation UI
   function createTabsUI() {
+    const scrollerWrapper = document.createElement("div");
+    scrollerWrapper.id = "settings-tab-scroller";
+
     const navContainer = document.createElement("div");
     navContainer.id = "settings-tab-nav";
-    navContainer.className =
-      "flex border-b border-border-color mb-6 overflow-x-auto scrollbar-hide";
 
     TABS.forEach((tab) => {
       const btn = document.createElement("button");
-      btn.className = `px-6 py-3 text-sm font-medium border-b-2 transition-all duration-200 flex items-center gap-2 whitespace-nowrap ${
-        currentTab === tab.id
-          ? "border-accent text-text-primary bg-accent/5"
-          : "border-transparent text-text-secondary hover:text-text-primary hover:bg-bg-tertiary/50"
+      btn.type = "button";
+      btn.className = `settings-tab-btn ${
+        currentTab === tab.id ? "active" : ""
       }`;
       btn.dataset.tabId = tab.id;
 
-      // Icon
       const icon = document.createElement("i");
       icon.dataset.lucide = tab.icon;
-      icon.className = "w-4 h-4";
-
       btn.appendChild(icon);
-      btn.appendChild(document.createTextNode(tab.label));
+
+      const labelSpan = document.createElement("span");
+      labelSpan.textContent = tab.label;
+      btn.appendChild(labelSpan);
 
       btn.addEventListener("click", (e) => {
         e.preventDefault();
         switchTab(tab.id);
+        btn.scrollIntoView({
+          behavior: "smooth",
+          inline: "center",
+          block: "nearest",
+        });
       });
 
       navContainer.appendChild(btn);
     });
 
-    return navContainer;
+    scrollerWrapper.appendChild(navContainer);
+    return scrollerWrapper;
   }
 
-  // Helper to create content containers for each tab
   function createTabContainers() {
     const wrapper = document.createElement("div");
     wrapper.id = "settings-tab-content-wrapper";
@@ -62,34 +224,23 @@
     TABS.forEach((tab) => {
       const container = document.createElement("div");
       container.id = `tab-content-${tab.id}`;
-      // Add extra padding at bottom for the save button area
-      container.className = `space-y-6 pb-4 ${
-        currentTab === tab.id ? "block" : "hidden"
-      } animate-fadeIn`;
+      container.className = `${currentTab === tab.id ? "block" : "hidden"}`;
       wrapper.appendChild(container);
     });
 
     return wrapper;
   }
 
-  // Switch logic
   function switchTab(tabId) {
     currentTab = tabId;
 
-    // Update Buttons
     const nav = document.getElementById("settings-tab-nav");
-    if (!nav) return;
+    if (nav) {
+      Array.from(nav.children).forEach((btn) => {
+        btn.classList.toggle("active", btn.dataset.tabId === tabId);
+      });
+    }
 
-    Array.from(nav.children).forEach((btn) => {
-      const isActive = btn.dataset.tabId === tabId;
-      btn.className = `px-6 py-3 text-sm font-medium border-b-2 transition-all duration-200 flex items-center gap-2 whitespace-nowrap ${
-        isActive
-          ? "border-accent text-text-primary bg-accent/5"
-          : "border-transparent text-text-secondary hover:text-text-primary hover:bg-bg-tertiary/50"
-      }`;
-    });
-
-    // Update Content
     const wrapper = document.getElementById("settings-tab-content-wrapper");
     if (!wrapper) return;
 
@@ -102,56 +253,47 @@
         container.classList.remove("block");
       }
     });
+
+    const scrollEl = document.getElementById("workspace-content");
+    if (scrollEl) scrollEl.scrollTop = 0;
   }
 
-  // Core Logic: Categorize and Move Elements
   function organizeContent(settingsForm) {
-    // Prevent re-initialization
     if (settingsForm.querySelector("#settings-tab-nav")) return;
 
-    // 1. Create Layout Structure
     const header = settingsForm.querySelector("h1");
-    const containerDiv = settingsForm.querySelector(".space-y-8.max-w-4xl");
+    const containerDiv =
+      settingsForm.querySelector(".space-y-8") ||
+      settingsForm.querySelector(".space-y-6");
 
     if (!header || !containerDiv) return;
 
     const tabsNav = createTabsUI();
     const tabsContent = createTabContainers();
 
-    // Insert Tabs after header
     header.insertAdjacentElement("afterend", tabsNav);
-
-    // Insert Content Wrapper
     header.parentNode.insertBefore(tabsContent, containerDiv);
 
-    // 2. Define Sorting Rules based on internal HTML structures (Language Agnostic)
     const sortElement = (element) => {
-      // -- External Module IDs --
       if (element.id === "lang-toggle-card") return "appearance";
       if (element.id === "theme-selector-card") return "appearance";
       if (element.id === "visual-engine-panel") return "appearance";
       if (element.id === "hyper-voice-os-panel") return "voice";
 
-      // -- Content Based Sorting (Language Agnostic checks via inner DOM IDs) --
-
-      // Automation
       if (
         element.id === "automations-container" ||
         element.querySelector("#automations-container")
-      )
+      ) {
         return "automation";
-
-      // Appearance (POS Layout is in Appearance)
+      }
       if (element.querySelector("#pos-layout-selector")) return "appearance";
-
-      // Templates (Receipts and Customizations go to Templates)
       if (
         element.querySelector("#receipt-template-selector") ||
         element.querySelector("textarea[name='receiptFooterText']")
-      )
+      ) {
         return "templates";
+      }
 
-      // Fallback text check (Includes both English and Bangla just in case)
       const title = element.querySelector("h2")?.innerText?.toLowerCase() || "";
       if (title.includes("automation") || title.includes("অটোমেশন"))
         return "automation";
@@ -164,24 +306,17 @@
       )
         return "templates";
 
-      // Default everything else to General
       return "general";
     };
 
-    // 3. Move Existing Elements
     let saveButtonTemplate = null;
 
     Array.from(containerDiv.children).forEach((child) => {
-      // Identify the Save Button container
-      if (
-        child.classList.contains("flex") &&
-        child.querySelector('button[data-action="save-settings"]')
-      ) {
+      if (child.querySelector('button[data-action="save-settings"]')) {
         saveButtonTemplate = child;
-        return; // Don't move it yet, we will clone it later
+        return;
       }
 
-      // If it was the old permissions container, we skip it
       if (
         child.id === "permissions-container" ||
         child
@@ -199,100 +334,81 @@
       if (targetContainer) targetContainer.appendChild(child);
     });
 
-    // 4. Distribute Save Button to ALL Tabs
+    // Distribute Save Button to all tabs
     if (saveButtonTemplate) {
       TABS.forEach((tab) => {
-        const container = document.getElementById(`tab-content-${tab.id}`);
-        // Only append if the tab container exists
-        if (container) {
-          const btnContainer = saveButtonTemplate.cloneNode(true);
-          // Add some styling to make it look like a footer
-          btnContainer.classList.add(
-            "mt-8",
-            "pt-4",
-            "border-t",
-            "border-border-color",
-          );
-          container.appendChild(btnContainer);
+        const tabContainer = document.getElementById(`tab-content-${tab.id}`);
+        if (tabContainer) {
+          const btnWrapper = saveButtonTemplate.cloneNode(true);
+          btnWrapper.className = "settings-save-bar";
+          tabContainer.appendChild(btnWrapper);
         }
       });
-      // Remove original from DOM to avoid duplicate ID issues
       saveButtonTemplate.remove();
     }
 
-    // 5. Hide the original container
     containerDiv.style.display = "none";
-
-    // 6. Initial Icon Render
     if (window.lucide) window.lucide.createIcons();
 
-    // 7. Check for empty tabs and hide their buttons
+    // Hide empty tab buttons
     TABS.forEach((tab) => {
       const content = document.getElementById(`tab-content-${tab.id}`);
       const btn = document.querySelector(`button[data-tab-id="${tab.id}"]`);
-      // We check if children > 1 because we just added the save button to everyone.
-      // If a tab ONLY has the save button, it's effectively empty.
       if (content && btn && content.children.length <= 1) {
         btn.style.display = "none";
       }
     });
   }
 
-  // --- CONTINUOUS MONITORING ---
-  const observer = new MutationObserver((mutations) => {
+  const observer = new MutationObserver(() => {
     const settingsForm = document.getElementById("settings-form");
-
     if (!settingsForm) return;
 
     if (!document.getElementById("settings-tab-nav")) {
       organizeContent(settingsForm);
     }
 
-    // Watch for injected elements
     Array.from(settingsForm.children).forEach((child) => {
-      if (child.tagName === "H1" || child.tagName === "SCRIPT") return;
-      if (child.id === "settings-tab-nav") return;
-      if (child.id === "settings-tab-content-wrapper") return;
-
+      if (["H1", "SCRIPT"].includes(child.tagName)) return;
       if (
-        child.classList.contains("space-y-8") &&
-        child.classList.contains("max-w-4xl")
+        [
+          "settings-tab-scroller",
+          "settings-tab-nav",
+          "settings-tab-content-wrapper",
+        ].includes(child.id)
+      )
+        return;
+      if (
+        child.classList.contains("space-y-8") ||
+        child.classList.contains("space-y-6")
       )
         return;
 
-      // Determine where it goes
       let targetTab = "general";
-
       if (
-        child.id === "lang-toggle-card" ||
-        child.id === "theme-selector-card" ||
-        child.id === "visual-engine-panel"
-      ) {
+        [
+          "lang-toggle-card",
+          "theme-selector-card",
+          "visual-engine-panel",
+        ].includes(child.id)
+      )
         targetTab = "appearance";
-      }
+      if (child.id === "hyper-voice-os-panel") targetTab = "voice";
 
-      // Route Voice OS
-      if (child.id === "hyper-voice-os-panel") {
-        targetTab = "voice";
-      }
-
-      // Move it
-      const container = document.getElementById(`tab-content-${targetTab}`);
-      if (container) {
-        // Prepend so it appears before the Save button
-        container.prepend(child);
+      const targetContainer = document.getElementById(
+        `tab-content-${targetTab}`,
+      );
+      if (targetContainer) {
+        targetContainer.prepend(child);
         const btn = document.querySelector(
           `button[data-tab-id="${targetTab}"]`,
         );
-        if (btn) btn.style.display = "flex";
+        if (btn) btn.style.display = "inline-flex";
       }
     });
   });
 
-  observer.observe(document.body, {
-    childList: true,
-    subtree: true,
-  });
+  observer.observe(document.body, { childList: true, subtree: true });
 
   const initialSettings = document.getElementById("settings-form");
   if (initialSettings) {
