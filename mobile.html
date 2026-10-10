@@ -511,10 +511,23 @@
         z-index: 250 !important;
       }
 
-      /* Elevated Controls Wrapper to Float Over Data Tables */
+     /* High-Z-Index Header & Store Dropdown (Floats over all content) */
+      #main-header {
+        z-index: 120 !important;
+        position: relative !important;
+      }
+      #store-switcher-container {
+        z-index: 200 !important;
+        position: relative !important;
+      }
+      #store-menu {
+        z-index: 300 !important;
+      }
+
+      /* Standardized Controls Wrapper (Floats below header dropdowns) */
       #invoice-controls-container {
         position: relative !important;
-        z-index: 105 !important;
+        z-index: 20 !important;
       }
 
       /* Payment Modal Keypad */
@@ -3921,6 +3934,7 @@ const commonChartOptions = (isCurrency = true, customOptions = {}) => {
 };
 
 const renderPaginationControls = (container, totalItems, currentPage, itemsPerPage, viewType) => {
+    if (!container) return;
     const totalPages = Math.ceil(totalItems / itemsPerPage);
     if (totalPages <= 1) {
         container.innerHTML = '';
@@ -3930,14 +3944,20 @@ const renderPaginationControls = (container, totalItems, currentPage, itemsPerPa
     const startItem = (currentPage - 1) * itemsPerPage + 1;
     const endItem = Math.min(startItem + itemsPerPage - 1, totalItems);
 
-    let paginationHTML = `<div class="flex items-center justify-between text-sm text-text-secondary">`;
-    paginationHTML += `<div>Showing <span class="font-medium text-text-primary">${startItem}</span> to <span class="font-medium text-text-primary">${endItem}</span> of <span class="font-medium text-text-primary">${totalItems}</span> results</div>`;
-    paginationHTML += `<div class="flex items-center gap-2">`;
-    paginationHTML += `<button data-action="paginate" data-view-type="${viewType}" data-page="${currentPage - 1}" class="pagination-arrow-btn" ${currentPage === 1 ? 'disabled' : ''}><i data-lucide="chevron-left" class="w-5 h-5 pointer-events-none"></i></button>`;
-    
-    // Simplified pagination links (e.g., 1 ... 4 5 6 ... 10)
+    // Mistranslation-proof format: uses an en-dash "1–15 of 16" to prevent translation engines from turning "to" into "তো"
+    let paginationHTML = `
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-3 p-3 sm:p-3.5 bg-[#141416] border border-white/10 rounded-2xl shadow-lg mb-8 select-none">
+            <div class="text-xs text-text-secondary font-medium">
+                Showing <span class="font-mono font-bold text-white">${startItem}–${endItem}</span> of <span class="font-mono font-bold text-white">${totalItems}</span> entries
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0">
+                <button type="button" data-action="paginate" data-view-type="${viewType}" data-page="${currentPage - 1}" class="pagination-arrow-btn" ${currentPage === 1 ? 'disabled' : ''} title="Previous Page">
+                    <i data-lucide="chevron-left" class="w-4 h-4 pointer-events-none"></i>
+                </button>
+    `;
+
     const pagesToShow = [];
-    if (totalPages <= 7) {
+    if (totalPages <= 6) {
         for (let i = 1; i <= totalPages; i++) pagesToShow.push(i);
     } else {
         pagesToShow.push(1);
@@ -3948,19 +3968,25 @@ const renderPaginationControls = (container, totalItems, currentPage, itemsPerPa
         if (currentPage < totalPages - 2) pagesToShow.push('...');
         pagesToShow.push(totalPages);
     }
-    
+
     const uniquePages = [...new Set(pagesToShow)];
 
     uniquePages.forEach(p => {
         if (p === '...') {
-            paginationHTML += `<span class="pagination-ellipsis">...</span>`;
+            paginationHTML += `<span class="pagination-ellipsis">…</span>`;
         } else {
-            paginationHTML += `<button data-action="paginate" data-view-type="${viewType}" data-page="${p}" class="pagination-page-btn ${p === currentPage ? 'active' : ''}">${p}</button>`;
+            paginationHTML += `<button type="button" data-action="paginate" data-view-type="${viewType}" data-page="${p}" class="pagination-page-btn ${p === currentPage ? 'active' : ''}">${p}</button>`;
         }
     });
 
-    paginationHTML += `<button data-action="paginate" data-view-type="${viewType}" data-page="${currentPage + 1}" class="pagination-arrow-btn" ${currentPage === totalPages ? 'disabled' : ''}><i data-lucide="chevron-right" class="w-5 h-5 pointer-events-none"></i></button>`;
-    paginationHTML += `</div></div>`;
+    paginationHTML += `
+                <button type="button" data-action="paginate" data-view-type="${viewType}" data-page="${currentPage + 1}" class="pagination-arrow-btn" ${currentPage === totalPages ? 'disabled' : ''} title="Next Page">
+                    <i data-lucide="chevron-right" class="w-4 h-4 pointer-events-none"></i>
+                </button>
+            </div>
+        </div>
+    `;
+
     container.innerHTML = paginationHTML;
     lucide.createIcons();
 };
@@ -4824,50 +4850,67 @@ function handleCustomerExport() {
                         border-color: var(--accent);
                         transform: translateY(-2px);
                     }
-                    /* Super Advanced Pagination Styles */
+/* Tactile Executive Pagination Tiles */
                     .pagination-arrow-btn {
-                        display: flex; align-items: center; justify-content: center;
-                        width: 36px; height: 36px;
-                        border: 1px solid var(--border-color);
-                        border-radius: 8px;
-                        background-color: var(--bg-secondary);
-                        color: var(--text-secondary);
-                        transition: all 0.2s ease-in-out;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        width: 36px;
+                        height: 36px;
+                        border: 1px solid rgba(255, 255, 255, 0.1);
+                        border-radius: 0.75rem;
+                        background-color: #0a0a0a;
+                        color: #9ca3af;
+                        transition: all 0.15s ease-in-out;
+                        cursor: pointer;
                     }
-                    .pagination-arrow-btn:not(:disabled):hover {
-                        background-color: var(--bg-tertiary);
-                        color: var(--text-primary);
-                        border-color: var(--border-color-strong);
+                    .pagination-arrow-btn:not(:disabled):hover,
+                    .pagination-arrow-btn:not(:disabled):active {
+                        background-color: rgba(255, 255, 255, 0.08);
+                        color: #ffffff;
+                        border-color: rgba(255, 255, 255, 0.25);
                     }
                     .pagination-arrow-btn:disabled {
-                        opacity: 0.4;
+                        opacity: 0.25;
                         cursor: not-allowed;
                     }
                     .pagination-page-btn {
-                        display: flex; align-items: center; justify-content: center;
-                        min-width: 36px; height: 36px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        min-width: 36px;
+                        height: 36px;
                         padding: 0 8px;
-                        border-radius: 8px;
-                        font-weight: 500;
-                        transition: all 0.2s ease-in-out;
-                        border: 1px solid transparent;
+                        border-radius: 0.75rem;
+                        font-size: 0.8rem;
+                        font-weight: 700;
+                        font-family: monospace;
+                        background-color: #0a0a0a;
+                        color: #9ca3af;
+                        border: 1px solid rgba(255, 255, 255, 0.1);
+                        transition: all 0.15s ease-in-out;
+                        cursor: pointer;
                     }
                     .pagination-page-btn:hover:not(.active) {
-                        background-color: var(--bg-tertiary);
-                        color: var(--text-primary);
+                        background-color: rgba(255, 255, 255, 0.08);
+                        color: #ffffff;
+                        border-color: rgba(255, 255, 255, 0.25);
                     }
                     .pagination-page-btn.active {
-                        background-color: var(--accent);
-                        color: white;
-                        font-weight: 600;
-                        box-shadow: 0 4px 12px -2px var(--accent-glow);
-                        border-color: var(--accent);
+                        background: #007bff !important;
+                        color: #ffffff !important;
+                        border-color: rgba(255, 255, 255, 0.25) !important;
+                        box-shadow: 0 4px 14px -2px rgba(0, 123, 255, 0.45) !important;
                     }
                     .pagination-ellipsis {
-                        display: flex; align-items: center; justify-content: center;
-                        width: 36px; height: 36px;
-                        color: var(--text-secondary);
-                        letter-spacing: 2px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        width: 28px;
+                        height: 36px;
+                        color: #6b7280;
+                        font-size: 0.8rem;
+                        font-weight: bold;
                     }
                     /* STYLES FOR HEADER COLLAPSE */
                     #main-header {
@@ -6244,49 +6287,71 @@ function handleCustomerExport() {
 case "dashboard":
               return `
                         <div class="space-y-5 sm:space-y-6 max-w-7xl mx-auto pb-6 select-none">
-                            <!-- Dashboard Header & Period Scroller -->
-                            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3.5">
-                                <div>
-                                    <div class="flex items-center gap-2.5">
-                                        <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight" id="dashboard-user-greeting">Welcome Back</h1>
-                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-[11px] font-bold">
+                            <!-- Dashboard Header (Always 1 Line) & Period Scroller -->
+                            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+                                <div class="w-full md:w-auto min-w-0">
+                                    <div class="flex items-center justify-between sm:justify-start gap-2 w-full min-w-0">
+                                        <h1 class="text-lg sm:text-2xl md:text-3xl font-black text-white tracking-tight whitespace-nowrap truncate min-w-0 flex-1" id="dashboard-user-greeting">Welcome Back</h1>
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-[10px] sm:text-xs font-bold whitespace-nowrap shrink-0">
                                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Live Store
                                         </span>
                                     </div>
                                     <p class="text-xs sm:text-sm text-text-secondary mt-0.5" id="dashboard-date">Loading analytics...</p>
                                 </div>
 
-                               <!-- Smart Auto-Centering Carousel with Right Gradient Hint -->
-                                <div class="relative w-full md:w-auto overflow-hidden">
-                                    <div id="dashboard-period-scroller" class="overflow-x-auto no-scrollbar py-1 pr-14 -mr-4 sm:mr-0 sm:pr-0" style="-webkit-overflow-scrolling: touch; scroll-behavior: smooth;">
-                                        <div id="dashboard-period-tabs" class="inline-flex items-center gap-1.5 bg-[#141416] p-1 rounded-2xl border border-white/10 shadow-inner">
-                                            <button data-action="set-dashboard-period" data-period="today" data-label="Today" class="dashboard-period-btn active">Today</button>
-                                            <button data-action="set-dashboard-period" data-period="yesterday" data-label="Yesterday" class="dashboard-period-btn">Yesterday</button>
-                                            <button data-action="set-dashboard-period" data-period="week" data-label="This Week" class="dashboard-period-btn">Week</button>
-                                            <button data-action="set-dashboard-period" data-period="last7" data-label="Last 7 Days" class="dashboard-period-btn">7 Days</button>
-                                            <button data-action="set-dashboard-period" data-period="month" data-label="This Month" class="dashboard-period-btn">This Month</button>
-                                            <button data-action="set-dashboard-period" data-period="last30" data-label="Last 30 Days" class="dashboard-period-btn">30 Days</button>
-                                            <button data-action="set-dashboard-period" data-period="year" data-label="This Year" class="dashboard-period-btn">Year</button>
-                                            <button data-action="set-dashboard-period" data-period="custom" data-label="Custom" class="dashboard-period-btn flex items-center gap-1"><i data-lucide="calendar" class="w-3.5 h-3.5 pointer-events-none"></i> Custom</button>
+                               <!-- Native Smooth Mobile Scroller -->
+                                <div class="w-full md:w-auto min-w-0 relative">
+                                    <div id="dashboard-period-scroller" class="w-full overflow-x-auto no-scrollbar py-1">
+                                        <div id="dashboard-period-tabs" class="inline-flex items-center gap-1.5 bg-[#141416] p-1 rounded-2xl border border-white/10 shadow-inner flex-nowrap" style="width: max-content; min-width: 100%;">
+                                            <button type="button" data-action="set-dashboard-period" data-period="today" data-label="Today" class="dashboard-period-btn active">Today</button>
+                                            <button type="button" data-action="set-dashboard-period" data-period="yesterday" data-label="Yesterday" class="dashboard-period-btn">Yesterday</button>
+                                            <button type="button" data-action="set-dashboard-period" data-period="week" data-label="This Week" class="dashboard-period-btn">Week</button>
+                                            <button type="button" data-action="set-dashboard-period" data-period="last7" data-label="Last 7 Days" class="dashboard-period-btn">7 Days</button>
+                                            <button type="button" data-action="set-dashboard-period" data-period="month" data-label="This Month" class="dashboard-period-btn">This Month</button>
+                                            <button type="button" data-action="set-dashboard-period" data-period="last30" data-label="Last 30 Days" class="dashboard-period-btn">30 Days</button>
+                                            <button type="button" data-action="set-dashboard-period" data-period="year" data-label="This Year" class="dashboard-period-btn">Year</button>
+                                            <button type="button" data-action="set-dashboard-period" data-period="custom" data-label="Custom" class="dashboard-period-btn flex items-center gap-1"><i data-lucide="calendar" class="w-3.5 h-3.5 pointer-events-none"></i> Custom</button>
                                         </div>
                                     </div>
-                                    <!-- Mobile Gradient Hint (Disappears as user scrolls) -->
+                                    <!-- Mobile Right Gradient Hint -->
                                     <div class="sm:hidden absolute right-0 top-0 bottom-0 w-8 pointer-events-none bg-gradient-to-l from-[#0a0a0a] to-transparent flex items-center justify-end pr-0.5 text-text-secondary/40">
-                                        <i data-lucide="chevron-right" class="w-3 h-3"></i>
+                                        <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Custom Date Range Picker (Expands Smoothly When Selected) -->
-                            <div id="dashboard-custom-range" class="hidden flex flex-wrap items-center justify-end gap-2 p-3 bg-[#141416] border border-white/10 rounded-2xl shadow-md">
-                                <label for="dashboard-start-date" class="text-xs text-text-secondary">From:</label>
-                                <input type="date" id="dashboard-start-date" class="form-input text-xs p-1.5 h-9 bg-bg-tertiary rounded-xl border-white/10">
-                                <label for="dashboard-end-date" class="text-xs text-text-secondary">To:</label>
-                                <input type="date" id="dashboard-end-date" class="form-input text-xs p-1.5 h-9 bg-bg-tertiary rounded-xl border-white/10">
-                                <button id="dashboard-apply-range" class="btn btn-primary text-xs py-1.5 px-4 h-9 rounded-xl font-bold">Apply Range</button>
+<!-- Custom Date Range Card (Auto-Collapsing & Mobile Responsive) -->
+                            <div id="dashboard-custom-range" class="hidden p-3.5 sm:p-4 bg-gradient-to-br from-[#18181b] to-[#121214] border border-accent/30 rounded-3xl shadow-2xl space-y-3">
+                                <div class="flex items-center justify-between pb-2 border-b border-white/[0.06]">
+                                    <span class="text-[10px] sm:text-xs font-bold text-accent uppercase tracking-wider flex items-center gap-1.5">
+                                        <i data-lucide="calendar-range" class="w-3.5 h-3.5"></i> Custom Timeline
+                                    </span>
+                                    <button type="button" id="close-custom-range-btn" class="p-1 rounded-lg text-text-secondary hover:text-white bg-white/5 border border-white/10 active:scale-90 transition-all text-xs" title="Dismiss">
+                                        <i data-lucide="x" class="w-3.5 h-3.5 pointer-events-none"></i>
+                                    </button>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-2.5">
+                                    <div>
+                                        <label for="dashboard-start-date" class="block text-[10px] font-bold text-text-secondary uppercase tracking-wider mb-1 flex items-center gap-1">
+                                            <i data-lucide="calendar" class="w-3 h-3 text-accent"></i> From (Start)
+                                        </label>
+                                        <input type="date" id="dashboard-start-date" class="form-input w-full text-xs font-semibold h-11 bg-[#0a0a0a] rounded-xl border border-white/10 text-white px-3 focus:border-accent" style="text-align: left !important; -webkit-appearance: none !important; color-scheme: dark;">
+                                    </div>
+                                    <div>
+                                        <label for="dashboard-end-date" class="block text-[10px] font-bold text-text-secondary uppercase tracking-wider mb-1 flex items-center gap-1">
+                                            <i data-lucide="calendar" class="w-3 h-3 text-red-400"></i> To (End)
+                                        </label>
+                                        <input type="date" id="dashboard-end-date" class="form-input w-full text-xs font-semibold h-11 bg-[#0a0a0a] rounded-xl border border-white/10 text-white px-3 focus:border-accent" style="text-align: left !important; -webkit-appearance: none !important; color-scheme: dark;">
+                                    </div>
+                                </div>
+
+                                <button id="dashboard-apply-range" type="button" class="btn btn-primary w-full h-11 rounded-xl text-xs sm:text-sm font-bold shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2 active:scale-95 transition-all" style="background: linear-gradient(135deg, #007bff 0%, #0056b3 100%) !important; color: #ffffff !important; border: 1px solid rgba(255, 255, 255, 0.2) !important;">
+                                    <i data-lucide="check-circle-2" class="w-4 h-4 pointer-events-none"></i> Apply Custom Range
+                                </button>
                             </div>
 
-                            <!-- Quick Action App Launcher (Fintech Tile Grid) -->
+                            <!-- Quick Action App Launcher -->
                             <div class="grid grid-cols-3 sm:grid-cols-6 gap-2 sm:gap-3">
                                 <button data-action="quick-pos" class="flex flex-col items-center justify-center p-2.5 sm:p-3 bg-gradient-to-b from-[#18181b] to-[#121214] border border-white/10 hover:border-accent rounded-2xl active:scale-95 transition-all group">
                                     <div class="w-10 h-10 rounded-xl bg-blue-500/10 text-accent flex items-center justify-center mb-1.5 group-hover:scale-110 transition-transform">
@@ -6326,7 +6391,7 @@ case "dashboard":
                                 </button>
                             </div>
 
-                            <!-- Main KPI Cards (Responsive 2x2 Bento on Mobile, 4 Cols on Desktop) -->
+                            <!-- Main KPI Cards (Responsive Bento) -->
                             <div id="dashboard-stats-container" class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4"></div>
 
                             <!-- Main Charts & Performance -->
@@ -6415,6 +6480,20 @@ case "dashboard":
                             </div>
                         </div>
                         <style> 
+                            #dashboard-period-scroller {
+                                display: block !important;
+                                width: 100% !important;
+                                max-width: 100% !important;
+                                overflow-x: auto !important;
+                                overflow-y: hidden !important;
+                                -webkit-overflow-scrolling: touch !important;
+                                touch-action: pan-x !important;
+                                scrollbar-width: none !important;
+                                -ms-overflow-style: none !important;
+                            }
+                            #dashboard-period-scroller::-webkit-scrollbar { 
+                                display: none !important; 
+                            }
                             .dashboard-period-btn { 
                                 padding: 6px 14px; 
                                 font-size: 12px; 
@@ -6422,8 +6501,13 @@ case "dashboard":
                                 border-radius: 9999px; 
                                 color: var(--text-secondary); 
                                 transition: all 0.2s ease; 
-                                white-space: nowrap;
-                                border: 1px solid transparent;
+                                white-space: nowrap !important;
+                                border: 1px solid transparent; 
+                                touch-action: pan-x !important;
+                                flex-shrink: 0 !important;
+                                user-select: none !important;
+                                -webkit-user-select: none !important;
+                                cursor: pointer;
                             }
                             .dashboard-period-btn.active { 
                                 background: var(--accent); 
@@ -6435,8 +6519,6 @@ case "dashboard":
                                 background: rgba(255, 255, 255, 0.08); 
                                 color: var(--text-primary);
                             }
-                            .no-scrollbar::-webkit-scrollbar { display: none; }
-                            .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
                         </style>
                     `;
                     case 'pos': {
@@ -8886,7 +8968,7 @@ function initDashboard(pane) {
                     return;
                 }
 
-                // Dynamic User Time-of-Day Greeting
+                // Dynamic User Time-of-Day Greeting (Always Single Line)
                 const user = appState.session.currentUser;
                 const greetingEl = pane.querySelector('#dashboard-user-greeting');
                 if (greetingEl && user) {
@@ -8894,8 +8976,9 @@ function initDashboard(pane) {
                     let timeGreeting = "Good morning";
                     if (hour >= 12 && hour < 17) timeGreeting = "Good afternoon";
                     else if (hour >= 17) timeGreeting = "Good evening";
-                    const firstName = (user.name || 'Store Admin').split(' ')[0];
+                    const firstName = (user.name || 'Admin').trim().split(' ')[0];
                     greetingEl.textContent = `${timeGreeting}, ${firstName}`;
+                    greetingEl.setAttribute('title', `${timeGreeting}, ${user.name || 'Admin'}`);
                 }
 
                 const term = getCurrentProfile().terminology;
@@ -8987,7 +9070,7 @@ function initDashboard(pane) {
                             endDate = todayEnd;
                             prevStartDate = new Date(startDate);
                             prevStartDate.setDate(startDate.getDate() - 1);
-                            prevStartDate.setHours(0,0,0,0);
+                            prevStartDate.setHours(0, 0, 0, 0);
                             prevEndDate = new Date(prevStartDate);
                             prevEndDate.setHours(23, 59, 59, 999);
                             periodLabel = "vs. yesterday";
@@ -9000,15 +9083,15 @@ function initDashboard(pane) {
                     }
 
                     const getMetricsForPeriod = (start, end) => {
-                        const relevantInvoices = firestoreData.invoices.filter(inv => {
+                        const relevantInvoices = (firestoreData.invoices || []).filter(inv => {
                             const invDate = new Date(inv.date);
                             return invDate >= start && invDate <= end && inv.status !== 'Void';
                         });
 
                         const totalRevenue = relevantInvoices.reduce((sum, inv) => {
-                            let val = inv.totalInBaseCurrency;
+                            let val = inv.totalInBaseCurrency || 0;
                             if (inv.isEMI) {
-                                const schedule = firestoreData.emiSchedules.find(s => s.invoiceId === inv.id);
+                                const schedule = (firestoreData.emiSchedules || []).find(s => s.invoiceId === inv.id);
                                 if (schedule) val += (schedule.totalInterest || 0);
                             }
                             return sum + val;
@@ -9028,7 +9111,7 @@ function initDashboard(pane) {
 
                             let interestProfit = 0;
                             if (inv.isEMI) {
-                                const schedule = firestoreData.emiSchedules.find(s => s.invoiceId === inv.id);
+                                const schedule = (firestoreData.emiSchedules || []).find(s => s.invoiceId === inv.id);
                                 if (schedule) interestProfit = schedule.totalInterest || 0;
                             }
                             
@@ -9041,7 +9124,7 @@ function initDashboard(pane) {
                     
                     const currentMetrics = getMetricsForPeriod(startDate, endDate);
                     const previousMetrics = getMetricsForPeriod(prevStartDate, prevEndDate);
-                    const totalReceivables = firestoreData.customers.reduce((sum, c) => sum + (c.currentDue || 0), 0);
+                    const totalReceivables = (firestoreData.customers || []).reduce((sum, c) => sum + (c.currentDue || 0), 0);
 
                     const calculateChange = (current, previous) => {
                         if (previous === 0) return current > 0 ? 100 : 0;
@@ -9074,7 +9157,6 @@ function initDashboard(pane) {
                         stats = stats.filter(s => s.label !== 'Gross Profit');
                     }
 
-                    // Render Modern Bento Cards
                     pane.querySelector('#dashboard-stats-container').innerHTML = stats.map(s => `
                         <div class="p-3.5 sm:p-5 rounded-2xl bg-gradient-to-br from-[#17171a] to-[#101012] border border-white/10 shadow-lg relative overflow-hidden flex flex-col justify-between">
                             <div class="flex items-center justify-between gap-1.5">
@@ -9093,10 +9175,10 @@ function initDashboard(pane) {
                         </div>
                     `).join('');
                     
-                    // Render AI Insights
+                    // AI Insights
                     const insightsContainer = pane.querySelector('#ai-insights-container');
                     if (insightsContainer && (appState.session.userRole === 'admin' || appState.session.userRole === 'manager')) {
-                        const insightNotifications = firestoreData.notifications
+                        const insightNotifications = (firestoreData.notifications || [])
                             .filter(n => ['stock', 'info', 'warning'].includes(n.type))
                             .slice(0, 2);
                         
@@ -9113,20 +9195,18 @@ function initDashboard(pane) {
                         } else {
                             insightsContainer.innerHTML = `<p class="text-xs text-text-secondary p-3 text-center">All operational parameters are balanced.</p>`;
                         }
-                    } else if (insightsContainer) {
-                        insightsContainer.closest('.glass-pane').style.display = 'none';
                     }
 
                     // Top Products List
                     const salesByProduct = {};
-                    firestoreData.invoices
+                    (firestoreData.invoices || [])
                         .filter(inv => new Date(inv.date) >= startDate && inv.status !== 'Void')
                         .forEach(inv => {
                             const items = inv.items || [];
                             const subtotal = inv.subtotalInBaseCurrency || items.reduce((s, i) => s + (i.price * (i.qty || 1)), 0);
                             let totalInterest = 0;
                             if (inv.isEMI) {
-                                const schedule = firestoreData.emiSchedules.find(s => s.invoiceId === inv.id);
+                                const schedule = (firestoreData.emiSchedules || []).find(s => s.invoiceId === inv.id);
                                 if (schedule) totalInterest = schedule.totalInterest || 0;
                             }
 
@@ -9144,7 +9224,7 @@ function initDashboard(pane) {
                     const topProducts = Object.entries(salesByProduct)
                         .sort(([, a], [, b]) => b - a)
                         .slice(0, 3)
-                        .map(([id, revenue]) => ({ product: firestoreData.products.find(p => p.id === id), revenue }));
+                        .map(([id, revenue]) => ({ product: (firestoreData.products || []).find(p => p.id === id), revenue }));
                     
                     pane.querySelector('#top-products-list').innerHTML = topProducts.length ? topProducts.map(item => `
                         <li class="flex items-center justify-between p-2 rounded-xl bg-[#141416] border border-white/5">
@@ -9156,9 +9236,9 @@ function initDashboard(pane) {
                     // Top Customers List
                     const customerSpending = currentMetrics.relevantInvoices.reduce((acc, inv) => {
                         if (inv.customerId) {
-                            let val = inv.totalInBaseCurrency;
+                            let val = inv.totalInBaseCurrency || 0;
                             if (inv.isEMI) {
-                                const schedule = firestoreData.emiSchedules.find(s => s.invoiceId === inv.id);
+                                const schedule = (firestoreData.emiSchedules || []).find(s => s.invoiceId === inv.id);
                                 if (schedule) val += (schedule.totalInterest || 0);
                             }
                             acc[inv.customerId] = (acc[inv.customerId] || 0) + val;
@@ -9170,7 +9250,7 @@ function initDashboard(pane) {
                         .sort(([, a], [, b]) => b - a)
                         .slice(0, 3)
                         .map(([id, total]) => ({
-                            customer: firestoreData.customers.find(c => c.id === id),
+                            customer: (firestoreData.customers || []).find(c => c.id === id),
                             total
                         }));
 
@@ -9182,14 +9262,14 @@ function initDashboard(pane) {
                     `).join('') : `<li><p class="text-xs text-text-secondary text-center py-2">No customer sales.</p></li>`;
 
                     // Low Stock Alert
-                    const lowStockProducts = firestoreData.products
+                    const lowStockProducts = (firestoreData.products || [])
                         .filter(p => p.productType === 'physical' && p.stock > 0 && p.stock < 20)
                         .sort((a,b) => a.stock - b.stock);
 
                     pane.querySelector('#low-stock-list').innerHTML = lowStockProducts.length ? lowStockProducts.map(p => {
                         let productName = p.name;
                         if (p.parentSKU && p.variantOptions) {
-                            const parent = firestoreData.products.find(parent => parent.id === p.parentSKU);
+                            const parent = (firestoreData.products || []).find(parent => parent.id === p.parentSKU);
                             const parentName = parent ? parent.name : p.name;
                             const variantInfo = Object.values(p.variantOptions).join(' / ');
                             productName = `${parentName} (${variantInfo})`;
@@ -9202,7 +9282,7 @@ function initDashboard(pane) {
                         </li>`;
                     }).join('') : `<li><p class="text-xs text-text-secondary text-center py-2">Inventory is well-stocked.</p></li>`;
 
-                    // Middle Pane: Cashier Performance & Recent Activity
+                    // Middle Pane: Staff Sales & Recent Activity
                     const middlePane = pane.querySelector('#dashboard-middle-pane');
                     if (appState.session.userRole === 'admin' || appState.session.userRole === 'manager') {
                         const salesByCashier = currentMetrics.relevantInvoices.reduce((acc, inv) => {
@@ -9258,7 +9338,7 @@ function initDashboard(pane) {
                     }
 
                     // Render Charts
-                    const chartInvoices = firestoreData.invoices.filter(inv => {
+                    const chartInvoices = (firestoreData.invoices || []).filter(inv => {
                         const invDate = new Date(inv.date);
                         return invDate >= startDate && invDate <= endDate && inv.status !== 'Void';
                     });
@@ -9269,9 +9349,9 @@ function initDashboard(pane) {
                         salesData = Array(24).fill(0);
                         chartInvoices.forEach(inv => {
                             const hour = new Date(inv.date).getHours();
-                            let val = inv.totalInBaseCurrency;
+                            let val = inv.totalInBaseCurrency || 0;
                             if (inv.isEMI) {
-                                const schedule = firestoreData.emiSchedules.find(s => s.invoiceId === inv.id);
+                                const schedule = (firestoreData.emiSchedules || []).find(s => s.invoiceId === inv.id);
                                 if (schedule) val += (schedule.totalInterest || 0);
                             }
                             salesData[hour] += val;
@@ -9279,9 +9359,9 @@ function initDashboard(pane) {
                     } else { 
                         const salesByDay = chartInvoices.reduce((acc, inv) => {
                             const day = new Date(inv.date).toLocaleDateString([], { month: 'short', day: 'numeric'});
-                            let val = inv.totalInBaseCurrency;
+                            let val = inv.totalInBaseCurrency || 0;
                             if (inv.isEMI) {
-                                const schedule = firestoreData.emiSchedules.find(s => s.invoiceId === inv.id);
+                                const schedule = (firestoreData.emiSchedules || []).find(s => s.invoiceId === inv.id);
                                 if (schedule) val += (schedule.totalInterest || 0);
                             }
                             acc[day] = (acc[day] || 0) + val;
@@ -9326,7 +9406,7 @@ function initDashboard(pane) {
                                     x: { 
                                         grid: { display: false }, 
                                         ticks: {
-                                            color: '#9ca3af',
+                                            color: '#9ca3af', 
                                             font: { size: 10, family: chartStyles.fontFamily }
                                         } 
                                     } 
@@ -9346,14 +9426,14 @@ function initDashboard(pane) {
                                         } 
                                     } 
                                 } 
-                            }
+                            } 
                         });
                     }
 
                     // Category Chart
                     const categorySales = chartInvoices.flatMap(inv => inv.items || []).reduce((acc, item) => {
-                        const product = firestoreData.products.find(p => p.id === item.id);
-                        if (product) {
+                        const product = (firestoreData.products || []).find(p => p.id === item.id);
+                        if (product && product.category) {
                             acc[product.category] = (acc[product.category] || 0) + (item.price * (item.qty || 1));
                         }
                         return acc;
@@ -9389,7 +9469,7 @@ function initDashboard(pane) {
                                         } 
                                     } 
                                 } 
-                            }
+                            } 
                         });
                     }
 
@@ -9397,9 +9477,9 @@ function initDashboard(pane) {
                     const hourlySalesData = Array(24).fill(0);
                     currentMetrics.relevantInvoices.forEach(inv => {
                         const hour = new Date(inv.date).getHours();
-                        let val = inv.totalInBaseCurrency;
+                        let val = inv.totalInBaseCurrency || 0;
                         if (inv.isEMI) {
-                            const schedule = firestoreData.emiSchedules.find(s => s.invoiceId === inv.id);
+                            const schedule = (firestoreData.emiSchedules || []).find(s => s.invoiceId === inv.id);
                             if (schedule) val += (schedule.totalInterest || 0);
                         }
                         hourlySalesData[hour] += val;
@@ -9467,44 +9547,121 @@ function initDashboard(pane) {
                     lucide.createIcons();
                 };
 
-              // Period Pill Click Handlers with Smooth Auto-Centering on Mobile
-                pane.querySelectorAll('[data-action="set-dashboard-period"]').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        const target = e.currentTarget;
-                        const period = target.dataset.period;
-                        
-                        pane.querySelectorAll('.dashboard-period-btn').forEach(b => b.classList.remove('active'));
-                        target.classList.add('active');
+                // Pure Native Touch Momentum Carousel Handler
+                const periodScroller = pane.querySelector('#dashboard-period-scroller');
+                if (periodScroller) {
+                    let touchStartX = 0;
+                    let touchStartY = 0;
+                    let isHorizontalSwipe = false;
 
-                        // Smoothly centers the selected pill into the mobile viewport
-                        target.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                    periodScroller.addEventListener('touchstart', (e) => {
+                        touchStartX = e.touches[0].clientX;
+                        touchStartY = e.touches[0].clientY;
+                        isHorizontalSwipe = false;
+                    }, { passive: true });
 
-                        const customRangeContainer = pane.querySelector('#dashboard-custom-range');
-                        if (period === 'custom') {
-                            customRangeContainer?.classList.remove('hidden');
-                        } else {
-                            customRangeContainer?.classList.add('hidden');
-                            updateDashboardData(period);
+                    periodScroller.addEventListener('touchmove', (e) => {
+                        const diffX = Math.abs(e.touches[0].clientX - touchStartX);
+                        const diffY = Math.abs(e.touches[0].clientY - touchStartY);
+                        if (diffX > 7 && diffX > diffY) {
+                            isHorizontalSwipe = true;
                         }
+                    }, { passive: true });
+
+                    pane.querySelectorAll('.dashboard-period-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            // If the user was swiping horizontally, do not trigger button selection
+                            if (isHorizontalSwipe) {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                isHorizontalSwipe = false;
+                                return;
+                            }
+                            e.preventDefault();
+                            const target = e.currentTarget;
+                            const period = target.dataset.period;
+                            
+                            pane.querySelectorAll('.dashboard-period-btn').forEach(b => b.classList.remove('active'));
+                            target.classList.add('active');
+                            target.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+
+                           const customRangeContainer = pane.querySelector('#dashboard-custom-range');
+                            const customBtn = pane.querySelector('[data-action="set-dashboard-period"][data-period="custom"]');
+
+                            if (period === 'custom') {
+                                // Toggle drawer if re-clicked while already active
+                                const isCurrentlyVisible = !customRangeContainer?.classList.contains('hidden');
+                                if (isCurrentlyVisible && target.classList.contains('active')) {
+                                    customRangeContainer?.classList.add('hidden');
+                                    return;
+                                }
+
+                                customRangeContainer?.classList.remove('hidden');
+
+                                // Auto-populate default dates if empty
+                                const startInput = pane.querySelector('#dashboard-start-date');
+                                const endInput = pane.querySelector('#dashboard-end-date');
+                                if (startInput && !startInput.value) {
+                                    const startMonth = new Date();
+                                    startMonth.setDate(1);
+                                    startInput.value = startMonth.toISOString().slice(0, 10);
+                                }
+                                if (endInput && !endInput.value) {
+                                    endInput.value = new Date().toISOString().slice(0, 10);
+                                }
+                                lucide.createIcons();
+                            } else {
+                                customRangeContainer?.classList.add('hidden');
+                                // Reset custom button label when switching to preset periods
+                                if (customBtn) {
+                                    customBtn.innerHTML = `<i data-lucide="calendar" class="w-3.5 h-3.5 pointer-events-none"></i> Custom`;
+                                    lucide.createIcons();
+                                }
+                                updateDashboardData(period);
+                            }
+                        });
                     });
-                });
+                }
                 
+                // Apply Range Handler: Updates data and automatically collapses the drawer
                 pane.querySelector('#dashboard-apply-range')?.addEventListener('click', () => {
                     const start = pane.querySelector('#dashboard-start-date').value;
                     const end = pane.querySelector('#dashboard-end-date').value;
+                    const customRangeContainer = pane.querySelector('#dashboard-custom-range');
+                    const customBtn = pane.querySelector('[data-action="set-dashboard-period"][data-period="custom"]');
+
                     if (start && end) {
                         if (new Date(start) > new Date(end)) {
                             showToast('Start date cannot be after the end date.', 'error');
                             return;
                         }
+
+                        // Update Dashboard figures
                         updateDashboardData('custom', { start, end });
+
+                        // 1. Creatively collapse the drawer to eliminate clutter
+                        customRangeContainer?.classList.add('hidden');
+
+                        // 2. Reflect the applied date range inside the Custom button pill
+                        if (customBtn) {
+                            const sDate = new Date(start).toLocaleDateString([], { month: 'short', day: 'numeric' });
+                            const eDate = new Date(end).toLocaleDateString([], { month: 'short', day: 'numeric' });
+                            customBtn.innerHTML = `<i data-lucide="calendar-check" class="w-3.5 h-3.5 pointer-events-none text-emerald-300"></i> ${sDate} – ${eDate}`;
+                            lucide.createIcons();
+                        }
+
+                        showToast('Custom range applied successfully!', 'success');
                     } else {
                         showToast('Please select both a start and end date.', 'error');
                     }
                 });
 
-                // Fully Active Quick Action Hub (Direct Module Calls)
+                // Quick dismiss "X" button on the custom range card
+                pane.querySelector('#close-custom-range-btn')?.addEventListener('click', () => {
+                    pane.querySelector('#dashboard-custom-range')?.classList.add('hidden');
+                });
+
+                // Quick Actions Routing
                 pane.addEventListener('click', e => {
                     const btn = e.target.closest('[data-action]');
                     if (!btn) return;
@@ -9514,8 +9671,15 @@ function initDashboard(pane) {
                         openOrSwitchTab('pos');
                     }
                     if (action === 'quick-scan') {
-                        if (typeof openCameraScanner === 'function') openCameraScanner();
-                        else if (window.openCameraScanner) window.openCameraScanner();
+                        // Open POS Terminal and activate integrated camera
+                        openOrSwitchTab('pos');
+                        setTimeout(() => {
+                            const toggleBtn = document.querySelector('#toggle-scanner-btn');
+                            const wrapper = document.querySelector('#mpos-scanner-wrapper');
+                            if (wrapper && wrapper.classList.contains('mpos-scanner-collapsed')) {
+                                toggleBtn?.click();
+                            }
+                        }, 220);
                     }
                     if (action === 'quick-daybook') {
                         openDaybookModal();

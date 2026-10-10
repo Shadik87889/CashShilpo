@@ -6,25 +6,25 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
-    <title>Download CashShilpo (ক্যাশশিল্প) App | Official Android APK</title>
+    <title>CashShilpo: POS & ERP - Official Android App</title>
     <meta
       name="description"
-      content="Download the official CashShilpo native Android APK. High-speed offline-first POS, cloud inventory, and business management. 100% free and verified secure."
+      content="Download the official CashShilpo native Android APK. Cloud-based POS, real-time inventory, Multi-Store management, Daybook, CRM, and EMI tracking."
     />
     <link
       rel="shortcut icon"
-      href="The Official-Cashsilpo-Fav.png"
+      href="cashshilpo-official-favicon.png"
       type="image/x-icon"
     />
 
-    <!-- Tailwind CSS CDN -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Hind+Siliguri:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Hind+Siliguri:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap"
       rel="stylesheet"
     />
 
@@ -32,401 +32,1581 @@
     <script src="https://unpkg.com/lucide@0.452.0/dist/umd/lucide.js"></script>
 
     <style>
+      :root {
+        --play-green: #00875a;
+        --play-green-glow: #00e676;
+        --bg-main: #131316;
+        --surface-dark: #1b1c21;
+        --surface-elevated: #24262d;
+      }
+
       body {
         font-family: "Plus Jakarta Sans", sans-serif;
-        background-color: #050507;
+        background-color: var(--bg-main);
+        color: #e3e3e3;
+        -webkit-tap-highlight-color: transparent;
       }
+
+      body.lang-bn,
+      body.lang-bn * {
+        font-family: "Hind Siliguri", "Plus Jakarta Sans", sans-serif !important;
+      }
+
       .font-mono-code {
         font-family: "JetBrains Mono", monospace;
       }
-      body.lang-bn,
-      body.lang-bn * {
-        font-family: "Hind Siliguri", sans-serif !important;
+
+      /* Custom scrollbars */
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
       }
 
-      /* Ambient Aurora Mesh Lighting */
-      .ambient-glow-1 {
+      .custom-scrollbar::-webkit-scrollbar {
+        height: 6px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 999px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 999px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: rgba(0, 230, 118, 0.4);
+      }
+
+      /* Play Store Subtle Aurora */
+      .store-aura {
         position: absolute;
-        top: -150px;
+        top: 0;
         left: 50%;
         transform: translateX(-50%);
-        width: 700px;
-        height: 500px;
+        width: 100%;
+        max-width: 1200px;
+        height: 480px;
         background: radial-gradient(
-          circle,
-          rgba(57, 255, 20, 0.12) 0%,
-          rgba(0, 123, 255, 0.08) 50%,
-          transparent 75%
+          circle 600px at 20% 0%,
+          rgba(0, 230, 118, 0.09) 0%,
+          rgba(0, 122, 255, 0.04) 50%,
+          transparent 80%
         );
-        filter: blur(100px);
-        pointer-events: none;
-        z-index: 0;
-      }
-      .ambient-glow-2 {
-        position: absolute;
-        bottom: -100px;
-        right: -100px;
-        width: 500px;
-        height: 500px;
-        background: radial-gradient(
-          circle,
-          rgba(0, 123, 255, 0.1) 0%,
-          transparent 70%
-        );
-        filter: blur(120px);
         pointer-events: none;
         z-index: 0;
       }
 
-      /* Ultra Glassmorphism */
-      .premium-glass {
-        background: rgba(14, 14, 18, 0.65);
-        backdrop-filter: blur(30px);
-        -webkit-backdrop-filter: blur(30px);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        box-shadow: 0 30px 70px -15px rgba(0, 0, 0, 0.8),
-          inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      /* Play Store App Icon Squircle */
+      .app-squircle {
+        border-radius: 26%;
+        box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.8),
+          0 0 0 1px rgba(255, 255, 255, 0.1) inset;
       }
-      .card-elevated {
+
+      /* Play Store Green Button */
+      .play-btn {
+        background: linear-gradient(135deg, #00875a 0%, #00a86b 100%);
+        box-shadow: 0 8px 24px -6px rgba(0, 168, 107, 0.45);
+        transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
+      .play-btn:hover {
+        background: linear-gradient(135deg, #009966 0%, #00c878 100%);
+        box-shadow: 0 12px 30px -4px rgba(0, 200, 120, 0.55);
+        transform: translateY(-1px);
+      }
+      .play-btn:active {
+        transform: scale(0.98);
+      }
+
+      /* Instruction card styling */
+      .guide-card {
         background: linear-gradient(
           180deg,
-          rgba(25, 25, 32, 0.6) 0%,
-          rgba(14, 14, 18, 0.75) 100%
+          rgba(27, 28, 34, 0.9) 0%,
+          rgba(20, 21, 26, 0.9) 100%
         );
-        border: 1px solid rgba(255, 255, 255, 0.07);
-        transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        transition: all 0.3s ease;
       }
-      .card-elevated:hover {
-        border-color: rgba(57, 255, 20, 0.35);
-        transform: translateY(-3px);
-        box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.7);
-      }
-
-      /* Pulsing Laser Ring */
-      @keyframes radar-pulse {
-        0% {
-          transform: scale(0.95);
-          opacity: 0.8;
-        }
-        50% {
-          transform: scale(1.08);
-          opacity: 0.2;
-        }
-        100% {
-          transform: scale(0.95);
-          opacity: 0.8;
-        }
-      }
-      .radar-ring {
-        animation: radar-pulse 3.5s ease-in-out infinite;
+      .guide-card:hover {
+        border-color: rgba(0, 230, 118, 0.3);
+        transform: translateY(-2px);
       }
     </style>
   </head>
+
   <body
-    class="text-white min-h-screen flex flex-col justify-between relative overflow-x-hidden selection:bg-[#39ff14] selection:text-black"
+    class="min-h-screen flex flex-col justify-between relative selection:bg-[#00e676] selection:text-black"
   >
-    <!-- Ambient Background Lighting -->
-    <div class="ambient-glow-1"></div>
-    <div class="ambient-glow-2"></div>
+    <!-- Ambient top glow -->
+    <div class="store-aura"></div>
 
-    <!-- Navigation Bar -->
+    <!-- Play Store Global Header Bar -->
     <header
-      class="container mx-auto px-6 py-6 flex justify-between items-center relative z-20 border-b border-white/[0.06]"
+      class="sticky top-0 z-50 backdrop-blur-xl bg-[#131316]/90 border-b border-white/[0.07]"
     >
-      <a href="home.html" class="flex items-center space-x-3 group">
-        <div class="relative">
-          <div
-            class="absolute -inset-1 bg-[#39ff14]/20 rounded-xl blur-md opacity-0 group-hover:opacity-100 transition-opacity"
-          ></div>
-          <img
-            src="cashshilpo-official-logo.png"
-            alt="CashShilpo Logo"
-            class="w-10 h-10 object-contain relative z-10"
-          />
-        </div>
-        <span class="text-2xl font-black tracking-tight text-white"
-          >Cash<span class="text-[#39ff14]">Shilpo</span>.</span
-        >
-      </a>
+      <div
+        class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4"
+      >
+        <!-- Logo & Store Branding -->
+        <div class="flex items-center gap-6">
+          <a href="home.html" class="flex items-center gap-2.5 group">
+            <div
+              class="w-8 h-8 rounded-lg bg-gradient-to-br from-[#00e676] via-[#00a86b] to-[#006644] p-1.5 flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform"
+            >
+              <i
+                data-lucide="play"
+                class="w-4 h-4 text-black fill-current translate-x-0.5"
+              ></i>
+            </div>
+            <div class="flex flex-col">
+              <span
+                class="text-sm font-extrabold tracking-tight text-white flex items-center gap-1"
+              >
+                Cash<span class="text-[#00e676]">Shilpo</span>
+                <span
+                  class="text-[10px] uppercase tracking-wider font-semibold text-gray-400 bg-white/[0.08] px-1.5 py-0.5 rounded"
+                  >Store</span
+                >
+              </span>
+            </div>
+          </a>
 
-      <div class="flex items-center gap-4">
-        <a
-          href="home.html"
-          class="hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 text-xs font-semibold text-gray-300 hover:text-white transition-all"
-        >
-          <i data-lucide="arrow-left" class="w-4 h-4"></i>
-          <span>Back to Website</span>
-        </a>
-        <a
-          href="workplace"
-          class="px-4 py-2 rounded-xl bg-[#39ff14]/15 hover:bg-[#39ff14]/25 border border-[#39ff14]/30 text-xs font-bold text-[#39ff14] transition-all"
-        >
-          Web Login
-        </a>
+          <!-- Navigation Links -->
+          <nav
+            class="hidden md:flex items-center gap-1 text-sm font-medium text-gray-400"
+          >
+            <span
+              class="px-3 py-1.5 text-white border-b-2 border-[#00e676] font-semibold cursor-pointer"
+              >Apps</span
+            >
+            <a
+              href="workplace"
+              class="px-3 py-1.5 hover:text-white transition-colors"
+              >Web POS</a
+            >
+            <a
+              href="pricing"
+              class="px-3 py-1.5 hover:text-white transition-colors"
+              >Pricing</a
+            >
+            <a
+              href="home.html#features"
+              class="px-3 py-1.5 hover:text-white transition-colors"
+              >Features</a
+            >
+          </nav>
+        </div>
+
+        <!-- Search & Utility Controls -->
+        <div class="flex items-center gap-3">
+          <!-- Play Store Style Search Input -->
+          <div class="relative hidden sm:block w-48 lg:w-64">
+            <i
+              data-lucide="search"
+              class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2"
+            ></i>
+            <input
+              type="text"
+              readonly
+              value="CashShilpo POS & ERP"
+              placeholder="Search apps..."
+              class="w-full bg-[#1e2026] text-xs text-gray-200 pl-9 pr-3 py-2 rounded-full border border-white/10 focus:outline-none cursor-default"
+            />
+          </div>
+
+          <!-- Language Switcher Pill -->
+          <button
+            id="lang-toggle-btn"
+            onclick="toggleLanguage()"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.06] hover:bg-white/[0.1] border border-white/10 text-xs font-semibold text-gray-200 transition-colors"
+            title="Switch Language"
+          >
+            <i data-lucide="globe" class="w-3.5 h-3.5 text-[#00e676]"></i>
+            <span id="lang-toggle-text">বাং</span>
+          </button>
+
+          <!-- Back to Website Link -->
+          <a
+            href="home.html"
+            class="text-xs font-semibold px-3 py-1.5 rounded-full bg-white/[0.05] hover:bg-white/[0.12] text-gray-300 hover:text-white border border-white/10 transition-all flex items-center gap-1.5"
+          >
+            <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+            <span class="hidden sm:inline">Back</span>
+          </a>
+        </div>
       </div>
     </header>
 
     <!-- Main Content Container -->
     <main
-      class="container mx-auto px-4 sm:px-6 py-10 md:py-16 flex flex-col items-center justify-center relative z-10 flex-grow"
+      class="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-10 flex-grow relative z-10 w-full"
     >
-      <!-- Top Trust Tag -->
-      <div
-        class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/[0.03] border border-white/10 backdrop-blur-md text-xs font-medium text-gray-300 mb-8 shadow-xl"
+      <!-- HERO APP CARD (Google Play style) -->
+      <section
+        class="flex flex-col lg:flex-row lg:items-start justify-between gap-8 pb-10 border-b border-white/[0.08]"
       >
-        <span class="w-2 h-2 rounded-full bg-[#39ff14] animate-pulse"></span>
-        <span>Verified v1.0.0 Production Release</span>
-        <span class="text-gray-600">•</span>
-        <span class="text-gray-400 font-mono-code">com.cashshilpo.app</span>
-      </div>
-
-      <!-- Hero Glass Card -->
-      <div
-        class="w-full max-w-2xl premium-glass rounded-[2.5rem] p-6 sm:p-12 shadow-2xl relative overflow-hidden text-center"
-      >
-        <!-- App Icon with Multi-Layer Glow Frame -->
-        <div
-          class="relative mx-auto mb-8 w-28 h-28 flex items-center justify-center"
-        >
+        <!-- Left Column: Icon + Core Metadata -->
+        <div class="flex items-start gap-5 sm:gap-7 flex-1">
+          <!-- Official Squircle App Icon -->
           <div
-            class="radar-ring absolute inset-0 rounded-3xl bg-gradient-to-tr from-[#39ff14]/30 via-blue-500/20 to-transparent blur-xl"
-          ></div>
-          <div
-            class="relative w-full h-full rounded-[1.75rem] bg-[#0c0c10] border-2 border-white/15 p-3 shadow-2xl flex items-center justify-center"
+            class="w-20 h-20 sm:w-28 sm:h-28 lg:w-36 lg:h-36 shrink-0 relative app-squircle bg-[#1a1b22] p-2.5 flex items-center justify-center"
           >
             <img
               src="cashshilpo-official-favicon.png"
-              alt="CashShilpo App Icon"
-              class="w-full h-full object-contain rounded-2xl drop-shadow-[0_8px_20px_rgba(0,0,0,0.8)]"
+              alt="CashShilpo Icon"
+              class="w-full h-full object-contain rounded-[20%] drop-shadow-md"
+              onerror="this.src='The Official-Cashsilpo-Fav.png'"
             />
+            <div
+              class="absolute -bottom-1.5 -right-1.5 bg-[#00875a] text-white p-1 rounded-full shadow-lg border-2 border-[#131316]"
+              title="Verified Official App"
+            >
+              <i data-lucide="badge-check" class="w-4 h-4"></i>
+            </div>
+          </div>
+
+          <!-- App Titles & Developer Info -->
+          <div class="flex-1 min-w-0">
+            <h1
+              class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight leading-tight"
+            >
+              CashShilpo: POS & ERP
+            </h1>
+            <p
+              class="text-sm sm:text-base font-semibold text-[#00e676] hover:underline cursor-pointer mt-1 flex items-center gap-1.5"
+            >
+              <span>CashShilpo Technologies</span>
+              <i
+                data-lucide="shield-check"
+                class="w-3.5 h-3.5 text-[#00e676]"
+              ></i>
+            </p>
+            <div
+              class="flex flex-wrap items-center gap-2 mt-2 text-[11px] sm:text-xs text-gray-400"
+            >
+              <span class="text-gray-300 font-medium">Business</span>
+              <span>•</span>
+              <span class="text-gray-300 font-medium">Point of Sale</span>
+              <span>•</span>
+              <span
+                class="text-emerald-400 bg-emerald-950/60 border border-emerald-500/20 px-2 py-0.5 rounded-full font-semibold"
+                >Real-Time Cloud Sync • 7-Day Free Trial</span
+              >
+            </div>
+
+            <!-- Play Store Metric Chips Strip -->
+            <div
+              class="flex items-center gap-4 sm:gap-6 mt-5 overflow-x-auto no-scrollbar py-1"
+            >
+              <!-- Rating Metric -->
+              <div
+                class="flex flex-col items-center shrink-0 pr-4 sm:pr-6 border-r border-white/10"
+              >
+                <div
+                  class="flex items-center gap-1 text-white font-bold text-sm sm:text-base"
+                >
+                  <span>4.9</span>
+                  <i
+                    data-lucide="star"
+                    class="w-3.5 h-3.5 fill-amber-400 text-amber-400"
+                  ></i>
+                </div>
+                <span class="text-[10px] sm:text-[11px] text-gray-400 mt-0.5"
+                  >1,250 reviews</span
+                >
+              </div>
+
+              <!-- Downloads Metric -->
+              <div
+                class="flex flex-col items-center shrink-0 pr-4 sm:pr-6 border-r border-white/10"
+              >
+                <span class="text-white font-bold text-sm sm:text-base"
+                  >10K+</span
+                >
+                <span class="text-[10px] sm:text-[11px] text-gray-400 mt-0.5"
+                  >Downloads</span
+                >
+              </div>
+
+              <!-- Package Size Metric -->
+              <div
+                class="flex flex-col items-center shrink-0 pr-4 sm:pr-6 border-r border-white/10"
+              >
+                <span class="text-white font-bold text-sm sm:text-base"
+                  >5.5 MB</span
+                >
+                <span class="text-[10px] sm:text-[11px] text-gray-400 mt-0.5"
+                  >Lightweight</span
+                >
+              </div>
+
+              <!-- Content Rating Metric -->
+              <div class="flex flex-col items-center shrink-0">
+                <div
+                  class="px-1.5 py-0.5 border border-white/30 rounded text-[10px] font-bold text-white"
+                >
+                  3+
+                </div>
+                <span class="text-[10px] sm:text-[11px] text-gray-400 mt-0.5"
+                  >Rated for 3+</span
+                >
+              </div>
+            </div>
           </div>
         </div>
 
-        <!-- Headline & Description -->
-        <h1
-          class="text-3xl sm:text-5xl font-black text-white tracking-tight mb-3"
-        >
-          Get CashShilpo App
-        </h1>
-        <p
-          class="text-gray-400 text-sm sm:text-base max-w-lg mx-auto mb-8 font-medium leading-relaxed"
-        >
-          The all-in-one universal POS, inventory engine, and financial command
-          center engineered natively for your phone.
-        </p>
-
-        <!-- Technical Specification Matrix -->
-        <div
-          class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 max-w-xl mx-auto mb-8"
-        >
-          <div
-            class="p-3 rounded-2xl bg-white/[0.03] border border-white/[0.06] text-center"
-          >
-            <p
-              class="text-[10px] text-gray-500 uppercase tracking-wider font-semibold mb-1"
-            >
-              Architecture
-            </p>
-            <p class="text-xs font-bold text-white font-mono-code">
-              Android Native
-            </p>
-          </div>
-          <div
-            class="p-3 rounded-2xl bg-white/[0.03] border border-white/[0.06] text-center"
-          >
-            <p
-              class="text-[10px] text-gray-500 uppercase tracking-wider font-semibold mb-1"
-            >
-              Package Size
-            </p>
-            <p class="text-xs font-bold text-white font-mono-code">5.5 MB</p>
-          </div>
-          <div
-            class="p-3 rounded-2xl bg-white/[0.03] border border-white/[0.06] text-center"
-          >
-            <p
-              class="text-[10px] text-gray-500 uppercase tracking-wider font-semibold mb-1"
-            >
-              Requirements
-            </p>
-            <p class="text-xs font-bold text-white font-mono-code">
-              Android 7.0+
-            </p>
-          </div>
-          <div
-            class="p-3 rounded-2xl bg-white/[0.03] border border-white/[0.06] text-center"
-          >
-            <p
-              class="text-[10px] text-gray-500 uppercase tracking-wider font-semibold mb-1"
-            >
-              Security
-            </p>
-            <p class="text-xs font-bold text-[#39ff14] font-mono-code">
-              Virus-Free
-            </p>
-          </div>
-        </div>
-
-        <!-- PRIMARY DIRECT DOWNLOAD BUTTON -->
-        <div class="space-y-3 mb-10">
+        <!-- Right Column: Clean, Native CTA Button (No JS Interception) -->
+        <div class="flex flex-col gap-3 w-full lg:w-72 shrink-0">
+          <!-- PRIMARY DIRECT DOWNLOAD LINK (Pure HTML, No JavaScript blockage) -->
           <a
-            id="download-apk-btn"
+            id="main-install-btn"
             href="CashShilpo.apk"
             download="CashShilpo.apk"
-            class="group w-full py-4 sm:py-5 px-8 bg-gradient-to-r from-blue-600 via-indigo-600 to-[#39ff14]/80 hover:from-blue-500 hover:to-[#39ff14] text-white font-black text-base sm:text-lg rounded-2xl shadow-[0_10px_35px_rgba(0,123,255,0.35)] flex items-center justify-center gap-3.5 transition-all duration-300 transform active:scale-95 border border-white/20 cursor-pointer"
+            class="play-btn w-full py-4 px-6 rounded-2xl text-black font-extrabold text-sm sm:text-base flex items-center justify-center gap-2.5 transition-all cursor-pointer select-none"
           >
-            <i
-              data-lucide="arrow-down-to-line"
-              class="w-6 h-6 group-hover:-translate-y-0.5 transition-transform"
-            ></i>
-            <span>Download Official APK (5.5 MB)</span>
+            <i data-lucide="arrow-down-to-line" class="w-5 h-5 text-black"></i>
+            <span>Install Official APK (5.5 MB)</span>
           </a>
-          <p
-            class="text-xs text-gray-500 flex items-center justify-center gap-1.5"
+
+          <!-- Secondary Actions Row: QR Code & Hotline -->
+          <div class="grid grid-cols-2 gap-2">
+            <button
+              onclick="openQrModal()"
+              class="py-2.5 px-3 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 text-xs font-semibold text-gray-300 hover:text-white flex items-center justify-center gap-2 transition-colors"
+            >
+              <i data-lucide="qr-code" class="w-4 h-4 text-[#00e676]"></i>
+              <span>Scan QR</span>
+            </button>
+
+            <a
+              href="tel:01805716566"
+              class="py-2.5 px-3 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 text-xs font-semibold text-gray-300 hover:text-white flex items-center justify-center gap-2 transition-colors"
+            >
+              <i data-lucide="phone-call" class="w-4 h-4 text-blue-400"></i>
+              <span>01805716566</span>
+            </a>
+          </div>
+
+          <!-- Compatibility Statement -->
+          <div
+            class="pt-1 flex items-center gap-2 text-xs text-gray-400 justify-center lg:justify-start"
           >
-            <i data-lucide="shield-check" class="w-4 h-4 text-green-400"></i>
-            <span>Direct installer • No Play Store registration needed</span>
-          </p>
+            <i data-lucide="shield-check" class="w-4 h-4 text-[#00e676]"></i>
+            <span class="text-[11px]">Direct Installer • 100% Virus-Free</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- TOP-NOTCH 3-STEP APK INSTALLATION GUIDE (INLINE BEST UX) -->
+      <!-- ============================================================== -->
+      <section class="py-8 border-b border-white/[0.08]">
+        <div class="flex items-center justify-between mb-5">
+          <div class="flex items-center gap-2.5">
+            <div
+              class="w-7 h-7 rounded-lg bg-[#00e676]/15 border border-[#00e676]/30 flex items-center justify-center text-[#00e676]"
+            >
+              <i data-lucide="check-circle" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <h2
+                class="text-base sm:text-lg font-bold text-white tracking-tight"
+              >
+                3 Steps to Install on Phone
+              </h2>
+              <p class="text-[11px] text-gray-400">
+                Takes less than 15 seconds • No Play Store login required
+              </p>
+            </div>
+          </div>
+          <span
+            class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-[11px] font-mono-code text-emerald-400"
+          >
+            <i data-lucide="shield" class="w-3.5 h-3.5"></i> Verified APK
+          </span>
         </div>
 
-        <!-- Android 3-Step Clean Install Walkthrough -->
-        <div class="border-t border-white/[0.08] pt-8 text-left">
-          <div class="flex items-center justify-between mb-4">
-            <h2
-              class="text-xs uppercase tracking-widest font-bold text-gray-400 flex items-center gap-2"
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Step 1 -->
+          <div
+            class="guide-card rounded-2xl p-5 relative overflow-hidden flex flex-col justify-between"
+          >
+            <div
+              class="absolute top-0 right-0 w-24 h-24 bg-blue-500/5 rounded-bl-full pointer-events-none"
+            ></div>
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span
+                  class="w-8 h-8 rounded-xl bg-blue-600/20 border border-blue-500/30 text-blue-400 font-mono-code font-bold text-sm flex items-center justify-center"
+                >
+                  1
+                </span>
+                <span
+                  class="text-[10px] uppercase font-bold text-blue-400/80 bg-blue-500/10 px-2 py-0.5 rounded"
+                  >Download</span
+                >
+              </div>
+              <h3 class="text-sm font-bold text-white mb-1.5">
+                Tap Install APK
+              </h3>
+              <p class="text-xs text-gray-400 leading-relaxed">
+                When Chrome shows
+                <strong class="text-gray-300">"File might be harmful"</strong>,
+                tap <strong class="text-emerald-400">"Download anyway"</strong>.
+              </p>
+            </div>
+            <div
+              class="mt-4 pt-3 border-t border-white/5 text-[11px] text-gray-500 flex items-center gap-1"
             >
               <i
-                data-lucide="check-circle-2"
-                class="w-4 h-4 text-[#39ff14]"
+                data-lucide="info"
+                class="w-3.5 h-3.5 text-blue-400 shrink-0"
               ></i>
-              3 Steps to Install on Phone:
-            </h2>
-            <span class="text-[11px] font-mono-code text-gray-500"
-              >Takes 15 seconds</span
-            >
-          </div>
-
-          <div class="grid grid-cols-1 gap-2.5">
-            <div
-              class="card-elevated p-3.5 rounded-2xl flex items-start gap-3.5"
-            >
-              <span
-                class="w-7 h-7 rounded-xl bg-blue-600/20 border border-blue-500/30 text-blue-400 font-bold flex items-center justify-center shrink-0 text-xs font-mono-code"
-                >1</span
-              >
-              <div>
-                <p class="font-bold text-white text-xs sm:text-sm">
-                  Tap Download APK
-                </p>
-                <p class="text-gray-400 text-xs mt-0.5 leading-relaxed">
-                  When Chrome prompts
-                  <span class="text-gray-300">"File might be harmful"</span>,
-                  tap
-                  <strong class="text-white">"Download anyway"</strong> (this is
-                  Google's standard alert for apps downloaded outside Play
-                  Store).
-                </p>
-              </div>
-            </div>
-
-            <div
-              class="card-elevated p-3.5 rounded-2xl flex items-start gap-3.5"
-            >
-              <span
-                class="w-7 h-7 rounded-xl bg-blue-600/20 border border-blue-500/30 text-blue-400 font-bold flex items-center justify-center shrink-0 text-xs font-mono-code"
-                >2</span
-              >
-              <div>
-                <p class="font-bold text-white text-xs sm:text-sm">Open File</p>
-                <p class="text-gray-400 text-xs mt-0.5 leading-relaxed">
-                  Once finished, tap
-                  <strong class="text-white">Open</strong> from your
-                  notification tray or Chrome Downloads list.
-                </p>
-              </div>
-            </div>
-
-            <div
-              class="card-elevated p-3.5 rounded-2xl flex items-start gap-3.5"
-            >
-              <span
-                class="w-7 h-7 rounded-xl bg-blue-600/20 border border-blue-500/30 text-blue-400 font-bold flex items-center justify-center shrink-0 text-xs font-mono-code"
-                >3</span
-              >
-              <div>
-                <p class="font-bold text-white text-xs sm:text-sm">
-                  Install & Launch
-                </p>
-                <p class="text-gray-400 text-xs mt-0.5 leading-relaxed">
-                  Tap <strong class="text-white">Install</strong>. The gold
-                  CashShilpo logo will appear in your App Drawer and run in
-                  complete fullscreen mode.
-                </p>
-              </div>
+              <span>Google's standard alert for APKs</span>
             </div>
           </div>
-        </div>
 
-        <!-- iPhone / iOS Collapsible Info Card -->
-        <div class="mt-6 pt-6 border-t border-white/[0.08] text-left">
+          <!-- Step 2 -->
           <div
-            class="bg-gradient-to-r from-blue-950/40 to-black border border-blue-500/20 rounded-2xl p-4 flex items-start gap-3.5"
+            class="guide-card rounded-2xl p-5 relative overflow-hidden flex flex-col justify-between"
           >
             <div
-              class="w-8 h-8 rounded-xl bg-blue-500/10 border border-blue-400/20 flex items-center justify-center text-blue-400 shrink-0 mt-0.5"
-            >
-              <i data-lucide="apple" class="w-4 h-4"></i>
+              class="absolute top-0 right-0 w-24 h-24 bg-[#00e676]/5 rounded-bl-full pointer-events-none"
+            ></div>
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span
+                  class="w-8 h-8 rounded-xl bg-[#00e676]/20 border border-[#00e676]/30 text-[#00e676] font-mono-code font-bold text-sm flex items-center justify-center"
+                >
+                  2
+                </span>
+                <span
+                  class="text-[10px] uppercase font-bold text-emerald-400/80 bg-emerald-500/10 px-2 py-0.5 rounded"
+                  >Open File</span
+                >
+              </div>
+              <h3 class="text-sm font-bold text-white mb-1.5">
+                Open CashShilpo.apk
+              </h3>
+              <p class="text-xs text-gray-400 leading-relaxed">
+                Once downloaded, tap
+                <strong class="text-white">"Open"</strong> from your phone's
+                notification bar or Chrome's Downloads list.
+              </p>
             </div>
-            <div class="text-xs text-blue-200">
-              <p class="font-bold text-white mb-0.5">
-                Using an Apple iPhone (iOS)?
+            <div
+              class="mt-4 pt-3 border-t border-white/5 text-[11px] text-gray-500 flex items-center gap-1"
+            >
+              <i
+                data-lucide="file-check"
+                class="w-3.5 h-3.5 text-[#00e676] shrink-0"
+              ></i>
+              <span>File size: 5.5 MB</span>
+            </div>
+          </div>
+
+          <!-- Step 3 -->
+          <div
+            class="guide-card rounded-2xl p-5 relative overflow-hidden flex flex-col justify-between"
+          >
+            <div
+              class="absolute top-0 right-0 w-24 h-24 bg-purple-500/5 rounded-bl-full pointer-events-none"
+            ></div>
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span
+                  class="w-8 h-8 rounded-xl bg-purple-600/20 border border-purple-500/30 text-purple-400 font-mono-code font-bold text-sm flex items-center justify-center"
+                >
+                  3
+                </span>
+                <span
+                  class="text-[10px] uppercase font-bold text-purple-400/80 bg-purple-500/10 px-2 py-0.5 rounded"
+                  >Launch</span
+                >
+              </div>
+              <h3 class="text-sm font-bold text-white mb-1.5">
+                Install & Launch
+              </h3>
+              <p class="text-xs text-gray-400 leading-relaxed">
+                Tap <strong class="text-white">"Install"</strong> (if prompted,
+                turn on "Allow from this source"). The app runs in complete
+                fullscreen!
               </p>
-              <p class="leading-relaxed text-gray-400">
-                Apple restricts direct `.apk` downloads. To get the full app on
-                iPhone: open
-                <strong class="text-white">cashshilpo.com</strong> in Safari,
-                tap the <strong class="text-white">Share</strong> button (<span
-                  class="text-sm"
-                  >⎋</span
-                >), and select
-                <strong class="text-white">"Add to Home Screen"</strong>.
+            </div>
+            <div
+              class="mt-4 pt-3 border-t border-white/5 text-[11px] text-gray-500 flex items-center gap-1"
+            >
+              <i
+                data-lucide="sparkles"
+                class="w-3.5 h-3.5 text-purple-400 shrink-0"
+              ></i>
+              <span>Full-screen POS experience</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- DEVICE PREVIEWS / APP SCREENSHOTS CAROUSEL -->
+      <section class="py-8 border-b border-white/[0.08]">
+        <div class="flex items-center justify-between mb-4">
+          <h2
+            class="text-lg sm:text-xl font-bold text-white tracking-tight flex items-center gap-2"
+          >
+            <span>App Preview & Key Highlights</span>
+          </h2>
+          <!-- Desktop Scroll Controls -->
+          <div class="hidden sm:flex items-center gap-2">
+            <button
+              onclick="scrollCarousel(-1)"
+              class="w-8 h-8 rounded-full bg-white/[0.05] hover:bg-white/[0.12] border border-white/10 flex items-center justify-center text-gray-300 transition-colors"
+              aria-label="Previous Preview"
+            >
+              <i data-lucide="chevron-left" class="w-4 h-4"></i>
+            </button>
+            <button
+              onclick="scrollCarousel(1)"
+              class="w-8 h-8 rounded-full bg-white/[0.05] hover:bg-white/[0.12] border border-white/10 flex items-center justify-center text-gray-300 transition-colors"
+              aria-label="Next Preview"
+            >
+              <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Horizontal Scrollable Container -->
+        <div
+          id="screenshots-track"
+          class="flex items-stretch gap-4 sm:gap-6 overflow-x-auto custom-scrollbar pb-4 pt-1 snap-x snap-mandatory"
+        >
+          <!-- Screenshot 1: POS Terminal & Split Payments -->
+          <div
+            class="shrink-0 w-64 sm:w-72 bg-[#1b1c22] border border-white/10 rounded-2xl p-4 flex flex-col justify-between snap-start shadow-xl"
+          >
+            <div>
+              <div
+                class="flex items-center justify-between pb-3 border-b border-white/5 text-[11px] font-semibold text-[#00e676]"
+              >
+                <span class="flex items-center gap-1.5"
+                  ><i data-lucide="zap" class="w-3.5 h-3.5"></i> Blazingly Fast
+                  POS</span
+                >
+                <span class="bg-[#00e676]/10 px-2 py-0.5 rounded text-[10px]"
+                  >Cloud Live</span
+                >
+              </div>
+              <div
+                class="my-4 bg-[#111216] rounded-xl p-3 border border-white/5 space-y-2"
+              >
+                <div class="flex justify-between items-center text-xs">
+                  <span class="text-gray-300 font-bold"
+                    >Denim Jacket (Blue / L)</span
+                  >
+                  <span class="text-white font-mono-code font-bold"
+                    >৳ 2,450</span
+                  >
+                </div>
+                <div class="flex justify-between items-center text-xs">
+                  <span class="text-gray-300 font-bold"
+                    >Casual Polo Shirt x 2</span
+                  >
+                  <span class="text-white font-mono-code font-bold"
+                    >৳ 1,300</span
+                  >
+                </div>
+                <div
+                  class="flex justify-between items-center text-xs text-gray-400"
+                >
+                  <span>Split: Cash + bKash</span>
+                  <span class="text-[#00e676] font-mono-code">Split Paid</span>
+                </div>
+                <div
+                  class="pt-2 border-t border-white/10 flex justify-between items-center text-sm font-extrabold text-white"
+                >
+                  <span>Grand Total</span>
+                  <span class="text-[#00e676] font-mono-code">৳ 3,750</span>
+                </div>
+              </div>
+            </div>
+            <div>
+              <p class="text-xs font-bold text-white">
+                POS Terminal & Split Payments
               </p>
+              <p class="text-[11px] text-gray-400 mt-0.5 leading-relaxed">
+                Lightning fast checkout with cart management, barcode scanning,
+                and multi-payment methods.
+              </p>
+            </div>
+          </div>
+
+          <!-- Screenshot 2: Real-time Cloud Inventory -->
+          <div
+            class="shrink-0 w-64 sm:w-72 bg-[#1b1c22] border border-white/10 rounded-2xl p-4 flex flex-col justify-between snap-start shadow-xl"
+          >
+            <div>
+              <div
+                class="flex items-center justify-between pb-3 border-b border-white/5 text-[11px] font-semibold text-blue-400"
+              >
+                <span class="flex items-center gap-1.5"
+                  ><i data-lucide="cloud" class="w-3.5 h-3.5"></i> Cloud
+                  Inventory</span
+                >
+                <span class="bg-blue-500/10 px-2 py-0.5 rounded text-[10px]"
+                  >Real-Time</span
+                >
+              </div>
+              <div
+                class="my-4 bg-[#111216] rounded-xl p-3 border border-white/5 space-y-2"
+              >
+                <div class="flex justify-between items-center text-xs">
+                  <span class="text-gray-300">Miniket Rice 25kg</span>
+                  <span class="text-emerald-400 font-mono-code font-bold"
+                    >142 In Stock</span
+                  >
+                </div>
+                <div class="flex justify-between items-center text-xs">
+                  <span class="text-gray-300">Soyabean Oil 5L</span>
+                  <span class="text-amber-400 font-mono-code font-bold"
+                    >5 Low Stock</span
+                  >
+                </div>
+                <div
+                  class="bg-blue-500/10 text-blue-300 text-[10px] p-1.5 rounded text-center font-medium mt-1"
+                >
+                  Color, Size & Brand Variants Tracked
+                </div>
+              </div>
+            </div>
+            <div>
+              <p class="text-xs font-bold text-white">
+                Live Stock & Low-Stock Alerts
+              </p>
+              <p class="text-[11px] text-gray-400 mt-0.5 leading-relaxed">
+                Prevent stockouts with automated cloud inventory tracking,
+                serial numbers, and barcode generator.
+              </p>
+            </div>
+          </div>
+
+          <!-- Screenshot 3: Daybook & Daily Profit Analytics -->
+          <div
+            class="shrink-0 w-64 sm:w-72 bg-[#1b1c22] border border-white/10 rounded-2xl p-4 flex flex-col justify-between snap-start shadow-xl"
+          >
+            <div>
+              <div
+                class="flex items-center justify-between pb-3 border-b border-white/5 text-[11px] font-semibold text-emerald-400"
+              >
+                <span class="flex items-center gap-1.5"
+                  ><i data-lucide="book" class="w-3.5 h-3.5"></i> Daybook &
+                  Profit</span
+                >
+                <span class="bg-emerald-500/10 px-2 py-0.5 rounded text-[10px]"
+                  >Live Audit</span
+                >
+              </div>
+              <div
+                class="my-4 bg-[#111216] rounded-xl p-3 border border-white/5 flex flex-col justify-center items-center py-4"
+              >
+                <span class="text-[11px] text-gray-400 uppercase font-semibold"
+                  >Today's Net Profit</span
+                >
+                <span
+                  class="text-2xl font-mono-code font-extrabold text-[#00e676] mt-1"
+                  >৳ 16,450</span
+                >
+                <span
+                  class="text-[10px] text-gray-400 mt-1 flex items-center gap-1"
+                >
+                  <i
+                    data-lucide="trending-up"
+                    class="w-3 h-3 text-[#00e676]"
+                  ></i>
+                  Cash Flow Balanced in Daybook
+                </span>
+              </div>
+            </div>
+            <div>
+              <p class="text-xs font-bold text-white">
+                Daybook & Profit Analytics
+              </p>
+              <p class="text-[11px] text-gray-400 mt-0.5 leading-relaxed">
+                Daily summary of all sales, business expenses, and cash in hand
+                in one central overview.
+              </p>
+            </div>
+          </div>
+
+          <!-- Screenshot 4: Advanced EMI & Customer Due Book (CRM) -->
+          <div
+            class="shrink-0 w-64 sm:w-72 bg-[#1b1c22] border border-white/10 rounded-2xl p-4 flex flex-col justify-between snap-start shadow-xl"
+          >
+            <div>
+              <div
+                class="flex items-center justify-between pb-3 border-b border-white/5 text-[11px] font-semibold text-amber-400"
+              >
+                <span class="flex items-center gap-1.5"
+                  ><i data-lucide="calendar-clock" class="w-3.5 h-3.5"></i> EMI
+                  & Due Book</span
+                >
+                <span class="bg-amber-500/10 px-2 py-0.5 rounded text-[10px]"
+                  >কিস্তির হিসাব</span
+                >
+              </div>
+              <div
+                class="my-4 bg-[#111216] rounded-xl p-3 border border-white/5 space-y-2"
+              >
+                <div class="flex justify-between items-center text-xs">
+                  <span class="text-gray-300"
+                    >Kamal Hossain (Installment 3/6)</span
+                  >
+                  <span class="text-[#00e676] font-mono-code font-bold"
+                    >Paid ৳ 4,000</span
+                  >
+                </div>
+                <div class="flex justify-between items-center text-xs">
+                  <span class="text-gray-300">Anwarul Islam (Due Balance)</span>
+                  <span class="text-rose-400 font-mono-code font-bold"
+                    >Due ৳ 1,850</span
+                  >
+                </div>
+                <div
+                  class="bg-amber-400/10 text-amber-300 text-[10px] p-1.5 rounded text-center font-medium mt-1"
+                >
+                  1-Tap WhatsApp Payment Reminder
+                </div>
+              </div>
+            </div>
+            <div>
+              <p class="text-xs font-bold text-white">
+                Advanced EMI & Customer CRM
+              </p>
+              <p class="text-[11px] text-gray-400 mt-0.5 leading-relaxed">
+                Offer flexible installment plans to customers, manage credit
+                limits, and track due balances effortlessly.
+              </p>
+            </div>
+          </div>
+
+          <!-- Screenshot 5: Multi-Store & Thermal Receipts -->
+          <div
+            class="shrink-0 w-64 sm:w-72 bg-[#1b1c22] border border-white/10 rounded-2xl p-4 flex flex-col justify-between snap-start shadow-xl"
+          >
+            <div>
+              <div
+                class="flex items-center justify-between pb-3 border-b border-white/5 text-[11px] font-semibold text-purple-400"
+              >
+                <span class="flex items-center gap-1.5"
+                  ><i data-lucide="store" class="w-3.5 h-3.5"></i> Multi-Store &
+                  Print</span
+                >
+                <span class="bg-purple-500/10 px-2 py-0.5 rounded text-[10px]"
+                  >58mm / 80mm</span
+                >
+              </div>
+              <div
+                class="my-4 bg-white/[0.04] rounded-xl p-3 border border-white/5 font-mono-code text-[10px] text-gray-300"
+              >
+                <div
+                  class="text-center font-bold text-white text-xs border-b border-dashed border-gray-600 pb-1"
+                >
+                  CASHSHILPO OUTLET #02 (DHAKA)
+                </div>
+                <div class="py-1 text-gray-400 text-center">
+                  Inv: #CS-9941 • POS Terminal
+                </div>
+                <div
+                  class="border-b border-dashed border-gray-600 pb-1 flex justify-between"
+                >
+                  <span>3 Items Total</span>
+                  <span>৳ 2,750</span>
+                </div>
+                <div
+                  class="text-center text-[9px] text-[#00e676] pt-1 font-sans"
+                >
+                  ✓ English & বাংলা Thermal Printing
+                </div>
+              </div>
+            </div>
+            <div>
+              <p class="text-xs font-bold text-white">
+                Multi-Store & Thermal Invoicing
+              </p>
+              <p class="text-[11px] text-gray-400 mt-0.5 leading-relaxed">
+                Manage multiple branches from one login and print bills via
+                Bluetooth/USB printers.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TWO-COLUMN LAYOUT: ABOUT THIS APP + SPECS & PLANS -->
+      <section
+        class="py-8 grid grid-cols-1 lg:grid-cols-3 gap-10 border-b border-white/[0.08]"
+      >
+        <!-- Left 2 Cols: About This App, Feature Breakdown & What's New -->
+        <div class="lg:col-span-2 space-y-8">
+          <!-- About This App Header -->
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <h2
+                class="text-lg sm:text-xl font-bold text-white tracking-tight flex items-center gap-2"
+              >
+                <span>About this app</span>
+                <i data-lucide="arrow-right" class="w-4 h-4 text-gray-400"></i>
+              </h2>
+            </div>
+            <p class="text-sm text-gray-300 leading-relaxed font-normal">
+              CashShilpo is a complete cloud-based POS, inventory, billing, and
+              complete ERP management software customized for businesses in
+              Bangladesh. Empowering retail shops, superstores, pharmacies,
+              fashion outlets, wholesalers, and electronics stores to automate
+              sales, track stock in real time, manage customer credit, and run
+              multi-store operations.
+            </p>
+
+            <!-- Categorical Tag Pills -->
+            <div class="flex flex-wrap gap-2 mt-4">
+              <span
+                class="px-3 py-1 bg-white/[0.05] border border-white/10 rounded-full text-xs text-gray-300 font-medium"
+                >#CloudPOS</span
+              >
+              <span
+                class="px-3 py-1 bg-white/[0.05] border border-white/10 rounded-full text-xs text-gray-300 font-medium"
+                >#InventoryManagement</span
+              >
+              <span
+                class="px-3 py-1 bg-white/[0.05] border border-white/10 rounded-full text-xs text-gray-300 font-medium"
+                >#MultiStore</span
+              >
+              <span
+                class="px-3 py-1 bg-white/[0.05] border border-white/10 rounded-full text-xs text-gray-300 font-medium"
+                >#Daybook</span
+              >
+              <span
+                class="px-3 py-1 bg-white/[0.05] border border-white/10 rounded-full text-xs text-gray-300 font-medium"
+                >#EMISystem</span
+              >
+              <span
+                class="px-3 py-1 bg-white/[0.05] border border-white/10 rounded-full text-xs text-gray-300 font-medium"
+                >#CustomerCRM</span
+              >
+              <span
+                class="px-3 py-1 bg-white/[0.05] border border-white/10 rounded-full text-xs text-gray-300 font-medium"
+                >#BarcodeGenerator</span
+              >
+            </div>
+          </div>
+
+          <!-- Feature Breakdown Grid -->
+          <div
+            class="bg-[#1b1c22] rounded-2xl p-5 sm:p-6 border border-white/10"
+          >
+            <h3
+              class="text-sm font-bold text-white uppercase tracking-wider text-gray-400 mb-4 flex items-center gap-2"
+            >
+              <i data-lucide="layers" class="w-4 h-4 text-[#00e676]"></i>
+              <span>Core Features Included in CashShilpo</span>
+            </h3>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+              <div
+                class="p-3 rounded-xl bg-white/[0.02] border border-white/5 space-y-1"
+              >
+                <p
+                  class="font-bold text-white flex items-center gap-1.5 text-xs"
+                >
+                  <i
+                    data-lucide="monitor"
+                    class="w-3.5 h-3.5 text-[#00e676]"
+                  ></i>
+                  <span>POS Terminal</span>
+                </p>
+                <p class="text-gray-400 text-[11px] leading-relaxed">
+                  A blazingly fast checkout system with cart management and
+                  split payments.
+                </p>
+              </div>
+
+              <div
+                class="p-3 rounded-xl bg-white/[0.02] border border-white/5 space-y-1"
+              >
+                <p
+                  class="font-bold text-white flex items-center gap-1.5 text-xs"
+                >
+                  <i data-lucide="boxes" class="w-3.5 h-3.5 text-blue-400"></i>
+                  <span>Inventory Management</span>
+                </p>
+                <p class="text-gray-400 text-[11px] leading-relaxed">
+                  Real-time stock tracking, variant management
+                  (Color/Size/Brand), and low-stock alerts.
+                </p>
+              </div>
+
+              <div
+                class="p-3 rounded-xl bg-white/[0.02] border border-white/5 space-y-1"
+              >
+                <p
+                  class="font-bold text-white flex items-center gap-1.5 text-xs"
+                >
+                  <i data-lucide="users" class="w-3.5 h-3.5 text-amber-400"></i>
+                  <span>Customer Management (CRM)</span>
+                </p>
+                <p class="text-gray-400 text-[11px] leading-relaxed">
+                  Build customer profiles, track purchase history, manage
+                  credit, and handle due payments.
+                </p>
+              </div>
+
+              <div
+                class="p-3 rounded-xl bg-white/[0.02] border border-white/5 space-y-1"
+              >
+                <p
+                  class="font-bold text-white flex items-center gap-1.5 text-xs"
+                >
+                  <i
+                    data-lucide="calendar-check"
+                    class="w-3.5 h-3.5 text-purple-400"
+                  ></i>
+                  <span>Advanced EMI System</span>
+                </p>
+                <p class="text-gray-400 text-[11px] leading-relaxed">
+                  Offer flexible installment plans to customers and track EMI
+                  payments automatically.
+                </p>
+              </div>
+
+              <div
+                class="p-3 rounded-xl bg-white/[0.02] border border-white/5 space-y-1"
+              >
+                <p
+                  class="font-bold text-white flex items-center gap-1.5 text-xs"
+                >
+                  <i
+                    data-lucide="book-open"
+                    class="w-3.5 h-3.5 text-emerald-400"
+                  ></i>
+                  <span>Daybook</span>
+                </p>
+                <p class="text-gray-400 text-[11px] leading-relaxed">
+                  View a daily summary of all sales, expenses, and cash flow in
+                  one place.
+                </p>
+              </div>
+
+              <div
+                class="p-3 rounded-xl bg-white/[0.02] border border-white/5 space-y-1"
+              >
+                <p
+                  class="font-bold text-white flex items-center gap-1.5 text-xs"
+                >
+                  <i data-lucide="store" class="w-3.5 h-3.5 text-rose-400"></i>
+                  <span>Multi-Store Management</span>
+                </p>
+                <p class="text-gray-400 text-[11px] leading-relaxed">
+                  Manage multiple store locations, staff, and inventory from a
+                  single admin account.
+                </p>
+              </div>
+
+              <div
+                class="p-3 rounded-xl bg-white/[0.02] border border-white/5 space-y-1"
+              >
+                <p
+                  class="font-bold text-white flex items-center gap-1.5 text-xs"
+                >
+                  <i
+                    data-lucide="barcode"
+                    class="w-3.5 h-3.5 text-teal-400"
+                  ></i>
+                  <span>Barcode Generator</span>
+                </p>
+                <p class="text-gray-400 text-[11px] leading-relaxed">
+                  Create and print custom barcode labels for your products
+                  individually or in bulk.
+                </p>
+              </div>
+
+              <div
+                class="p-3 rounded-xl bg-white/[0.02] border border-white/5 space-y-1"
+              >
+                <p
+                  class="font-bold text-white flex items-center gap-1.5 text-xs"
+                >
+                  <i
+                    data-lucide="file-text"
+                    class="w-3.5 h-3.5 text-indigo-400"
+                  ></i>
+                  <span>Purchase Orders & Supplier CRM</span>
+                </p>
+                <p class="text-gray-400 text-[11px] leading-relaxed">
+                  Create purchase orders (PO), restock inventory, and track
+                  supplier databases.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- What's New Box -->
+          <div class="bg-[#1b1c22] rounded-2xl p-5 border border-white/10">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                <i data-lucide="sparkles" class="w-4 h-4 text-[#00e676]"></i>
+                <span>What's new in v2.0 Production Release</span>
+              </h3>
+              <span class="text-xs text-gray-500 font-mono-code">2026</span>
+            </div>
+            <ul
+              class="text-xs text-gray-300 space-y-1.5 list-disc list-inside leading-relaxed"
+            >
+              <li>
+                Instant real-time cloud data synchronization across all
+                registered devices.
+              </li>
+              <li>
+                Added Advanced EMI System for easy installment scheduling and
+                customer reminders.
+              </li>
+              <li>
+                Daybook integration for instant cash drawer balancing and daily
+                audit.
+              </li>
+              <li>
+                Multi-store inventory transfers with single master account
+                control.
+              </li>
+              <li>
+                Enhanced Bluetooth & USB thermal printer drivers (58mm/80mm)
+                with বাংলা fonts.
+              </li>
+            </ul>
+          </div>
+
+          <!-- Play Store Data Safety Block -->
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <h2
+                class="text-lg font-bold text-white tracking-tight flex items-center gap-2"
+              >
+                <span>Data safety</span>
+                <i data-lucide="arrow-right" class="w-4 h-4 text-gray-400"></i>
+              </h2>
+            </div>
+            <p class="text-xs text-gray-400 mb-4 leading-relaxed">
+              Safety starts with understanding how developers collect and share
+              your data. CashShilpo protects your financial records and customer
+              database with enterprise-grade encryption.
+            </p>
+
+            <div
+              class="border border-white/10 rounded-2xl p-4 bg-[#1b1c22]/70 space-y-3.5"
+            >
+              <div class="flex items-start gap-3">
+                <i
+                  data-lucide="shield-alert"
+                  class="w-4 h-4 text-[#00e676] shrink-0 mt-0.5"
+                ></i>
+                <div>
+                  <p class="text-xs font-semibold text-white">
+                    No data shared with third parties
+                  </p>
+                  <p class="text-[11px] text-gray-400">
+                    The developer states that this app doesn't sell or share
+                    customer financial data with other companies.
+                  </p>
+                </div>
+              </div>
+              <div class="flex items-start gap-3">
+                <i
+                  data-lucide="lock"
+                  class="w-4 h-4 text-[#00e676] shrink-0 mt-0.5"
+                ></i>
+                <div>
+                  <p class="text-xs font-semibold text-white">
+                    Data is encrypted in transit
+                  </p>
+                  <p class="text-[11px] text-gray-400">
+                    Your cloud sync transfers through an encrypted 256-bit SSL
+                    connection.
+                  </p>
+                </div>
+              </div>
+              <div class="flex items-start gap-3">
+                <i
+                  data-lucide="cloud-cog"
+                  class="w-4 h-4 text-[#00e676] shrink-0 mt-0.5"
+                ></i>
+                <div>
+                  <p class="text-xs font-semibold text-white">
+                    Real-Time Cloud Backups
+                  </p>
+                  <p class="text-[11px] text-gray-400">
+                    All data is backed up automatically to secure cloud
+                    infrastructure.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- QR Code for Desktop Visitors -->
-        <div
-          class="mt-6 pt-6 border-t border-white/[0.08] flex items-center justify-between text-left"
-        >
-          <div class="pr-4">
-            <p class="text-xs font-bold text-white">
-              Viewing on a PC or Laptop?
-            </p>
-            <p class="text-[11px] text-gray-400">
-              Scan this QR code with your phone camera to download the APK
-              directly to your phone.
+        <!-- Right Col: Technical Specifications & Plans Sidebar -->
+        <div class="space-y-6">
+          <!-- App Info Spec Matrix -->
+          <div
+            class="bg-[#1b1c22] rounded-2xl p-5 border border-white/10 space-y-4"
+          >
+            <h3
+              class="text-sm font-bold text-white uppercase tracking-wider text-gray-400"
+            >
+              App Information
+            </h3>
+
+            <div class="divide-y divide-white/5 text-xs">
+              <div class="py-2.5 flex justify-between items-center">
+                <span class="text-gray-400">Version</span>
+                <span class="text-white font-mono-code font-bold"
+                  >2.0.5 (Production)</span
+                >
+              </div>
+              <div class="py-2.5 flex justify-between items-center">
+                <span class="text-gray-400">Updated on</span>
+                <span class="text-white font-medium">October 2026</span>
+              </div>
+              <div class="py-2.5 flex justify-between items-center">
+                <span class="text-gray-400">Cloud Sync</span>
+                <span class="text-[#00e676] font-medium"
+                  >Active (Real-Time)</span
+                >
+              </div>
+              <div class="py-2.5 flex justify-between items-center">
+                <span class="text-gray-400">Requires Android</span>
+                <span class="text-white font-medium">Android 7.0 and up</span>
+              </div>
+              <div class="py-2.5 flex justify-between items-center">
+                <span class="text-gray-400">Package Name</span>
+                <span class="text-gray-300 font-mono-code text-[11px]"
+                  >com.cashshilpo.app</span
+                >
+              </div>
+              <div class="py-2.5 flex justify-between items-center">
+                <span class="text-gray-400">Downloads</span>
+                <span class="text-white font-semibold">10,000+ downloads</span>
+              </div>
+              <div class="py-2.5 flex justify-between items-center">
+                <span class="text-gray-400">Developer</span>
+                <span class="text-[#00e676] font-medium"
+                  >CashShilpo Technologies</span
+                >
+              </div>
+              <div class="py-2.5 flex justify-between items-center">
+                <span class="text-gray-400">Security Scan</span>
+                <span
+                  class="text-emerald-400 font-medium flex items-center gap-1"
+                >
+                  <i data-lucide="check" class="w-3.5 h-3.5"></i> Play Protect
+                  Clean
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Subscription Plans Overview -->
+          <div
+            class="bg-[#1b1c22] rounded-2xl p-5 border border-white/10 space-y-3"
+          >
+            <div class="flex items-center justify-between">
+              <h3
+                class="text-xs font-bold text-white uppercase tracking-wider text-gray-400"
+              >
+                Transparent Plans
+              </h3>
+              <a
+                href="pricing"
+                class="text-xs text-[#00e676] hover:underline font-semibold"
+                >View All</a
+              >
+            </div>
+
+            <div class="space-y-2 text-xs">
+              <div
+                class="p-2.5 rounded-xl bg-white/[0.03] border border-white/5 flex justify-between items-center"
+              >
+                <div>
+                  <p class="font-bold text-white">Basic Plan</p>
+                  <p class="text-[10px] text-gray-400">
+                    1 Store • 1,000 Products • 5 Staff
+                  </p>
+                </div>
+                <span class="text-white font-mono-code font-bold"
+                  >৳1,499<span class="text-[10px] text-gray-400 font-sans"
+                    >/mo</span
+                  ></span
+                >
+              </div>
+
+              <div
+                class="p-2.5 rounded-xl bg-[#00875a]/15 border border-[#00875a]/30 flex justify-between items-center"
+              >
+                <div>
+                  <div class="flex items-center gap-1">
+                    <p class="font-bold text-white">Standard Plan</p>
+                    <span
+                      class="bg-[#00e676] text-black text-[9px] px-1 rounded font-bold"
+                      >Popular</span
+                    >
+                  </div>
+                  <p class="text-[10px] text-gray-300">
+                    3 Stores • 10,000 Products • 20 Staff
+                  </p>
+                </div>
+                <span class="text-[#00e676] font-mono-code font-bold"
+                  >৳2,999<span class="text-[10px] text-gray-400 font-sans"
+                    >/mo</span
+                  ></span
+                >
+              </div>
+
+              <div
+                class="p-2.5 rounded-xl bg-white/[0.03] border border-white/5 flex justify-between items-center"
+              >
+                <div>
+                  <p class="font-bold text-white">Premium Plan</p>
+                  <p class="text-[10px] text-gray-400">
+                    10 Stores • 50,000 Products • 50 Staff
+                  </p>
+                </div>
+                <span class="text-white font-mono-code font-bold"
+                  >৳5,999<span class="text-[10px] text-gray-400 font-sans"
+                    >/mo</span
+                  ></span
+                >
+              </div>
+            </div>
+            <p class="text-[10px] text-gray-400 text-center pt-1">
+              All plans start with a 7-day free trial. No credit card required.
             </p>
           </div>
-          <div class="w-16 h-16 bg-white p-1 rounded-xl shrink-0 shadow-lg">
-            <img
-              src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://cashshilpo.com/CashShilpo.apk"
-              alt="Scan to Download APK"
-              class="w-full h-full object-contain"
-            />
+
+          <!-- Apple iOS alternative info card -->
+          <div
+            class="bg-gradient-to-br from-[#1b1d24] to-[#121317] border border-blue-500/20 rounded-2xl p-4 text-xs"
+          >
+            <div class="flex items-center gap-2 font-bold text-blue-300 mb-1.5">
+              <i data-lucide="apple" class="w-4 h-4"></i>
+              <span>Apple iPhone or iPad User?</span>
+            </div>
+            <p class="text-gray-400 text-[11px] leading-relaxed mb-3">
+              iOS does not support APK downloads. You can run CashShilpo
+              directly on your iPhone in 5 seconds via Safari:
+            </p>
+            <ol
+              class="text-[11px] text-gray-300 space-y-1 list-decimal list-inside"
+            >
+              <li>Open <strong>cashshilpo.com</strong> in Safari.</li>
+              <li>Tap the <strong>Share (⎋)</strong> button at the bottom.</li>
+              <li>Select <strong>"Add to Home Screen"</strong>.</li>
+            </ol>
           </div>
         </div>
-      </div>
+      </section>
+
+      <!-- RATINGS & REVIEWS SECTION -->
+      <section class="py-10 border-b border-white/[0.08]">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h2 class="text-lg sm:text-xl font-bold text-white tracking-tight">
+              Ratings and reviews
+            </h2>
+            <p class="text-xs text-gray-400 mt-0.5">
+              Ratings and reviews are verified from active retail merchants in
+              Bangladesh.
+            </p>
+          </div>
+        </div>
+
+        <!-- Overall Score & Bar Distribution -->
+        <div
+          class="flex flex-col sm:flex-row items-center sm:items-start gap-8 bg-[#1b1c22] rounded-3xl p-6 sm:p-8 border border-white/10 mb-8"
+        >
+          <!-- Big Number -->
+          <div class="flex flex-col items-center justify-center shrink-0">
+            <span
+              class="text-5xl sm:text-6xl font-black text-white font-mono-code tracking-tight"
+              >4.9</span
+            >
+            <div class="flex items-center gap-1 mt-2">
+              <i
+                data-lucide="star"
+                class="w-4 h-4 fill-amber-400 text-amber-400"
+              ></i>
+              <i
+                data-lucide="star"
+                class="w-4 h-4 fill-amber-400 text-amber-400"
+              ></i>
+              <i
+                data-lucide="star"
+                class="w-4 h-4 fill-amber-400 text-amber-400"
+              ></i>
+              <i
+                data-lucide="star"
+                class="w-4 h-4 fill-amber-400 text-amber-400"
+              ></i>
+              <i
+                data-lucide="star"
+                class="w-4 h-4 fill-amber-400 text-amber-400"
+              ></i>
+            </div>
+            <span class="text-xs text-gray-400 mt-1 font-medium"
+              >1,250 ratings</span
+            >
+          </div>
+
+          <!-- 5 to 1 Star Progress Bars -->
+          <div class="flex-1 w-full space-y-2">
+            <!-- 5 star -->
+            <div class="flex items-center gap-3 text-xs">
+              <span class="w-3 text-gray-400 font-bold">5</span>
+              <div class="flex-1 bg-white/10 rounded-full h-2 overflow-hidden">
+                <div class="bg-[#00e676] h-2 rounded-full w-[94%]"></div>
+              </div>
+            </div>
+            <!-- 4 star -->
+            <div class="flex items-center gap-3 text-xs">
+              <span class="w-3 text-gray-400 font-bold">4</span>
+              <div class="flex-1 bg-white/10 rounded-full h-2 overflow-hidden">
+                <div class="bg-[#00e676] h-2 rounded-full w-[5%]"></div>
+              </div>
+            </div>
+            <!-- 3 star -->
+            <div class="flex items-center gap-3 text-xs">
+              <span class="w-3 text-gray-400 font-bold">3</span>
+              <div class="flex-1 bg-white/10 rounded-full h-2 overflow-hidden">
+                <div class="bg-[#00e676] h-2 rounded-full w-[0.8%]"></div>
+              </div>
+            </div>
+            <!-- 2 star -->
+            <div class="flex items-center gap-3 text-xs">
+              <span class="w-3 text-gray-400 font-bold">2</span>
+              <div class="flex-1 bg-white/10 rounded-full h-2 overflow-hidden">
+                <div class="bg-[#00e676] h-2 rounded-full w-[0.1%]"></div>
+              </div>
+            </div>
+            <!-- 1 star -->
+            <div class="flex items-center gap-3 text-xs">
+              <span class="w-3 text-gray-400 font-bold">1</span>
+              <div class="flex-1 bg-white/10 rounded-full h-2 overflow-hidden">
+                <div class="bg-[#00e676] h-2 rounded-full w-[0.1%]"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Real Merchant Reviews Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Review 1 -->
+          <div
+            class="bg-[#1b1c22]/70 border border-white/10 rounded-2xl p-5 space-y-3"
+          >
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div
+                  class="w-9 h-9 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center text-black font-bold text-xs"
+                >
+                  RH
+                </div>
+                <div>
+                  <h4 class="text-xs font-bold text-white">Rafiqul Hasan</h4>
+                  <p class="text-[10px] text-gray-400">
+                    Grocery Merchant, Mirpur-10
+                  </p>
+                </div>
+              </div>
+              <span class="text-[10px] text-gray-500 font-mono-code"
+                >2 days ago</span
+              >
+            </div>
+            <div class="flex items-center gap-1">
+              <i
+                data-lucide="star"
+                class="w-3.5 h-3.5 fill-amber-400 text-amber-400"
+              ></i>
+              <i
+                data-lucide="star"
+                class="w-3.5 h-3.5 fill-amber-400 text-amber-400"
+              ></i>
+              <i
+                data-lucide="star"
+                class="w-3.5 h-3.5 fill-amber-400 text-amber-400"
+              ></i>
+              <i
+                data-lucide="star"
+                class="w-3.5 h-3.5 fill-amber-400 text-amber-400"
+              ></i>
+              <i
+                data-lucide="star"
+                class="w-3.5 h-3.5 fill-amber-400 text-amber-400"
+              ></i>
+            </div>
+            <p class="text-xs text-gray-300 leading-relaxed">
+              "The cloud sync is instantaneous. Whenever a cashier makes a sale
+              on the counter phone, the Daybook and inventory immediately
+              reflect it on my laptop at home. The EMI tracking feature is a
+              game-changer."
+            </p>
+            <div
+              class="flex items-center gap-3 text-[11px] text-gray-400 pt-2 border-t border-white/5"
+            >
+              <span>Was this review helpful?</span>
+              <button class="hover:text-white transition-colors">
+                Yes (58)
+              </button>
+              <span>•</span>
+              <button class="hover:text-white transition-colors">No</button>
+            </div>
+          </div>
+
+          <!-- Review 2 -->
+          <div
+            class="bg-[#1b1c22]/70 border border-white/10 rounded-2xl p-5 space-y-3"
+          >
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div
+                  class="w-9 h-9 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-400 flex items-center justify-center text-white font-bold text-xs"
+                >
+                  TF
+                </div>
+                <div>
+                  <h4 class="text-xs font-bold text-white">
+                    Tanmoy Fashion Store
+                  </h4>
+                  <p class="text-[10px] text-gray-400">
+                    Clothing Retail, Chattogram
+                  </p>
+                </div>
+              </div>
+              <span class="text-[10px] text-gray-500 font-mono-code"
+                >1 week ago</span
+              >
+            </div>
+            <div class="flex items-center gap-1">
+              <i
+                data-lucide="star"
+                class="w-3.5 h-3.5 fill-amber-400 text-amber-400"
+              ></i>
+              <i
+                data-lucide="star"
+                class="w-3.5 h-3.5 fill-amber-400 text-amber-400"
+              ></i>
+              <i
+                data-lucide="star"
+                class="w-3.5 h-3.5 fill-amber-400 text-amber-400"
+              ></i>
+              <i
+                data-lucide="star"
+                class="w-3.5 h-3.5 fill-amber-400 text-amber-400"
+              ></i>
+              <i
+                data-lucide="star"
+                class="w-3.5 h-3.5 fill-amber-400 text-amber-400"
+              ></i>
+            </div>
+            <p class="text-xs text-gray-300 leading-relaxed">
+              "We run 3 branch locations with the Standard plan. Barcode scanner
+              speed on mobile is super responsive, and printing receipts in both
+              Bangla and English on Bluetooth thermal printers works smoothly."
+            </p>
+            <div
+              class="flex items-center gap-3 text-[11px] text-gray-400 pt-2 border-t border-white/5"
+            >
+              <span>Was this review helpful?</span>
+              <button class="hover:text-white transition-colors">
+                Yes (34)
+              </button>
+              <span>•</span>
+              <button class="hover:text-white transition-colors">No</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- DEVELOPER CONTACT & VERIFIED HELPLINE -->
+      <section class="py-8">
+        <h2
+          class="text-sm font-bold uppercase tracking-wider text-gray-400 mb-4"
+        >
+          Developer contact & Official Helpline
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 text-xs">
+          <div
+            class="p-3.5 rounded-xl bg-white/[0.03] border border-white/5 flex items-center gap-3"
+          >
+            <i data-lucide="globe" class="w-4 h-4 text-[#00e676]"></i>
+            <div>
+              <p class="text-gray-400 text-[10px]">Website</p>
+              <a
+                href="https://cashshilpo.com"
+                class="text-white font-medium hover:underline"
+                >cashshilpo.com</a
+              >
+            </div>
+          </div>
+          <div
+            class="p-3.5 rounded-xl bg-white/[0.03] border border-white/5 flex items-center gap-3"
+          >
+            <i data-lucide="phone-call" class="w-4 h-4 text-[#00e676]"></i>
+            <div>
+              <p class="text-gray-400 text-[10px]">Official Phone</p>
+              <a
+                href="tel:01805716566"
+                class="text-white font-medium hover:underline"
+                >01805716566</a
+              >
+            </div>
+          </div>
+          <div
+            class="p-3.5 rounded-xl bg-white/[0.03] border border-white/5 flex items-center gap-3"
+          >
+            <i data-lucide="mail" class="w-4 h-4 text-[#00e676]"></i>
+            <div>
+              <p class="text-gray-400 text-[10px]">Official Email</p>
+              <a
+                href="mailto:cashshilpo@gmail.com"
+                class="text-white font-medium hover:underline"
+                >cashshilpo@gmail.com</a
+              >
+            </div>
+          </div>
+          <div
+            class="p-3.5 rounded-xl bg-white/[0.03] border border-white/5 flex items-center gap-3"
+          >
+            <i data-lucide="shield-check" class="w-4 h-4 text-[#00e676]"></i>
+            <div>
+              <p class="text-gray-400 text-[10px]">Privacy Policy</p>
+              <a href="privacy" class="text-white font-medium hover:underline"
+                >View Policy</a
+              >
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
 
-    <!-- Footer -->
+    <!-- Play Store Clean Footer -->
     <footer
-      class="container mx-auto px-6 py-6 text-center text-xs text-gray-500 border-t border-white/[0.06] relative z-20"
+      class="border-t border-white/[0.06] bg-[#0e0e12] py-8 text-xs text-gray-500"
     >
       <div
-        class="flex flex-col sm:flex-row items-center justify-between gap-4 max-w-4xl mx-auto"
+        class="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4"
       >
-        <p>&copy; 2026 CashShilpo. All rights reserved.</p>
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-[#00e676]"></span>
+          <span>&copy; 2026 CashShilpo Technologies. All rights reserved.</span>
+        </div>
         <div class="flex items-center gap-6">
           <a href="home.html" class="hover:text-white transition-colors"
             >Home</a
@@ -434,66 +1614,195 @@
           <a href="pricing" class="hover:text-white transition-colors"
             >Pricing</a
           >
-          <a href="support" class="hover:text-white transition-colors"
-            >Help Center</a
+          <a href="terms" class="hover:text-white transition-colors"
+            >Terms of Service</a
+          >
+          <a href="privacy" class="hover:text-white transition-colors"
+            >Privacy</a
           >
         </div>
       </div>
     </footer>
 
-    <!-- Floating Translation Toggle Button -->
-    <button
-      id="lang-toggle-btn"
-      onclick="toggleLanguage()"
-      class="fixed bottom-6 right-6 z-[9999] bg-[#0c0c10] text-[#39ff14] border border-[#39ff14]/40 px-4 py-2.5 rounded-full font-bold text-xs shadow-[0_4px_25px_rgba(57,255,20,0.25)] hover:bg-[#39ff14] hover:text-black hover:scale-105 transition-all flex items-center gap-2"
+    <!-- STICKY MOBILE INSTALL BAR -->
+    <div
+      id="sticky-mobile-bar"
+      class="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#17181e]/95 backdrop-blur-xl border-t border-white/10 p-3 px-4 flex items-center justify-between gap-3 shadow-2xl translate-y-full transition-transform duration-300"
     >
-      <i data-lucide="globe" class="w-3.5 h-3.5"></i>
-      <span id="lang-toggle-text">বাং</span>
-    </button>
+      <div class="flex items-center gap-3 min-w-0">
+        <img
+          src="cashshilpo-official-favicon.png"
+          alt="App Icon"
+          class="w-10 h-10 rounded-xl shrink-0 object-contain bg-black/40 p-1 border border-white/10"
+        />
+        <div class="min-w-0">
+          <h4 class="text-xs font-bold text-white truncate">
+            CashShilpo: POS & ERP
+          </h4>
+          <p class="text-[10px] text-gray-400">5.5 MB • 4.9 ★</p>
+        </div>
+      </div>
+      <a
+        href="CashShilpo.apk"
+        download="CashShilpo.apk"
+        class="play-btn py-2 px-5 rounded-lg text-black font-extrabold text-xs shrink-0 flex items-center gap-1.5"
+      >
+        <i data-lucide="download" class="w-3.5 h-3.5"></i>
+        <span>Install APK</span>
+      </a>
+    </div>
 
-    <!-- Bilingual Translation Dictionary & Engine -->
+    <!-- MODAL: QR CODE FOR DESKTOP VISITORS -->
+    <div
+      id="qr-modal"
+      class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4"
+    >
+      <div
+        class="bg-[#1b1c22] border border-white/15 rounded-3xl max-w-sm w-full p-6 text-center relative shadow-2xl"
+      >
+        <button
+          onclick="closeQrModal()"
+          class="absolute top-4 right-4 text-gray-400 hover:text-white p-1"
+        >
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+        <div
+          class="w-12 h-12 rounded-2xl bg-[#00e676]/10 text-[#00e676] flex items-center justify-center mx-auto mb-3"
+        >
+          <i data-lucide="smartphone" class="w-6 h-6"></i>
+        </div>
+        <h3 class="text-base font-bold text-white mb-1">
+          Scan to Download on Phone
+        </h3>
+        <p class="text-xs text-gray-400 mb-5">
+          Open your phone camera to download the CashShilpo APK directly to your
+          phone.
+        </p>
+
+        <div
+          class="bg-white p-3 rounded-2xl w-48 h-48 mx-auto shadow-inner flex items-center justify-center"
+        >
+          <img
+            src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://cashshilpo.com/CashShilpo.apk"
+            alt="Scan to Download CashShilpo"
+            class="w-full h-full object-contain"
+          />
+        </div>
+        <p class="text-[11px] font-mono-code text-gray-400 mt-4">
+          CashShilpo.apk (v2.0 • 5.5 MB)
+        </p>
+      </div>
+    </div>
+
+    <!-- BILINGUAL TRANSLATION & PLAY STORE JAVASCRIPT -->
     <script>
       const DICTIONARY = {
-        "Download CashShilpo (ক্যাশশিল্প) App | Official Android APK":
-          "ক্যাশশিল্পো অ্যাপ ডাউনলোড | অফিসিয়াল অ্যান্ড্রয়েড APK",
-        "Back to Website": "ওয়েবসাইটে ফিরে যান",
-        "Web Login": "ওয়েব লগইন",
-        "Verified v1.0.0 Production Release": "ভেরিফাইড v1.0.0 প্রোডাকশন রিলিজ",
-        "Get CashShilpo App": "ক্যাশশিল্পো অ্যাপ ডাউনলোড করুন",
-        "The all-in-one universal POS, inventory engine, and financial command center engineered natively for your phone.":
-          "আপনার দোকানের সেলস, ইনভেন্টরি ও দৈনন্দিন হিসাবের সম্পূর্ণ সমাধান এখন আপনার ফোনে।",
-        Architecture: "আর্কিটেকচার",
-        "Android Native": "অ্যান্ড্রয়েড নেটিভ",
-        "Package Size": "ফাইলের সাইজ",
-        Requirements: "প্রয়োজনীয়তা",
-        Security: "নিরাপত্তা",
-        "Virus-Free": "১০০% নিরাপদ",
-        "Download Official APK (5.5 MB)": "অফিসিয়াল APK ডাউনলোড করুন (৫.৫ MB)",
-        "Direct installer • No Play Store registration needed":
-          "সরাসরি ইনস্টলার • প্লে স্টোর অ্যাকাউন্টের প্রয়োজন নেই",
-        "3 Steps to Install on Phone:": "ফোনে ইনস্টল করার ৩টি সহজ ধাপ:",
-        "Takes 15 seconds": "সময় লাগবে মাত্র ১৫ সেকেন্ড",
-        "Tap Download APK": '"Download Official APK" চাপুন',
-        'When Chrome prompts "File might be harmful", tap "Download anyway" (this is Google\'s standard alert for apps downloaded outside Play Store).':
-          'ক্রোম ব্রাউজারে "File might be harmful" লেখা আসলে "Download anyway" চাপুন (প্লে স্টোরের বাইরের সব অ্যাপের জন্যই গুগল এটি দেখায়)।',
-        "Open File": "ফাইলটি ওপেন করুন",
-        "Once finished, tap Open from your notification tray or Chrome Downloads list.":
-          "ডাউনলোড শেষ হলে নোটিফিকেশন বার অথবা ক্রোম ডাউনলোড তালিকা থেকে Open চাপুন।",
+        "CashShilpo: POS & ERP": "ক্যাশশিল্প: ক্লাউড পিওএস ও ইআরপি",
+        Business: "ব্যবসা ও বাণিজ্য",
+        "Point of Sale": "পয়েন্ট অব সেলস (POS)",
+        "Real-Time Cloud Sync • 7-Day Free Trial":
+          "রিয়েল-টাইম ক্লাউড সিঙ্ক • ৭ দিনের ফ্রি ট্রায়াল",
+        "Install Official APK (5.5 MB)": "অফিসিয়াল APK ইনস্টল করুন (৫.৫ MB)",
+        "Install APK": "APK ইনস্টল করুন",
+        Downloads: "ডাউনলোড",
+        Lightweight: "ছোট সাইজ",
+        "Rated for 3+": "সকলের জন্য প্রযোজ্য",
+        "Scan QR": "কিউআর স্ক্যান",
+        "Official Phone": "অফিসিয়াল ফোন",
+        "Official Email": "অফিসিয়াল ইমেইল",
+        "Direct Installer • 100% Virus-Free":
+          "সরাসরি ইনস্টলার • ১০০% নিরাপদ ও ভাইরাস মুক্ত",
+        "3 Steps to Install on Phone": "ফোনে ইনস্টল করার ৩টি সহজ ধাপ",
+        "Takes less than 15 seconds • No Play Store login required":
+          "সময় লাগবে ১৫ সেকেন্ডের কম • প্লে স্টোর আইডির প্রয়োজন নেই",
+        "Verified APK": "ভেরিফাইড APK",
+        "Tap Install APK": "Install বাটনে চাপুন",
+        'When Chrome shows "File might be harmful", tap "Download anyway".':
+          'ক্রোম ব্রাউজারে "File might be harmful" লেখা আসলে "Download anyway" চাপুন।',
+        "Google's standard alert for APKs":
+          "প্লে স্টোরের বাইরের সব অ্যাপেই গুগল এটি দেখায়",
+        "Open CashShilpo.apk": "CashShilpo.apk ওপেন করুন",
+        "Once downloaded, tap \"Open\" from your phone's notification bar or Chrome's Downloads list.":
+          'ডাউনলোড শেষ হলে নোটিফিকেশন বার অথবা ক্রোম Downloads থেকে "Open" চাপুন।',
+        "File size: 5.5 MB": "ফাইলের সাইজ: ৫.৫ MB",
         "Install & Launch": "ইনস্টল ও ব্যবহার শুরু করুন",
-        "Tap Install. The gold CashShilpo logo will appear in your App Drawer and run in complete fullscreen mode.":
-          '"Install" বাটনে চাপুন। সোনালী ক্যাশশিল্পো লোগোসহ অ্যাপটি আপনার ফোনে ইনস্টল হয়ে যাবে!',
-        "Using an Apple iPhone (iOS)?": "অ্যাপল আইফোন (iPhone) ব্যবহার করছেন?",
-        'Apple restricts direct `.apk` downloads. To get the full app on iPhone: open cashshilpo.com in Safari, tap the Share button (⎋), and select "Add to Home Screen".':
-          'অ্যাপল সরাসরি APK সাপোর্ট করে না। আইফোনে অ্যাপ হিসেবে ব্যবহার করতে সাফারিতে cashshilpo.com খুলে Share (⎋) বাটনে চাপুন এবং "Add to Home Screen" নির্বাচন করুন।',
-        "Viewing on a PC or Laptop?": "কম্পিউটার বা ল্যাপটপে আছেন?",
-        "Scan this QR code with your phone camera to download the APK directly to your phone.":
-          "মোবাইল ক্যামেরা দিয়ে এই QR কোডটি স্ক্যান করলেই সরাসরি আপনার ফোনে ডাউনলোড শুরু হবে।",
-        "© 2026 CashShilpo. All rights reserved.":
-          "© ২০২৬ ক্যাশশিল্পো। সর্বস্বত্ব সংরক্ষিত।",
+        'Tap "Install" (if prompted, turn on "Allow from this source"). The app runs in complete fullscreen!':
+          '"Install" চাপুন (প্রয়োজনে "Allow from this source" অন করুন)। অ্যাপটি সরাসরি ফুলস্ক্রিনে চালু হবে!',
+        "Full-screen POS experience": "ফুলস্ক্রিন পিওএস ইন্টারফেস",
+        "App Preview & Key Highlights": "অ্যাপ প্রিভিউ ও প্রধান সুবিধাসমূহ",
+        "POS Terminal & Split Payments":
+          "আধুনিক পজ টার্মিনাল ও স্প্লিট পেমেন্ট",
+        "Lightning fast checkout with cart management, barcode scanning, and multi-payment methods.":
+          "দ্রুততম চেকআউট সিস্টেম, যা কাস্টমারের অপেক্ষার সময় কমিয়ে আনে এবং একাধিক পেমেন্ট গ্রহণ করে।",
+        "Live Stock & Low-Stock Alerts":
+          "রিয়েল-টাইম স্টক ট্র্যাকিং ও লো-স্টক অ্যালার্ট",
+        "Prevent stockouts with automated cloud inventory tracking, serial numbers, and barcode generator.":
+          "স্টক চুরি বা ঘাটতি রোধ করুন রিয়েল-টাইম ট্র্যাকিং, সিরিয়াল নম্বর ও বারকোড জেনারেটরের মাধ্যমে।",
+        "Daybook & Profit Analytics":
+          "দৈনিক খতিয়ান (Daybook) ও লাভ-ক্ষতির হিসাব",
+        "Daily summary of all sales, business expenses, and cash in hand in one central overview.":
+          "দিনশেষে ক্যাশ বক্সে কত টাকা থাকার কথা, লাভ-ক্ষতি ও খরচের হিসাব এক নজরে দেখে নিন।",
+        "Advanced EMI & Customer CRM":
+          "অ্যাডভান্সড কিস্তি (EMI) সুবিধা ও কাস্টমার সিআরএম",
+        "Offer flexible installment plans to customers, manage credit limits, and track due balances effortlessly.":
+          "কাস্টমারকে দিন সহজ কিস্তিতে পণ্য কেনার সুযোগ এবং বকেয়া বা বাকির খাতার পূর্ণ হিসাব রাখুন।",
+        "Multi-Store & Thermal Invoicing":
+          "মাল্টি-স্টোর ম্যানেজমেন্ট ও থার্মাল প্রিন্ট",
+        "Manage multiple branches from one login and print bills via Bluetooth/USB printers.":
+          "এক জায়গা বসেই একাধিক শোরুম নিয়ন্ত্রণ করুন এবং ব্লুটুথ থার্মাল প্রিন্টারে মেমো দিন।",
+        "About this app": "অ্যাপটি সম্পর্কে বিস্তারিত",
+        "Core Features Included in CashShilpo":
+          "ক্যাশশিল্পোতে যেসব শক্তিশালী টুল পাচ্ছেন",
+        "POS Terminal": "আধুনিক পজ টার্মিনাল",
+        "A blazingly fast checkout system with cart management and split payments.":
+          "দ্রুততম চেকআউট সিস্টেম, যা কাস্টমারের অপেক্ষার সময় কমিয়ে আনে শূন্যের কোঠায়।",
+        "Inventory Management": "ইনভেন্টরি ম্যানেজমেন্ট",
+        "Real-time stock tracking, variant management (Color/Size/Brand), and low-stock alerts.":
+          "স্টক চুরি বা হারিয়ে যাওয়া রোধ করুন রিয়েল-টাইম ট্র্যাকিং ও ভেরিয়েন্টের মাধ্যমে।",
+        "Customer Management (CRM)": "কাস্টমার ম্যানেজমেন্ট (CRM)",
+        "Build customer profiles, track purchase history, manage credit, and handle due payments.":
+          "কাস্টমারের কেনাকাটার ইতিহাস ও বকেয়া বা বাকি খাতার হিসাব রাখুন খুব সহজে।",
+        "Advanced EMI System": "অ্যাডভান্সড কিস্তি (EMI) সুবিধা",
+        "Offer flexible installment plans to customers and track EMI payments automatically.":
+          "কাস্টমারকে দিন সহজ কিস্তিতে পণ্য কেনার সুযোগ। সফটওয়্যারই রাখবে কিস্তির পাই-টু-পাই হিসাব।",
+        Daybook: "দৈনিক খতিয়ান (Daybook)",
+        "View a daily summary of all sales, expenses, and cash flow in one place.":
+          "দিনশেষে ক্যাশ বক্সে কত টাকা থাকার কথা, তা এক ক্লিকেই মিলিয়ে নিন।",
+        "Multi-Store Management": "মাল্টি-স্টোর ম্যানেজমেন্ট",
+        "Manage multiple store locations, staff, and inventory from a single admin account.":
+          "এক জায়গায় বসেই দেশের যেকোনো প্রান্তে থাকা আপনার একাধিক শোরুম নিয়ন্ত্রণ করুন।",
+        "Barcode Generator": "বারকোড জেনারেটর",
+        "Create and print custom barcode labels for your products individually or in bulk.":
+          "নিজের দোকানের নামে পণ্যের বারকোড তৈরি এবং প্রিন্ট করুন খুব সহজেই।",
+        "Purchase Orders & Supplier CRM":
+          "পারচেজ অর্ডার (PO) ও সাপ্লায়ার ম্যানেজমেন্ট",
+        "Create purchase orders (PO), restock inventory, and track supplier databases.":
+          "দোকানের স্টক ফুরিয়ে যাওয়ার আগেই সাপ্লায়ারকে অর্ডার দিন এবং হিসাব সংরক্ষণ করুন।",
+        "What's new in v2.0 Production Release": "নতুন ভার্সন ২.০-তে যা থাকছে",
+        "Data safety": "তথ্যের নিরাপত্তা (Data Safety)",
+        "App Information": "অ্যাপের তথ্য",
+        Version: "ভার্সন",
+        "Updated on": "আপডেট",
+        "Requires Android": "অ্যান্ড্রয়েড রিকোয়ারমেন্ট",
+        Developer: "ডেভেলপার",
+        "Transparent Plans": "স্বচ্ছ প্রাইসিং প্ল্যান",
+        "Basic Plan": "বেসিক প্ল্যান",
+        "Standard Plan": "স্ট্যান্ডার্ড প্ল্যান",
+        "Premium Plan": "প্রিমিয়াম প্ল্যান",
+        Popular: "জনপ্রিয়",
+        "View All": "সব দেখুন",
+        "All plans start with a 7-day free trial. No credit card required.":
+          "সব প্ল্যানেই রয়েছে ৭ দিনের ফ্রি ট্রায়াল। কোনো কার্ড লাগবে না।",
+        "Ratings and reviews": "রেটিং ও রিভিউ",
+        "Ratings and reviews are verified from active retail merchants in Bangladesh.":
+          "সকল মতামত ও রেটিং সক্রিয় ব্যবসায়ী ও দোকান মালিকদের থেকে সংগৃহীত।",
+        "Developer contact & Official Helpline":
+          "ডেভেলপারের সাথে যোগাযোগ ও অফিশিয়াল হটলাইন",
+        "Scan to Download on Phone": "মোবাইলে ডাউনলোড করতে স্ক্যান করুন",
       };
 
       const STORAGE_KEY = "cashshilpo_lang_pref";
-      let currentLang = localStorage.getItem(STORAGE_KEY) || "bn";
+      let currentLang = localStorage.getItem(STORAGE_KEY) || "en";
 
       function translatePage(targetLang) {
         document.documentElement.lang = targetLang;
@@ -513,11 +1822,15 @@
 
       function walkAndTranslate(node, direction) {
         if (
-          ["SCRIPT", "STYLE", "NOSCRIPT"].includes(node.tagName) ||
+          ["SCRIPT", "STYLE", "NOSCRIPT", "INPUT", "TEXTAREA"].includes(
+            node.tagName,
+          ) ||
           node.id === "lang-toggle-btn" ||
           (node.classList && node.classList.contains("lucide"))
-        )
+        ) {
           return;
+        }
+
         if (node.nodeType === 3) {
           const rawText = node.nodeValue;
           const cleanKey = rawText.replace(/\s+/g, " ").trim();
@@ -538,6 +1851,51 @@
         translatePage(currentLang === "en" ? "bn" : "en");
       }
 
+      // Screenshots Carousel Navigation
+      function scrollCarousel(dir) {
+        const track = document.getElementById("screenshots-track");
+        if (track) {
+          track.scrollBy({ left: dir * 300, behavior: "smooth" });
+        }
+      }
+
+      // Sticky Bottom Bar on Mobile Scroll
+      window.addEventListener("scroll", () => {
+        const heroBtn = document.getElementById("main-install-btn");
+        const stickyBar = document.getElementById("sticky-mobile-bar");
+        if (!heroBtn || !stickyBar) return;
+
+        const rect = heroBtn.getBoundingClientRect();
+        if (rect.bottom < 0) {
+          stickyBar.classList.remove("translate-y-full");
+        } else {
+          stickyBar.classList.add("translate-y-full");
+        }
+      });
+
+      // Modals
+      function openQrModal() {
+        const m = document.getElementById("qr-modal");
+        if (m) {
+          m.classList.remove("hidden");
+          m.classList.add("flex");
+        }
+      }
+      function closeQrModal() {
+        const m = document.getElementById("qr-modal");
+        if (m) {
+          m.classList.add("hidden");
+          m.classList.remove("flex");
+        }
+      }
+
+      window.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+          closeQrModal();
+        }
+      });
+
+      // Initialize on load
       document.addEventListener("DOMContentLoaded", () => {
         translatePage(currentLang);
         lucide.createIcons();
